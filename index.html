@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>UV-QDS Playground — Cosmic Variance & Rotation Curves</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Plotly CDN for nice interactive plots -->
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #05060a;
+      --bg-card: #10131c;
+      --bg-card-soft: #141827;
+      --accent: #ffb347;
+      --accent-soft: rgba(255, 179, 71, 0.1);
+      --accent-2: #66e0ff;
+      --text-main: #f5f7ff;
+      --text-soft: #b8bedc;
+      --border-soft: #252a3a;
+      --danger: #ff5c7a;
+      --radius-card: 18px;
+      --shadow-soft: 0 18px 40px rgba(0,0,0,0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #151b32 0, #05060a 45%);
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .app-shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px 16px 32px;
+    }
+
+    header.app-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      border-radius: 999px;
+      background: linear-gradient(120deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      border: 1px solid rgba(255,255,255,0.06);
+      backdrop-filter: blur(18px);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-pill {
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #ffe08a, #ff7f50);
+      box-shadow: 0 0 26px rgba(255, 190, 92, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .brand-title {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .brand-title span:first-child {
+      font-size: 16px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+    }
+
+    .brand-title span:last-child {
+      font-size: 18px;
+      font-weight: 650;
+    }
+
+    .tagline {
+      font-size: 13px;
+      color: var(--text-soft);
+      opacity: 0.9;
+    }
+
+    .tagline strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .pill-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--text-soft);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(0,0,0,0.2);
+    }
+
+    .pill.primary {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(255, 179, 71, 0.08);
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.4fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 880px) {
+      main {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      header.app-header {
+        border-radius: 18px;
+        align-items: flex-start;
+      }
+    }
+
+    .card {
+      border-radius: var(--radius-card);
+      background: radial-gradient(circle at top left, rgba(255,255,255,0.06), rgba(9,10,19,0.95));
+      border: 1px solid var(--border-soft);
+      box-shadow: var(--shadow-soft);
+      padding: 16px 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 0;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title-badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.26);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--text-soft);
+    }
+
+    .card-subtitle {
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .chip {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--text-soft);
+      background: rgba(0,0,0,0.28);
+    }
+
+    .chip.accent {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(255, 179, 71, 0.09);
+    }
+
+    .chip.blue {
+      border-color: var(--accent-2);
+      color: var(--accent-2);
+      background: rgba(102, 224, 255, 0.08);
+    }
+
+    .controls {
+      margin-top: 4px;
+      padding: 8px;
+      border-radius: 12px;
+      background: radial-gradient(circle at top left, rgba(255,255,255,0.02), rgba(8,9,16,0.98));
+      border: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    .control-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .control-row label {
+      min-width: 80px;
+      font-size: 12px;
+    }
+
+    .control-row input[type="range"] {
+      flex: 1;
+      accent-color: var(--accent);
+    }
+
+    .control-value {
+      min-width: 46px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      color: var(--accent);
+      font-size: 12px;
+    }
+
+    .plot {
+      width: 100%;
+      height: 250px;
+    }
+
+    .plot-wrapper {
+      margin-top: 6px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #050710;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .hint-text {
+      font-size: 11px;
+      color: var(--text-soft);
+      opacity: 0.85;
+    }
+
+    .hint-text strong {
+      color: var(--accent);
+    }
+
+    .split-vertical {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 0;
+    }
+
+    .textarea {
+      width: 100%;
+      min-height: 120px;
+      resize: vertical;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: #050710;
+      color: var(--text-main);
+      padding: 8px 10px;
+      font-family: "SF Mono", ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    button.btn {
+      font-size: 12px;
+      border-radius: 999px;
+      border: none;
+      padding: 6px 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent);
+      color: #1a1307;
+      font-weight: 600;
+      box-shadow: 0 6px 15px rgba(255,179,71,0.35);
+    }
+
+    button.btn.ghost {
+      background: transparent;
+      color: var(--text-soft);
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: none;
+    }
+
+    .stat-line {
+      font-size: 12px;
+      color: var(--text-soft);
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .stat-line span.value {
+      font-variant-numeric: tabular-nums;
+      color: var(--accent-2);
+    }
+
+    footer.app-footer {
+      margin-top: 14px;
+      font-size: 11px;
+      color: var(--text-soft);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    footer.app-footer a {
+      color: var(--accent-2);
+      text-decoration: none;
+    }
+
+    footer.app-footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-pill">Q</div>
+      <div class="brand-title">
+        <span>UV-QDS Playground</span>
+        <span>Cosmic variance, rotation curves & noise</span>
+      </div>
+    </div>
+    <div class="tagline">
+      Real-time toy demo of the <strong>Quantum Dark Substrate</strong> kernel — tweak the sliders, try to break it, send your objections.
+    </div>
+    <div class="pill-links">
+      <a class="pill primary" href="#" onclick="alert('Fill in your Zenodo DOI here.'); return false;">
+        🔗 Preprint DOI
+      </a>
+      <a class="pill" href="#" onclick="alert('Fill in your GitHub repo here.'); return false;">
+        🐙 GitHub: QDS code
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <!-- LEFT COLUMN: plots -->
+    <section class="split-vertical">
+      <!-- Cosmic variance card -->
+      <article class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">
+              σ(H)/H vs scale
+              <span class="card-title-badge">Cosmic variance lab</span>
+            </div>
+            <div class="card-subtitle">
+              Compare a simple QDS-style power-law with a steeper “standard” fall-off. All units are illustrative.
+            </div>
+          </div>
+          <div class="chip-row">
+            <span class="chip accent">p ≈ 0.35</span>
+            <span class="chip">R: survey scale</span>
+          </div>
+        </div>
+
+        <div class="controls">
+          <div class="control-row">
+            <label for="cv-A">QDS A</label>
+            <input id="cv-A" type="range" min="0.005" max="0.04" step="0.001" value="0.017" />
+            <span class="control-value" id="cv-A-val">0.017</span>
+          </div>
+          <div class="control-row">
+            <label for="cv-p">QDS p</label>
+            <input id="cv-p" type="range" min="0.2" max="0.7" step="0.01" value="0.35" />
+            <span class="control-value" id="cv-p-val">0.35</span>
+          </div>
+          <div class="control-row">
+            <label for="cv-Rmax">R max</label>
+            <input id="cv-Rmax" type="range" min="100" max="800" step="20" value="500" />
+            <span class="control-value" id="cv-Rmax-val">500</span>
+          </div>
+          <div class="hint-text">
+            This is a <strong>toy</strong> visualisation: σ(H)/H<sub>QDS</sub> = A · R<sup>−p</sup>, σ(H)/H<sub>std</sub> = A · R<sup>−1</sup>.
+            Plug in real survey scales & fits in your notebook.
+          </div>
+        </div>
+
+        <div class="plot-wrapper">
+          <div id="cv-plot" class="plot"></div>
+        </div>
+      </article>
+
+      <!-- Rotation curves card -->
+      <article class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">
+              Galaxy rotation curves
+              <span class="card-title-badge">QDS vs Newtonian</span>
+            </div>
+            <div class="card-subtitle">
+              Newtonian + one extra kernel factor: a(r) ∝ r<sup>−2</sup>(1 + α e<sup>−r/λ</sup>). Again: units are arbitrary demo-units.
+            </div>
+          </div>
+          <div class="chip-row">
+            <span class="chip blue">flat tail?</span>
+            <span class="chip">play with α, λ</span>
+          </div>
+        </div>
+
+        <div class="controls">
+          <div class="control-row">
+            <label for="rc-alpha">α (boost)</label>
+            <input id="rc-alpha" type="range" min="0" max="3" step="0.1" value="1.5" />
+            <span class="control-value" id="rc-alpha-val">1.5</span>
+          </div>
+          <div class="control-row">
+            <label for="rc-lam">λ (scale)</label>
+            <input id="rc-lam" type="range" min="0.5" max="8" step="0.1" value="3.0" />
+            <span class="control-value" id="rc-lam-val">3.0</span>
+          </div>
+          <div class="control-row">
+            <label for="rc-M">Mass M</label>
+            <input id="rc-M" type="range" min="0.5" max="3.0" step="0.1" value="1.0" />
+            <span class="control-value" id="rc-M-val">1.0</span>
+          </div>
+          <div class="hint-text">
+            v(r) is in arbitrary units; shape is the point. Replace this with real DDO154 / other galaxy data if you want a proper demo.
+          </div>
+        </div>
+
+        <div class="plot-wrapper">
+          <div id="rc-plot" class="plot"></div>
+        </div>
+      </article>
+    </section>
+
+    <!-- RIGHT COLUMN: compression + “break it” panel -->
+    <section class="split-vertical">
+      <article class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">
+              Noise / compression sandbox
+              <span class="card-title-badge">Toy QDSX view</span>
+            </div>
+            <div class="card-subtitle">
+              Paste a log or text, get a quick feel for structure vs randomness.
+              This is a very light-weight proxy for the full QDSX engine.
+            </div>
+          </div>
+        </div>
+
+        <textarea id="comp-input" class="textarea" placeholder="Paste some text, JSON, logs, or code here. Short is fine."></textarea>
+
+        <div class="btn-row">
+          <div>
+            <button class="btn" onclick="analyzeCompression()">
+              ⚙️ Analyse
+            </button>
+            <button class="btn ghost" onclick="loadExampleText()">
+              🧪 Load example
+            </button>
+          </div>
+          <div class="hint-text">
+            Uses simple run-length & symbol stats. QDSX proper lives in your Python engines.
+          </div>
+        </div>
+
+        <div id="comp-results" style="margin-top:8px; display:none;">
+          <div class="stat-line">
+            <span>Raw length (chars)</span>
+            <span class="value" id="comp-raw">0</span>
+          </div>
+          <div class="stat-line">
+            <span>Unique symbols</span>
+            <span class="value" id="comp-uniq">0</span>
+          </div>
+          <div class="stat-line">
+            <span>Run-length encoded size (chars, toy)</span>
+            <span class="value" id="comp-rle">0</span>
+          </div>
+          <div class="stat-line">
+            <span>Estimated entropy (bits / symbol)</span>
+            <span class="value" id="comp-H">0</span>
+          </div>
+          <div class="stat-line">
+            <span>“Ideal” QDSX target size<br/><span style="font-size:10px; color:var(--text-soft);">(Raw × 0.36 for a strongly correlated signal)</span></span>
+            <span class="value" id="comp-qdsx">0</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">
+              “Please break this” corner
+              <span class="card-title-badge">For theorists & data people</span>
+            </div>
+            <div class="card-subtitle">
+              Think these toy curves are incompatible with your favourite dataset or no-go theorem? Excellent. That’s the point.
+            </div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <div class="hint-text" style="margin-bottom:6px;">
+            <strong>How to attack:</strong>
+          </div>
+          <ul class="hint-text" style="padding-left:18px; margin:0 0 6px 0;">
+            <li>Use the sliders to match or clash with real H₀ variance or rotation-curve data.</li>
+            <li>Note the (A, p, α, λ, M) settings that fail hardest.</li>
+            <li>Send a short note with:
+              <br/>• your dataset / argument
+              <br/>• the settings you tried
+              <br/>• why you think this kernel must fail.
+            </li>
+          </ul>
+          <div class="hint-text" style="margin-top:4px;">
+            📧 <strong>Email:</strong> <span style="color:var(--accent-2);">danfromdursley@gmail.com</span><br/>
+            🐙 <strong>GitHub issues:</strong> link on top bar.
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span>
+      Built as a light-weight public demo. Equations & serious fits live in the main papers and QDS engine bank.
+    </span>
+    <span>
+      If you can fully rule out this kernel, you’ll make the author very happy.
+    </span>
+  </footer>
+</div>
+
+<script>
+  // -------------------------
+  // Cosmic variance plot
+  // -------------------------
+  function generateCosmicData(A, p, Rmax) {
+    const R = [];
+    const qds = [];
+    const std = [];
+    const n = 80;
+    const Rmin = 20;
+
+    for (let i = 0; i < n; i++) {
+      const r = Rmin + (Rmax - Rmin) * (i / (n - 1));
+      const sigma_qds = A * Math.pow(r, -p);
+      const sigma_std = A * Math.pow(r, -1.0);
+      R.push(r);
+      qds.push(sigma_qds);
+      std.push(sigma_std);
+    }
+    return { R, qds, std };
+  }
+
+  function updateCosmicPlot() {
+    const A = parseFloat(document.getElementById('cv-A').value);
+    const p = parseFloat(document.getElementById('cv-p').value);
+    const Rmax = parseFloat(document.getElementById('cv-Rmax').value);
+
+    document.getElementById('cv-A-val').textContent = A.toFixed(3);
+    document.getElementById('cv-p-val').textContent = p.toFixed(2);
+    document.getElementById('cv-Rmax-val').textContent = Rmax.toFixed(0);
+
+    const { R, qds, std } = generateCosmicData(A, p, Rmax);
+
+    const traceQDS = {
+      x: R,
+      y: qds,
+      name: 'QDS toy σ(H)/H',
+      mode: 'lines',
+      line: { width: 3 }
+    };
+
+    const traceStd = {
+      x: R,
+      y: std,
+      name: 'Standard ~ R⁻¹',
+      mode: 'lines',
+      line: { dash: 'dot', width: 2 }
+    };
+
+    const layout = {
+      margin: { l: 45, r: 10, t: 20, b: 40 },
+      xaxis: {
+        title: 'R (arbitrary scale units)',
+        gridcolor: '#262c3b',
+        zeroline: false
+      },
+      yaxis: {
+        title: 'σ(H) / H (toy units)',
+        gridcolor: '#262c3b',
+        zeroline: false
+      },
+      paper_bgcolor: 'rgba(0,0,0,0)',
+      plot_bgcolor: '#050710',
+      legend: {
+        bgcolor: 'rgba(0,0,0,0)',
+        font: { size: 11 }
+      }
+    };
+
+    Plotly.react('cv-plot', [traceQDS, traceStd], layout, { responsive: true, displaylogo: false });
+  }
+
+  // -------------------------
+  // Rotation curves plot
+  // -------------------------
+  function generateRotationData(alpha, lambda, M) {
+    const r = [];
+    const vNewt = [];
+    const vQDS = [];
+    const n = 120;
+    const rMin = 0.2;
+    const rMax = 20.0;
+    const G = 1.0;
+
+    for (let i = 0; i < n; i++) {
+      const radius = rMin + (rMax - rMin) * (i / (n - 1));
+      const aNewt = (G * M) / (radius * radius);
+      const aQDS = aNewt * (1.0 + alpha * Math.exp(-radius / lambda));
+      const vN = Math.sqrt(aNewt * radius);
+      const vQ = Math.sqrt(aQDS * radius);
+      r.push(radius);
+      vNewt.push(vN);
+      vQDS.push(vQ);
+    }
+    return { r, vNewt, vQDS };
+  }
+
+  function updateRotationPlot() {
+    const alpha = parseFloat(document.getElementById('rc-alpha').value);
+    const lambda = parseFloat(document.getElementById('rc-lam').value);
+    const M = parseFloat(document.getElementById('rc-M').value);
+
+    document.getElementById('rc-alpha-val').textContent = alpha.toFixed(1);
+    document.getElementById('rc-lam-val').textContent = lambda.toFixed(1);
+    document.getElementById('rc-M-val').textContent = M.toFixed(1);
+
+    const { r, vNewt, vQDS } = generateRotationData(alpha, lambda, M);
+
+    const traceNewt = {
+      x: r,
+      y: vNewt,
+      name: 'Newtonian',
+      mode: 'lines',
+      line: { width: 2 }
+    };
+
+    const traceQDS = {
+      x: r,
+      y: vQDS,
+      name: 'QDS kernel',
+      mode: 'lines',
+      line: { width: 3 }
+    };
+
+    const layout = {
+      margin: { l: 45, r: 10, t: 20, b: 40 },
+      xaxis: {
+        title: 'r (arbitrary radius units)',
+        gridcolor: '#262c3b',
+        zeroline: false
+      },
+      yaxis: {
+        title: 'v(r) (arbitrary speed units)',
+        gridcolor: '#262c3b',
+        zeroline: false
+      },
+      paper_bgcolor: 'rgba(0,0,0,0)',
+      plot_bgcolor: '#050710',
+      legend: {
+        bgcolor: 'rgba(0,0,0,0)',
+        font: { size: 11 }
+      }
+    };
+
+    Plotly.react('rc-plot', [traceNewt, traceQDS], layout, { responsive: true, displaylogo: false });
+  }
+
+  // -------------------------
+  // Compression sandbox
+  // -------------------------
+  function analyzeCompression() {
+    const text = document.getElementById('comp-input').value || '';
+    const rawLen = text.length;
+
+    const resultsEl = document.getElementById('comp-results');
+    const rawEl = document.getElementById('comp-raw');
+    const uniqEl = document.getElementById('comp-uniq');
+    const rleEl = document.getElementById('comp-rle');
+    const HEl = document.getElementById('comp-H');
+    const qdsxEl = document.getElementById('comp-qdsx');
+
+    if (!rawLen) {
+      resultsEl.style.display = 'none';
+      return;
+    }
+
+    // symbol frequencies
+    const freq = {};
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      freq[ch] = (freq[ch] || 0) + 1;
+    }
+    const uniq = Object.keys(freq).length;
+
+    // toy run-length encoding estimate
+    let rleLen = 0;
+    let current = text[0];
+    let count = 1;
+    for (let i = 1; i < text.length; i++) {
+      if (text[i] === current) {
+        count++;
+      } else {
+        // store symbol + printable count
+        rleLen += 1 + String(count).length;
+        current = text[i];
+        count = 1;
+      }
+    }
+    rleLen += 1 + String(count).length;
+
+    // Shannon entropy estimate
+    let H = 0.0;
+    for (const ch in freq) {
+      const p = freq[ch] / rawLen;
+      H -= p * Math.log2(p);
+    }
+
+    const qdsxTarget = Math.round(rawLen * 0.36);
+
+    rawEl.textContent = rawLen.toString();
+    uniqEl.textContent = uniq.toString();
+    rleEl.textContent = rleLen.toString();
+    HEl.textContent = H.toFixed(2);
+    qdsxEl.textContent = qdsxTarget.toString();
+
+    resultsEl.style.display = 'block';
+  }
+
+  function loadExampleText() {
+    const sample = [
+      "# Example: structured log-like text",
+      "[2025-12-03 14:21] INFO  QDS kernel fit: A=0.017, p=0.35, chi2=1.02",
+      "[2025-12-03 14:22] INFO  rotation_curve: alpha=1.5, lambda=3.0, RMS=0.91",
+      "[2025-12-03 14:23] WARN  survey H0_block: R=150, sigma_H/H=0.023",
+      "[2025-12-03 14:24] INFO  QDSX compression: raw=20480, qdsx=7420"
+    ].join("\n");
+    document.getElementById('comp-input').value = sample;
+    analyzeCompression();
+  }
+
+  // -------------------------
+  // Initialise
+  // -------------------------
+  function initUVQDS() {
+    // attach handlers
+    document.getElementById('cv-A').addEventListener('input', updateCosmicPlot);
+    document.getElementById('cv-p').addEventListener('input', updateCosmicPlot);
+    document.getElementById('cv-Rmax').addEventListener('input', updateCosmicPlot);
+
+    document.getElementById('rc-alpha').addEventListener('input', updateRotationPlot);
+    document.getElementById('rc-lam').addEventListener('input', updateRotationPlot);
+    document.getElementById('rc-M').addEventListener('input', updateRotationPlot);
+
+    // first draw
+    updateCosmicPlot();
+    updateRotationPlot();
+  }
+
+  window.addEventListener('DOMContentLoaded', initUVQDS);
+</script>
+</body>
+</html>
