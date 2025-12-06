@@ -1,0 +1,8 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it."
+title: "UV-QDS"
+type: software
+authors:
+  - family-names: "Williams"
+    given-names: "Daniel Brian"
+repository-code: "https://github.com/danfromdursley-spec/UV-QDS"
