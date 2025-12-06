@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UV-QDS — All Pages Index</title>
+  <style>
+    :root{
+      --bg:#070b12; --panel:#0c1220; --panel2:#0a0f1b;
+      --text:#eef2ff; --muted:#a7b0c5; --accent:#9d7bff; --accent2:#4be3ff;
+      --border:rgba(255,255,255,.06);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
+      background:radial-gradient(1200px 600px at 20% -10%, rgba(157,123,255,.18), transparent),
+                 radial-gradient(1000px 700px at 90% 10%, rgba(75,227,255,.12), transparent),
+                 var(--bg);
+      color:var(--text);
+    }
+    header{
+      padding:28px 18px 10px;
+      max-width:980px; margin:0 auto;
+    }
+    .pill{
+      display:inline-block; font-size:12px; padding:6px 10px; border-radius:999px;
+      background:linear-gradient(90deg, rgba(157,123,255,.18), rgba(75,227,255,.12));
+      border:1px solid var(--border); color:var(--muted);
+      margin-bottom:10px;
+    }
+    h1{margin:6px 0 8px; font-size:28px; letter-spacing:.2px;}
+    p{margin:0 0 14px; color:var(--muted)}
+    main{max-width:980px; margin:0 auto; padding:0 18px 30px;}
+    .controls{
+      display:flex; gap:10px; flex-wrap:wrap;
+      background:linear-gradient(180deg, rgba(255,255,255,.04), transparent);
+      border:1px solid var(--border); border-radius:16px; padding:12px;
+    }
+    input{
+      flex:1 1 220px; min-width:180px;
+      background:var(--panel); color:var(--text);
+      border:1px solid var(--border); border-radius:12px;
+      padding:10px 12px; font-size:14px; outline:none;
+    }
+    select, button{
+      background:var(--panel); color:var(--text);
+      border:1px solid var(--border); border-radius:12px;
+      padding:10px 12px; font-size:14px;
+    }
+    .grid{
+      margin-top:14px;
+      display:grid; gap:10px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+    .card{
+      text-decoration:none; color:inherit;
+      background:linear-gradient(180deg, rgba(255,255,255,.03), transparent),
+                 var(--panel2);
+      border:1px solid var(--border);
+      border-radius:16px; padding:14px 14px 12px;
+      transition:transform .12s ease, border-color .12s ease, background .12s ease;
+    }
+    .card:hover{
+      transform:translateY(-1px);
+      border-color:rgba(157,123,255,.35);
+      background:linear-gradient(180deg, rgba(157,123,255,.08), transparent),
+                 var(--panel);
+    }
+    .name{font-weight:650; font-size:16px; margin:0 0 4px;}
+    .path{font-size:11px; color:var(--muted); opacity:.9; word-break:break-all}
+    .tag{
+      display:inline-block; margin-top:8px; font-size:10px; padding:3px 7px;
+      border-radius:999px; border:1px solid var(--border); color:var(--muted);
+    }
+    footer{
+      max-width:980px; margin:0 auto; padding:12px 18px 30px;
+      color:var(--muted); font-size:11px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="pill">Auto-generated master map</span>
+    <h1>UV-QDS — All Pages Index</h1>
+    <p>A single hub linking every HTML tool/page in this release.</p>
+  </header>
+
+  <main>
+    <div class="controls">
+      <input id="q" placeholder="Filter pages… (battery, universe, solar, index, hub)" />
+      <select id="group">
+        <option value="none">No grouping</option>
+        <option value="category">Group by category</option>
+      </select>
+      <button id="reset">Reset</button>
+    </div>
+
+    <div id="list" class="grid"></div>
+  </main>
+
+  <footer>
+    Tip: keep this file committed so your repo always has a one-click “everything” doorway.
+  </footer>
+
+  <script>
+    // data injected below
+const PAGES = [
+    { title: "index", href: "QDS-5-WEDGE-PORTFOLIO/index.html", path: "QDS-5-WEDGE-PORTFOLIO/index.html", category: "Indexes" },
+    { title: "index", href: "QDS_Battery_Lab/index.html", path: "QDS_Battery_Lab/index.html", category: "Indexes" },
+    { title: "all pages min", href: "all_pages_min.html", path: "all_pages_min.html", category: "Misc" },
+    { title: "cannon side 2d v1", href: "cannon_side_2d_v1.html", path: "cannon_side_2d_v1.html", category: "Games / Toys" },
+    { title: "cannon wall breaker v1", href: "cannon_wall_breaker_v1.html", path: "cannon_wall_breaker_v1.html", category: "Games / Toys" },
+    { title: "cannon wall breaker v1 1", href: "cannon_wall_breaker_v1_1.html", path: "cannon_wall_breaker_v1_1.html", category: "Games / Toys" },
+    { title: "catapult balloon pop v1", href: "catapult_balloon_pop_v1.html", path: "catapult_balloon_pop_v1.html", category: "Games / Toys" },
+    { title: "ddmelts microsite v1", href: "ddmelts_microsite_v1.html", path: "ddmelts_microsite_v1.html", category: "Misc" },
+    { title: "ddmelts microsite v1 1", href: "ddmelts_microsite_v1_1.html", path: "ddmelts_microsite_v1_1.html", category: "Misc" },
+    { title: "ddmelts microsite v1 2 live links", href: "ddmelts_microsite_v1_2_live_links.html", path: "ddmelts_microsite_v1_2_live_links.html", category: "Misc" },
+    { title: "ddmelts microsite v1 2 pink hearts", href: "ddmelts_microsite_v1_2_pink_hearts.html", path: "ddmelts_microsite_v1_2_pink_hearts.html", category: "Misc" },
+    { title: "index", href: "index.html", path: "index.html", category: "Indexes" },
+    { title: "indus atlas v1 qds language lab", href: "indus_atlas_v1_qds_language_lab.html", path: "indus_atlas_v1_qds_language_lab.html", category: "Language / Indus" },
+    { title: "offer demo suite v1", href: "offer_demo_suite_v1.html", path: "offer_demo_suite_v1.html", category: "Misc" },
+    { title: "offer index v1", href: "offer_index_v1.html", path: "offer_index_v1.html", category: "Indexes" },
+    { title: "offer microsite v1", href: "offer_microsite_v1.html", path: "offer_microsite_v1.html", category: "Misc" },
+    { title: "offer showcase hub v1", href: "offer_showcase_hub_v1.html", path: "offer_showcase_hub_v1.html", category: "Misc" },
+    { title: "omega os index v1", href: "omega_os_index_v1.html", path: "omega_os_index_v1.html", category: "Ω / OS" },
+    { title: "omega os index v2", href: "omega_os_index_v2.html", path: "omega_os_index_v2.html", category: "Ω / OS" },
+    { title: "omega qds lab", href: "omega_qds_lab.html", path: "omega_qds_lab.html", category: "Ω / OS" },
+    { title: "portfolio", href: "portfolio.html", path: "portfolio.html", category: "Misc" },
+    { title: "portfolio market allinone v1", href: "portfolio_market_allinone_v1.html", path: "portfolio_market_allinone_v1.html", category: "Misc" },
+    { title: "portfolio offer v2", href: "portfolio_offer_v2.html", path: "portfolio_offer_v2.html", category: "Misc" },
+    { title: "portfolio offer v2 20251206 134821", href: "portfolio_offer_v2_20251206_134821.html", path: "portfolio_offer_v2_20251206_134821.html", category: "Misc" },
+    { title: "portfolio ultimate allinone v1", href: "portfolio_ultimate_allinone_v1.html", path: "portfolio_ultimate_allinone_v1.html", category: "Misc" },
+    { title: "portfolio v1", href: "portfolio_v1.html", path: "portfolio_v1.html", category: "Misc" },
+    { title: "proof of ship v1", href: "proof_of_ship_v1.html", path: "proof_of_ship_v1.html", category: "Misc" },
+    { title: "pyramid pinball v1", href: "pyramid_pinball_v1.html", path: "pyramid_pinball_v1.html", category: "Games / Toys" },
+    { title: "qds 5 pillars hub", href: "qds_5_pillars_hub.html", path: "qds_5_pillars_hub.html", category: "Pillars / Portfolio" },
+    { title: "qds 5 pillars hub v1", href: "qds_5_pillars_hub_v1.html", path: "qds_5_pillars_hub_v1.html", category: "Pillars / Portfolio" },
+    { title: "qds battery coach v3", href: "qds_battery_coach_v3.html", path: "qds_battery_coach_v3.html", category: "Battery" },
+    { title: "qds battery hub v9 1 purple neon", href: "qds_battery_hub_v9_1_purple_neon.html", path: "qds_battery_hub_v9_1_purple_neon.html", category: "Battery" },
+    { title: "qds battery hub v9 2 purple neon", href: "qds_battery_hub_v9_2_purple_neon.html", path: "qds_battery_hub_v9_2_purple_neon.html", category: "Battery" },
+    { title: "qds battery hub v9 3 science neon", href: "qds_battery_hub_v9_3_science_neon.html", path: "qds_battery_hub_v9_3_science_neon.html", category: "Battery" },
+    { title: "qds battery hub v9 4 science neon plus", href: "qds_battery_hub_v9_4_science_neon_plus.html", path: "qds_battery_hub_v9_4_science_neon_plus.html", category: "Battery" },
+    { title: "qds battery hub v9 5 1 science neon", href: "qds_battery_hub_v9_5_1_science_neon.html", path: "qds_battery_hub_v9_5_1_science_neon.html", category: "Battery" },
+    { title: "qds battery hub v9 5 science neon", href: "qds_battery_hub_v9_5_science_neon.html", path: "qds_battery_hub_v9_5_science_neon.html", category: "Battery" },
+    { title: "qds battery hub v9 6 science neon", href: "qds_battery_hub_v9_6_science_neon.html", path: "qds_battery_hub_v9_6_science_neon.html", category: "Battery" },
+    { title: "qds battery hub v9 7 science neon lab", href: "qds_battery_hub_v9_7_science_neon_lab.html", path: "qds_battery_hub_v9_7_science_neon_lab.html", category: "Battery" },
+    { title: "qds battery index v1 neon os", href: "qds_battery_index_v1_neon_os.html", path: "qds_battery_index_v1_neon_os.html", category: "Battery" },
+    { title: "qds battery lab", href: "qds_battery_lab.html", path: "qds_battery_lab.html", category: "Battery" },
+    { title: "qds battery lab showcase stress bias v1", href: "qds_battery_lab_showcase_stress_bias_v1.html", path: "qds_battery_lab_showcase_stress_bias_v1.html", category: "Battery" },
+    { title: "qds battery lab showcase stress bias v2", href: "qds_battery_lab_showcase_stress_bias_v2.html", path: "qds_battery_lab_showcase_stress_bias_v2.html", category: "Battery" },
+    { title: "qds battery lab showcase v1", href: "qds_battery_lab_showcase_v1.html", path: "qds_battery_lab_showcase_v1.html", category: "Battery" },
+    { title: "qds battery noise toy v1", href: "qds_battery_noise_toy_v1.html", path: "qds_battery_noise_toy_v1.html", category: "Battery" },
+    { title: "qds battery os index v1", href: "qds_battery_os_index_v1.html", path: "qds_battery_os_index_v1.html", category: "Battery" },
+    { title: "qds battery suite v4 showcase", href: "qds_battery_suite_v4_showcase.html", path: "qds_battery_suite_v4_showcase.html", category: "Battery" },
+    { title: "qds battery suite v5 boss polish", href: "qds_battery_suite_v5_boss_polish.html", path: "qds_battery_suite_v5_boss_polish.html", category: "Battery" },
+    { title: "qds battery suite v6 realworld", href: "qds_battery_suite_v6_realworld.html", path: "qds_battery_suite_v6_realworld.html", category: "Battery" },
+    { title: "qds battery suite v8 1 fairpath", href: "qds_battery_suite_v8_1_fairpath.html", path: "qds_battery_suite_v8_1_fairpath.html", category: "Battery" },
+    { title: "qds battery suite v8 2 poster tamed", href: "qds_battery_suite_v8_2_poster_tamed.html", path: "qds_battery_suite_v8_2_poster_tamed.html", category: "Battery" },
+    { title: "qds battery suite v8 3 neon shell", href: "qds_battery_suite_v8_3_neon_shell.html", path: "qds_battery_suite_v8_3_neon_shell.html", category: "Battery" },
+    { title: "qds battery suite v8 nextlevel", href: "qds_battery_suite_v8_nextlevel.html", path: "qds_battery_suite_v8_nextlevel.html", category: "Battery" },
+    { title: "qds battery whisperer v2", href: "qds_battery_whisperer_v2.html", path: "qds_battery_whisperer_v2.html", category: "Battery" },
+    { title: "qds chips noise v1", href: "qds_chips_noise_v1.html", path: "qds_chips_noise_v1.html", category: "Misc" },
+    { title: "qds compression lab v1", href: "qds_compression_lab_v1.html", path: "qds_compression_lab_v1.html", category: "Misc" },
+    { title: "qds sensors metrology v1", href: "qds_sensors_metrology_v1.html", path: "qds_sensors_metrology_v1.html", category: "Misc" },
+    { title: "qds shed index v1", href: "qds_shed_index_v1.html", path: "qds_shed_index_v1.html", category: "Indexes" },
+    { title: "qds showcase index v1", href: "qds_showcase_index_v1.html", path: "qds_showcase_index_v1.html", category: "Indexes" },
+    { title: "qds showcase index v1 1", href: "qds_showcase_index_v1_1.html", path: "qds_showcase_index_v1_1.html", category: "Indexes" },
+    { title: "qds solar v6 textures", href: "qds_solar_v6_textures.html", path: "qds_solar_v6_textures.html", category: "Solar" },
+    { title: "qds test task pack v1", href: "qds_test_task_pack_v1.html", path: "qds_test_task_pack_v1.html", category: "Tests / Repro" },
+    { title: "qds test task pack v1 1 pro", href: "qds_test_task_pack_v1_1_pro.html", path: "qds_test_task_pack_v1_1_pro.html", category: "Tests / Repro" },
+    { title: "qds universe v12b mobile", href: "qds_universe_v12b_mobile.html", path: "qds_universe_v12b_mobile.html", category: "Universe" },
+    { title: "qds universe v9 10 neon planet colours", href: "qds_universe_v9_10_neon_planet_colours.html", path: "qds_universe_v9_10_neon_planet_colours.html", category: "Universe" },
+    { title: "qds universe v9 2 neon clear planets", href: "qds_universe_v9_2_neon_clear_planets.html", path: "qds_universe_v9_2_neon_clear_planets.html", category: "Universe" },
+    { title: "qds universe v9 6 turbo pan", href: "qds_universe_v9_6_turbo_pan.html", path: "qds_universe_v9_6_turbo_pan.html", category: "Universe" },
+    { title: "solar system v8 offline", href: "solar_system_v8_offline.html", path: "solar_system_v8_offline.html", category: "Solar" },
+    { title: "solar system v9 2 mobile 3d showcase", href: "solar_system_v9_2_mobile_3d_showcase.html", path: "solar_system_v9_2_mobile_3d_showcase.html", category: "Solar" },
+    { title: "start here 90s v1", href: "start_here_90s_v1.html", path: "start_here_90s_v1.html", category: "Maps / Local" },
+    { title: "stinchcombe map", href: "stinchcombe_map.html", path: "stinchcombe_map.html", category: "Maps / Local" },
+  ];
+    const categorize = (name) => {
+      const n = name.toLowerCase();
+      if (n.includes("battery")) return "Battery";
+      if (n.includes("universe")) return "Universe";
+      if (n.includes("solar")) return "Solar";
+      if (n.includes("omega")) return "Ω / OS";
+      if (n.includes("index")) return "Indexes";
+      if (n.includes("pillar") || n.includes("wedge")) return "Pillars / Portfolio";
+      if (n.includes("cannon") || n.includes("catapult") || n.includes("pinball")) return "Games / Toys";
+      if (n.includes("indus")) return "Language / Indus";
+      if (n.includes("stinchcombe") || n.includes("her")) return "Maps / Local";
+      if (n.includes("test")) return "Tests / Repro";
+      return "Misc";
+    };
+
+    const elList = document.getElementById("list");
+    const elQ = document.getElementById("q");
+    const elGroup = document.getElementById("group");
+    const elReset = document.getElementById("reset");
+
+    const renderFlat = (items) => {
+      elList.innerHTML = "";
+      for (const p of items) {
+        const a = document.createElement("a");
+        a.className = "card";
+        a.href = p.href;
+        a.innerHTML = `
+          <div class="name">${p.title}</div>
+          <div class="path">${p.path}</div>
+          <span class="tag">${p.category}</span>
+        `;
+        elList.appendChild(a);
+      }
+    };
+
+    const renderGrouped = (items) => {
+      elList.innerHTML = "";
+      const groups = {};
+      for (const p of items) {
+        (groups[p.category] ||= []).push(p);
+      }
+      const cats = Object.keys(groups).sort();
+      for (const c of cats) {
+        const header = document.createElement("div");
+        header.style.gridColumn = "1 / -1";
+        header.style.padding = "8px 6px 2px";
+        header.style.color = "#a7b0c5";
+        header.style.fontSize = "12px";
+        header.style.letterSpacing = ".2px";
+        header.textContent = c;
+        elList.appendChild(header);
+
+        for (const p of groups[c]) {
+          const a = document.createElement("a");
+          a.className = "card";
+          a.href = p.href;
+          a.innerHTML = `
+            <div class="name">${p.title}</div>
+            <div class="path">${p.path}</div>
+            <span class="tag">${p.category}</span>
+          `;
+          elList.appendChild(a);
+        }
+      }
+    };
+
+    const apply = () => {
+      const q = (elQ.value || "").toLowerCase().trim();
+      let items = PAGES.filter(p =>
+        !q ||
+        p.title.toLowerCase().includes(q) ||
+        p.path.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q)
+      );
+
+      if (elGroup.value === "category") renderGrouped(items);
+      else renderFlat(items);
+    };
+
+    elQ.addEventListener("input", apply);
+    elGroup.addEventListener("change", apply);
+    elReset.addEventListener("click", () => { elQ.value=""; elGroup.value="none"; apply(); });
+
+    // init
+    apply();
+  </script>
+</body>
+</html>
