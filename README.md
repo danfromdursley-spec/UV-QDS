@@ -21,3 +21,7 @@ Serious equations & fits live in the QDS papers and engine bank.
 git clone https://github.com/danfromdursley-spec/UV-QDS.git
 cd UV-QDS
 # open index.html in any modern browser
+
+## v1.1.1
+Curated mobile-first showcase: battery OS + labs, Universe and Solar 3D highlights,
+QDS 5 Pillars hub, reproducible test pack, games, and shed separation.
