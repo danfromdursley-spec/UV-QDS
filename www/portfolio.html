@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UV-QDS Portfolio — Daniel Brian Williams</title>
+  <meta name="description" content="Mobile-first demo ecosystem: battery labs, interactive physics toys, language tools, and curated showcase workflow." />
+  <style>
+    :root{
+      --bg:#07080c;
+      --panel:#0c0f18;
+      --panel-2:#0a0c14;
+      --text:#f5f7ff;
+      --muted:#b6bdd8;
+      --accent:#8b9bff;
+      --accent-2:#7dffcf;
+      --hot:#ff7ad9;
+      --border:rgba(255,255,255,0.08);
+      --glow:0 0 18px rgba(139,155,255,0.18), 0 0 40px rgba(125,255,207,0.08);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background:
+        radial-gradient(1000px 600px at 15% -10%, rgba(139,155,255,0.10), transparent 60%),
+        radial-gradient(900px 700px at 85% -20%, rgba(255,122,217,0.08), transparent 60%),
+        radial-gradient(900px 700px at 50% 120%, rgba(125,255,207,0.08), transparent 60%),
+        var(--bg);
+      color:var(--text);
+    }
+    header{
+      padding:28px 18px 10px;
+      max-width:1100px;
+      margin:0 auto;
+    }
+    .badge{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      padding:6px 10px;
+      border:1px solid var(--border);
+      background:linear-gradient(135deg, rgba(139,155,255,0.10), rgba(125,255,207,0.06));
+      border-radius:999px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    h1{
+      margin:14px 0 6px;
+      font-size: clamp(26px, 4vw, 40px);
+      letter-spacing:0.2px;
+    }
+    .subtitle{
+      color:var(--muted);
+      font-size: clamp(14px, 1.8vw, 16px);
+      line-height:1.45;
+      margin-bottom:18px;
+    }
+    .topbar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin:16px 0 6px;
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:linear-gradient(135deg, rgba(139,155,255,0.10), rgba(255,122,217,0.06));
+      color:var(--text);
+      text-decoration:none;
+      font-weight:600;
+      font-size:13px;
+      box-shadow: var(--glow);
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); border-color: rgba(139,155,255,0.35); }
+    .btn.secondary{
+      background:linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+      box-shadow:none;
+      color:var(--muted);
+      font-weight:500;
+    }
+    main{
+      max-width:1100px;
+      margin:0 auto;
+      padding: 8px 14px 50px;
+      display:grid;
+      gap:14px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap:14px;
+    }
+    .card{
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00)), var(--panel);
+      padding:16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.28);
+    }
+    .card.soft{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00)), var(--panel-2);
+    }
+    .col-12{ grid-column: span 12; }
+    .col-8{ grid-column: span 8; }
+    .col-6{ grid-column: span 6; }
+    .col-4{ grid-column: span 4; }
+    .col-3{ grid-column: span 3; }
+
+    @media (max-width: 980px){
+      .col-8,.col-6,.col-4,.col-3{ grid-column: span 12; }
+    }
+
+    h2{
+      margin: 0 0 10px;
+      font-size: clamp(18px, 2.4vw, 22px);
+    }
+    h3{
+      margin: 0 0 6px;
+      font-size: 16px;
+    }
+    p{ margin: 6px 0 0; color: var(--muted); line-height:1.45; font-size: 14px;}
+    ul{ margin: 10px 0 0; padding-left: 18px; color: var(--muted); }
+    li{ margin: 6px 0; font-size: 14px; }
+
+    .section-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .tag{
+      display:inline-flex;
+      padding:4px 8px;
+      border-radius:999px;
+      font-size:11px;
+      border:1px solid var(--border);
+      color:var(--muted);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .demo-list{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap:10px;
+      margin-top:10px;
+    }
+    @media (max-width: 680px){
+      .demo-list{ grid-template-columns: 1fr; }
+    }
+    .demo{
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px 12px 10px;
+      background: linear-gradient(135deg, rgba(139,155,255,0.06), rgba(125,255,207,0.04), rgba(255,122,217,0.04));
+    }
+    .demo a{
+      color:var(--text);
+      text-decoration:none;
+      font-weight:650;
+      font-size:14px;
+    }
+    .demo small{
+      display:block;
+      margin-top:4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .pricing{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap:10px;
+      margin-top:10px;
+    }
+    @media (max-width: 980px){
+      .pricing{ grid-template-columns: 1fr; }
+    }
+    .price-card{
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:14px;
+      background: rgba(255,255,255,0.02);
+    }
+    .price{
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      margin-top: 6px;
+      background: linear-gradient(90deg, var(--accent), var(--hot), var(--accent-2));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color: transparent;
+    }
+
+    footer{
+      max-width:1100px;
+      margin:0 auto;
+      padding: 0 14px 40px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .hr{
+      height:1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+      margin: 6px 0 14px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <span class="badge">UV-QDS • Mobile-first demos • v1.1.2 release era</span>
+  <h1>Portfolio — Daniel Brian Williams</h1>
+  <div class="subtitle">
+    A fast-built, phone-driven demo ecosystem: interactive battery labs, space/physics toys,
+    QDS 5 Pillars hubs, reproducibility packs, and clean “showroom vs shed” release discipline.
+  </div>
+
+  <div class="topbar">
+    <a class="btn" href="index.html">Home Index</a>
+    <a class="btn" href="qds_showcase_index_v1_1.html">Showcase</a>
+    <a class="btn secondary" href="qds_shed_index_v1.html">Shed (WIP)</a>
+    <a class="btn secondary" href="omega_os_index_v2.html">Ω-OS Index</a>
+  </div>
+</header>
+
+<main>
+
+  <div class="grid">
+    <section class="card col-12">
+      <div class="section-title">
+        <h2>Start Here — 20 Second Wow Path</h2>
+        <span class="tag">Client-friendly demo route</span>
+      </div>
+      <div class="demo-list">
+        <div class="demo">
+          <a href="qds_battery_os_index_v1.html">Battery OS Index</a>
+          <small>Curated battery tools and flagship labs in one flow.</small>
+        </div>
+        <div class="demo">
+          <a href="qds_universe_v9_2_neon_clear_planets.html">QDS Universe v9.2 — Neon Clear Planets</a>
+          <small>Mobile-first 3D vibe demo with clean planet styling.</small>
+        </div>
+        <div class="demo">
+          <a href="solar_system_v9_2_mobile_3d_showcase.html">Solar System v9.2 — Mobile 3D Showcase</a>
+          <small>Touch-friendly solar engine showcase.</small>
+        </div>
+        <div class="demo">
+          <a href="qds_test_task_pack_v1_1_pro.html">Test / Repro Pack</a>
+          <small>Repro-first mindset. Lightweight proof-of-work kit.</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="card col-8">
+      <div class="section-title">
+        <h2>What I Build</h2>
+        <span class="tag">Rapid productised demos</span>
+      </div>
+      <ul>
+        <li><strong>Mobile-first interactive hubs</strong> with clean navigation and curated demo paths.</li>
+        <li><strong>Mini web apps</strong> that turn complex logic into friendly, usable UI.</li>
+        <li><strong>R&amp;D showcase ecosystems</strong> with versioned releases and reproducible artifacts.</li>
+        <li><strong>Lightweight scripts</strong> for one-command local launch and frictionless demos.</li>
+      </ul>
+      <p>
+        Built with speed, clarity, and “showroom vs shed” structure so it’s
+        easy for others to understand, test, and share.
+      </p>
+    </section>
+
+    <section class="card soft col-4">
+      <div class="section-title">
+        <h2>Quick Stats</h2>
+        <span class="tag">Last 4-day sprint</span>
+      </div>
+      <ul>
+        <li>Showcase + Shed indexes</li>
+        <li>Battery flagship suite</li>
+        <li>Universe + Solar hero builds</li>
+        <li>5 Pillars / Wedge portfolio</li>
+        <li>Games + learning toys</li>
+        <li>Release tags + tidy repo hygiene</li>
+      </ul>
+    </section>
+
+    <section class="card col-12">
+      <div class="section-title">
+        <h2>Featured Work</h2>
+        <span class="tag">Curated highlights</span>
+      </div>
+      <div class="demo-list">
+        <div class="demo">
+          <a href="qds_battery_hub_v9_7_science_neon_lab.html">Battery Hub v9.7 — Science Neon Lab</a>
+          <small>Flagship dashboard style. Fast, readable, mobile-optimised.</small>
+        </div>
+        <div class="demo">
+          <a href="qds_battery_suite_v8_3_neon_shell.html">Battery Suite v8.3 — Neon Shell</a>
+          <small>Coherent UI + tool grouping.</small>
+        </div>
+        <div class="demo">
+          <a href="qds_battery_suite_v6_realworld.html">Battery Suite v6 — Realworld</a>
+          <small>More grounded, practical layout.</small>
+        </div>
+        <div class="demo">
+          <a href="qds_5_pillars_hub_v1.html">QDS 5 Pillars Hub</a>
+          <small>Chips/noise • compression • sensors/metrology and more.</small>
+        </div>
+        <div class="demo">
+          <a href="indus_atlas_v1_qds_language_lab.html">Indus Atlas — Language Lab</a>
+          <small>Cross-domain demo bridging language + structure.</small>
+        </div>
+        <div class="demo">
+          <a href="pyramid_pinball_v1.html">Pyramid Pinball</a>
+          <small>Fun physics toy with a clean mobile feel.</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="card col-12">
+      <div class="section-title">
+        <h2>Productised Offers (starter pricing)</h2>
+        <span class="tag">Simple, honest packages</span>
+      </div>
+      <div class="pricing">
+        <div class="price-card">
+          <h3>One-Page Microsite</h3>
+          <p>Mobile-first brand page with clean hero, sections, and contact links.</p>
+          <div class="price">£300–£900</div>
+          <p>Great for local businesses and creators.</p>
+        </div>
+        <div class="price-card">
+          <h3>Showcase Hub</h3>
+          <p>Home index + 5–10 linked pages/tools with a guided “Start Here” path.</p>
+          <div class="price">£800–£2,500</div>
+          <p>Ideal for small teams and R&D demos.</p>
+        </div>
+        <div class="price-card">
+          <h3>Interactive Demo Suite</h3>
+          <p>2–4 lightweight interactive tools with versioned release + launch script.</p>
+          <div class="price">£1,500–£5,000</div>
+          <p>Perfect for startups, science outreach, and niche engineering.</p>
+        </div>
+      </div>
+      <p style="margin-top:10px;">
+        These bands reflect fast delivery and clear scope — not agency theatre.
+      </p>
+    </section>
+
+    <section class="card soft col-12">
+      <div class="section-title">
+        <h2>Style & Workflow</h2>
+        <span class="tag">Phone-first shipping</span>
+      </div>
+      <ul>
+        <li>Rapid iteration on Android (Termux).</li>
+        <li>Clean versioning and release tags.</li>
+        <li>Curated public “showroom” with a hidden dev shed.</li>
+        <li>Simple scripts for running everything locally in seconds.</li>
+      </ul>
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  <div class="hr"></div>
+  Built as part of the UV-QDS demo ecosystem. This portfolio page is a lightweight
+  snapshot of current capabilities and curated public outputs.
+</footer>
+
+</body>
+</html>
