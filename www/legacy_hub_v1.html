@@ -1,0 +1,72 @@
+cd ~/OMEGA_EMPIRE/UV_QDS/www
+
+cat > legacy_hub_v1.html <<'EOF'
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Legacy Hub v1 — Early Experiments Arcade</title>
+  <style>
+    body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:#070b14;color:#e8ecff}
+    .wrap{max-width:900px;margin:0 auto;padding:24px}
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.06);margin:4px;font-size:12px}
+    .card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+          border-radius:18px;padding:16px 18px;margin:12px 0}
+    a{color:#b8a3ff;text-decoration:none}
+    a:hover{text-decoration:underline}
+    h1{font-size:28px;margin:4px 0 10px}
+    p{opacity:.85}
+    .grid{display:grid;gap:10px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <span class="pill">legacy</span>
+    <span class="pill">museum wing</span>
+    <span class="pill">phone-first</span>
+
+    <h1>Legacy Hub v1 — Early Experiments Arcade</h1>
+    <p>
+      A tidy home for first-gen builds, early UI styles, and foundational toys.
+      This is the history shelf — not the flagship route.
+    </p>
+
+    <div class="card">
+      <strong>Battery Roots</strong>
+      <div class="grid">
+        <a href="qds_battery_hub_v9_1_purple_neon.html">Battery Hub v9.1 — Purple Neon</a>
+        <a href="qds_battery_hub_v9_2_purple_neon.html">Battery Hub v9.2 — Purple Neon</a>
+        <a href="qds_battery_suite_v4_showcase.html">Battery Suite v4 — Showcase</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <strong>Cosmos Classics</strong>
+      <div class="grid">
+        <a href="solar_system_v8_offline.html">Solar System v8 — Offline</a>
+        <a href="qds_universe_v9_2_neon_clear_planets.html">QDS Universe v9.2 — Neon Clear Planets</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <strong>Early Fun</strong>
+      <div class="grid">
+        <a href="catapult_balloon_pop_v1.html">Catapult Balloon Pop v1</a>
+        <a href="pyramid_pinball_v1.html">Pyramid Pinball v1</a>
+        <a href="cannon_side_2d_v1.html">Cannon Side 2D v1</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <strong>Back to Present</strong>
+      <div class="grid">
+        <a href="index.html">Home Index</a>
+        <a href="qds_showcase_index_v1_1.html">Showcase Index</a>
+        <a href="all_pages_index.html">All Pages Index</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+EOF
