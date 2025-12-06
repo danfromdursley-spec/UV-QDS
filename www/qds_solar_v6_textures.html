@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>QDS Solar System V6 — Textured Edition 🎩</title>
+<style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: black;
+        font-family: system-ui, sans-serif;
+    }
+    #renderCanvas { width: 100%; height: 100%; touch-action: none; }
+    #ui {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        padding: 12px;
+        background: rgba(0,0,0,0.55);
+        border-radius: 10px;
+        color: white;
+        backdrop-filter: blur(6px);
+    }
+    input[type=range] {
+        width: 180px;
+    }
+</style>
+</head>
+
+<body>
+<canvas id="renderCanvas"></canvas>
+
+<div id="ui">
+    <b>Solar System V6 — Textured Edition 🎩</b><br><br>
+
+    QDS λ<sub>c</sub>:<br>
+    <input id="lambdaC" type="range" min="0" max="5" step="0.1" value="2"><br>
+
+    QDS τ<sub>c</sub>:<br>
+    <input id="tauC" type="range" min="0" max="5" step="0.1" value="2"><br><br>
+
+    <button id="fireCME">💥 Fire CME</button>
+    <button id="museum">🎨 Museum Mode</button>
+</div>
+
+<script src="https://cdn.babylonjs.com/babylon.js"></script>
+<script src="https://cdn.babylonjs.com/gui/babylon.gui.min.js"></script>
+
+<script>
+// Get canvas + engine
+const canvas = document.getElementById("renderCanvas");
+const engine = new BABYLON.Engine(canvas, true);
+
+// Create scene
+const createScene = () => {
+    const scene = new BABYLON.Scene(engine);
+    scene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
+
+    // Camera
+    const camera = new BABYLON.ArcRotateCamera(
+        "camera",
+        Math.PI / 2,
+        Math.PI / 2.5,
+        80,
+        new BABYLON.Vector3(0, 0, 0),
+        scene
+    );
+    camera.attachControl(canvas, true);
+
+    // Lighting
+    const light = new BABYLON.HemisphericLight(
+        "light",
+        new BABYLON.Vector3(0, 1, 0),
+        scene
+    );
+    light.intensity = 0.6;
+
+    // REAL SUN LIGHT for shading planets
+    const sunLight = new BABYLON.PointLight(
+        "sunLight",
+        new BABYLON.Vector3(0, 0, 0),
+        scene
+    );
+    sunLight.intensity = 2.5;
+
+    // Asset manager for loading textures
+    const assets = new BABYLON.AssetsManager(scene);
+
+    // Texture URLs
+    const urls = {
+        sun: "https://raw.githubusercontent.com/erichlof/Planet-Textures/master/sun.jpg",
+        mercury: "https://raw.githubusercontent.com/erichlof/Planet-Textures/master/mercurymap.jpg",
+        venus: "https://raw.githubusercontent.com/erichlof/Planet-Textures/master/venusmap.jpg",
+        earth: "https://raw.githubusercontent.com/erichlof/Planet-Textures/master/earthmap1k.jpg",
+        moon: "https://raw.githubusercontent.com/erichlof/Planet-Textures/master/moonmap1k.jpg",
+        mars: "https://raw.githubusercontent.com/erichlof/Planet-Textures/master/marsmap1k.jpg",
+        jupiter: "https://raw.githubusercontent.com/erichlof/Planet-Textures/master/jupiter.jpg",
+        saturn: "https://raw.githubusercontent.com/erichlof/Planet-Textures/master/saturn.jpg",
+        saturnRing: "https://raw.githubusercontent.com/erichlof/Planet-Textures/master/saturnringcolor.jpg",
+        uranus: "https://raw.githubusercontent.com/erichlof/Planet-Textures/master/uranus.jpg",
+        neptune: "https://raw.githubusercontent.com/erichlof/Planet-Textures/master/neptune.jpg",
+        pluto: "https://raw.githubusercontent.com/erichlof/Planet-Textures/master/plutomap1k.jpg"
+    };
+
+    let textures = {};
+
+    // Load all textures
+    for (let key in urls) {
+        const task = assets.addTextureTask(key, urls[key]);
+        task.onSuccess = t => { textures[key] = t.texture; };
+    }
+
+    // After textures load, continue in PART 2
+    assets.onFinish = function() {
+        console.log("Textures loaded.");
+        window.startSolarSystem(scene, textures);
+    };
+
+    assets.load();
+
+    return scene;
+};
+
+const scene = createScene();
+engine.runRenderLoop(() => scene.render());
+window.addEventListener("resize", () => engine.resize());
+
+</script>// =======================================
+// PART 2 — SOLAR SYSTEM CREATION 🎩
+// =======================================
+
+window.startSolarSystem = function(scene, tex) {
+
+    // Helper: make a planet
+    function makePlanet(name, size, texture, distance, speed, tilt = 0) {
+        const sphere = BABYLON.MeshBuilder.CreateSphere(name, { diameter: size }, scene);
+        sphere.position.x = distance;
+
+        const mat = new BABYLON.StandardMaterial(name + "_mat", scene);
+        mat.diffuseTexture = texture;
+        mat.specularColor = new BABYLON.Color3(0, 0, 0);
+        sphere.material = mat;
+
+        sphere.rotation.x = tilt;
+
+        return {
+            mesh: sphere,
+            distance,
+            angle: Math.random() * Math.PI * 2,
+            speed
+        };
+    }
+
+    // ☀️ SUN
+    const sun = BABYLON.MeshBuilder.CreateSphere("sun", { diameter: 12 }, scene);
+    const sunMat = new BABYLON.StandardMaterial("sunMat", scene);
+    sunMat.emissiveTexture = tex.sun;
+    sun.material = sunMat;
+
+    // Add glow around Sun
+    const glow = new BABYLON.GlowLayer("glow", scene, {
+        blurKernelSize: 64
+    });
+    glow.intensity = 0.6;
+
+    // 🌍 PLANET BUILDS
+    const planets = [];
+
+    planets.push(makePlanet("mercury", 0.8, tex.mercury, 14, 0.020));
+    planets.push(makePlanet("venus", 1.8, tex.venus, 18, 0.015));
+    const earth = makePlanet("earth", 2, tex.earth, 24, 0.010, 0.41);
+    planets.push(earth);
+
+    // 🌕 MOON
+    const moon = makePlanet("moon", 0.5, tex.moon, 3, 0.05);
+    moon.parent = earth.mesh;
+
+    planets.push(makePlanet("mars", 1.1, tex.mars, 30, 0.008));
+
+    planets.push(makePlanet("jupiter", 5, tex.jupiter, 40, 0.004));
+    planets.push(makePlanet("saturn", 4.5, tex.saturn, 52, 0.003));
+    planets.push(makePlanet("uranus", 3, tex.uranus, 62, 0.002));
+    planets.push(makePlanet("neptune", 3, tex.neptune, 70, 0.0018));
+    planets.push(makePlanet("pluto", 0.6, tex.pluto, 80, 0.0012));
+
+    // 💍 SATURN RINGS
+    const ring = BABYLON.MeshBuilder.CreateDisc("saturnRing", {
+        radius: 7,
+        tessellation: 90,
+        sideOrientation: BABYLON.Mesh.DOUBLESIDE
+    }, scene);
+
+    const ringMat = new BABYLON.StandardMaterial("ringMat", scene);
+    ringMat.diffuseTexture = tex.saturnRing;
+    ringMat.diffuseTexture.hasAlpha = true;
+    ring.material = ringMat;
+
+    ring.rotation.x = Math.PI / 2;
+    ring.parent = planets.find(p => p.mesh.name === "saturn").mesh;
+
+    // =======================================
+    // ⚙️ ORBIT ANIMATION LOOP
+    // =======================================
+    scene.onBeforeRenderObservable.add(() => {
+        const dt = scene.getEngine().getDeltaTime() * 0.001;
+
+        for (let p of planets) {
+            p.angle += p.speed * dt;
+            p.mesh.position.x = Math.cos(p.angle) * p.distance;
+            p.mesh.position.z = Math.sin(p.angle) * p.distance;
+        }
+
+        // Moon orbit
+        moon.angle += moon.speed * dt * 4;
+        moon.mesh.position.x = earth.mesh.position.x + Math.cos(moon.angle) * 3;
+        moon.mesh.position.z = earth.mesh.position.z + Math.sin(moon.angle) * 3;
+    });
+
+    // Store global reference for Part 3 features
+    window.SOLAR = {
+        scene,
+        planets,
+        sun,
+        earth,
+        moon
+    };
+};
+// =======================================
+// PART 3 — QDS WARP GRID + CME SYSTEM
+// =======================================
+
+window.finishSolarSystem = function(scene) {
+
+    // ---------------------------------------------------------
+    // 🌌 QDS SPACETIME WARP GRID (beautiful museum floor)
+    // ---------------------------------------------------------
+
+    const grid = BABYLON.MeshBuilder.CreateGround("qdsGrid", {
+        width: 300,
+        height: 300,
+        subdivisions: 120
+    }, scene);
+
+    const gridMat = new BABYLON.StandardMaterial("gridMat", scene);
+    gridMat.wireframe = true;
+    gridMat.emissiveColor = new BABYLON.Color3(0.1, 0.6, 1.0);
+    grid.material = gridMat;
+    grid.position.y = -6;
+
+    // QDS warp distortion parameters
+    let QDS = {
+        lambda: 2.0,
+        tau: 2.0
+    };
+
+    scene.registerBeforeRender(() => {
+        const t = performance.now() * 0.001;
+
+        grid.updateMeshPositions(pos => {
+            for (let i = 0; i < pos.length; i += 3) {
+                const x = pos[i];
+                const z = pos[i + 2];
+                const r = Math.sqrt(x*x + z*z);
+
+                // QDS vacuum warping ripple
+                const warp = Math.sin(r * QDS.lambda - t * QDS.tau) * 0.3;
+
+                pos[i + 1] = warp;
+            }
+        });
+        grid.refreshBoundingInfo();
+    });
+
+    // ---------------------------------------------------------
+    // ✨ CME SYSTEM — Sun "sneezes" shockwaves across the grid
+    // ---------------------------------------------------------
+
+    let cmeWaves = [];
+
+    function fireCME(intensity = 1) {
+        const ring = BABYLON.MeshBuilder.CreateTorus("cmeWave", {
+            diameter: 2,
+            thickness: 0.15
+        }, scene);
+
+        const mat = new BABYLON.StandardMaterial("cmeMat", scene);
+        mat.emissiveColor = new BABYLON.Color3(1, 0.6, 0.1);
+        ring.material = mat;
+
+        ring.position = window.SOLAR.sun.position.clone();
+        ring.scaling = new BABYLON.Vector3(1, 0.1, 1);
+
+        cmeWaves.push({
+            mesh: ring,
+            size: 1,
+            intensity
+        });
+    }
+
+    scene.onBeforeRenderObservable.add(() => {
+        let dt = scene.getEngine().getDeltaTime() * 0.001;
+
+        cmeWaves.forEach(w => {
+            w.size += dt * 12 * w.intensity;
+            w.mesh.scaling.x = w.size;
+            w.mesh.scaling.z = w.size;
+
+            // Fade out
+            w.mesh.material.emissiveColor = new BABYLON.Color3(
+                1 * (1 - w.size / 50),
+                0.6 * (1 - w.size / 50),
+                0.1 * (1 - w.size / 50)
+            );
+        });
+
+        // Remove dead waves
+        cmeWaves = cmeWaves.filter(w => w.size < 50);
+    });
+
+    // Make public for UI button
+    window.fireCME = fireCME;
+
+    // ---------------------------------------------------------
+    // 🛡 Planet Magnetospheres
+    // ---------------------------------------------------------
+
+    for (const p of window.SOLAR.planets) {
+        const m = BABYLON.MeshBuilder.CreateSphere(p.mesh.name + "_mag", {
+            diameter: p.mesh.scaling.x * 6
+        }, scene);
+
+        const mm = new BABYLON.StandardMaterial("magMat" + p.mesh.name, scene);
+        mm.alpha = 0.15;
+        mm.emissiveColor = new BABYLON.Color3(0.3, 0.5, 1);
+        m.material = mm;
+
+        m.parent = p.mesh;
+    }
+
+    // ---------------------------------------------------------
+    // 🎛 LINK SLIDERS → QDS PARAMETERS
+    // ---------------------------------------------------------
+    const λslider = document.getElementById("lambdaSlider");
+    const τslider = document.getElementById("tauSlider");
+
+    λslider.oninput = () => QDS.lambda = parseFloat(λslider.value);
+    τslider.oninput = () => QDS.tau = parseFloat(τslider.value);
+
+    // ---------------------------------------------------------
+    // 🎨 Museum Mode — cinematic slow lighting
+    // ---------------------------------------------------------
+    window.enableMuseumMode = function(enable) {
+        if (enable) {
+            gridMat.emissiveColor = new BABYLON.Color3(0.2, 0.5, 1.0);
+            glow.intensity = 0.9;
+        } else {
+            gridMat.emissiveColor = new BABYLON.Color3(0.1, 0.6, 1.0);
+            glow.intensity = 0.6;
+        }
+    };
+
+    console.log("✅ Solar System V6 fully loaded (textures + CME + QDS warp grid + magnetospheres)");
+};
