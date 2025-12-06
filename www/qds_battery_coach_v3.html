@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>QDS Battery Coach v3 — Shed Edition</title>
+<style>
+  :root{
+    --bg:#070b14; --bg2:#0b1222; --panel:#0e162b; --panel2:#0b1426;
+    --txt:#e8eefc; --muted:#a8b3cc; --accent:#7c9bff; --accent2:#ff6fb1;
+    --good:#7dffb3; --warn:#ffd479; --bad:#ff7d7d; --line:#1a2744;
+    --shadow: 0 10px 30px rgba(0,0,0,0.45);
+    --radius: 16px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    color:var(--txt);
+    background:
+      radial-gradient(1200px 800px at 10% -10%, #1a2450 0%, transparent 55%),
+      radial-gradient(1200px 800px at 90% 10%, #2a0d3d 0%, transparent 55%),
+      linear-gradient(180deg, var(--bg), var(--bg2) 45%, var(--bg));
+    min-height:100vh;
+  }
+  header{
+    padding:18px 18px 8px 18px;
+  }
+  .title{
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+  }
+  .badge{
+    padding:4px 10px; border:1px solid var(--line);
+    border-radius:999px; font-size:11px; color:var(--muted);
+    background:rgba(255,255,255,0.02);
+  }
+  h1{font-size:20px; margin:0 0 2px 0; letter-spacing:0.2px}
+  .sub{font-size:12px; color:var(--muted)}
+  main{padding:10px 14px 30px 14px; display:grid; gap:12px}
+  .card{
+    background: linear-gradient(160deg, rgba(255,255,255,0.03), rgba(255,255,255,0.00));
+    border:1px solid var(--line);
+    border-radius: var(--radius);
+    padding:14px;
+    box-shadow: var(--shadow);
+  }
+  .section-title{
+    font-size:14px; letter-spacing:0.3px; margin:0 0 10px 0; color:var(--txt);
+  }
+  .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  .grid-3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px}
+  @media (max-width:820px){
+    .grid-2, .grid-3{grid-template-columns:1fr}
+  }
+  .control{
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00));
+    border:1px solid var(--line);
+    border-radius: 14px;
+    padding:10px 10px 8px 10px;
+  }
+  .control label{
+    display:flex; justify-content:space-between; gap:8px;
+    font-size:12px; color:var(--muted);
+    margin-bottom:6px;
+  }
+  .control small{color:var(--muted); font-size:11px}
+  input[type="range"]{width:100%}
+  .row{
+    display:flex; gap:8px; flex-wrap:wrap;
+  }
+  .btn{
+    appearance:none; border:1px solid var(--line);
+    background: linear-gradient(160deg, rgba(124,155,255,0.18), rgba(124,155,255,0.05));
+    color:var(--txt); padding:10px 14px; border-radius: 12px;
+    font-weight:600; font-size:12.5px; letter-spacing:0.2px;
+  }
+  .btn.secondary{
+    background: linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  }
+  .btn.danger{
+    background: linear-gradient(160deg, rgba(255,125,125,0.18), rgba(255,125,125,0.05));
+  }
+  .btn:active{transform: translateY(1px)}
+  .pill{
+    padding:6px 10px; border-radius:999px; font-size:11px;
+    border:1px solid var(--line); background:rgba(255,255,255,0.03);
+    color:var(--muted);
+  }
+  .toggle{
+    display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted);
+    margin:6px 0;
+  }
+  .toggle input{transform: translateY(1px)}
+  .results-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:10px;
+  }
+  @media (max-width:820px){ .results-grid{grid-template-columns:1fr 1fr} }
+  @media (max-width:520px){ .results-grid{grid-template-columns:1fr} }
+  .metric{
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.00));
+    border:1px solid var(--line); border-radius: 14px; padding:12px;
+  }
+  .metric .name{font-size:11px; color:var(--muted)}
+  .metric .value{font-size:26px; font-weight:800; letter-spacing:0.3px; margin-top:2px}
+  .metric .unit{font-size:11px; color:var(--muted)}
+  canvas{
+    width:100%; height:240px; background: rgba(255,255,255,0.02);
+    border:1px solid var(--line); border-radius: 14px;
+  }
+  .legend{display:flex; gap:10px; flex-wrap:wrap; margin-top:8px}
+  .dot{
+    width:10px; height:10px; border-radius:999px; display:inline-block; margin-right:6px;
+  }
+  .muted{color:var(--muted)}
+  .coach-box{
+    border:1px solid rgba(255,255,255,0.08);
+    background: linear-gradient(160deg, rgba(124,155,255,0.08), rgba(255,111,177,0.06));
+    border-radius: 14px; padding:12px;
+  }
+  .coach-head{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+  }
+  .coach-title{font-size:13px; font-weight:700}
+  .risk{
+    font-size:10px; padding:3px 8px; border-radius:999px; border:1px solid var(--line);
+  }
+  .risk.good{color:var(--good)}
+  .risk.warn{color:var(--warn)}
+  .risk.bad{color:var(--bad)}
+  .small-note{font-size:10.5px; color:var(--muted)}
+  .hr{height:1px; background:var(--line); margin:10px 0}
+  .history{
+    max-height:160px; overflow:auto; border:1px solid var(--line);
+    border-radius: 12px; padding:8px; background: rgba(255,255,255,0.02);
+    font-size:11px; color:var(--muted);
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="title">
+    <h1>QDS Battery Coach v3</h1>
+    <span class="badge">single-file • no libs • mobile-safe</span>
+    <span class="badge">Monte Carlo + AR(1) QDS noise</span>
+    <span class="badge">local learning</span>
+  </div>
+  <div class="sub">Toy digital twin for wear patterns + a simple “coach brain” that learns your runs.</div>
+</header>
+
+<main>
+
+  <div class="card">
+    <div class="section-title">Controls</div>
+
+    <div class="grid-2">
+      <div class="control">
+        <label>
+          <span>Base drain per cycle (%)</span>
+          <strong id="v_base">2.0</strong>
+        </label>
+        <input id="base" type="range" min="0.2" max="6" step="0.1" value="2.0">
+        <small>Deterministic degradation per cycle.</small>
+      </div>
+
+      <div class="control">
+        <label>
+          <span>Noise amplitude (%)</span>
+          <strong id="v_amp">3.0</strong>
+        </label>
+        <input id="amp" type="range" min="0" max="10" step="0.1" value="3.0">
+        <small>Stochastic variability applied each cycle.</small>
+      </div>
+
+      <div class="control">
+        <label>
+          <span>Correlation p (0–0.99)</span>
+          <strong id="v_p">0.60</strong>
+        </label>
+        <input id="p" type="range" min="0" max="0.99" step="0.01" value="0.60">
+        <small>AR(1) correlation strength for QDS-style noise.</small>
+      </div>
+
+      <div class="control">
+        <label>
+          <span>Number of cells (runs)</span>
+          <strong id="v_n">1550</strong>
+        </label>
+        <input id="n" type="range" min="200" max="4000" step="50" value="1550">
+        <small>Monte Carlo population per model.</small>
+      </div>
+
+      <div class="control">
+        <label>
+          <span>Max cycles simulated</span>
+          <strong id="v_max">3000</strong>
+        </label>
+        <input id="maxc" type="range" min="200" max="8000" step="50" value="3000">
+        <small>Upper bound to avoid infinite sims.</small>
+      </div>
+
+      <div class="control">
+        <label>
+          <span>Failure threshold (%)</span>
+          <strong id="v_thr">80</strong>
+        </label>
+        <input id="thr" type="range" min="5" max="95" step="1" value="80">
+        <small>Cell fails when health ≤ threshold.</small>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="grid-2">
+      <div>
+        <div class="section-title">Presets</div>
+        <div class="row">
+          <button class="btn secondary" id="preset_real">Preset: Realistic phone</button>
+          <button class="btn secondary" id="preset_contrast">Preset: QDS contrast</button>
+          <button class="btn secondary" id="preset_chaos">Preset: Chaos</button>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="section-title">Stress Hammers</div>
+        <label class="toggle"><input type="checkbox" id="nonlin" checked> Nonlinear wear (accelerates when health is low)</label>
+        <label class="toggle"><input type="checkbox" id="heat" checked> Heat epochs (periodic harsh cycles)</label>
+        <label class="toggle"><input type="checkbox" id="outlier" checked> Rare outliers (shock events)</label>
+        <div class="row">
+          <span class="pill" id="hammer_label">Hammer: Pathological regime</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title">Bias Integrity (v2)</div>
+        <label class="toggle"><input type="checkbox" id="paired" checked> Paired Fair Mode (same ε stream for White/QDS)</label>
+        <label class="toggle"><input type="checkbox" id="noregen" checked> No Regen (drain cannot go negative)</label>
+        <label class="toggle"><input type="checkbox" id="blind" checked> Blind labels (display swap)</label>
+        <div class="row">
+          <button class="btn secondary" id="hardnull">Hard null (p=0)</button>
+        </div>
+        <div class="small-note">This defaults to a correlation-only fairness harness.</div>
+
+        <div class="hr"></div>
+
+        <div class="section-title">Coach Mode</div>
+        <label class="toggle"><input type="checkbox" id="coach_on" checked> Enable Battery Coach</label>
+        <label class="toggle"><input type="checkbox" id="coach_store" checked> Store learning locally</label>
+        <div class="small-note">Uses your last runs to shape advice + risk scoring.</div>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="row">
+      <button class="btn" id="run">Run simulation</button>
+      <button class="btn secondary" id="reset">Reset defaults</button>
+      <button class="btn danger" id="clear_hist">Clear history</button>
+    </div>
+  </div>
+
+
+  <div class="card">
+    <div class="section-title">Results</div>
+
+    <div class="coach-box" id="coach_box">
+      <div class="coach-head">
+        <div class="coach-title">Battery Coach 🧠🔋</div>
+        <span class="risk" id="risk_badge">—</span>
+      </div>
+      <div class="small-note" id="coach_summary">Run a sim to generate adaptive advice.</div>
+      <div class="hr"></div>
+      <div id="coach_advice" class="muted" style="font-size:12px; line-height:1.35;"></div>
+      <div class="hr"></div>
+      <div class="small-note" id="coach_learning">Learning: idle.</div>
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="results-grid">
+      <div class="metric">
+        <div class="name" id="lbl_white_mean">White noise mean lifetime</div>
+        <div class="value" id="white_mean">—</div>
+        <div class="unit">cycles</div>
+      </div>
+      <div class="metric">
+        <div class="name" id="lbl_white_sig">White noise σ</div>
+        <div class="value" id="white_sig">—</div>
+        <div class="unit">cycles</div>
+      </div>
+      <div class="metric">
+        <div class="name" id="lbl_qds_mean">QDS-style mean lifetime</div>
+        <div class="value" id="qds_mean">—</div>
+        <div class="unit">cycles</div>
+      </div>
+      <div class="metric">
+        <div class="name" id="lbl_qds_sig">QDS-style σ</div>
+        <div class="value" id="qds_sig">—</div>
+        <div class="unit">cycles</div>
+      </div>
+      <div class="metric">
+        <div class="name">Relative change (QDS vs white)</div>
+        <div class="value" id="rel_change">—</div>
+        <div class="unit">%</div>
+      </div>
+      <div class="metric">
+        <div class="name">Paired mean Δ cycles</div>
+        <div class="value" id="paired_delta">—</div>
+        <div class="unit">cycles</div>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="section-title">Sample health profile (paired example)</div>
+    <canvas id="profile"></canvas>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--accent)"></span><span id="lbl_white_line">White noise</span></span>
+      <span><span class="dot" style="background:var(--accent2)"></span><span id="lbl_qds_line">QDS-style</span></span>
+      <span class="pill" id="profile_note">—</span>
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="section-title">Cycles to failure (distribution)</div>
+    <canvas id="hist"></canvas>
+
+    <div class="hr"></div>
+    <div class="section-title">Recent run history (local)</div>
+    <div class="history" id="history_box">No saved runs yet.</div>
+  </div>
+
+</main>
+
+<script>
+/* ============================
+   QDS Battery Coach v3 (toy)
+   - White noise vs AR(1) QDS
+   - Stress hammers
+   - Fairness toggles
+   - Local learning + coach advice
+   ============================ */
+
+const $ = (id)=>document.getElementById(id);
+
+// sliders
+const S = {
+  base:$("base"), amp:$("amp"), p:$("p"), n:$("n"), maxc:$("maxc"), thr:$("thr")
+};
+const V = {
+  base:$("v_base"), amp:$("v_amp"), p:$("v_p"), n:$("v_n"), maxc:$("v_max"), thr:$("v_thr")
+};
+
+// toggles
+const T = {
+  nonlin:$("nonlin"), heat:$("heat"), outlier:$("outlier"),
+  paired:$("paired"), noregen:$("noregen"), blind:$("blind"),
+  coach_on:$("coach_on"), coach_store:$("coach_store")
+};
+
+// buttons
+const B = {
+  run:$("run"), reset:$("reset"),
+  preset_real:$("preset_real"), preset_contrast:$("preset_contrast"), preset_chaos:$("preset_chaos"),
+  hardnull:$("hardnull"), clear_hist:$("clear_hist")
+};
+
+// results
+const R = {
+  white_mean:$("white_mean"), white_sig:$("white_sig"),
+  qds_mean:$("qds_mean"), qds_sig:$("qds_sig"),
+  rel_change:$("rel_change"), paired_delta:$("paired_delta"),
+  profile_note:$("profile_note"),
+  history_box:$("history_box")
+};
+
+// coach
+const C = {
+  box:$("coach_box"), badge:$("risk_badge"),
+  summary:$("coach_summary"), advice:$("coach_advice"), learning:$("coach_learning")
+};
+
+const HIST_KEY = "QDS_BATTERY_COACH_V3_HISTORY";
+
+// ---------- utils ----------
+function clamp(x,a,b){ return Math.max(a, Math.min(b,x)); }
+
+function setSliderReads(){
+  V.base.textContent = (+S.base.value).toFixed(1);
+  V.amp.textContent  = (+S.amp.value).toFixed(1);
+  V.p.textContent    = (+S.p.value).toFixed(2);
+  V.n.textContent    = (+S.n.value|0);
+  V.maxc.textContent = (+S.maxc.value|0);
+  V.thr.textContent  = (+S.thr.value|0);
+}
+Object.values(S).forEach(sl=>sl.addEventListener("input", setSliderReads));
+setSliderReads();
+
+function normalPair(u1,u2){
+  // Box-Muller
+  const r = Math.sqrt(-2*Math.log(Math.max(u1,1e-12)));
+  const theta = 2*Math.PI*u2;
+  return [r*Math.cos(theta), r*Math.sin(theta)];
+}
+function rand(){ return Math.random(); }
+
+// ---------- stress model ----------
+function heatMultiplier(cycle){
+  // mild but periodic harsh window
+  // every 60 cycles, 12-cycle hot streak
+  const period = 60, hotLen = 12;
+  const m = cycle % period;
+  return (m < hotLen) ? 1.6 : 1.0;
+}
+function outlierExtra(){
+  // rare shocks
+  // ~0.5% chance of a spike
+  return (rand() < 0.005) ? (2.5 + 3.5*rand()) : 0.0;
+}
+function nonlinearMultiplier(health){
+  // accelerates as health drops
+  // gentle curve
+  const frac = clamp(1 - health/100, 0, 1);
+  return 1 + 1.2*frac*frac;
+}
+
+// ---------- simulate one cell ----------
+function simulateCell(params, useQDS, epsStream){
+  let health = 100;
+  let noisePrev = 0;
+  const {base, amp, p, maxCycles, thr, nonlin, heat, outlier, noregen} = params;
+
+  // store a profile for first paired example
+  const profile = [];
+
+  for(let c=1; c<=maxCycles; c++){
+    const [u1,u2] = epsStream.next();
+    const [z] = normalPair(u1,u2); // single normal
+    const eps = z * amp;
+
+    let noise = eps;
+    if(useQDS){
+      const s = Math.sqrt(Math.max(0, 1 - p*p));
+      noise = p*noisePrev + s*eps;
+      noisePrev = noise;
+    }
+
+    let drain = base + noise;
+
+    if(heat) drain *= heatMultiplier(c);
+    if(outlier) drain += outlierExtra();
+    if(nonlin) drain *= nonlinearMultiplier(health);
+
+    if(noregen && drain < 0) drain = 0;
+
+    health -= drain;
+    profile.push({c, health});
+
+    if(health <= thr){
+      return {cycles:c, profile};
+    }
+  }
+  return {cycles:maxCycles, profile};
+}
+
+// ---------- epsilon stream ----------
+function makeEpsStreamPaired(){
+  // yields shared uniforms for both models
+  return {
+    next(){
+      return [rand(), rand()];
+    }
+  };
+}
+function makeEpsStreamIndependent(){
+  // still same API
+  return {
+    next(){
+      return [rand(), rand()];
+    }
+  };
+}
+
+// ---------- main simulation ----------
+function runSim(){
+  const base = +S.base.value;
+  const amp  = +S.amp.value;
+  const p    = +S.p.value;
+  const n    = +S.n.value|0;
+  const maxCycles = +S.maxc.value|0;
+  const thr  = +S.thr.value|0;
+
+  const params = {
+    base, amp, p, maxCycles, thr,
+    nonlin:T.nonlin.checked,
+    heat:T.heat.checked,
+    outlier:T.outlier.checked,
+    noregen:T.noregen.checked
+  };
+
+  const paired = T.paired.checked;
+
+  const whiteCycles = new Array(n);
+  const qdsCycles   = new Array(n);
+
+  let pairedProfileWhite = null;
+  let pairedProfileQDS = null;
+
+  for(let i=0; i<n; i++){
+    const stream = paired ? makeEpsStreamPaired() : makeEpsStreamIndependent();
+
+    const w = simulateCell(params, false, stream);
+    const q = simulateCell(params, true,  paired ? stream : makeEpsStreamIndependent());
+
+    whiteCycles[i] = w.cycles;
+    qdsCycles[i]   = q.cycles;
+
+    if(i===0){
+      pairedProfileWhite = w.profile;
+      pairedProfileQDS   = q.profile;
+    }
+  }
+
+  const statsW = calcStats(whiteCycles);
+  const statsQ = calcStats(qdsCycles);
+
+  const rel = (statsQ.mean - statsW.mean) / Math.max(1e-9, statsW.mean) * 100;
+  const pairedDelta = (statsQ.mean - statsW.mean);
+
+  // update display with optional blind labels
+  applyLabels();
+
+  R.white_mean.textContent = statsW.mean.toFixed(1);
+  R.white_sig.textContent  = statsW.std.toFixed(1);
+  R.qds_mean.textContent   = statsQ.mean.toFixed(1);
+  R.qds_sig.textContent    = statsQ.std.toFixed(1);
+  R.rel_change.textContent = (rel>=0?"+":"") + rel.toFixed(1);
+  R.paired_delta.textContent = (pairedDelta>=0?"+":"") + pairedDelta.toFixed(2);
+
+  // charts
+  drawProfile(pairedProfileWhite, pairedProfileQDS, thr);
+  drawHist(whiteCycles, qdsCycles);
+
+  // save history
+  const runObj = {
+    ts: new Date().toISOString(),
+    base, amp, p, thr, n, maxCycles,
+    stress: {nonlin:params.nonlin, heat:params.heat, outlier:params.outlier},
+    bias: {paired, noregen:params.noregen, blind:T.blind.checked},
+    white: {mean:statsW.mean, std:statsW.std},
+    qds:   {mean:statsQ.mean, std:statsQ.std},
+    rel, pairedDelta
+  };
+
+  if(T.coach_store.checked){
+    pushHistory(runObj);
+    renderHistory();
+  }
+
+  // coach
+  if(T.coach_on.checked){
+    runCoach(runObj);
+  }else{
+    C.badge.textContent = "Coach OFF";
+    C.badge.className = "risk";
+    C.summary.textContent = "Coach disabled.";
+    C.advice.textContent = "";
+    C.learning.textContent = "Learning: paused.";
+  }
+
+  // small note
+  R.profile_note.textContent = `White failed ~cycle ${pairedProfileWhite.at(-1)?.c ?? "?"}, QDS failed ~cycle ${pairedProfileQDS.at(-1)?.c ?? "?"}.`;
+}
+
+// ---------- stats ----------
+function calcStats(arr){
+  const n = arr.length;
+  let s=0; for(const x of arr) s+=x;
+  const mean = s/n;
+  let v=0; for(const x of arr){ const d=x-mean; v+=d*d; }
+  const std = Math.sqrt(v/Math.max(1,n-1));
+  return {mean, std};
+}
+
+// ---------- labels / blind mode ----------
+function applyLabels(){
+  const blind = T.blind.checked;
+  const swap = blind && (Math.floor(Date.now()/1000) % 2 === 0);
+
+  const whiteName = swap ? "QDS-style" : "White noise";
+  const qdsName   = swap ? "White noise" : "QDS-style";
+
+  $("lbl_white_mean").textContent = `${whiteName} mean lifetime`;
+  $("lbl_white_sig").textContent  = `${whiteName} σ`;
+  $("lbl_qds_mean").textContent   = `${qdsName} mean lifetime`;
+  $("lbl_qds_sig").textContent    = `${qdsName} σ`;
+
+  $("lbl_white_line").textContent = whiteName;
+  $("lbl_qds_line").textContent   = qdsName;
+}
+
+// ---------- charts ----------
+function drawProfile(wProf, qProf, thr){
+  const c = $("profile");
+  const ctx = c.getContext("2d");
+  const W = c.width = c.clientWidth * devicePixelRatio;
+  const H = c.height = c.clientHeight * devicePixelRatio;
+
+  ctx.clearRect(0,0,W,H);
+
+  // grid
+  ctx.globalAlpha = 1;
+  ctx.strokeStyle = "rgba(255,255,255,0.06)";
+  ctx.lineWidth = 1*devicePixelRatio;
+  const gridN = 6;
+  for(let i=1;i<gridN;i++){
+    const y = H*i/gridN;
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+  }
+
+  function plot(prof, color){
+    if(!prof || prof.length===0) return;
+    const maxC = prof.at(-1).c;
+    ctx.beginPath();
+    for(let i=0;i<prof.length;i++){
+      const x = (prof[i].c / maxC) * (W*0.98) + W*0.01;
+      const y = H - (clamp(prof[i].health, 0, 100)/100) * (H*0.90) - H*0.05;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2.2*devicePixelRatio;
+    ctx.stroke();
+  }
+
+  plot(wProf, getComputedStyle(document.documentElement).getPropertyValue("--accent").trim());
+  plot(qProf, getComputedStyle(document.documentElement).getPropertyValue("--accent2").trim());
+
+  // threshold line
+  const yThr = H - (thr/100)*(H*0.90) - H*0.05;
+  ctx.setLineDash([6*devicePixelRatio, 6*devicePixelRatio]);
+  ctx.strokeStyle = "rgba(255,255,255,0.12)";
+  ctx.beginPath(); ctx.moveTo(W*0.01, yThr); ctx.lineTo(W*0.99, yThr); ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function drawHist(wArr, qArr){
+  const c = $("hist");
+  const ctx = c.getContext("2d");
+  const W = c.width = c.clientWidth * devicePixelRatio;
+  const H = c.height = c.clientHeight * devicePixelRatio;
+  ctx.clearRect(0,0,W,H);
+
+  const all = wArr.concat(qArr);
+  const min = Math.min(...all);
+  const max = Math.max(...all);
+  const bins = 18;
+  const bw = (max - min + 1) / bins;
+
+  const hw = new Array(bins).fill(0);
+  const hq = new Array(bins).fill(0);
+
+  for(const x of wArr){
+    const i = clamp(Math.floor((x-min)/bw), 0, bins-1);
+    hw[i]++;
+  }
+  for(const x of qArr){
+    const i = clamp(Math.floor((x-min)/bw), 0, bins-1);
+    hq[i]++;
+  }
+
+  const peak = Math.max(...hw, ...hq, 1);
+  const pad = 0.08;
+  const innerW = W*(1-2*pad);
+  const innerH = H*(1-2*pad);
+
+  // background grid
+  ctx.strokeStyle = "rgba(255,255,255,0.06)";
+  ctx.lineWidth = 1*devicePixelRatio;
+  for(let i=1;i<=4;i++){
+    const y = H*pad + innerH*i/5;
+    ctx.beginPath(); ctx.moveTo(W*pad,y); ctx.lineTo(W*(1-pad),y); ctx.stroke();
+  }
+
+  const barW = innerW / bins;
+
+  for(let i=0;i<bins;i++){
+    const x0 = W*pad + i*barW;
+
+    const h1 = (hw[i]/peak) * innerH;
+    const h2 = (hq[i]/peak) * innerH;
+
+    // white (accent)
+    ctx.fillStyle = "rgba(124,155,255,0.55)";
+    ctx.fillRect(x0 + barW*0.08, H*pad + (innerH - h1), barW*0.38, h1);
+
+    // qds (accent2)
+    ctx.fillStyle = "rgba(255,111,177,0.50)";
+    ctx.fillRect(x0 + barW*0.54, H*pad + (innerH - h2), barW*0.38, h2);
+  }
+}
+
+// ---------- history ----------
+function loadHistory(){
+  try{
+    const raw = localStorage.getItem(HIST_KEY);
+    if(!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr : [];
+  }catch(e){ return []; }
+}
+function saveHistory(arr){
+  try{ localStorage.setItem(HIST_KEY, JSON.stringify(arr.slice(-60))); }catch(e){}
+}
+function pushHistory(obj){
+  const arr = loadHistory();
+  arr.push(obj);
+  saveHistory(arr);
+}
+function renderHistory(){
+  const arr = loadHistory().slice().reverse();
+  if(arr.length===0){
+    R.history_box.textContent = "No saved runs yet.";
+    return;
+  }
+  const lines = arr.slice(0,12).map(r=>{
+    const t = new Date(r.ts);
+    const ts = t.toLocaleString();
+    const rel = (r.rel>=0?"+":"") + r.rel.toFixed(1) + "%";
+    return `${ts}
+base=${r.base.toFixed(1)}% · amp=${r.amp.toFixed(1)}% · p=${r.p.toFixed(2)} · thr=${r.thr}%
+n=${r.n} · max=${r.maxCycles}
+white μ=${r.white.mean.toFixed(1)} σ=${r.white.std.toFixed(1)} · QDS μ=${r.qds.mean.toFixed(1)} σ=${r.qds.std.toFixed(1)}
+Δ=${rel} · pairedΔ=${(r.pairedDelta>=0?"+":"") + r.pairedDelta.toFixed(2)}
+stress: nonlin=${r.stress.nonlin} heat=${r.stress.heat} outlier=${r.stress.outlier}
+bias: paired=${r.bias.paired} noRegen=${r.bias.noregen} blind=${r.bias.blind}`.replace(/\n/g," · ");
+  });
+  R.history_box.innerHTML = lines.join("<br><br>");
+}
+
+// ---------- coach brain ----------
+function runCoach(latest){
+  const hist = loadHistory();
+  const recent = hist.slice(-8); // last 8 runs
+
+  // risk score from parameters + stress toggles
+  const base = latest.base, amp = latest.amp, p = latest.p;
+  const s = latest.stress;
+
+  let risk = 0;
+  risk += base * 10;           // 0.2–6 => 2–60
+  risk += amp  * 6;            // 0–10 => 0–60
+  risk += p    * 25;           // 0–1 => 0–25
+  risk += s.heat ? 12 : 0;
+  risk += s.outlier ? 10 : 0;
+  risk += s.nonlin ? 8 : 0;
+  risk = clamp(risk, 0, 100);
+
+  let band = "good";
+  if(risk >= 65) band = "bad";
+  else if(risk >= 38) band = "warn";
+
+  C.badge.className = "risk " + band;
+  C.badge.textContent =
+    band==="good" ? "LOW STRESS" :
+    band==="warn" ? "MEDIUM STRESS" : "HIGH STRESS";
+
+  // “learning” signal: average rel over recent runs
+  let learnedRel = null;
+  if(recent.length){
+    const m = recent.reduce((a,r)=>a+r.rel,0) / recent.length;
+    learnedRel = m;
+  }
+
+  // heuristic advice
+  const chargeCap =
+    band==="bad" ? 80 :
+    band==="warn" ? 85 : 90;
+
+  const fastChargeText =
+    band==="bad" ? "Avoid routine fast charging; use it only when you must." :
+    band==="warn" ? "Fast charge is fine occasionally; prefer cooler conditions." :
+    "Fast charge is OK, but keep an eye on heat.";
+
+  const tempText =
+    s.heat ? "Heat epochs flagged — prioritise cooling/airflow and avoid charging while hot." :
+    "Thermal stress looks moderate in this regime.";
+
+  const corrText =
+    p >= 0.6 ? "Strong correlation regime: ageing can cluster into sharper drops. Smoother charge patterns help." :
+    p >= 0.25 ? "Moderate correlation: you may see 'good weeks' and 'bad weeks'." :
+    "Low correlation: wear is closer to random scatter.";
+
+  const outlierText =
+    s.outlier ? "Rare shock events ON — treat high-current spikes as the enemy of longevity." :
+    "Shock events OFF — smoother scenario.";
+
+  // toy “real-world-ish” translation (very conservative)
+  // map lifetime cycles to a soft “retention outlook”
+  // purely illustrative
+  const w = latest.white.mean;
+  const q = latest.qds.mean;
+  const rel = latest.rel;
+
+  const outlook =
+    rel > 15 ? "This sim configuration suggests a noticeable resilience edge under correlated stress." :
+    rel > 3  ? "This configuration suggests a small but consistent resilience edge." :
+    rel > -3 ? "This looks roughly neutral in this configuration." :
+               "This configuration suggests correlation may be harming stability here.";
+
+  const learnedLine = (learnedRel==null)
+    ? "Learning: not enough stored runs yet."
+    : `Learning (last ${recent.length} runs): mean Δ ≈ ${(learnedRel>=0?"+":"") + learnedRel.toFixed(1)}%.`;
+
+  C.summary.textContent =
+    `Risk score ≈ ${risk.toFixed(0)}/100. Suggested daily target: ${chargeCap}% cap for longevity.`;
+
+  C.advice.innerHTML = `
+• <strong>Charge window:</strong> Aim for <strong>25–${chargeCap}%</strong> for routine days.  
+• <strong>Overnight plan:</strong> If you need 100% for travel, top off closer to departure.  
+• <strong>Heat discipline:</strong> ${tempText}  
+• <strong>Correlation read:</strong> ${corrText}  
+• <strong>Shock control:</strong> ${outlierText}  
+• <strong>Fast charge:</strong> ${fastChargeText}  
+• <strong>Outcome note:</strong> ${outlook}
+`;
+
+  C.learning.textContent = learnedLine;
+
+  // micro “coach flavour”
+  const deltaStr = (w && q)
+    ? `White μ=${w.toFixed(1)} vs QDS μ=${q.toFixed(1)} ⇒ ${(rel>=0?"+":"") + rel.toFixed(1)}%.`
+    : "—";
+  C.learning.title = deltaStr;
+}
+
+// ---------- defaults / presets ----------
+function setAll({base, amp, p, n, maxc, thr, nonlin, heat, outlier, paired, noregen, blind}){
+  S.base.value = base; S.amp.value = amp; S.p.value = p;
+  S.n.value = n; S.maxc.value = maxc; S.thr.value = thr;
+  T.nonlin.checked = nonlin; T.heat.checked = heat; T.outlier.checked = outlier;
+  T.paired.checked = paired; T.noregen.checked = noregen; T.blind.checked = blind;
+  setSliderReads();
+  applyLabels();
+}
+
+function defaults(){
+  setAll({
+    base:2.0, amp:3.0, p:0.60, n:1550, maxc:3000, thr:80,
+    nonlin:true, heat:true, outlier:true,
+    paired:true, noregen:true, blind:true
+  });
+}
+defaults();
+
+B.reset.addEventListener("click", defaults);
+
+B.preset_real.addEventListener("click", ()=>setAll({
+  base:1.2, amp:1.8, p:0.25, n:1200, maxc:4000, thr:75,
+  nonlin:true, heat:false, outlier:false,
+  paired:true, noregen:true, blind:true
+}));
+
+B.preset_contrast.addEventListener("click", ()=>setAll({
+  base:2.0, amp:3.5, p:0.70, n:1800, maxc:3500, thr:60,
+  nonlin:true, heat:true, outlier:true,
+  paired:true, noregen:true, blind:true
+}));
+
+B.preset_chaos.addEventListener("click", ()=>setAll({
+  base:3.5, amp:6.0, p:0.85, n:2000, maxc:2500, thr:50,
+  nonlin:true, heat:true, outlier:true,
+  paired:true, noregen:true, blind:true
+}));
+
+B.hardnull.addEventListener("click", ()=>{
+  S.p.value = 0.00;
+  setSliderReads();
+});
+
+B.clear_hist.addEventListener("click", ()=>{
+  try{ localStorage.removeItem(HIST_KEY); }catch(e){}
+  renderHistory();
+  C.badge.textContent = "—";
+  C.badge.className = "risk";
+  C.summary.textContent = "History cleared.";
+  C.advice.textContent = "";
+  C.learning.textContent = "Learning: reset.";
+});
+
+// ---------- run ----------
+B.run.addEventListener("click", runSim);
+
+// init
+renderHistory();
+applyLabels();
+</script>
+</body>
+</html>

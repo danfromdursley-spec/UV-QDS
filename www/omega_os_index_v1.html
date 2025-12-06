@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ω-OS Index v1 — Shed Edition</title>
+<style>
+:root{
+  --bg:#07070e;
+  --panel:#0d0b1d;
+  --panel2:#120f2a;
+  --glow:#24ff9a;
+  --glow2:#8b5bff;
+  --text:#f2f4ff;
+  --muted:#b7b9d6;
+  --radius:18px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(139,91,255,.14), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(36,255,154,.12), transparent 60%),
+    linear-gradient(180deg, #05050c, #070711 35%, #05050c);
+  min-height:100vh;
+}
+.wrap{
+  max-width:980px;
+  margin:0 auto;
+  padding:18px 14px 40px;
+}
+.header{
+  background:linear-gradient(135deg, rgba(139,91,255,.12), rgba(36,255,154,.10));
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:var(--radius);
+  padding:18px 16px;
+  box-shadow: 0 0 0 1px rgba(36,255,154,.08) inset;
+}
+.title{
+  display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+}
+.badge{
+  display:inline-flex;
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:12px;
+  letter-spacing:.2px;
+  border:1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.03);
+}
+.badge.green{ border-color: rgba(36,255,154,.35); color:#c7ffe8;}
+.badge.purple{ border-color: rgba(139,91,255,.35); color:#e4d8ff;}
+.sub{
+  margin-top:8px;
+  color:var(--muted);
+  font-size:13.5px;
+}
+.section{
+  margin-top:16px;
+  background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:var(--radius);
+  padding:14px;
+}
+.section h2{
+  margin:2px 0 10px;
+  font-size:18px;
+  letter-spacing:.3px;
+}
+.grid{
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap:10px;
+}
+@media (min-width:820px){
+  .grid{ grid-template-columns: repeat(3, minmax(0,1fr)); }
+}
+.card{
+  position:relative;
+  background: linear-gradient(145deg, var(--panel), var(--panel2));
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:14px;
+  padding:14px 12px 12px;
+  text-decoration:none;
+  color:var(--text);
+  min-height:108px;
+  transition: transform .06s ease, border-color .12s ease, box-shadow .12s ease;
+}
+.card:hover{
+  transform: translateY(-1px);
+  border-color: rgba(36,255,154,.22);
+  box-shadow: 0 0 0 1px rgba(36,255,154,.10) inset;
+}
+.tag{
+  display:inline-block;
+  font-size:11px;
+  padding:3px 8px;
+  border-radius:999px;
+  margin-bottom:8px;
+  background: rgba(36,255,154,.08);
+  border:1px solid rgba(36,255,154,.22);
+  color:#d8fff1;
+}
+.tag.p{ background: rgba(139,91,255,.08); border-color: rgba(139,91,255,.25); color:#efe7ff;}
+.name{
+  font-size:16px; font-weight:650; line-height:1.15;
+}
+.desc{
+  margin-top:6px;
+  color:var(--muted);
+  font-size:12.5px;
+  line-height:1.25;
+}
+.footer{
+  margin-top:14px;
+  color:var(--muted);
+  font-size:12px;
+  text-align:center;
+  opacity:.85;
+}
+.smallrow{
+  display:flex; gap:8px; flex-wrap:wrap;
+}
+.btn{
+  display:inline-flex;
+  align-items:center; justify-content:center;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.03);
+  color:var(--text);
+  text-decoration:none;
+  font-size:12.5px;
+}
+.btn:hover{ border-color: rgba(139,91,255,.28); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div class="title">
+      <span class="badge purple">Ω-OS</span>
+      <span class="badge green">Offline</span>
+      <span class="badge green">Phone-safe</span>
+      <span class="badge purple">Shed Edition</span>
+      <h1 style="margin:0;font-size:22px;">Ω-OS Index v1</h1>
+    </div>
+    <div class="sub">
+      One home button for your growing empire. Uses relative links → works on any localhost port.
+    </div>
+    <div class="smallrow" style="margin-top:10px;">
+      <a class="btn" href="omega_qds_lab.html">Open Ω-QDS Lab</a>
+      <a class="btn" href="qds_battery_os_index_v1.html">Open Battery OS</a>
+      <a class="btn" href="indus_atlas_v1_qds_language_lab.html">Open Indus Atlas</a>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>⭐ Core Homes</h2>
+    <div class="grid">
+      <a class="card" href="qds_battery_os_index_v1.html">
+        <span class="tag">Recommended</span>
+        <div class="name">QDS Battery OS — Index</div>
+        <div class="desc">Battery family launchpad: hubs, suites, coach, logs.</div>
+      </a>
+
+      <a class="card" href="omega_qds_lab.html">
+        <span class="tag p">Unified Lab</span>
+        <div class="name">Ω-QDS Lab Dashboard</div>
+        <div class="desc">Your multi-toy phone-safe command board.</div>
+      </a>
+
+      <a class="card" href="indus_atlas_v1_qds_language_lab.html">
+        <span class="tag p">Language</span>
+        <div class="name">Indus Atlas</div>
+        <div class="desc">Script + coherence lab in one bite-sized portal.</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>🔋 Battery Quick Launch</h2>
+    <div class="grid">
+      <a class="card" href="qds_battery_hub_v9_6_science_neon.html">
+        <span class="tag">Stable</span>
+        <div class="name">Battery Hub v9.6</div>
+        <div class="desc">Fast semi-empirical AR(1) stress toy.</div>
+      </a>
+
+      <a class="card" href="qds_battery_hub_v9_5_science_neon.html">
+        <span class="tag">Milestone</span>
+        <div class="name">Battery Hub v9.5</div>
+        <div class="desc">QuickSweep + dedupe era.</div>
+      </a>
+
+      <a class="card" href="qds_battery_coach_v3.html">
+        <span class="tag p">Coach</span>
+        <div class="name">Battery Coach v3</div>
+        <div class="desc">Friendly habits + interpretation layer.</div>
+      </a>
+
+      <a class="card" href="qds_battery_whisperer_v2.html">
+        <span class="tag p">Utility</span>
+        <div class="name">Whisperer v2</div>
+        <div class="desc">Lightweight helper / quick sanity checks.</div>
+      </a>
+
+      <a class="card" href="qds_battery_lab.html">
+        <span class="tag">Workbench</span>
+        <div class="name">Battery Lab Classic</div>
+        <div class="desc">Older stable lab page.</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>🌌 Space & Maps</h2>
+    <div class="grid">
+      <a class="card" href="solar_system_v8_offline.html">
+        <span class="tag">Offline</span>
+        <div class="name">Solar System v8</div>
+        <div class="desc">Clean lightweight cosmos.</div>
+      </a>
+
+      <a class="card" href="qds_universe_v9_10_neon_planet_colours.html">
+        <span class="tag p">Neon</span>
+        <div class="name">Universe v9.10</div>
+        <div class="desc">Pretty orbit chaos for the eyeballs.</div>
+      </a>
+
+      <a class="card" href="stinchcombe_map.html">
+        <span class="tag p">Local</span>
+        <div class="name">Stinchcombe Map</div>
+        <div class="desc">Your turf layer.</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>🎯 Toys & Experiments</h2>
+    <div class="grid">
+      <a class="card" href="catapult_balloon_pop_v1.html">
+        <span class="tag">Fun</span>
+        <div class="name">Catapult Balloon Pop</div>
+        <div class="desc">Chaos therapy, scientifically approved by vibes.</div>
+      </a>
+
+      <a class="card" href="qds_battery_noise_toy_v1.html">
+        <span class="tag">Demo</span>
+        <div class="name">Battery Noise Toy</div>
+        <div class="desc">Noise-only intuition lab.</div>
+      </a>
+
+      <a class="card" href="qds_battery_lab_showcase_v1.html">
+        <span class="tag p">Showcase</span>
+        <div class="name">Battery Lab Showcase</div>
+        <div class="desc">Guided visuals.</div>
+      </a>
+
+      <a class="card" href="qds_battery_lab_showcase_stress_bias_v2.html">
+        <span class="tag p">Experiment</span>
+        <div class="name">Stress Bias v2</div>
+        <div class="desc">Bias variant demo.</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="footer">
+    Ω-OS Index v1 • Curated list. Add new pages by dropping a new card link. 🎩
+  </div>
+
+</div>
+</body>
+</html>

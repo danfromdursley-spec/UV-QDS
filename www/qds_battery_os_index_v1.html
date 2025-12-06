@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>QDS Battery OS — Index v1</title>
+<style>
+:root{
+  --bg:#07020f;
+  --panel:#0d041e;
+  --panel2:#120626;
+  --accent:#9b5cff;     /* purple */
+  --accent2:#00ff88;    /* neon green */
+  --text:#f5edff;
+  --muted:#cbb8ff;
+  --warn:#ff4bd8;
+  --glow:0 0 12px rgba(155,92,255,.35), 0 0 18px rgba(0,255,136,.18);
+  --radius:14px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, sans-serif;
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(155,92,255,.15), transparent 60%),
+    radial-gradient(1000px 700px at 110% 10%, rgba(0,255,136,.10), transparent 60%),
+    linear-gradient(180deg, #05010c, var(--bg));
+  color:var(--text);
+}
+header{
+  padding:18px 16px 10px;
+}
+h1{
+  margin:0 0 6px 0;
+  font-size:1.25rem;
+  letter-spacing:.3px;
+}
+.sub{
+  color:var(--muted);
+  font-size:.9rem;
+}
+.badge{
+  display:inline-block;
+  padding:2px 8px;
+  border:1px solid rgba(0,255,136,.35);
+  border-radius:999px;
+  color:var(--accent2);
+  font-size:.72rem;
+  margin-left:6px;
+}
+.wrap{
+  padding: 0 12px 20px;
+  display:grid;
+  gap:12px;
+}
+.panel{
+  background: linear-gradient(135deg, rgba(155,92,255,.08), rgba(0,255,136,.06)),
+              linear-gradient(180deg, var(--panel), var(--panel2));
+  border:1px solid rgba(155,92,255,.22);
+  border-radius:var(--radius);
+  padding:12px;
+  box-shadow: var(--glow);
+}
+.section-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin:0 0 10px 0;
+  font-weight:700;
+  font-size:1rem;
+}
+.grid{
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap:10px;
+}
+@media (min-width:700px){
+  .grid{ grid-template-columns: repeat(3, minmax(0,1fr)); }
+}
+.btn{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  padding:12px 12px 10px;
+  border-radius:12px;
+  background:
+    linear-gradient(135deg, rgba(155,92,255,.18), rgba(0,255,136,.10)),
+    linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00));
+  border:1px solid rgba(0,255,136,.25);
+  text-decoration:none;
+  color:var(--text);
+  min-height:72px;
+  transition: transform .08s ease, border-color .12s ease, box-shadow .12s ease;
+}
+.btn:hover{ transform: translateY(-1px); }
+.btn:active{ transform: translateY(1px) scale(.99); }
+.btn .name{
+  font-weight:700;
+  font-size:.98rem;
+}
+.btn .meta{
+  font-size:.76rem;
+  color:var(--muted);
+}
+.tag{
+  align-self:flex-start;
+  font-size:.68rem;
+  padding:1px 6px;
+  border-radius:999px;
+  border:1px solid rgba(155,92,255,.35);
+  color:var(--accent);
+}
+.tag.green{
+  border-color: rgba(0,255,136,.45);
+  color: var(--accent2);
+}
+.tag.warn{
+  border-color: rgba(255,75,216,.5);
+  color: var(--warn);
+}
+.row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.small-btn{
+  padding:8px 10px;
+  background: linear-gradient(135deg, rgba(155,92,255,.22), rgba(0,255,136,.12));
+  border:1px solid rgba(155,92,255,.28);
+  border-radius:10px;
+  color:var(--text);
+  text-decoration:none;
+  font-size:.85rem;
+  font-weight:600;
+}
+.small-btn.secondary{
+  border-color: rgba(0,255,136,.35);
+}
+.note{
+  font-size:.85rem;
+  color:var(--muted);
+  line-height:1.35;
+}
+footer{
+  padding: 0 12px 22px;
+  color:var(--muted);
+  font-size:.8rem;
+}
+code.inline{
+  background: rgba(255,255,255,.05);
+  padding:1px 6px;
+  border-radius:6px;
+  border:1px solid rgba(255,255,255,.08);
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>QDS Battery OS — Index v1 <span class="badge">Shed Edition</span></h1>
+  <div class="sub">Offline • Phone-safe • Purple / Neon Green 🔋</div>
+</header>
+
+<div class="wrap">
+
+  <div class="panel">
+    <div class="section-title">
+      <span>⭐ Recommended Launch</span>
+      <span class="sub">start here, old chap</span>
+    </div>
+    <div class="grid" id="recommended"></div>
+  </div>
+
+  <div class="panel">
+    <div class="section-title">
+      <span>🧪 Hubs</span>
+      <span class="sub">version ladder</span>
+    </div>
+    <div class="grid" id="hubs"></div>
+  </div>
+
+  <div class="panel">
+    <div class="section-title">
+      <span>🧰 Suites & Toys</span>
+      <span class="sub">showcases + intuition labs</span>
+    </div>
+    <div class="grid" id="suites"></div>
+  </div>
+
+  <div class="panel">
+    <div class="section-title">
+      <span>🧑‍🔧 Coach & Logs</span>
+      <span class="sub">practical + archive</span>
+    </div>
+    <div class="grid" id="coach"></div>
+  </div>
+
+  <div class="panel">
+    <div class="section-title">
+      <span>⚡ Quick Tools</span>
+      <span class="sub">Termux-friendly habits</span>
+    </div>
+    <div class="row">
+      <a class="small-btn" href="qds_battery_os_index_v1.html">Reload Index</a>
+      <a class="small-btn secondary" href="omega_qds_lab.html">Ω-QDS Lab</a>
+      <a class="small-btn secondary" href="qds_battery_lab.html">Battery Lab Classic</a>
+    </div>
+    <p class="note" style="margin-top:10px">
+      If you’re serving via localhost, all these links are golden.
+      If you open as raw files, most still work offline.
+    </p>
+  </div>
+
+</div>
+
+<footer>
+  This index uses a curated list (browser security can’t auto-scan your folder).
+  If you add new pages, just extend the JS list at the bottom.
+</footer>
+
+<script>
+const PAGES = [
+  // --- Recommended / flagship ---
+  {id:"hub97", name:"Battery Hub v9.7 — Lab-Shaped Neon", file:"qds_battery_hub_v9_7_science_neon_lab.html",
+   group:"recommended", tag:"Most accurate (toy)", tagClass:"green",
+   meta:"Cycle + Calendar • Capacity + Resistance • AR(1) stress"},
+  {id:"hub96", name:"Battery Hub v9.6 — Science Neon", file:"qds_battery_hub_v9_6_science_neon.html",
+   group:"recommended", tag:"Stable", tagClass:"green",
+   meta:"Fast phone-safe semi-empirical model"},
+  {id:"coach3", name:"Battery Coach v3", file:"qds_battery_coach_v3.html",
+   group:"recommended", tag:"Practical", tagClass:"green",
+   meta:"Friendly advice layer"},
+
+  // --- Hubs ---
+  {name:"Hub v9.6 — Science Neon", file:"qds_battery_hub_v9_6_science_neon.html", group:"hubs",
+   tag:"Latest prior", meta:"AR(1) stress + T + DoD + Poster/NoRegen"},
+  {name:"Hub v9.5.1 — Science Neon", file:"qds_battery_hub_v9_5_1_science_neon.html", group:"hubs",
+   tag:"Patch", meta:"Bugfix / tweaks"},
+  {name:"Hub v9.5 — Science Neon", file:"qds_battery_hub_v9_5_science_neon.html", group:"hubs",
+   tag:"Milestone", meta:"QuickSweep + dedupe"},
+  {name:"Hub v9.4 — Science Neon Plus", file:"qds_battery_hub_v9_4_science_neon_plus.html", group:"hubs",
+   tag:"Expansion", meta:"Enhanced UI + logic"},
+  {name:"Hub v9.3 — Science Neon", file:"qds_battery_hub_v9_3_science_neon.html", group:"hubs",
+   tag:"Core", meta:"Semi-empirical fade toy"},
+  {name:"Hub v9.2 — Purple / Neon Green", file:"qds_battery_hub_v9_2_purple_neon.html", group:"hubs",
+   tag:"Classic neon", meta:"Earlier style build"},
+  {name:"Hub v9.1 — Purple Neon", file:"qds_battery_hub_v9_1_purple_neon.html", group:"hubs",
+   tag:"Prototype", meta:"First neon hub"},
+
+  // --- Suites & toys ---
+  {name:"Suite v8 NextLevel", file:"qds_battery_suite_v8_nextlevel.html", group:"suites",
+   tag:"Showcase", meta:"UI + behaviours pack"},
+  {name:"Suite v8.3 Neon Shell", file:"qds_battery_suite_v8_3_neon_shell.html", group:"suites",
+   tag:"Neon", meta:"Styled showcase"},
+  {name:"Suite v8.2 Poster Tamed", file:"qds_battery_suite_v8_2_poster_tamed.html", group:"suites",
+   tag:"Poster-safe", meta:"Tamed extremes"},
+  {name:"Suite v8.1 FairPath", file:"qds_battery_suite_v8_1_fairpath.html", group:"suites",
+   tag:"Balanced", meta:"Fair comparison focus"},
+  {name:"Suite v6 RealWorld", file:"qds_battery_suite_v6_realworld.html", group:"suites",
+   tag:"Realism push", meta:"More grounded assumptions"},
+  {name:"Suite v5 Boss Polish", file:"qds_battery_suite_v5_boss_polish.html", group:"suites",
+   tag:"Polish", meta:"UI refinement"},
+  {name:"Suite v4 Showcase", file:"qds_battery_suite_v4_showcase.html", group:"suites",
+   tag:"Vintage", meta:"Earlier demo set"},
+  {name:"Noise Toy v1", file:"qds_battery_noise_toy_v1.html", group:"suites",
+   tag:"Fast intuition", meta:"Noise-only behaviour demo"},
+  {name:"Lab Showcase v1", file:"qds_battery_lab_showcase_v1.html", group:"suites",
+   tag:"Demo", meta:"Guided visuals"},
+  {name:"Stress Bias v1", file:"qds_battery_lab_showcase_stress_bias_v1.html", group:"suites",
+   tag:"Experiment", meta:"Bias illustration"},
+  {name:"Stress Bias v2", file:"qds_battery_lab_showcase_stress_bias_v2.html", group:"suites",
+   tag:"Experiment", meta:"Bias variant"},
+
+  // --- Coach & logs ---
+  {name:"Battery Lab Classic", file:"qds_battery_lab.html", group:"coach",
+   tag:"Workbench", meta:"Older stable lab page"},
+  {name:"Whisperer v2", file:"qds_battery_whisperer_v2.html", group:"coach",
+   tag:"Fun utility", meta:"Lightweight helper"}
+];
+
+function card(p){
+  const a = document.createElement("a");
+  a.className = "btn";
+  a.href = p.file;
+  a.innerHTML = `
+    <span class="tag ${p.tagClass||""}">${p.tag||"Module"}</span>
+    <span class="name">${p.name}</span>
+    <span class="meta">${p.meta||p.file}</span>
+  `;
+  return a;
+}
+
+function mount(group, elId){
+  const root = document.getElementById(elId);
+  PAGES.filter(p=>p.group===group).forEach(p=>root.appendChild(card(p)));
+}
+
+mount("recommended","recommended");
+mount("hubs","hubs");
+mount("suites","suites");
+mount("coach","coach");
+</script>
+</body>
+</html>

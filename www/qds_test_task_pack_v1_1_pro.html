@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+<title>QDS Test Task Pack v1.1 PRO (Phone Offline)</title>
+<style>
+  :root{
+    --bg:#05070c; --fg:#eef4ff; --mut:#a8b6d1; --acc:#7dd3fc;
+    --panel: rgba(12,18,32,0.82);
+    --btn: rgba(120,160,255,0.12);
+    --btn2: rgba(120,160,255,0.22);
+    --good:#9bffb1; --warn:#ffd48a; --bad:#ff9b9b;
+    --lineOk: rgba(155,255,177,0.08);
+    --lineBad: rgba(255,155,155,0.08);
+  }
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);
+    font:14px/1.25 system-ui,Segoe UI,Roboto,Arial}
+  #wrap{position:fixed;inset:0;overflow:auto}
+  .page{max-width:1040px;margin:0 auto;padding:14px 12px 40px}
+  h1{font-size:20px;margin:10px 0 6px}
+  h2{font-size:16px;margin:16px 0 8px;color:var(--acc)}
+  .panel{
+    background:var(--panel);border:1px solid rgba(140,180,255,0.14);
+    border-radius:14px;padding:12px;margin:10px 0;
+    box-shadow:0 6px 22px rgba(0,0,0,0.35)
+  }
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .mut{color:var(--mut)}
+  .small{font-size:11px}
+  .tag{display:inline-block;padding:2px 8px;border-radius:999px;
+    background:rgba(125,211,252,0.12);border:1px solid rgba(125,211,252,0.22);
+    font-size:10px;color:var(--acc)}
+  button{
+    background:var(--btn);color:var(--fg);
+    border:1px solid rgba(140,180,255,0.18);
+    padding:8px 10px;border-radius:10px;font-weight:600;
+  }
+  button:active{background:var(--btn2);transform: translateY(1px)}
+  textarea,input{
+    background:rgba(255,255,255,0.04);color:var(--fg);
+    border:1px solid rgba(140,180,255,0.14);
+    border-radius:10px;padding:8px;
+  }
+  textarea{width:100%;min-height:110px}
+  canvas{
+    width:100%;height:220px;background:rgba(255,255,255,0.03);
+    border-radius:10px;border:1px solid rgba(140,180,255,0.12)
+  }
+  .checklist label{display:flex;gap:8px;align-items:flex-start;padding:6px 0}
+  .checklist input{margin-top:2px}
+  .good{color:var(--good)} .warn{color:var(--warn)} .bad{color:var(--bad)}
+
+  /* Tabs */
+  .tabs{display:flex;gap:6px;flex-wrap:wrap}
+  .tabBtn{
+    padding:8px 12px;border-radius:12px;
+  }
+  .tabBtn.active{
+    border-color: rgba(125,211,252,0.45);
+    background: rgba(125,211,252,0.18);
+  }
+  .tabPanel{display:none}
+  .tabPanel.active{display:block}
+
+  /* Inspector */
+  .inspector{
+    max-height:180px;overflow:auto;border-radius:10px;
+    border:1px solid rgba(140,180,255,0.12);
+    background: rgba(255,255,255,0.03);
+  }
+  .line{
+    display:flex;gap:8px;align-items:center;
+    padding:5px 8px;border-bottom:1px solid rgba(140,180,255,0.06);
+  }
+  .line:last-child{border-bottom:none}
+  .line.ok{background:var(--lineOk)}
+  .line.bad{background:var(--lineBad)}
+  .pill{
+    font-size:9px;padding:1px 6px;border-radius:999px;border:1px solid;
+  }
+  .pill.ok{color:var(--good);border-color:rgba(155,255,177,0.35)}
+  .pill.bad{color:var(--bad);border-color:rgba(255,155,155,0.35)}
+  .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div class="page">
+    <div class="row">
+      <span class="tag">Offline-first</span>
+      <span class="tag">Phone-safe</span>
+      <span class="tag">No libs</span>
+      <span class="tag">v1.1 PRO</span>
+    </div>
+
+    <h1>QDS Test Task Pack v1.1 PRO</h1>
+    <div class="mut small">
+      A lightweight, reproducibility-first checklist + micro-fit tools.
+      This pack helps keep tests clean, logged and shareable.
+    </div>
+
+    <div class="panel">
+      <div class="tabs">
+        <button class="tabBtn active" data-tab="tab_check">Checklist</button>
+        <button class="tabBtn" data-tab="tab_h0">H₀ Micro-Fit</button>
+        <button class="tabBtn" data-tab="tab_gal">Galaxy Micro-Check</button>
+        <button class="tabBtn" data-tab="tab_notes">Notes</button>
+      </div>
+    </div>
+
+    <!-- ================= CHECKLIST TAB ================= -->
+    <div id="tab_check" class="tabPanel active">
+
+      <div class="panel">
+        <h2>1) Core Task Checklist</h2>
+        <div class="checklist" id="checklist"></div>
+        <div class="row">
+          <button id="btnAll">Mark All</button>
+          <button id="btnNone">Clear</button>
+          <span class="mut small" id="progressTxt">0%</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>2) Session Metadata</h2>
+        <div class="row">
+          <input id="sessionName" placeholder="Session label (e.g., QDS_TestPack_Run_01)" style="flex:1"/>
+          <input id="dateStamp" placeholder="Date" style="width:160px"/>
+        </div>
+        <div class="row">
+          <input id="device" placeholder="Device (auto-detected)" style="flex:1"/>
+          <input id="browser" placeholder="Browser (auto-detected)" style="flex:1"/>
+        </div>
+        <div class="row">
+          <input id="datasetRef" placeholder="Dataset refs (Pantheon+/SH0ES/...)" style="flex:1"/>
+        </div>
+        <div class="row">
+          <button id="btnSaveMeta">Save Meta</button>
+          <button id="btnExport">Export JSON</button>
+        </div>
+        <div class="mut small" id="metaStatus"></div>
+      </div>
+
+    </div>
+
+    <!-- ================= H0 TAB ================= -->
+    <div id="tab_h0" class="tabPanel">
+
+      <div class="panel">
+        <h2>3) H₀ Variance Micro-Fit (Power Law)</h2>
+        <div class="mut small">
+          Paste CSV with columns: <b>R</b>, <b>sigmaH_over_H</b>.
+          Fits: <b>y = A * R^-p</b> via log–log regression.
+        </div>
+
+        <div class="row">
+          <button id="btnLoadSample">Load Sample</button>
+          <button id="btnPasteClipH0">Paste Clipboard</button>
+          <button id="btnFit">Run Fit</button>
+          <button id="btnClearData">Clear Data</button>
+        </div>
+
+        <textarea id="csvBox" spellcheck="false"
+          placeholder="R,sigmaH_over_H
+50,0.030
+100,0.022
+200,0.017
+400,0.013"></textarea>
+
+        <div class="row">
+          <div class="panel" style="flex:1;margin:0">
+            <div class="mut small">Fit output</div>
+            <div id="fitOut" class="small"></div>
+          </div>
+          <div class="panel" style="flex:1;margin:0">
+            <div class="mut small">Interpretation helper</div>
+            <div id="fitHint" class="small mut"></div>
+          </div>
+        </div>
+
+        <canvas id="plotH0"></canvas>
+
+        <div class="panel" style="margin-top:10px">
+          <div class="row">
+            <span class="mut small">Line inspector (first 60 non-empty lines)</span>
+            <span class="mut small" id="insCountH0"></span>
+          </div>
+          <div id="insH0" class="inspector"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================= GALAXY TAB ================= -->
+    <div id="tab_gal" class="tabPanel">
+
+      <div class="panel">
+        <h2>4) Galaxy Rotation Micro-Check (RMS Utility)</h2>
+        <div class="mut small">
+          Paste rows with any of these columns (header optional):<br>
+          <span class="mono">r, v_obs, v_newt, v_qds</span><br>
+          The tool computes RMS differences where possible and plots quick curves.
+          This is a lightweight sanity check, not a full mass-model fit.
+        </div>
+
+        <div class="row">
+          <button id="btnLoadGalSample">Load Sample</button>
+          <button id="btnPasteClipGal">Paste Clipboard</button>
+          <button id="btnGalAnalyse">Analyse</button>
+          <button id="btnGalClear">Clear Data</button>
+        </div>
+
+        <textarea id="galBox" spellcheck="false"
+          placeholder="r,v_obs,v_newt,v_qds
+1,110,90,108
+2,140,115,138
+3,160,130,158
+4,175,140,172"></textarea>
+
+        <div class="row">
+          <div class="panel" style="flex:1;margin:0">
+            <div class="mut small">RMS summary</div>
+            <div id="galOut" class="small"></div>
+          </div>
+          <div class="panel" style="flex:1;margin:0">
+            <div class="mut small">Notes</div>
+            <div id="galHint" class="small mut"></div>
+          </div>
+        </div>
+
+        <canvas id="plotGal"></canvas>
+
+        <div class="panel" style="margin-top:10px">
+          <div class="row">
+            <span class="mut small">Line inspector (first 60 non-empty lines)</span>
+            <span class="mut small" id="insCountGal"></span>
+          </div>
+          <div id="insGal" class="inspector"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================= NOTES TAB ================= -->
+    <div id="tab_notes" class="tabPanel">
+      <div class="panel">
+        <h2>5) Notes</h2>
+        <textarea id="notes" placeholder="Observations, anomalies, tweaks, TODOs..."></textarea>
+        <div class="row">
+          <button id="btnSaveNotes">Save Notes</button>
+          <button id="btnWipeAll">Wipe Local Save</button>
+          <span class="mut small" id="saveStatus"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mut small">
+      PRO tip: Use the Galaxy tab for quick RMS sanity checks, then run your deeper QDS pipelines.
+      This pack is your portable “field clipboard.” 🎩
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  // ============================
+  // QDS Test Task Pack v1.1 PRO
+  // ============================
+
+  const KEY = "QDS_TEST_PACK_V1_1_PRO";
+
+  const TASKS = [
+    "Confirm dataset source + version and record reference IDs.",
+    "Define the exact hypothesis statement for this session.",
+    "Write falsification thresholds (what would count as a fail).",
+    "Run H₀-variance micro-fit with raw pasted data.",
+    "Capture screenshot of fit + plot for record.",
+    "If using galaxy data, confirm units + distance conventions.",
+    "Record device + browser + performance notes.",
+    "Export JSON log for archive."
+  ];
+
+  // ---- elements ----
+  const checklistEl = document.getElementById("checklist");
+  const progressTxt = document.getElementById("progressTxt");
+
+  const sessionName = document.getElementById("sessionName");
+  const dateStamp = document.getElementById("dateStamp");
+  const device = document.getElementById("device");
+  const browser = document.getElementById("browser");
+  const datasetRef = document.getElementById("datasetRef");
+  const metaStatus = document.getElementById("metaStatus");
+
+  const csvBox = document.getElementById("csvBox");
+  const fitOut = document.getElementById("fitOut");
+  const fitHint = document.getElementById("fitHint");
+  const plotH0 = document.getElementById("plotH0");
+  const pctxH0 = plotH0.getContext("2d");
+  const insH0 = document.getElementById("insH0");
+  const insCountH0 = document.getElementById("insCountH0");
+
+  const galBox = document.getElementById("galBox");
+  const galOut = document.getElementById("galOut");
+  const galHint = document.getElementById("galHint");
+  const plotGal = document.getElementById("plotGal");
+  const pctxGal = plotGal.getContext("2d");
+  const insGal = document.getElementById("insGal");
+  const insCountGal = document.getElementById("insCountGal");
+
+  const notes = document.getElementById("notes");
+  const saveStatus = document.getElementById("saveStatus");
+
+  // ---- state ----
+  let state = loadState();
+
+  // ============================
+  // Tabs
+  // ============================
+  document.querySelectorAll(".tabBtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tabBtn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".tabPanel").forEach(p => p.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById(btn.dataset.tab).classList.add("active");
+    });
+  });
+
+  // ============================
+  // Init date + auto detect
+  // ============================
+  const pad = n => String(n).padStart(2,"0");
+  if (!state.meta.dateStamp){
+    const d = new Date();
+    state.meta.dateStamp = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  }
+  if (!state.meta.device){
+    state.meta.device = navigator.platform || "Android";
+  }
+  if (!state.meta.browser){
+    state.meta.browser = navigator.userAgent || "Browser";
+  }
+  saveState();
+
+  // ============================
+  // Checklist
+  // ============================
+  function renderChecklist(){
+    checklistEl.innerHTML = "";
+    TASKS.forEach((t, i) => {
+      const row = document.createElement("label");
+      row.innerHTML = `<input type="checkbox"><span>${t}</span>`;
+      checklistEl.appendChild(row);
+      const cb = row.querySelector("input");
+      cb.checked = !!state.tasks[i];
+      cb.addEventListener("change", () => {
+        state.tasks[i] = cb.checked;
+        saveState();
+        updateProgress();
+      });
+    });
+    updateProgress();
+  }
+
+  function updateProgress(){
+    const done = state.tasks.filter(Boolean).length;
+    const pct = Math.round((done / TASKS.length) * 100);
+    progressTxt.textContent = `${pct}% (${done}/${TASKS.length})`;
+  }
+
+  document.getElementById("btnAll").addEventListener("click", () => {
+    state.tasks = TASKS.map(()=>true);
+    saveState(); renderChecklist();
+  });
+  document.getElementById("btnNone").addEventListener("click", () => {
+    state.tasks = TASKS.map(()=>false);
+    saveState(); renderChecklist();
+  });
+
+  // ============================
+  // Meta
+  // ============================
+  function renderMeta(){
+    sessionName.value = state.meta.sessionName || "";
+    dateStamp.value = state.meta.dateStamp || "";
+    device.value = state.meta.device || "";
+    browser.value = state.meta.browser || "";
+    datasetRef.value = state.meta.datasetRef || "";
+  }
+
+  document.getElementById("btnSaveMeta").addEventListener("click", () => {
+    state.meta.sessionName = sessionName.value.trim();
+    state.meta.dateStamp = dateStamp.value.trim();
+    state.meta.device = device.value.trim();
+    state.meta.browser = browser.value.trim();
+    state.meta.datasetRef = datasetRef.value.trim();
+    saveState();
+    metaStatus.textContent = "Meta saved ✓";
+    setTimeout(()=>metaStatus.textContent="", 900);
+  });
+
+  // ============================
+  // Notes
+  // ============================
+  function renderNotes(){
+    notes.value = state.notes || "";
+  }
+  document.getElementById("btnSaveNotes").addEventListener("click", () => {
+    state.notes = notes.value;
+    saveState();
+    saveStatus.textContent = "Saved ✓";
+    setTimeout(()=>saveStatus.textContent="", 900);
+  });
+
+  // ============================
+  // Clipboard helpers
+  // ============================
+  async function pasteClipboardInto(textarea){
+    try{
+      if (!navigator.clipboard || !navigator.clipboard.readText){
+        return false;
+      }
+      const t = await navigator.clipboard.readText();
+      if (t && t.trim()){
+        textarea.value = t.trim();
+        return true;
+      }
+      return false;
+    }catch(e){
+      return false;
+    }
+  }
+
+  document.getElementById("btnPasteClipH0").addEventListener("click", async () => {
+    const ok = await pasteClipboardInto(csvBox);
+    if (!ok) flashHint(fitOut, "Clipboard blocked/empty. Paste manually.");
+    renderInspectorH0();
+  });
+
+  document.getElementById("btnPasteClipGal").addEventListener("click", async () => {
+    const ok = await pasteClipboardInto(galBox);
+    if (!ok) flashHint(galOut, "Clipboard blocked/empty. Paste manually.");
+    renderInspectorGal();
+  });
+
+  function flashHint(el, msg){
+    el.innerHTML = `<span class="warn">${escapeHtml(msg)}</span>`;
+    setTimeout(()=>{ if(el.innerText.includes(msg)) el.innerHTML=""; }, 1200);
+  }
+
+  // ============================
+  // Export
+  // ============================
+  document.getElementById("btnExport").addEventListener("click", () => {
+    // capture latest inputs
+    state.meta.sessionName = sessionName.value.trim();
+    state.meta.dateStamp = dateStamp.value.trim();
+    state.meta.device = device.value.trim();
+    state.meta.browser = browser.value.trim();
+    state.meta.datasetRef = datasetRef.value.trim();
+    state.notes = notes.value;
+
+    const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
+    const a = document.createElement("a");
+    const stamp = (state.meta.dateStamp || "date").replace(/[^0-9\-]/g,"");
+    const name = (state.meta.sessionName || "QDS_TestPack_PRO").replace(/[^\w\-]+/g,"_");
+    a.href = URL.createObjectURL(blob);
+    a.download = `${name}_${stamp}_testpack.json`;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+  });
+
+  // ============================
+  // Wipe
+  // ============================
+  document.getElementById("btnWipeAll").addEventListener("click", () => {
+    localStorage.removeItem(KEY);
+    state = defaultState();
+    renderChecklist(); renderMeta(); renderNotes();
+    fitOut.textContent=""; fitHint.textContent="";
+    galOut.textContent=""; galHint.textContent="";
+    drawPlotH0([], null);
+    drawPlotGal([], null);
+    renderInspectorH0();
+    renderInspectorGal();
+  });
+
+  // ============================
+  // H0 Micro-Fit
+  // ============================
+  const SAMPLE_H0 = `R,sigmaH_over_H
+50,0.030
+80,0.025
+120,0.021
+200,0.017
+300,0.0145
+450,0.0125
+700,0.0108`;
+
+  document.getElementById("btnLoadSample").addEventListener("click", () => {
+    csvBox.value = SAMPLE_H0;
+    renderInspectorH0();
+  });
+
+  document.getElementById("btnClearData").addEventListener("click", () => {
+    csvBox.value = "";
+    fitOut.textContent = "";
+    fitHint.textContent = "";
+    state.h0 = null;
+    saveState();
+    drawPlotH0([], null);
+    renderInspectorH0();
+  });
+
+  csvBox.addEventListener("input", () => renderInspectorH0());
+
+  document.getElementById("btnFit").addEventListener("click", () => {
+    const parsed = parseFlexibleTable(csvBox.value);
+    const rows = pickH0Rows(parsed);
+
+    renderInspectorH0(parsed);
+
+    if (rows.length < 2){
+      fitOut.innerHTML = `<span class="bad">No valid data found.</span>`;
+      fitHint.textContent = "";
+      drawPlotH0(rows, null);
+      state.h0 = null; saveState();
+      return;
+    }
+
+    const x = rows.map(r => Math.log(r.R));
+    const y = rows.map(r => Math.log(r.Y));
+
+    const fit = linReg(x, y);
+    const p = -fit.m;
+    const A = Math.exp(fit.b);
+    const r2 = fit.r2;
+
+    state.h0 = { model:"sigmaH_over_H = A * R^-p", A, p, r2, n: rows.length, data: rows };
+    saveState();
+
+    fitOut.innerHTML =
+      `<span class="good">Fit OK</span><br>` +
+      `A ≈ <b>${A.toFixed(5)}</b><br>` +
+      `p ≈ <b>${p.toFixed(4)}</b><br>` +
+      `R² ≈ <b>${r2.toFixed(3)}</b><br>` +
+      `N = ${rows.length}`;
+
+    fitHint.textContent =
+      `Lower p means slower drop with scale R. Use this as a compact check before deeper external analysis.`;
+
+    drawPlotH0(rows, {A, p});
+  });
+
+  function pickH0Rows(parsed){
+    // Accept two-column numeric tables, header or no header.
+    const rows = [];
+    for (const r of parsed.rows){
+      const nums = r.nums;
+      if (nums.length >= 2){
+        const R = nums[0], Y = nums[1];
+        if (isFinite(R) && isFinite(Y) && R>0 && Y>0) rows.push({R, Y});
+      }
+    }
+    return rows;
+  }
+
+  // ============================
+  // Galaxy Micro-Check
+  // ============================
+  const SAMPLE_GAL = `r,v_obs,v_newt,v_qds
+1,110,90,108
+2,140,115,138
+3,160,130,158
+4,175,140,172
+5,185,147,183
+6,192,150,191`;
+
+  document.getElementById("btnLoadGalSample").addEventListener("click", () => {
+    galBox.value = SAMPLE_GAL;
+    renderInspectorGal();
+  });
+
+  document.getElementById("btnGalClear").addEventListener("click", () => {
+    galBox.value = "";
+    galOut.textContent = "";
+    galHint.textContent = "";
+    state.gal = null;
+    saveState();
+    drawPlotGal([], null);
+    renderInspectorGal();
+  });
+
+  galBox.addEventListener("input", () => renderInspectorGal());
+
+  document.getElementById("btnGalAnalyse").addEventListener("click", () => {
+    const parsed = parseFlexibleTable(galBox.value);
+    renderInspectorGal(parsed);
+
+    const rows = pickGalaxyRows(parsed);
+
+    if (rows.length < 2){
+      galOut.innerHTML = `<span class="bad">No valid galaxy rows.</span>`;
+      galHint.textContent = `Try headers: r,v_obs,v_newt,v_qds or just numeric columns in that order.`;
+      drawPlotGal(rows, null);
+      state.gal = null; saveState();
+      return;
+    }
+
+    const haveObs = rows.some(r => isFinite(r.v_obs));
+    const haveNewt = rows.some(r => isFinite(r.v_newt));
+    const haveQds  = rows.some(r => isFinite(r.v_qds));
+
+    let rmsNewt = null, rmsQds = null;
+
+    if (haveObs && haveNewt){
+      rmsNewt = rmsPair(rows, "v_obs", "v_newt");
+    }
+    if (haveObs && haveQds){
+      rmsQds = rmsPair(rows, "v_obs", "v_qds");
+    }
+
+    state.gal = {
+      n: rows.length,
+      haveObs, haveNewt, haveQds,
+      rmsNewt, rmsQds,
+      data: rows
+    };
+    saveState();
+
+    let out = `<span class="good">Parsed OK</span><br>N = ${rows.length}<br>`;
+    if (rmsNewt != null) out += `RMS(obs vs newt) ≈ <b>${rmsNewt.toFixed(3)}</b><br>`;
+    if (rmsQds  != null) out += `RMS(obs vs qds)  ≈ <b>${rmsQds.toFixed(3)}</b><br>`;
+    if (rmsNewt == null && rmsQds == null){
+      out += `<span class="warn">Add v_newt and/or v_qds for RMS comparison.</span>`;
+    }
+
+    galOut.innerHTML = out;
+
+    if (rmsNewt != null && rmsQds != null){
+      const delta = rmsNewt - rmsQds;
+      galHint.textContent =
+        `If RMS(obs vs qds) is lower than Newtonian here, that supports the direction of your model on this quick check. ΔRMS ≈ ${delta.toFixed(3)}.`;
+    } else {
+      galHint.textContent =
+        `This utility stays model-agnostic: you can paste any v_model columns you want and compare against v_obs.`;
+    }
+
+    drawPlotGal(rows, {haveObs, haveNewt, haveQds});
+  });
+
+  function pickGalaxyRows(parsed){
+    const rows = [];
+
+    // Attempt header mapping if present
+    const header = (parsed.header || []).map(h => h.toLowerCase());
+    const idx = (name) => header.indexOf(name);
+
+    const i_r = idx("r");
+    const i_vo = idx("v_obs");
+    const i_vn = idx("v_newt");
+    const i_vq = idx("v_qds");
+
+    for (const r of parsed.rows){
+      if (r.rawTokens.length === 0) continue;
+
+      let rr=null, vo=null, vn=null, vq=null;
+
+      if (header.length){
+        const get = (i) => (i>=0 && i<r.rawTokens.length) ? parseFloatSafe(r.rawTokens[i]) : null;
+        rr = get(i_r);
+        vo = get(i_vo);
+        vn = get(i_vn);
+        vq = get(i_vq);
+      }
+
+      // Fallback to numeric order if no header or missing
+      if (!isFinite(rr)){
+        const nums = r.nums;
+        if (nums.length >= 2){
+          rr = nums[0];
+          vo = nums[1];
+          vn = nums.length >= 3 ? nums[2] : null;
+          vq = nums.length >= 4 ? nums[3] : null;
+        }
+      }
+
+      if (isFinite(rr) && rr>0){
+        rows.push({
+          r: rr,
+          v_obs: isFinite(vo) ? vo : null,
+          v_newt: isFinite(vn) ? vn : null,
+          v_qds: isFinite(vq) ? vq : null
+        });
+      }
+    }
+
+    // sort by r
+    rows.sort((a,b)=>a.r-b.r);
+    return rows;
+  }
+
+  function rmsPair(rows, a, b){
+    let s=0, n=0;
+    for (const r of rows){
+      const x = r[a], y = r[b];
+      if (isFinite(x) && isFinite(y)){
+        const d = x-y;
+        s += d*d; n++;
+      }
+    }
+    return n ? Math.sqrt(s/n) : null;
+  }
+
+  // ============================
+  // Inspectors
+  // ============================
+  function renderInspectorH0(parsedOpt){
+    const parsed = parsedOpt || parseFlexibleTable(csvBox.value);
+    const max = 60;
+    const lines = parsed.lines.slice(0, max);
+
+    insH0.innerHTML = "";
+    let okCount=0;
+
+    lines.forEach((L) => {
+      const nums = L.nums;
+      const ok = (nums.length >= 2 && isFinite(nums[0]) && isFinite(nums[1]) && nums[0]>0 && nums[1]>0);
+      if (ok) okCount++;
+
+      const div = document.createElement("div");
+      div.className = "line " + (ok ? "ok" : "bad");
+
+      div.innerHTML =
+        `<span class="pill ${ok ? "ok":"bad"}">${ok ? "OK":"ERR"}</span>` +
+        `<span class="mono small">${escapeHtml(L.text)}</span>`;
+
+      insH0.appendChild(div);
+    });
+
+    insCountH0.textContent = `OK ${okCount}/${lines.length}`;
+  }
+
+  function renderInspectorGal(parsedOpt){
+    const parsed = parsedOpt || parseFlexibleTable(galBox.value);
+    const max = 60;
+    const lines = parsed.lines.slice(0, max);
+
+    insGal.innerHTML = "";
+    let okCount=0;
+
+    lines.forEach((L) => {
+      const nums = L.nums;
+      const ok = (nums.length >= 2 && isFinite(nums[0]) && nums[0]>0);
+      if (ok) okCount++;
+
+      const div = document.createElement("div");
+      div.className = "line " + (ok ? "ok" : "bad");
+      div.innerHTML =
+        `<span class="pill ${ok ? "ok":"bad"}">${ok ? "OK":"ERR"}</span>` +
+        `<span class="mono small">${escapeHtml(L.text)}</span>`;
+      insGal.appendChild(div);
+    });
+
+    insCountGal.textContent = `OK ${okCount}/${lines.length}`;
+  }
+
+  // ============================
+  // Plots (simple, log/linear)
+  // ============================
+  function prepCanvas(canvas, ctx){
+    const dpr = Math.min(2, devicePixelRatio||1);
+    canvas.width = Math.floor(canvas.clientWidth*dpr);
+    canvas.height = Math.floor(canvas.clientHeight*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+
+  function drawPlotH0(rows, fit){
+    prepCanvas(plotH0, pctxH0);
+    const W = plotH0.clientWidth, H = plotH0.clientHeight;
+    pctxH0.clearRect(0,0,W,H);
+
+    // bg
+    pctxH0.fillStyle = "rgba(255,255,255,0.02)";
+    pctxH0.fillRect(0,0,W,H);
+
+    const padL=38, padR=10, padT=10, padB=28;
+    const x0=padL, y0=H-padB, x1=W-padR, y1=padT;
+
+    // grid
+    pctxH0.strokeStyle = "rgba(140,180,255,0.08)";
+    pctxH0.lineWidth = 1;
+    for(let i=0;i<=4;i++){
+      const gx = x0 + (x1-x0)*(i/4);
+      pctxH0.beginPath(); pctxH0.moveTo(gx,y0); pctxH0.lineTo(gx,y1); pctxH0.stroke();
+      const gy = y0 - (y0-y1)*(i/4);
+      pctxH0.beginPath(); pctxH0.moveTo(x0,gy); pctxH0.lineTo(x1,gy); pctxH0.stroke();
+    }
+
+    if (!rows || rows.length === 0){
+      pctxH0.fillStyle = "rgba(200,220,255,0.5)";
+      pctxH0.font = "11px system-ui";
+      pctxH0.fillText("log R", x1-36, H-8);
+      pctxH0.fillText("log σ(H)/H", 6, 14);
+      return;
+    }
+
+    const xs = rows.map(r => Math.log(r.R));
+    const ys = rows.map(r => Math.log(r.Y));
+    let xmin=Math.min(...xs), xmax=Math.max(...xs);
+    let ymin=Math.min(...ys), ymax=Math.max(...ys);
+    if (xmax-xmin < 1e-6){ xmax=xmin+1; }
+    if (ymax-ymin < 1e-6){ ymax=ymin+1; }
+
+    const sx = v => x0 + (v-xmin)/(xmax-xmin) * (x1-x0);
+    const sy = v => y0 - (v-ymin)/(ymax-ymin) * (y0-y1);
+
+    // points
+    pctxH0.fillStyle = "rgba(125,211,252,0.9)";
+    rows.forEach((r,i) => {
+      const px = sx(xs[i]), py = sy(ys[i]);
+      pctxH0.beginPath();
+      pctxH0.arc(px,py,3.2,0,Math.PI*2);
+      pctxH0.fill();
+    });
+
+    // fit line
+    if (fit && isFinite(fit.A) && isFinite(fit.p)){
+      const a = Math.log(fit.A), p = fit.p;
+      const xA=xmin, xB=xmax;
+      const yA=a - p*xA, yB=a - p*xB;
+
+      pctxH0.strokeStyle = "rgba(200,240,255,0.7)";
+      pctxH0.lineWidth = 2;
+      pctxH0.beginPath();
+      pctxH0.moveTo(sx(xA), sy(yA));
+      pctxH0.lineTo(sx(xB), sy(yB));
+      pctxH0.stroke();
+    }
+
+    pctxH0.fillStyle = "rgba(200,220,255,0.6)";
+    pctxH0.font = "11px system-ui";
+    pctxH0.fillText("log R", x1-36, H-8);
+    pctxH0.fillText("log σ(H)/H", 6, 14);
+  }
+
+  function drawPlotGal(rows, flags){
+    prepCanvas(plotGal, pctxGal);
+    const W = plotGal.clientWidth, H = plotGal.clientHeight;
+    pctxGal.clearRect(0,0,W,H);
+
+    pctxGal.fillStyle = "rgba(255,255,255,0.02)";
+    pctxGal.fillRect(0,0,W,H);
+
+    const padL=38, padR=10, padT=10, padB=28;
+    const x0=padL, y0=H-padB, x1=W-padR, y1=padT;
+
+    // grid
+    pctxGal.strokeStyle = "rgba(140,180,255,0.08)";
+    pctxGal.lineWidth = 1;
+    for(let i=0;i<=4;i++){
+      const gx = x0 + (x1-x0)*(i/4);
+      pctxGal.beginPath(); pctxGal.moveTo(gx,y0); pctxGal.lineTo(gx,y1); pctxGal.stroke();
+      const gy = y0 - (y0-y1)*(i/4);
+      pctxGal.beginPath(); pctxGal.moveTo(x0,gy); pctxGal.lineTo(x1,gy); pctxGal.stroke();
+    }
+
+    if (!rows || rows.length === 0){
+      pctxGal.fillStyle = "rgba(200,220,255,0.5)";
+      pctxGal.font = "11px system-ui";
+      pctxGal.fillText("r", x1-10, H-8);
+      pctxGal.fillText("v", 8, 14);
+      return;
+    }
+
+    const rs = rows.map(r => r.r);
+    const vsAll = [];
+    rows.forEach(r => {
+      if (isFinite(r.v_obs)) vsAll.push(r.v_obs);
+      if (isFinite(r.v_newt)) vsAll.push(r.v_newt);
+      if (isFinite(r.v_qds)) vsAll.push(r.v_qds);
+    });
+
+    let rmin=Math.min(...rs), rmax=Math.max(...rs);
+    let vmin=Math.min(...vsAll), vmax=Math.max(...vsAll);
+    if (rmax-rmin < 1e-6){ rmax=rmin+1; }
+    if (vmax-vmin < 1e-6){ vmax=vmin+1; }
+
+    const sx = v => x0 + (v-rmin)/(rmax-rmin) * (x1-x0);
+    const sy = v => y0 - (v-vmin)/(vmax-vmin) * (y0-y1);
+
+    function drawSeries(key, stroke, fill){
+      const pts = rows.filter(r => isFinite(r[key]));
+      if (pts.length < 2) return;
+
+      pctxGal.strokeStyle = stroke;
+      pctxGal.lineWidth = 2;
+      pctxGal.beginPath();
+      pts.forEach((r,i) => {
+        const px = sx(r.r), py = sy(r[key]);
+        if (i===0) pctxGal.moveTo(px,py); else pctxGal.lineTo(px,py);
+      });
+      pctxGal.stroke();
+
+      pctxGal.fillStyle = fill;
+      pts.forEach(r => {
+        const px = sx(r.r), py = sy(r[key]);
+        pctxGal.beginPath();
+        pctxGal.arc(px,py,2.8,0,Math.PI*2);
+        pctxGal.fill();
+      });
+    }
+
+    // keep colours subtle and readable
+    drawSeries("v_obs",  "rgba(200,240,255,0.7)", "rgba(200,240,255,0.9)");
+    drawSeries("v_newt", "rgba(255,210,140,0.6)", "rgba(255,210,140,0.85)");
+    drawSeries("v_qds",  "rgba(155,255,177,0.6)", "rgba(155,255,177,0.9)");
+
+    pctxGal.fillStyle = "rgba(200,220,255,0.6)";
+    pctxGal.font = "11px system-ui";
+    pctxGal.fillText("r", x1-10, H-8);
+    pctxGal.fillText("v", 8, 14);
+  }
+
+  // ============================
+  // Flexible parser
+  // ============================
+  function parseFlexibleTable(txt){
+    const linesRaw = (txt||"").split(/\r?\n/);
+    const lines = [];
+    const rows = [];
+
+    let header = null;
+
+    for (const raw of linesRaw){
+      const text = raw.trim();
+      if (!text) continue;
+
+      // Tokenize by commas, tabs, semicolons, or multiple spaces
+      const toks = text.split(/[\t,;]+|\s{2,}/).map(t => t.trim()).filter(Boolean);
+
+      // If still single token with spaces, split by single spaces
+      const tokens = (toks.length<=1) ? text.split(/\s+/).filter(Boolean) : toks;
+
+      const nums = tokens.map(parseFloatSafe).filter(n => isFinite(n));
+
+      lines.push({ text, rawTokens: tokens, nums });
+
+      // header heuristic: first non-numeric-ish line with letters
+      if (!header){
+        const hasLetter = /[A-Za-z_]/.test(text);
+        const hasNum = /\d/.test(text);
+        if (hasLetter && !(!hasLetter && hasNum)){
+          // keep as header candidates
+          const headerTokens = text.split(/[\t,; ]+/).map(t=>t.trim()).filter(Boolean);
+          // Avoid treating pure numeric lines as header
+          const headerNums = headerTokens.map(parseFloatSafe).filter(n=>isFinite(n));
+          if (headerNums.length < Math.max(1, headerTokens.length/2)){
+            header = headerTokens;
+            continue;
+          }
+        }
+      }
+
+      rows.push({ rawTokens: tokens, nums });
+    }
+
+    return { header, lines, rows };
+  }
+
+  function parseFloatSafe(s){
+    if (s == null) return NaN;
+    // Strip non-numeric trailing junk (lightly)
+    const t = String(s).replace(/[^0-9eE\.\+\-]/g,"");
+    const n = parseFloat(t);
+    return n;
+  }
+
+  // ============================
+  // Regression
+  // ============================
+  function linReg(x, y){
+    const n = Math.min(x.length, y.length);
+    let sx=0, sy=0, sxx=0, sxy=0;
+    for (let i=0;i<n;i++){
+      sx += x[i]; sy += y[i];
+      sxx += x[i]*x[i];
+      sxy += x[i]*y[i];
+    }
+    const denom = (n*sxx - sx*sx) || 1e-12;
+    const m = (n*sxy - sx*sy) / denom;
+    const b = (sy - m*sx) / n;
+
+    let ssTot=0, ssRes=0;
+    const yMean = sy/n;
+    for (let i=0;i<n;i++){
+      const yi = y[i];
+      const yhat = m*x[i] + b;
+      ssTot += (yi - yMean)**2;
+      ssRes += (yi - yhat)**2;
+    }
+    const r2 = ssTot > 0 ? (1 - ssRes/ssTot) : 0;
+
+    return {m,b,r2};
+  }
+
+  // ============================
+  // Utilities
+  // ============================
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"]/g, c => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"
+    }[c]));
+  }
+
+  // ============================
+  // Storage
+  // ============================
+  function defaultState(){
+    return {
+      tasks: TASKS.map(()=>false),
+      meta: { sessionName:"", dateStamp:"", device:"", browser:"", datasetRef:"" },
+      notes:"",
+      h0:null,
+      gal:null
+    };
+  }
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return defaultState();
+      const obj = JSON.parse(raw);
+
+      if (!obj.tasks || obj.tasks.length !== TASKS.length){
+        obj.tasks = TASKS.map((_,i)=>!!(obj.tasks && obj.tasks[i]));
+      }
+      obj.meta = obj.meta || {};
+      obj.notes = obj.notes || "";
+      obj.h0 = obj.h0 || null;
+      obj.gal = obj.gal || null;
+      return obj;
+    }catch(e){
+      return defaultState();
+    }
+  }
+
+  function saveState(){
+    localStorage.setItem(KEY, JSON.stringify(state));
+  }
+
+  // ============================
+  // Initial render
+  // ============================
+  renderChecklist();
+  renderMeta();
+  renderNotes();
+
+  // restore plots/inspectors
+  renderInspectorH0();
+  renderInspectorGal();
+
+  if (state.h0 && state.h0.data){
+    fitOut.innerHTML =
+      `<span class="mut">Loaded saved fit</span><br>` +
+      `A ≈ <b>${(state.h0.A||0).toFixed(5)}</b><br>` +
+      `p ≈ <b>${(state.h0.p||0).toFixed(4)}</b><br>` +
+      `R² ≈ <b>${(state.h0.r2||0).toFixed(3)}</b><br>` +
+      `N = ${state.h0.n||0}`;
+    drawPlotH0(state.h0.data, {A:state.h0.A, p:state.h0.p});
+  } else {
+    drawPlotH0([], null);
+  }
+
+  if (state.gal && state.gal.data){
+    galOut.innerHTML = `<span class="mut">Loaded saved galaxy check</span><br>N = ${state.gal.n||0}`;
+    drawPlotGal(state.gal.data, {haveObs:state.gal.haveObs, haveNewt:state.gal.haveNewt, haveQds:state.gal.haveQds});
+  } else {
+    drawPlotGal([], null);
+  }
+
+})();
+</script>
+</body>
+</html>

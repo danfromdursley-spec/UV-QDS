@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+<title>Ω 2D Side Cannon v1 (Offline)</title>
+<style>
+  :root{
+    --bg:#060912; --fg:#eaf2ff; --mut:#9bb0cf;
+    --panel: rgba(10,16,28,0.78);
+    --btn: rgba(120,160,255,0.12);
+    --btn2: rgba(120,160,255,0.22);
+  }
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:14px/1.2 system-ui,Segoe UI,Roboto,Arial}
+  #wrap{position:fixed;inset:0;overflow:hidden}
+  canvas{position:absolute;inset:0;touch-action:none}
+  #hud{
+    position:absolute;left:10px;top:10px;z-index:5;
+    background:var(--panel);backdrop-filter: blur(6px);
+    padding:10px;border-radius:14px;min-width:180px;
+    box-shadow: 0 6px 22px rgba(0,0,0,0.35);
+  }
+  #hud .row{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+  .label{font-size:11px;color:var(--mut)}
+  button{
+    background:var(--btn);color:var(--fg);
+    border:1px solid rgba(140,180,255,0.18);
+    padding:8px 10px;border-radius:10px;font-weight:600;
+  }
+  button:active{background:var(--btn2);transform: translateY(1px)}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="c"></canvas>
+
+  <div id="hud">
+    <div class="row">
+      <button id="btnReset">RESET</button>
+      <button id="btnSoft">Soft</button>
+      <button id="btnMed">Med</button>
+      <button id="btnHard">Hard</button>
+    </div>
+    <div class="label">Drag from cannon to aim + power • Release to fire</div>
+    <div class="row"><span class="label" id="stats">Blocks: 0 | Shells: 0</span></div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const canvas = document.getElementById("c");
+  const ctx = canvas.getContext("2d", { alpha:false });
+
+  function resize(){
+    const dpr = Math.min(2, devicePixelRatio||1);
+    canvas.width = innerWidth*dpr;
+    canvas.height = innerHeight*dpr;
+    canvas.style.width = innerWidth+"px";
+    canvas.style.height = innerHeight+"px";
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  addEventListener("resize", resize, {passive:true});
+  resize();
+
+  const PPM = 22;
+  const G = 9.5;
+
+  function groundY(){ return innerHeight * 0.82; }
+  function cannonPos(){
+    return { x: innerWidth * 0.12, y: groundY() - 24 };
+  }
+
+  let shells = [];
+  let blocks = [];
+  let debris = [];
+
+  const PRE = {
+    soft: { rows: 5, cols: 8,  w: 26, h: 18, gap: 4, hp: 1 },
+    med:  { rows: 7, cols: 10, w: 24, h: 18, gap: 4, hp: 2 },
+    hard: { rows: 9, cols: 12, w: 22, h: 16, gap: 3, hp: 3 },
+  };
+  let wallMode = "med";
+
+  function buildWall(mode="med"){
+    wallMode = mode;
+    blocks.length = 0;
+
+    const P = PRE[mode];
+    const startX = innerWidth * 0.62;
+    const baseY = groundY();
+
+    for(let r=0;r<P.rows;r++){
+      for(let c=0;c<P.cols;c++){
+        const x = startX + c*(P.w+P.gap);
+        const y = baseY - (r+1)*(P.h+P.gap);
+        blocks.push({ x, y, w:P.w, h:P.h, hp:P.hp, alive:true });
+      }
+    }
+  }
+
+  function spawnDebris(x,y,n=10){
+    for(let i=0;i<n;i++){
+      debris.push({
+        x, y,
+        vx:(Math.random()-0.5)*180,
+        vy:-Math.random()*220,
+        life: 0.6 + Math.random()*0.5
+      });
+    }
+  }
+
+  let aiming = false;
+  let aimVec = { x:0, y:0 };
+  const MAX_PULL = 140;
+  const SPEED_GAIN = 0.22;
+
+  function clamp(n,min,max){ return Math.max(min, Math.min(max,n)); }
+  function len2(x,y){ return Math.hypot(x,y); }
+
+  function fireFromAim(){
+    const C = cannonPos();
+    const dx = aimVec.x;
+    const dy = aimVec.y;
+
+    const pull = clamp(len2(dx,dy), 0, MAX_PULL);
+    if (pull < 6) return;
+
+    const nx = dx / (pull||1);
+    const ny = dy / (pull||1);
+
+    const dirx = -nx;
+    const diry = -ny;
+
+    const speed = pull * SPEED_GAIN;
+    const vx = dirx * speed * 60 / PPM;
+    const vy = diry * speed * 60 / PPM;
+
+    shells.push({
+      x: C.x, y: C.y,
+      vx, vy,
+      r: 10,
+      alive:true,
+      t:0
+    });
+  }
+
+  function circleRectHit(cx,cy,cr, rx,ry,rw,rh){
+    const x = clamp(cx, rx, rx+rw);
+    const y = clamp(cy, ry, ry+rh);
+    const dx = cx-x, dy = cy-y;
+    return (dx*dx + dy*dy) <= cr*cr;
+  }
+
+  function step(dt){
+    const gy = G;
+
+    for(const s of shells){
+      if(!s.alive) continue;
+      s.t += dt;
+
+      s.vy += gy * dt;
+      s.x += (s.vx * PPM) * dt;
+      s.y += (s.vy * PPM) * dt;
+
+      if (s.y + s.r > groundY()){
+        s.y = groundY()-s.r;
+        s.vy *= -0.35;
+        s.vx *= 0.7;
+        if (Math.abs(s.vy) < 1.2) s.alive = false;
+      }
+
+      if (s.x < -200 || s.x > innerWidth+200 || s.t > 10){
+        s.alive = false;
+      }
+
+      for(const b of blocks){
+        if(!b.alive || !s.alive) continue;
+        if (circleRectHit(s.x,s.y,s.r, b.x,b.y,b.w,b.h)){
+          b.hp -= 1;
+          spawnDebris(s.x,s.y, 8);
+
+          s.vx *= 0.6;
+          s.vy *= -0.25;
+
+          if (b.hp <= 0){
+            b.alive = false;
+            spawnDebris(b.x+b.w/2, b.y+b.h/2, 14);
+          }
+        }
+      }
+    }
+
+    for(const d of debris){
+      d.life -= dt;
+      d.vy += gy * 0.6 * dt * PPM;
+      d.x += d.vx * dt;
+      d.y += d.vy * dt;
+    }
+    debris = debris.filter(d => d.life > 0);
+
+    if (shells.length > 30){
+      shells = shells.filter(s => s.alive);
+    }
+  }
+
+  function draw(){
+    ctx.fillStyle = "#060912";
+    ctx.fillRect(0,0,innerWidth,innerHeight);
+
+    ctx.strokeStyle = "rgba(140,180,255,0.14)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, groundY());
+    ctx.lineTo(innerWidth, groundY());
+    ctx.stroke();
+
+    const C = cannonPos();
+    ctx.save();
+    ctx.strokeStyle = "rgba(200,230,255,0.5)";
+    ctx.lineWidth = 2;
+
+    ctx.strokeRect(C.x-16, C.y-10, 30, 20);
+
+    let bx = 36, by = -6;
+    if (aiming){
+      const pull = clamp(len2(aimVec.x,aimVec.y), 0, MAX_PULL);
+      const nx = aimVec.x/(pull||1), ny = aimVec.y/(pull||1);
+      const dirx = -nx, diry = -ny;
+      bx = dirx * 44;
+      by = diry * 44;
+    }
+    ctx.beginPath();
+    ctx.moveTo(C.x, C.y);
+    ctx.lineTo(C.x + bx, C.y + by);
+    ctx.stroke();
+    ctx.restore();
+
+    if (aiming){
+      ctx.strokeStyle = "rgba(125,211,252,0.55)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(C.x, C.y);
+      ctx.lineTo(C.x + aimVec.x, C.y + aimVec.y);
+      ctx.stroke();
+
+      const p = clamp(len2(aimVec.x,aimVec.y), 0, MAX_PULL);
+      ctx.fillStyle = "rgba(125,211,252,0.18)";
+      ctx.beginPath();
+      ctx.arc(C.x, C.y, p, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    const alive = blocks.filter(b=>b.alive);
+    for(const b of alive){
+      ctx.strokeStyle =
+        (b.hp >= 3) ? "rgba(255,140,140,0.55)" :
+        (b.hp === 2) ? "rgba(255,210,140,0.55)" :
+                       "rgba(140,210,255,0.55)";
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(b.x,b.y,b.w,b.h);
+    }
+
+    for(const s of shells){
+      if(!s.alive) continue;
+      ctx.fillStyle = "rgba(160,220,255,0.92)";
+      ctx.beginPath();
+      ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fill();
+    }
+
+    for(const d of debris){
+      ctx.globalAlpha = Math.max(0, Math.min(1, d.life)) * 0.7;
+      ctx.fillStyle = "rgba(200,220,255,0.35)";
+      ctx.beginPath();
+      ctx.arc(d.x,d.y,2.2,0,Math.PI*2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function pointerToAim(e){
+    const C = cannonPos();
+    const dx = e.clientX - C.x;
+    const dy = e.clientY - C.y;
+    const L = len2(dx,dy);
+    const cl = Math.min(L, MAX_PULL);
+    aimVec.x = dx * (cl/(L||1));
+    aimVec.y = dy * (cl/(L||1));
+  }
+
+  canvas.addEventListener("pointerdown", (e)=>{
+    canvas.setPointerCapture(e.pointerId);
+    aiming = true;
+    pointerToAim(e);
+  });
+
+  canvas.addEventListener("pointermove", (e)=>{
+    if(!aiming) return;
+    pointerToAim(e);
+  });
+
+  function release(){
+    if(!aiming) return;
+    aiming = false;
+    fireFromAim();
+    aimVec.x = 0; aimVec.y = 0;
+  }
+  canvas.addEventListener("pointerup", release);
+  canvas.addEventListener("pointercancel", release);
+
+  const stats = document.getElementById("stats");
+  document.getElementById("btnReset").addEventListener("click", ()=>{
+    shells.length = 0; debris.length = 0;
+    buildWall(wallMode);
+  });
+  document.getElementById("btnSoft").addEventListener("click", ()=>buildWall("soft"));
+  document.getElementById("btnMed").addEventListener("click", ()=>buildWall("med"));
+  document.getElementById("btnHard").addEventListener("click", ()=>buildWall("hard"));
+
+  let lastT = performance.now();
+  function tick(t){
+    const dt = Math.min(0.033, (t-lastT)/1000);
+    lastT = t;
+
+    step(dt);
+    draw();
+
+    const aliveBlocks = blocks.reduce((n,b)=>n+(b.alive?1:0),0);
+    const aliveShells = shells.reduce((n,s)=>n+(s.alive?1:0),0);
+    stats.textContent = `Blocks: ${aliveBlocks} | Shells: ${aliveShells}`;
+
+    requestAnimationFrame(tick);
+  }
+
+  buildWall("med");
+  requestAnimationFrame(tick);
+
+})();
+</script>
+</body>
+</html>

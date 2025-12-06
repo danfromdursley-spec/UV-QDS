@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ω-QDS Shed Index v1</title>
+  <meta name="description" content="WIP/experimental index for Ω-QDS. The messy, glorious shed." />
+
+  <style>
+    :root{
+      --bg-0: #05060a;
+      --bg-1: #0b0f1a;
+      --panel: rgba(255,255,255,0.06);
+      --panel-2: rgba(255,255,255,0.09);
+      --border: rgba(255,255,255,0.08);
+      --muted: rgba(255,255,255,0.65);
+      --text: #f5f7ff;
+      --accent: #7cf3ff;
+      --accent-2: #a78bfa;
+      --warn: #FFE08A;
+      --shadow: 0 10px 30px rgba(0,0,0,0.35);
+      --radius-1: 14px;
+      --radius-2: 22px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 700px at 10% 10%, rgba(255,224,138,0.07), transparent 55%),
+        radial-gradient(900px 600px at 90% 15%, rgba(167,139,250,0.06), transparent 55%),
+        linear-gradient(160deg, var(--bg-0), var(--bg-1) 45%, #070b14 100%);
+      min-height:100vh;
+    }
+
+    header{
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(5,6,10,0.92), rgba(5,6,10,0.55), transparent);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .wrap{
+      max-width: 1050px;
+      margin: 0 auto;
+      padding: 18px 16px 36px;
+    }
+
+    .hero{
+      display:grid;
+      gap: 12px;
+      padding: 18px 16px 10px;
+    }
+
+    .title-row{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(255,224,138,0.16), rgba(167,139,250,0.10));
+      border: 1px solid var(--border);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: white;
+    }
+
+    h1{
+      font-size: clamp(22px, 5.2vw, 32px);
+      margin: 0;
+      line-height:1.15;
+    }
+
+    .subtitle{
+      color: var(--muted);
+      margin: 0 0 6px 0;
+      font-size: clamp(12.5px, 2.8vw, 14.5px);
+    }
+
+    .controls{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    @media (min-width: 720px){
+      .controls{
+        grid-template-columns: 1.2fr 0.8fr 0.5fr;
+        align-items:center;
+      }
+    }
+
+    .search, select, .btn{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: var(--radius-1);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 14px;
+      outline:none;
+    }
+    .search::placeholder{color: rgba(255,255,255,0.45)}
+
+    select{
+      appearance:none;
+      background-image:
+        linear-gradient(45deg, transparent 50%, rgba(255,255,255,0.5) 50%),
+        linear-gradient(135deg, rgba(255,255,255,0.5) 50%, transparent 50%);
+      background-position:
+        calc(100% - 18px) calc(50% - 3px),
+        calc(100% - 13px) calc(50% - 3px);
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+      padding-right: 28px;
+    }
+
+    .btn{
+      cursor:pointer;
+      text-align:center;
+      font-weight:600;
+      background: linear-gradient(120deg, rgba(255,224,138,0.14), rgba(167,139,250,0.10));
+    }
+
+    .section{
+      margin-top: 22px;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--panel), rgba(255,255,255,0.02));
+      border-radius: var(--radius-2);
+      padding: 14px 14px 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .section-head{
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap: 10px;
+      padding: 6px 6px 10px;
+      border-bottom: 1px dashed rgba(255,255,255,0.08);
+      margin-bottom: 12px;
+    }
+
+    .section-title{
+      font-size: 16px;
+      margin: 0;
+    }
+    .section-note{
+      color: var(--muted);
+      font-size: 11.5px;
+      margin: 0;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      background: rgba(255,255,255,0.04);
+      white-space: nowrap;
+    }
+    .pill.warn{
+      color: #120d00;
+      background: linear-gradient(90deg, rgba(255,224,138,0.95), rgba(255,224,138,0.55));
+      border-color: transparent;
+    }
+
+    .grid{
+      display:grid;
+      gap: 14px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 720px){
+      .grid{grid-template-columns: 1fr 1fr;}
+    }
+    @media (min-width: 1020px){
+      .grid{grid-template-columns: 1fr 1fr 1fr;}
+    }
+
+    .card{
+      border: 1px solid var(--border);
+      background:
+        linear-gradient(135deg, rgba(255,224,138,0.06), transparent 30%),
+        linear-gradient(135deg, rgba(167,139,250,0.06), transparent 35%),
+        var(--panel);
+      border-radius: var(--radius-1);
+      padding: 12px 12px 10px;
+      min-height: 90px;
+      display:flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .card h3{
+      font-size: 15px;
+      margin:0;
+    }
+    .card p{
+      margin:0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .meta{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    a.link{
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding: 9px 10px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      width: fit-content;
+    }
+
+    .foot{
+      color: var(--muted);
+      font-size: 11.5px;
+      padding: 18px 4px 0;
+      text-align:center;
+    }
+
+    .hidden{display:none !important;}
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="wrap hero">
+    <div class="title-row">
+      <span class="badge">Ω-QDS • Shed Index</span>
+      <span class="badge">v1</span>
+      <span class="badge">WIP / Experiments</span>
+    </div>
+    <h1>The Shed (WIP Yard)</h1>
+    <p class="subtitle">
+      This is the messy workshop list. If something here looks unstable, that’s the point.
+      Public demos belong in the Showcase.
+    </p>
+
+    <div class="controls">
+      <input id="search" class="search" type="search" placeholder="Search the shed… (v9_2, wedge, prototype, test)" />
+
+      <select id="bucket">
+        <option value="all">All shed buckets</option>
+        <option value="recent">🧪 Recent experiments</option>
+        <option value="battery">🔋 Battery WIPs</option>
+        <option value="space">🌌 Space/visual WIPs</option>
+        <option value="lang">🗿 Language/Indus WIPs</option>
+        <option value="games">🎮 Game prototypes</option>
+        <option value="retired">🧯 Retired / archived</option>
+      </select>
+
+      <button id="collapseToggle" class="btn" type="button">Collapse all</button>
+    </div>
+
+    <div class="title-row" style="margin-top:6px;">
+      <a class="link" href="qds_showcase_index_v1.html">← Back to Showcase</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!--
+    SHED RULES:
+    - Add anything experimental here.
+    - If it becomes demo-grade, move it to Showcase.
+    - Keep file names as-is; this is a human-maintained list.
+  -->
+
+  <section class="section" data-section="recent">
+    <div class="section-head">
+      <div>
+        <h2 class="section-title">🧪 Recent experiments</h2>
+        <p class="section-note">Fresh builds, half-built wedges, UI testbeds.</p>
+      </div>
+      <span class="pill warn">Unstable by design</span>
+    </div>
+    <div class="grid">
+      <!-- Example cards (delete or replace) -->
+      <article class="card" data-bucket="recent" data-tags="example placeholder">
+        <div class="meta">
+          <span class="pill">template</span>
+          <span class="pill">replace me</span>
+        </div>
+        <h3>Drop your newest WIP here</h3>
+        <p>Copy this card, change title/desc/href. Keep the chaos contained.</p>
+        <a class="link" href="#">Open (set link)</a>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" data-section="battery">
+    <div class="section-head">
+      <div>
+        <h2 class="section-title">🔋 Battery WIPs</h2>
+        <p class="section-note">Stress variants, model forks, UI scaffolds.</p>
+      </div>
+      <span class="pill warn">Prototype lane</span>
+    </div>
+    <div class="grid" id="batteryGrid">
+      <!-- Add cards -->
+    </div>
+  </section>
+
+  <section class="section" data-section="space">
+    <div class="section-head">
+      <div>
+        <h2 class="section-title">🌌 Space / visual WIPs</h2>
+        <p class="section-note">Universe forks, camera tests, shader chaos.</p>
+      </div>
+      <span class="pill warn">Eye-melters allowed</span>
+    </div>
+    <div class="grid" id="spaceGrid"></div>
+  </section>
+
+  <section class="section" data-section="lang">
+    <div class="section-head">
+      <div>
+        <h2 class="section-title">🗿 Language / Indus WIPs</h2>
+        <p class="section-note">Proto-maps, glyph role experiments, corpus tests.</p>
+      </div>
+      <span class="pill warn">Exploration zone</span>
+    </div>
+    <div class="grid" id="langGrid"></div>
+  </section>
+
+  <section class="section" data-section="games">
+    <div class="section-head">
+      <div>
+        <h2 class="section-title">🎮 Game prototypes</h2>
+        <p class="section-note">Physics toys, cannon forks, pinball variants.</p>
+      </div>
+      <span class="pill warn">Fun + broken OK</span>
+    </div>
+    <div class="grid" id="gamesGrid"></div>
+  </section>
+
+  <section class="section" data-section="retired">
+    <div class="section-head">
+      <div>
+        <h2 class="section-title">🧯 Retired / archived</h2>
+        <p class="section-note">Old stepping stones you don’t want in demos.</p>
+      </div>
+      <span class="pill">History drawer</span>
+    </div>
+    <div class="grid" id="retiredGrid"></div>
+  </section>
+
+  <div class="foot">
+    Ω-QDS Shed Index v1 • WIP lives here • Showcase stays clean.
+  </div>
+</main>
+
+<script>
+(function(){
+  const searchEl = document.getElementById("search");
+  const bucketEl = document.getElementById("bucket");
+  const toggleBtn = document.getElementById("collapseToggle");
+
+  const sections = Array.from(document.querySelectorAll(".section"));
+  const cards = () => Array.from(document.querySelectorAll(".card"));
+
+  let collapsed = false;
+
+  function normalize(s){ return (s||"").toLowerCase().trim(); }
+
+  function applyFilters(){
+    const q = normalize(searchEl.value);
+    const b = bucketEl.value;
+
+    cards().forEach(card => {
+      const bucket = card.getAttribute("data-bucket") || card.closest(".section")?.getAttribute("data-section") || "";
+      const tags = card.getAttribute("data-tags") || "";
+      const text = (card.innerText || "") + " " + tags;
+
+      const matchesBucket = (b === "all") || (bucket === b);
+      const matchesQ = !q || normalize(text).includes(q);
+
+      card.classList.toggle("hidden", !(matchesBucket && matchesQ));
+    });
+
+    sections.forEach(sec => {
+      const anyVisible = Array.from(sec.querySelectorAll(".card"))
+        .some(c => !c.classList.contains("hidden"));
+      sec.classList.toggle("hidden", !anyVisible);
+    });
+  }
+
+  function setCollapsed(state){
+    collapsed = state;
+    sections.forEach(sec => {
+      const grid = sec.querySelector(".grid");
+      if(!grid) return;
+      grid.style.display = collapsed ? "none" : "grid";
+    });
+    toggleBtn.textContent = collapsed ? "Expand all" : "Collapse all";
+  }
+
+  searchEl.addEventListener("input", applyFilters);
+  bucketEl.addEventListener("change", applyFilters);
+  toggleBtn.addEventListener("click", () => setCollapsed(!collapsed));
+
+  applyFilters();
+  setCollapsed(false);
+})();
+</script>
+</body>
+</html>

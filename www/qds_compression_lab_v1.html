@@ -1,0 +1,38 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QDS Compression Lab v1</title>
+<style>
+body{margin:0;font-family:system-ui;background:#070b1a;color:#e9f1ff}
+.wrap{max-width:860px;margin:0 auto;padding:18px}
+.card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:16px;margin:12px 0}
+button{background:#0e1b40;color:#fff;border:1px solid rgba(255,255,255,.12);padding:12px 14px;border-radius:12px;font-weight:600}
+code{background:rgba(255,255,255,.08);padding:2px 6px;border-radius:6px}
+</style></head>
+<body><div class="wrap">
+<h1>Compression / Signals</h1>
+<div class="card">
+<p>Mini structure-preserving demo. Generates synthetic correlated data, compares naive vs "kernel-ish" thinning.</p>
+</div>
+<div class="card">
+<button id="run">Run toy benchmark</button>
+<p id="out">No run yet.</p>
+</div>
+<script>
+function gen(n){
+  let x=0, arr=[];
+  for(let i=0;i<n;i++){ x=0.7*x+(Math.random()-0.5); arr.push(x); }
+  return arr;
+}
+function sizeEstimate(arr){ return arr.length; }
+document.getElementById("run").onclick=()=>{
+  const raw=gen(2000);
+  const naive=raw.filter((_,i)=>i%2==0);
+  const kernel=raw.filter((v,i)=>Math.abs(v)<0.35 || i%3==0);
+  const r=sizeEstimate(raw), n=sizeEstimate(naive), k=sizeEstimate(kernel);
+  document.getElementById("out").innerHTML=
+    "Raw points: <b>"+r+"</b><br>"+
+    "Naive thin: <b>"+n+"</b> (~"+(100*n/r).toFixed(1)+"%)<br>"+
+    "Kernel-ish thin: <b>"+k+"</b> (~"+(100*k/r).toFixed(1)+"%)<br>"+
+    "<small>Illustrative only - shows the idea of coherence-aware pruning.</small>";
+};
+</script>
+</div></body></html>

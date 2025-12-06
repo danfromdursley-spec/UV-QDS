@@ -1,0 +1,837 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ω-QDS Showcase Deck v1.1</title>
+  <meta name="description" content="Clean demo index for Ω-QDS tools: dashboards, battery flagships, pillars, space, repro, and games." />
+
+  <style>
+    :root{
+      --bg-0: #05060a;
+      --bg-1: #0b0f1a;
+      --panel: rgba(255,255,255,0.06);
+      --panel-2: rgba(255,255,255,0.09);
+      --border: rgba(255,255,255,0.08);
+      --muted: rgba(255,255,255,0.65);
+      --text: #f5f7ff;
+      --accent: #7cf3ff;
+      --accent-2: #a78bfa;
+      --good: #7CFFB2;
+      --warn: #FFE08A;
+      --shadow: 0 10px 30px rgba(0,0,0,0.35);
+      --radius-1: 14px;
+      --radius-2: 22px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 700px at 10% 10%, rgba(124,243,255,0.08), transparent 55%),
+        radial-gradient(900px 600px at 90% 15%, rgba(167,139,250,0.08), transparent 55%),
+        linear-gradient(160deg, var(--bg-0), var(--bg-1) 45%, #070b14 100%);
+      min-height:100vh;
+    }
+
+    header{
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(5,6,10,0.92), rgba(5,6,10,0.55), transparent);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .wrap{
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 18px 16px 36px;
+    }
+
+    .hero{
+      display: grid;
+      gap: 14px;
+      padding: 18px 16px 10px;
+    }
+
+    .title-row{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(124,243,255,0.14), rgba(167,139,250,0.14));
+      border: 1px solid var(--border);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: white;
+    }
+
+    h1{
+      font-size: clamp(22px, 5.2vw, 34px);
+      margin: 0;
+      line-height:1.15;
+      letter-spacing: 0.2px;
+    }
+
+    .subtitle{
+      color: var(--muted);
+      margin: 0 0 6px 0;
+      font-size: clamp(12.5px, 2.8vw, 14.5px);
+    }
+
+    /* --- NEW: Demo Path strip --- */
+    .demo-path{
+      border: 1px solid var(--border);
+      background:
+        linear-gradient(135deg, rgba(124,243,255,0.08), transparent 35%),
+        linear-gradient(135deg, rgba(167,139,250,0.08), transparent 35%),
+        var(--panel);
+      border-radius: var(--radius-2);
+      padding: 12px;
+      box-shadow: var(--shadow);
+      display:grid;
+      gap: 10px;
+    }
+
+    .demo-path-head{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .demo-path-title{
+      margin:0;
+      font-size: 14.5px;
+      letter-spacing: 0.2px;
+    }
+    .demo-path-note{
+      margin:0;
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+
+    .demo-buttons{
+      display:grid;
+      gap: 8px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 720px){
+      .demo-buttons{
+        grid-template-columns: 1fr 1fr 1fr auto;
+        align-items: stretch;
+      }
+    }
+
+    .demo-btn{
+      text-decoration:none;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 12px 10px;
+      border-radius: var(--radius-1);
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      font-size: 13.5px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      text-align:center;
+      min-height: 44px;
+    }
+
+    .demo-btn.primary{
+      border-color: rgba(124,243,255,0.35);
+      background: linear-gradient(90deg, rgba(124,243,255,0.18), rgba(167,139,250,0.14));
+    }
+
+    .demo-btn.shed{
+      border-color: rgba(255,224,138,0.35);
+      background: linear-gradient(90deg, rgba(255,224,138,0.18), rgba(167,139,250,0.10));
+    }
+
+    .controls{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 6px;
+    }
+    @media (min-width: 720px){
+      .controls{
+        grid-template-columns: 1.2fr 0.8fr 0.6fr;
+        align-items: center;
+      }
+    }
+
+    .search, select, .toggle-btn{
+      width: 100%;
+      padding: 12px 12px;
+      border-radius: var(--radius-1);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--text);
+      outline: none;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+      font-size: 14px;
+    }
+
+    .search::placeholder{color: rgba(255,255,255,0.45)}
+
+    select{
+      appearance: none;
+      background-image:
+        linear-gradient(45deg, transparent 50%, rgba(255,255,255,0.5) 50%),
+        linear-gradient(135deg, rgba(255,255,255,0.5) 50%, transparent 50%);
+      background-position:
+        calc(100% - 18px) calc(50% - 3px),
+        calc(100% - 13px) calc(50% - 3px);
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+      padding-right: 28px;
+    }
+
+    .toggle-btn{
+      cursor:pointer;
+      text-align:center;
+      background: linear-gradient(120deg, rgba(124,243,255,0.12), rgba(167,139,250,0.12));
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+
+    .grid{
+      display:grid;
+      gap: 14px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 720px){
+      .grid{grid-template-columns: 1fr 1fr;}
+    }
+    @media (min-width: 1020px){
+      .grid{grid-template-columns: 1fr 1fr 1fr;}
+    }
+
+    .section{
+      margin-top: 22px;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--panel), rgba(255,255,255,0.02));
+      border-radius: var(--radius-2);
+      padding: 14px 14px 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .section-head{
+      display:flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 6px 10px;
+      border-bottom: 1px dashed rgba(255,255,255,0.08);
+      margin-bottom: 12px;
+    }
+
+    .section-title{
+      font-size: 16px;
+      margin: 0;
+      letter-spacing: 0.3px;
+    }
+    .section-note{
+      color: var(--muted);
+      font-size: 11.5px;
+      margin: 0;
+    }
+
+    .card{
+      border: 1px solid var(--border);
+      background:
+        linear-gradient(135deg, rgba(124,243,255,0.06), transparent 30%),
+        linear-gradient(135deg, rgba(167,139,250,0.06), transparent 35%),
+        var(--panel);
+      border-radius: var(--radius-1);
+      padding: 12px 12px 10px;
+      transition: 120ms ease;
+      min-height: 96px;
+      display:flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .card .meta{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      background: rgba(255,255,255,0.04);
+      white-space: nowrap;
+    }
+    .pill.good{color: #05130c; background: linear-gradient(90deg, rgba(124,255,178,0.85), rgba(124,255,178,0.6)); border-color: transparent;}
+    .pill.core{color: #041018; background: linear-gradient(90deg, rgba(124,243,255,0.9), rgba(124,243,255,0.55)); border-color: transparent;}
+    .pill.fun{color: #140a04; background: linear-gradient(90deg, rgba(255,224,138,0.95), rgba(255,224,138,0.6)); border-color: transparent;}
+
+    .card h3{
+      font-size: 15px;
+      margin: 0;
+    }
+    .card p{
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .btn-row{
+      margin-top:auto;
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    a.btn{
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding: 9px 10px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+    }
+
+    a.btn.primary{
+      border-color: rgba(124,243,255,0.35);
+      background: linear-gradient(90deg, rgba(124,243,255,0.18), rgba(167,139,250,0.14));
+    }
+
+    .foot{
+      color: var(--muted);
+      font-size: 11.5px;
+      padding: 18px 4px 0;
+      text-align:center;
+    }
+
+    .hidden{display:none !important;}
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="wrap hero">
+      <div class="title-row">
+        <span class="badge">Ω-QDS • Showcase Deck</span>
+        <span class="badge">v1.1</span>
+        <span class="badge">Clean Builds Only</span>
+      </div>
+      <h1>QDS Showcase Index</h1>
+      <p class="subtitle">
+        The front-of-house demo list. All scaffolding builds remain in the shed.
+        Thumb-safe, fast, and presentation-ready.
+      </p>
+
+      <!-- NEW: Demo Path -->
+      <div class="demo-path">
+        <div class="demo-path-head">
+          <h3 class="demo-path-title">🚀 60-second Demo Path</h3>
+          <p class="demo-path-note">Perfect quick tour for mates, funders, and curious humans.</p>
+        </div>
+        <div class="demo-buttons">
+          <a class="demo-btn primary" href="omega_qds_lab.html">1) Ω-QDS Lab</a>
+          <a class="demo-btn primary" href="qds_battery_hub_v9_7_science_neon_lab.html">2) Battery Hub v9.7</a>
+          <a class="demo-btn primary" href="indus_atlas_v1_qds_language_lab.html">3) Indus Atlas</a>
+          <a class="demo-btn shed" href="qds_shed_index_v1.html">Shed (WIP)</a>
+        </div>
+      </div>
+
+      <div class="controls">
+        <input id="search" class="search" type="search" placeholder="Search showcase… (battery, Indus, cannon, pillars)" />
+
+        <select id="category">
+          <option value="all">All categories</option>
+          <option value="core">🧠 Core dashboards</option>
+          <option value="battery">🔋 Battery flagships</option>
+          <option value="pillars">🧱 QDS 5 Pillars</option>
+          <option value="space">🌌 Space & language toys</option>
+          <option value="repro">✅ Test / Repro</option>
+          <option value="games">🎮 Games / fun</option>
+        </select>
+
+        <button id="collapseToggle" class="toggle-btn" type="button">
+          Collapse all
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <!--
+      SHOWCASE LOCK v1.1
+      Only add stable, demo-grade builds here.
+      All WIP goes to qds_shed_index_v1.html
+    -->
+
+    <!-- ===== CORE DASHBOARDS ===== -->
+    <section class="section" data-section="core">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">🧠 Core dashboards</h2>
+          <p class="section-note">Primary demo anchors for tours, screenshots, and public share.</p>
+        </div>
+        <span class="pill core">Showcase-grade</span>
+      </div>
+
+      <div class="grid">
+        <article class="card" data-category="core" data-tags="omega qds lab dashboard core">
+          <div class="meta">
+            <span class="pill core">Core</span>
+            <span class="pill">HTML</span>
+          </div>
+          <h3>Ω-QDS Lab</h3>
+          <p>Unified mobile lab dashboard for your stacked world tools.</p>
+          <div class="btn-row">
+            <a class="btn primary" href="omega_qds_lab.html">Open</a>
+          </div>
+        </article>
+
+        <article class="card" data-category="core" data-tags="battery os index core dashboard">
+          <div class="meta">
+            <span class="pill core">Core</span>
+            <span class="pill">Battery OS</span>
+          </div>
+          <h3>Battery OS Index</h3>
+          <p>System-level navigation for your battery ecosystem.</p>
+          <div class="btn-row">
+            <a class="btn primary" href="qds_battery_os_index_v1.html">Open</a>
+          </div>
+        </article>
+
+        <article class="card" data-category="core" data-tags="neon battery index dashboard">
+          <div class="meta">
+            <span class="pill core">Core</span>
+            <span class="pill">Neon</span>
+          </div>
+          <h3>Neon Battery Index</h3>
+          <p>Bright, clean entry point for quick demos.</p>
+          <div class="btn-row">
+            <a class="btn primary" href="qds_battery_index_v1_neon_os.html">Open</a>
+          </div>
+        </article>
+
+        <article class="card" data-category="core" data-tags="indus atlas language lab core">
+          <div class="meta">
+            <span class="pill core">Core</span>
+            <span class="pill">Language</span>
+          </div>
+          <h3>Indus Atlas / Language Lab</h3>
+          <p>Structured Indus exploration with QDS-flavoured tooling.</p>
+          <div class="btn-row">
+            <a class="btn primary" href="indus_atlas_v1_qds_language_lab.html">Open</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ===== BATTERY FLAGSHIPS ===== -->
+    <section class="section" data-section="battery">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">🔋 Battery flagships</h2>
+          <p class="section-note">Your best “full fat” battery demos and toys.</p>
+        </div>
+        <span class="pill good">Flagship set</span>
+      </div>
+
+      <div class="grid">
+        <article class="card" data-category="battery" data-tags="battery hub v9.7 science neon lab flagship">
+          <div class="meta">
+            <span class="pill good">Flagship</span>
+            <span class="pill">v9.7</span>
+          </div>
+          <h3>Battery Hub v9.7 — Science Neon Lab</h3>
+          <p>High-polish lab UI for public-facing walkthroughs.</p>
+          <div class="btn-row">
+            <a class="btn primary" href="qds_battery_hub_v9_7_science_neon_lab.html">Open</a>
+          </div>
+        </article>
+
+        <article class="card" data-category="battery" data-tags="battery suite v8.3 neon shell">
+          <div class="meta">
+            <span class="pill good">Suite</span>
+            <span class="pill">v8.3</span>
+          </div>
+          <h3>Battery Suite v8.3 — Neon Shell</h3>
+          <p>Clean suite wrapper for modular battery tools.</p>
+          <div class="btn-row">
+            <a class="btn primary" href="qds_battery_suite_v8_3_neon_shell.html">Open</a>
+          </div>
+        </article>
+
+        <article class="card" data-category="battery" data-tags="battery suite v6 realworld">
+          <div class="meta">
+            <span class="pill good">Suite</span>
+            <span class="pill">Real-world</span>
+          </div>
+          <h3>Battery Suite v6 — Realworld</h3>
+          <p>Grounded, practical angle for serious demos.</p>
+          <div class="btn-row">
+            <a class="btn primary" href="qds_battery_suite_v6_realworld.html">Open</a>
+          </div>
+        </article>
+
+        <article class="card" data-category="battery" data-tags="battery stress bias showcase v2">
+          <div class="meta">
+            <span class="pill good">Showcase</span>
+            <span class="pill">Stress</span>
+          </div>
+          <h3>Battery Lab — Stress/Bias Showcase v2</h3>
+          <p>Focused stress-model visuals and quick narrative value.</p>
+          <div class="btn-row">
+            <a class="btn primary" href="qds_battery_lab_showcase_stress_bias_v2.html">Open</a>
+          </div>
+        </article>
+
+        <article class="card" data-category="battery" data-tags="battery noise toy">
+          <div class="meta">
+            <span class="pill good">Toy</span>
+            <span class="pill">Noise</span>
+          </div>
+          <h3>Battery Noise Toy v1</h3>
+          <p>Fast, demo-friendly illustration of noise logic.</p>
+          <div class="btn-row">
+            <a class="btn primary" href="qds_battery_noise_toy_v1.html">Open</a>
+          </div>
+        </article>
+
+        <article class="card" data-category="battery" data-tags="battery coach">
+          <div class="meta">
+            <span class="pill good">Coach</span>
+            <span class="pill">Guidance</span>
+          </div>
+          <h3>Battery Coach v3</h3>
+          <p>Human-friendly recommendations in a tidy wrapper.</p>
+          <div class="btn-row">
+            <a class="btn primary" href="qds_battery_coach_v3.html">Open</a>
+          </div>
+        </article>
+
+        <article class="card" data-category="battery" data-tags="battery whisperer">
+          <div class="meta">
+            <span class="pill good">Whisperer</span>
+            <span class="pill">Diagnostics</span>
+          </div>
+          <h3>Battery Whisperer v2</h3>
+          <p>Clean diagnostics style for your OS-scale story.</p>
+          <div class="btn-row">
+            <a class="btn primary" href="qds_battery_whisperer_v2.html">Open</a>
+          </div>
+        </article>
+
+        <article class="card" data-category="battery" data-tags="legacy battery lab index">
+          <div class="meta">
+            <span class="pill">Legacy</span>
+            <span class="pill">Index</span>
+          </div>
+          <h3>QDS Battery Lab (Legacy)</h3>
+          <p>Still useful — kept in the showroom as a reference anchor.</p>
+          <div class="btn-row">
+            <a class="btn primary" href="QDS_Battery_Lab/index.html">Open</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ===== QDS 5 PILLARS ===== -->
+    <section class="section" data-section="pillars">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">🧱 QDS 5 Pillars</h2>
+          <p class="section-note">Your structured cross-domain demo set.</p>
+        </div>
+        <span class="pill good">Framework core</span>
+      </div>
+
+      <div class="grid">
+        <article class="card" data-category="pillars" data-tags="5 pillars hub">
+          <div class="meta">
+            <span class="pill good">Hub</span>
+            <span class="pill">Pillars</span>
+          </div>
+          <h3>QDS 5 Pillars Hub</h3>
+          <p>Top-level conceptual navigation for the pillars set.</p>
+          <div class="btn-row">
+            <a class="btn primary" href="qds_5_pillars_hub_v1.html">Open</a>
+          </div>
+        </article>
+
+        <article class="card" data-category="pillars" data-tags="chips noise hardware">
+          <div class="meta">
+            <span class="pill">Chips</span>
+            <span class="pill">Noise</span>
+          </div>
+          <h3>Chips & Correlated Noise</h3>
+          <p>Hardware-facing narrative slice for the pillar stack.</p>
+          <div class="btn-row">
+            <a class="btn primary" href="qds_chips_noise_v1.html">Open</a>
+          </div>
+        </article>
+
+        <article class="card" data-category="pillars" data-tags="compression lab">
+          <div class="meta">
+            <span class="pill">Compression</span>
+            <span class="pill">Lab</span>
+          </div>
+          <h3>Compression Lab</h3>
+          <p>Information/entropy side of the QDS story.</p>
+          <div class="btn-row">
+            <a class="btn primary" href="qds_compression_lab_v1.html">Open</a>
+          </div>
+        </article>
+
+        <article class="card" data-category="pillars" data-tags="sensors metrology">
+          <div class="meta">
+            <span class="pill">Sensors</span>
+            <span class="pill">Metrology</span>
+          </div>
+          <h3>Sensors & Metrology</h3>
+          <p>Measurement-facing pillar with practical framing.</p>
+          <div class="btn-row">
+            <a class="btn primary" href="qds_sensors_metrology_v1.html">Open</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ===== SPACE & LANGUAGE TOYS ===== -->
+    <section class="section" data-section="space">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">🌌 Space & language toys</h2>
+          <p class="section-note">Beautiful, demo-safe cosmic + linguistic visuals.</p>
+        </div>
+        <span class="pill good">Public-friendly</span>
+      </div>
+
+      <div class="grid">
+        <article class="card" data-category="space" data-tags="solar system v8 offline 3d">
+          <div class="meta">
+            <span class="pill">Space</span>
+            <span class="pill">Offline</span>
+          </div>
+          <h3>Solar System v8 (Offline)</h3>
+          <p>Reliable, no-dependency solar demo build.</p>
+          <div class="btn-row">
+            <a class="btn primary" href="solar_system_v8_offline.html">Open</a>
+          </div>
+        </article>
+
+        <article class="card" data-category="space" data-tags="universe v9.10 neon planet colours">
+          <div class="meta">
+            <span class="pill">Universe</span>
+            <span class="pill">Neon</span>
+          </div>
+          <h3>QDS Universe v9.10 — Neon Planets</h3>
+          <p>High-style cosmic sandbox for show-and-tell.</p>
+          <div class="btn-row">
+            <a class="btn primary" href="qds_universe_v9_10_neon_planet_colours.html">Open</a>
+          </div>
+        </article>
+
+        <article class="card" data-category="space" data-tags="indus atlas language lab">
+          <div class="meta">
+            <span class="pill">Indus</span>
+            <span class="pill">Language</span>
+          </div>
+          <h3>Indus Atlas / Language Lab</h3>
+          <p>Also featured in Core — linked here for thematic browsing.</p>
+          <div class="btn-row">
+            <a class="btn primary" href="indus_atlas_v1_qds_language_lab.html">Open</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ===== TEST / REPRO ===== -->
+    <section class="section" data-section="repro">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">✅ Test / Repro</h2>
+          <p class="section-note">Clean task packs for verification and portability.</p>
+        </div>
+        <span class="pill good">Repro-ready</span>
+      </div>
+
+      <div class="grid">
+        <article class="card" data-category="repro" data-tags="test task pack v1.1 pro">
+          <div class="meta">
+            <span class="pill good">Pro</span>
+            <span class="pill">v1.1</span>
+          </div>
+          <h3>QDS Test Task Pack v1.1</h3>
+          <p>Quick reproducibility hooks in a tidy package.</p>
+          <div class="btn-row">
+            <a class="btn primary" href="qds_test_task_pack_v1_1_pro.html">Open</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ===== GAMES / FUN ===== -->
+    <section class="section" data-section="games">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">🎮 Games / fun</h2>
+          <p class="section-note">Showcase-safe play builds. Minimal chaos, maximum smiles.</p>
+        </div>
+        <span class="pill fun">Fun-zone</span>
+      </div>
+
+      <div class="grid">
+        <article class="card" data-category="games" data-tags="catapult balloon pop">
+          <div class="meta">
+            <span class="pill fun">Game</span>
+            <span class="pill">Catapult</span>
+          </div>
+          <h3>Catapult Balloon Pop v1</h3>
+          <p>Fast demo fun with physics flavour.</p>
+          <div class="btn-row">
+            <a class="btn primary" href="catapult_balloon_pop_v1.html">Open</a>
+          </div>
+        </article>
+
+        <article class="card" data-category="games" data-tags="cannon wall breaker v1.1">
+          <div class="meta">
+            <span class="pill fun">Game</span>
+            <span class="pill">Cannon</span>
+          </div>
+          <h3>Cannon Wall Breaker v1.1</h3>
+          <p>Your satisfying “smash the wall” showcase build.</p>
+          <div class="btn-row">
+            <a class="btn primary" href="cannon_wall_breaker_v1_1.html">Open</a>
+          </div>
+        </article>
+
+        <article class="card" data-category="games" data-tags="cannon side 2d">
+          <div class="meta">
+            <span class="pill fun">Game</span>
+            <span class="pill">2D</span>
+          </div>
+          <h3>Cannon Side 2D v1</h3>
+          <p>Simple, stable, phone-friendly cannon toy.</p>
+          <div class="btn-row">
+            <a class="btn primary" href="cannon_side_2d_v1.html">Open</a>
+          </div>
+        </article>
+
+        <article class="card" data-category="games" data-tags="pyramid pinball">
+          <div class="meta">
+            <span class="pill fun">Game</span>
+            <span class="pill">Pyramids</span>
+          </div>
+          <h3>Pyramid Pinball v1</h3>
+          <p>Because of course the pyramids made it into pinball.</p>
+          <div class="btn-row">
+            <a class="btn primary" href="pyramid_pinball_v1.html">Open</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <div class="foot">
+      Ω-QDS Showcase Deck v1.1 • Curated list only •
+      WIP builds deliberately excluded to keep demos clean.
+    </div>
+  </main>
+
+  <script>
+    (function(){
+      const searchEl = document.getElementById("search");
+      const categoryEl = document.getElementById("category");
+      const toggleBtn = document.getElementById("collapseToggle");
+
+      const sections = Array.from(document.querySelectorAll(".section"));
+      const cards = Array.from(document.querySelectorAll(".card"));
+
+      let collapsed = false;
+
+      function normalize(s){
+        return (s || "").toLowerCase().trim();
+      }
+
+      function applyFilters(){
+        const q = normalize(searchEl.value);
+        const cat = categoryEl.value;
+
+        cards.forEach(card => {
+          const c = card.getAttribute("data-category") || "";
+          const tags = card.getAttribute("data-tags") || "";
+          const text = (card.innerText || "") + " " + tags;
+
+          const matchesCat = (cat === "all") || (c === cat);
+          const matchesQ = !q || normalize(text).includes(q);
+
+          card.classList.toggle("hidden", !(matchesCat && matchesQ));
+        });
+
+        sections.forEach(sec => {
+          const secCat = sec.getAttribute("data-section");
+          const visibleInSec = cards.some(card =>
+            !card.classList.contains("hidden") &&
+            (card.getAttribute("data-category") === secCat)
+          );
+
+          sec.classList.toggle("hidden", !visibleInSec && cat !== "all");
+          if(cat === "all"){
+            const anyVisible = Array.from(sec.querySelectorAll(".card"))
+              .some(c => !c.classList.contains("hidden"));
+            sec.classList.toggle("hidden", !anyVisible);
+          }
+        });
+      }
+
+      function setCollapsed(state){
+        collapsed = state;
+        sections.forEach(sec => {
+          const grid = sec.querySelector(".grid");
+          if(!grid) return;
+          grid.style.display = collapsed ? "none" : "grid";
+        });
+        toggleBtn.textContent = collapsed ? "Expand all" : "Collapse all";
+      }
+
+      searchEl.addEventListener("input", applyFilters);
+      categoryEl.addEventListener("change", applyFilters);
+
+      toggleBtn.addEventListener("click", () => {
+        setCollapsed(!collapsed);
+      });
+
+      applyFilters();
+      setCollapsed(false);
+    })();
+  </script>
+</body>
+</html>

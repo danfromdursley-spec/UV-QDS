@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Ω Cannon Wall Breaker v1.1+ (Offline)</title>
+<style>
+  :root{
+    --bg:#05070c; --fg:#eaf2ff; --mut:#9bb0cf; --acc:#7dd3fc;
+    --panel: rgba(10,16,28,0.78);
+    --btn: rgba(120,160,255,0.12);
+    --btn2: rgba(120,160,255,0.22);
+  }
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:14px/1.2 system-ui,Segoe UI,Roboto,Arial}
+  #wrap{position:fixed;inset:0;overflow:hidden}
+  canvas{position:absolute;inset:0;touch-action:none}
+  #hud{
+    position:absolute;left:10px;top:10px;z-index:5;
+    background:var(--panel);backdrop-filter: blur(6px);
+    padding:10px 10px;border-radius:14px;min-width:170px;
+    box-shadow: 0 6px 22px rgba(0,0,0,0.35);
+  }
+  #hud .row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:6px 0}
+  #hud .label{font-size:11px;color:var(--mut);letter-spacing:.02em}
+  button{
+    background:var(--btn);color:var(--fg);border:1px solid rgba(140,180,255,0.18);
+    padding:8px 10px;border-radius:10px;font-weight:600;
+  }
+  button:active{background:var(--btn2);transform: translateY(1px)}
+  input[type="range"]{width:160px}
+  #mini{
+    position:absolute;right:10px;top:10px;z-index:5;
+    background:var(--panel);padding:10px;border-radius:14px;
+  }
+  #mini .label{font-size:11px;color:var(--mut)}
+  #note{
+    position:absolute;left:10px;bottom:10px;z-index:5;
+    background:var(--panel);padding:8px 10px;border-radius:12px;
+    font-size:11px;color:var(--mut)
+  }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="c"></canvas>
+
+  <div id="hud">
+    <div class="row">
+      <button id="btnFire">FIRE 💥</button>
+      <button id="btnReset">RESET</button>
+    </div>
+    <div class="row">
+      <button id="btnCam">Cam: Orbit</button>
+    </div>
+
+    <div class="label">Aim yaw</div>
+    <div class="row">
+      <input id="yawRange" type="range" min="-180" max="180" value="0" />
+    </div>
+
+    <div class="label">Aim pitch</div>
+    <div class="row">
+      <input id="pitchRange" type="range" min="-25" max="25" value="0" />
+    </div>
+
+    <div class="row">
+      <button id="btnSoft">Soft Wall</button>
+      <button id="btnMed">Med Wall</button>
+      <button id="btnHard">Hard Wall</button>
+    </div>
+
+    <div class="row">
+      <span class="label" id="stats">Blocks: 0 | Shells: 0</span>
+    </div>
+  </div>
+
+  <div id="mini">
+    <div class="label">Touch</div>
+    <div>Drag = look</div>
+    <div>Pinch = zoom</div>
+  </div>
+
+  <div id="note">
+    Ω Cannon Wall Breaker v1.1+ — offline, no libs. Orbit/Chase/Cannon cams 🎩
+  </div>
+</div>
+
+<script>
+(() => {
+  // ==========================================================
+  // Ω Cannon Wall Breaker v1.1+
+  // - 3 camera modes: orbit | chase | cannon
+  // - touch drag look-around + pinch zoom
+  // - simple 3D blocks + projectile gravity
+  // - offline-first, no libs
+  // ==========================================================
+
+  const canvas = document.getElementById("c");
+  const ctx = canvas.getContext("2d", { alpha: false });
+
+  function resize(){
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    canvas.width = Math.floor(innerWidth * dpr);
+    canvas.height = Math.floor(innerHeight * dpr);
+    canvas.style.width = innerWidth + "px";
+    canvas.style.height = innerHeight + "px";
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  addEventListener("resize", resize, {passive:true});
+  resize();
+
+  // ---------------- small vec helpers ----------------
+  const v3 = (x=0,y=0,z=0)=>({x,y,z});
+  const add = (a,b)=>v3(a.x+b.x,a.y+b.y,a.z+b.z);
+  const sub = (a,b)=>v3(a.x-b.x,a.y-b.y,a.z-b.z);
+  const mul = (a,s)=>v3(a.x*s,a.y*s,a.z*s);
+  const dot = (a,b)=>a.x*b.x+a.y*b.y+a.z*b.z;
+  const len = a=>Math.hypot(a.x,a.y,a.z);
+  const norm = a=>{const l=len(a)||1; return v3(a.x/l,a.y/l,a.z/l);};
+  const cross = (a,b)=>v3(
+    a.y*b.z-a.z*b.y,
+    a.z*b.x-a.x*b.z,
+    a.x*b.y-a.y*b.x
+  );
+  const lerp = (a,b,t)=>v3(
+    a.x+(b.x-a.x)*t,
+    a.y+(b.y-a.y)*t,
+    a.z+(b.z-a.z)*t
+  );
+  const clamp = (n,min,max)=>Math.max(min, Math.min(max,n));
+  const rad = d=>d*Math.PI/180;
+
+  // ---------------- world objects ----------------
+  const cannon = {
+    pos: v3(0, 1.2, 0),
+    yaw: 0,
+    pitch: 0
+  };
+
+  let shells = [];
+  let debris = [];
+  let blocks = [];
+  let lastShell = null;
+
+  // wall presets
+  const WALL_PRESETS = {
+    soft: { rows: 6, cols: 10, size: 1.6, spacing: 1.75, hp: 1 },
+    med:  { rows: 8, cols: 12, size: 1.5, spacing: 1.7,  hp: 2 },
+    hard: { rows: 10, cols: 14, size: 1.4, spacing: 1.65, hp: 3 },
+  };
+
+  let wallMode = "med";
+
+  function buildWall(mode="med"){
+    wallMode = mode;
+    blocks.length = 0;
+    const P = WALL_PRESETS[mode];
+    const z0 = 38;
+    const width = (P.cols-1)*P.spacing;
+    const height = (P.rows-1)*P.spacing;
+
+    for(let r=0;r<P.rows;r++){
+      for(let c=0;c<P.cols;c++){
+        const x = c*P.spacing - width/2;
+        const y = 2 + r*P.spacing;
+        blocks.push({
+          pos: v3(x,y,z0),
+          size: P.size,
+          hp: P.hp,
+          alive: true,
+        });
+      }
+    }
+  }
+
+  // ---------------- camera ----------------
+  let camMode = "orbit"; // orbit | chase | cannon
+
+  const camera = {
+    pos: v3(0,6,18),
+    look: v3(0,3,10),
+    smooth: 0.14,
+  };
+
+  let orbitBaseDist = 18;
+  let chaseBaseDist = 14;
+  let cannonBaseDist = 3.2;
+  let cannonBaseUp = 1.1;
+  let cannonLookAhead = 18;
+
+  // touch offsets
+  let dragYaw = 0;
+  let dragPitch = 0;
+  let pinchDelta = 0;
+
+  const PITCH_MIN = -0.85;
+  const PITCH_MAX =  0.60;
+
+  function cannonForward(){
+    const y = cannon.yaw || 0;
+    const p = cannon.pitch || 0;
+    const cy = Math.cos(y), sy = Math.sin(y);
+    const cp = Math.cos(p), sp = Math.sin(p);
+    return norm(v3(
+      sy * cp,
+      sp,
+      cy * cp
+    ));
+  }
+
+  function getChaseTarget(){
+    if (lastShell && lastShell.alive) return lastShell.pos;
+    return cannon.pos;
+  }
+
+  function getCamera(){
+    const focus = cannon.pos;
+    const offYaw = dragYaw || 0;
+    const offPitchRaw = dragPitch || 0;
+    const offPitch = clamp(offPitchRaw, PITCH_MIN, PITCH_MAX);
+
+    const baseYaw = (cannon.yaw || 0) + offYaw;
+    const basePitch = clamp((cannon.pitch || 0) + offPitch, PITCH_MIN, PITCH_MAX);
+
+    const cy = Math.cos(baseYaw), sy = Math.sin(baseYaw);
+    const cp = Math.cos(basePitch), sp = Math.sin(basePitch);
+
+    const aimDir = norm(v3(
+      sy * cp,
+      sp,
+      cy * cp
+    ));
+
+    const pinch = pinchDelta || 0;
+
+    let targetPos, targetLook;
+
+    if (camMode === "orbit") {
+      const dist = clamp(orbitBaseDist + pinch, 8, 40);
+      targetLook = add(focus, mul(aimDir, 6));
+      targetPos = add(add(focus, mul(v3(0,1,0), 3.0)), mul(aimDir, -dist));
+    }
+    else if (camMode === "chase") {
+      const chaseTarget = getChaseTarget();
+      const dist = clamp(chaseBaseDist + pinch, 6, 35);
+      targetLook = chaseTarget;
+      targetPos = add(add(chaseTarget, v3(0, 2.2, 0)), mul(aimDir, -dist));
+    }
+    else { // cannon
+      const dist = clamp(cannonBaseDist + pinch*0.25, 2.2, 8.0);
+      const anchor = add(focus, v3(0, cannonBaseUp, 0));
+      targetPos = add(anchor, mul(aimDir, -dist));
+      targetLook = add(anchor, mul(aimDir, cannonLookAhead));
+    }
+
+    camera.pos = lerp(camera.pos, targetPos, camera.smooth);
+    camera.look = lerp(camera.look, targetLook, camera.smooth);
+    return camera;
+  }
+
+  // ---------------- projection ----------------
+  function project(pt){
+    const cam = camera;
+    const forward = norm(sub(cam.look, cam.pos));
+    const worldUp = v3(0,1,0);
+    let right = cross(forward, worldUp);
+    if (len(right) < 0.0001) right = v3(1,0,0);
+    right = norm(right);
+    const up = norm(cross(right, forward));
+
+    const rel = sub(pt, cam.pos);
+    const x = dot(rel, right);
+    const y = dot(rel, up);
+    const z = dot(rel, forward);
+
+    if (z <= 0.05) return null;
+
+    const fov = 1.05; // tuned for phone comfort
+    const sx = (x / z) * (innerWidth * fov) + innerWidth/2;
+    const sy = (-y / z) * (innerWidth * fov) + innerHeight/2;
+
+    return { x:sx, y:sy, z };
+  }
+
+  function drawCube(c, size){
+    // Simple wire-ish cube using 8 points projected
+    const s = size/2;
+    const pts = [
+      v3(c.x-s,c.y-s,c.z-s), v3(c.x+s,c.y-s,c.z-s),
+      v3(c.x+s,c.y+s,c.z-s), v3(c.x-s,c.y+s,c.z-s),
+      v3(c.x-s,c.y-s,c.z+s), v3(c.x+s,c.y-s,c.z+s),
+      v3(c.x+s,c.y+s,c.z+s), v3(c.x-s,c.y+s,c.z+s),
+    ];
+    const pr = pts.map(project);
+    if (pr.some(p=>!p)) return;
+
+    const e = [
+      [0,1],[1,2],[2,3],[3,0],
+      [4,5],[5,6],[6,7],[7,4],
+      [0,4],[1,5],[2,6],[3,7]
+    ];
+
+    ctx.beginPath();
+    for (const [a,b] of e){
+      ctx.moveTo(pr[a].x, pr[a].y);
+      ctx.lineTo(pr[b].x, pr[b].y);
+    }
+    ctx.stroke();
+  }
+
+  // ---------------- physics ----------------
+  const GRAV = -9.2; // toy gravity
+  const SHELL_SPEED = 26;
+
+  function fire(){
+    const dir = cannonForward();
+    const p = add(cannon.pos, mul(dir, 1.7));
+    const v = add(mul(dir, SHELL_SPEED), v3(0, 1.0, 0));
+
+    const shell = {
+      pos: p,
+      vel: v,
+      r: 0.35,
+      alive: true,
+      t: 0
+    };
+    shells.push(shell);
+    lastShell = shell;
+  }
+
+  function spawnDebris(hitPos, count=10){
+    for(let i=0;i<count;i++){
+      const rv = v3(
+        (Math.random()-0.5)*6,
+        Math.random()*6,
+        (Math.random()-0.5)*6
+      );
+      debris.push({
+        pos: v3(hitPos.x, hitPos.y, hitPos.z),
+        vel: rv,
+        life: 0.9 + Math.random()*0.6
+      });
+    }
+  }
+
+  function step(dt){
+    // shells
+    for (const s of shells){
+      if (!s.alive) continue;
+      s.t += dt;
+      s.vel.y += GRAV * dt;
+      s.pos = add(s.pos, mul(s.vel, dt));
+
+      // simple lifetime + ground check
+      if (s.pos.y < 0.2 || s.t > 6){
+        s.alive = false;
+      }
+
+      // block collisions
+      for (const b of blocks){
+        if (!b.alive || !s.alive) continue;
+        const d = sub(s.pos, b.pos);
+        const dist = len(d);
+        const hitRange = s.r + b.size*0.75;
+        if (dist < hitRange){
+          b.hp -= 1;
+          s.vel = mul(s.vel, 0.6); // lose energy
+          spawnDebris(b.pos, 8);
+
+          if (b.hp <= 0){
+            b.alive = false;
+            spawnDebris(b.pos, 14);
+          }
+          // tiny bounce nudge
+          const n = norm(d);
+          s.vel = add(s.vel, mul(n, 3.2));
+        }
+      }
+    }
+
+    // debris
+    for (const d of debris){
+      d.life -= dt;
+      d.vel.y += GRAV * 0.6 * dt;
+      d.pos = add(d.pos, mul(d.vel, dt));
+    }
+    debris = debris.filter(d => d.life > 0);
+
+    // clean shells list occasionally
+    if (shells.length > 24){
+      shells = shells.filter(s => s.alive);
+    }
+  }
+
+  // ---------------- render ----------------
+  function drawGround(){
+    // faint horizon + grid lines
+    ctx.save();
+    ctx.strokeStyle = "rgba(140,180,255,0.08)";
+    ctx.lineWidth = 1;
+
+    for(let i=-10;i<=10;i++){
+      const a = project(v3(i*2, 0, 6));
+      const b = project(v3(i*2, 0, 60));
+      if (a && b){
+        ctx.beginPath();
+        ctx.moveTo(a.x,a.y);
+        ctx.lineTo(b.x,b.y);
+        ctx.stroke();
+      }
+    }
+    for(let k=6;k<=60;k+=6){
+      const a = project(v3(-22, 0, k));
+      const b = project(v3( 22, 0, k));
+      if (a && b){
+        ctx.beginPath();
+        ctx.moveTo(a.x,a.y);
+        ctx.lineTo(b.x,b.y);
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+
+  function drawCannon(){
+    ctx.save();
+    ctx.strokeStyle = "rgba(200,230,255,0.35)";
+    ctx.lineWidth = 1.4;
+
+    // body cube-ish
+    drawCube(v3(cannon.pos.x, cannon.pos.y, cannon.pos.z), 1.2);
+
+    // barrel line
+    const dir = cannonForward();
+    const p0 = add(cannon.pos, v3(0, 0.4, 0));
+    const p1 = add(p0, mul(dir, 2.8));
+    const a = project(p0), b = project(p1);
+
+    if (a && b){
+      ctx.beginPath();
+      ctx.moveTo(a.x,a.y);
+      ctx.lineTo(b.x,b.y);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function drawBlocks(){
+    ctx.save();
+    ctx.lineWidth = 1;
+
+    // sort by depth for nicer feel
+    const alive = blocks.filter(b=>b.alive);
+    alive.sort((A,B)=> (B.pos.z - A.pos.z));
+
+    for (const b of alive){
+      const hp = b.hp;
+      ctx.strokeStyle =
+        (hp >= 3) ? "rgba(255,140,140,0.45)" :
+        (hp === 2) ? "rgba(255,210,140,0.45)" :
+                    "rgba(140,210,255,0.45)";
+      drawCube(b.pos, b.size);
+    }
+
+    ctx.restore();
+  }
+
+  function drawShells(){
+    ctx.save();
+    for (const s of shells){
+      if (!s.alive) continue;
+      const p = project(s.pos);
+      if (!p) continue;
+      const r = clamp(120 / (p.z+0.001), 2, 12) * s.r;
+
+      ctx.fillStyle = "rgba(160,220,255,0.9)";
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r, 0, Math.PI*2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function drawDebris(){
+    ctx.save();
+    ctx.fillStyle = "rgba(200,220,255,0.25)";
+    for (const d of debris){
+      const p = project(d.pos);
+      if (!p) continue;
+      const r = clamp(60 / (p.z+0.001), 1, 4);
+      ctx.globalAlpha = clamp(d.life, 0, 1) * 0.7;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r, 0, Math.PI*2);
+      ctx.fill();
+    }
+    ctx.restore();
+    ctx.globalAlpha = 1;
+  }
+
+  function render(){
+    // background
+    ctx.fillStyle = "#05070c";
+    ctx.fillRect(0,0,innerWidth,innerHeight);
+
+    drawGround();
+    drawBlocks();
+    drawCannon();
+    drawShells();
+    drawDebris();
+  }
+
+  // ---------------- touch controls ----------------
+  const pointers = new Map();
+  let lastPinchDist = 0;
+  let lastDragX = 0, lastDragY = 0;
+
+  function getDist(a,b){
+    const dx = a.x-b.x, dy = a.y-b.y;
+    return Math.hypot(dx,dy);
+  }
+
+  canvas.addEventListener("pointerdown", (e)=>{
+    canvas.setPointerCapture(e.pointerId);
+    pointers.set(e.pointerId, { x:e.clientX, y:e.clientY });
+    if (pointers.size === 1){
+      lastDragX = e.clientX; lastDragY = e.clientY;
+    }
+    if (pointers.size === 2){
+      const [p1,p2] = [...pointers.values()];
+      lastPinchDist = getDist(p1,p2);
+    }
+  });
+
+  canvas.addEventListener("pointermove", (e)=>{
+    if (!pointers.has(e.pointerId)) return;
+    pointers.set(e.pointerId, { x:e.clientX, y:e.clientY });
+
+    if (pointers.size === 1){
+      const dx = e.clientX - lastDragX;
+      const dy = e.clientY - lastDragY;
+      lastDragX = e.clientX; lastDragY = e.clientY;
+
+      // tuned for phones
+      dragYaw   += dx * 0.0055;
+      dragPitch += dy * 0.0045;
+
+      dragPitch = clamp(dragPitch, PITCH_MIN, PITCH_MAX);
+    }
+    else if (pointers.size === 2){
+      const [p1,p2] = [...pointers.values()];
+      const dist = getDist(p1,p2);
+      const delta = dist - lastPinchDist;
+      lastPinchDist = dist;
+
+      // pinch affects distance
+      pinchDelta += delta * 0.02;
+      pinchDelta = clamp(pinchDelta, -10, 18);
+    }
+  });
+
+  function endPointer(e){
+    pointers.delete(e.pointerId);
+    if (pointers.size < 2) lastPinchDist = 0;
+  }
+  canvas.addEventListener("pointerup", endPointer);
+  canvas.addEventListener("pointercancel", endPointer);
+  canvas.addEventListener("pointerout", endPointer);
+  canvas.addEventListener("pointerleave", endPointer);
+
+  // ---------------- UI ----------------
+  const btnFire = document.getElementById("btnFire");
+  const btnReset = document.getElementById("btnReset");
+  const btnCam = document.getElementById("btnCam");
+  const yawRange = document.getElementById("yawRange");
+  const pitchRange = document.getElementById("pitchRange");
+  const btnSoft = document.getElementById("btnSoft");
+  const btnMed = document.getElementById("btnMed");
+  const btnHard = document.getElementById("btnHard");
+  const stats = document.getElementById("stats");
+
+  btnFire.addEventListener("click", fire);
+
+  btnReset.addEventListener("click", ()=>{
+    shells.length = 0;
+    debris.length = 0;
+    lastShell = null;
+    dragYaw = 0; dragPitch = 0; pinchDelta = 0;
+    cannon.yaw = 0; cannon.pitch = 0;
+    yawRange.value = "0";
+    pitchRange.value = "0";
+    buildWall(wallMode);
+  });
+
+  btnCam.addEventListener("click", () => {
+    camMode = (camMode === "orbit") ? "chase" :
+              (camMode === "chase") ? "cannon" : "orbit";
+
+    const label = (camMode === "orbit") ? "Orbit" :
+                  (camMode === "chase") ? "Chase" : "Cannon";
+
+    btnCam.textContent = "Cam: " + label;
+
+    // comfort reset
+    pinchDelta = 0;
+  });
+
+  yawRange.addEventListener("input", ()=>{
+    cannon.yaw = rad(parseFloat(yawRange.value));
+  });
+
+  pitchRange.addEventListener("input", ()=>{
+    cannon.pitch = rad(parseFloat(pitchRange.value));
+  });
+
+  btnSoft.addEventListener("click", ()=> buildWall("soft"));
+  btnMed.addEventListener("click", ()=> buildWall("med"));
+  btnHard.addEventListener("click", ()=> buildWall("hard"));
+
+  // ---------------- main loop ----------------
+  let lastT = performance.now();
+
+  function tick(t){
+    const dt = clamp((t - lastT) / 1000, 0, 0.033);
+    lastT = t;
+
+    getCamera();
+    step(dt);
+    render();
+
+    // stats
+    const aliveBlocks = blocks.reduce((n,b)=>n+(b.alive?1:0),0);
+    const aliveShells = shells.reduce((n,s)=>n+(s.alive?1:0),0);
+    stats.textContent = `Blocks: ${aliveBlocks} | Shells: ${aliveShells}`;
+
+    requestAnimationFrame(tick);
+  }
+
+  // init
+  buildWall("med");
+  requestAnimationFrame(tick);
+
+})();
+</script>
+</body>
+</html>

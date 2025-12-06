@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Pyramid Pinball v1.1</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<style>
+  :root {
+    --bg: #050816;
+    --panel: #070a18;
+    --gold-soft: #f6e3a3;
+    --gold-strong: #ffd86b;
+    --gold-dim: #6c5a2b;
+    --text-main: #fdf7e6;
+    --text-muted: #a8b0c8;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+      Roboto, "Segoe UI", sans-serif;
+    background: radial-gradient(circle at top, #16162a 0%, #050816 55%, #02030b 100%);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+  }
+  .shell {
+    width: 100%;
+    max-width: 420px;
+    padding: 10px 8px 16px;
+  }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  header .title {
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  header .badge {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 216, 107, 0.3);
+    color: var(--gold-strong);
+    background: linear-gradient(135deg, rgba(255, 216, 107, 0.08), transparent);
+  }
+  header .stats {
+    font-size: 11px;
+    text-align: right;
+    line-height: 1.4;
+    color: var(--text-muted);
+  }
+  header .stats span {
+    display: inline-block;
+    min-width: 54px;
+  }
+
+  .top-buttons {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .btn-top {
+    flex: 1;
+    padding: 6px 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 216, 107, 0.3);
+    background: radial-gradient(circle at top left, rgba(255, 216, 107, 0.15), rgba(5,8,22,0.9));
+    color: var(--gold-soft);
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+  }
+
+  .playfield-shell {
+    border-radius: 22px;
+    padding: 10px;
+    background: radial-gradient(circle at top, #151934 0%, #050816 50%, #020308 100%);
+    border: 1px solid rgba(255, 216, 107, 0.14);
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,0.8),
+      0 18px 40px rgba(0,0,0,0.8);
+    margin-bottom: 8px;
+  }
+
+  #gameCanvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 18px;
+    background: radial-gradient(circle at 20% 0%, #1f2444 0, #060818 50%, #02030c 100%);
+  }
+
+  .controls {
+    display: grid;
+    grid-template-columns: 1.1fr 0.8fr 1.1fr;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .ctrl-btn {
+    border-radius: 16px;
+    padding: 8px 6px 10px;
+    background: linear-gradient(135deg, rgba(255, 216, 107, 0.18), rgba(5,8,22,0.95));
+    border: 1px solid rgba(255, 216, 107, 0.35);
+    text-align: center;
+    font-size: 12px;
+    color: var(--gold-soft);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.7);
+    user-select: none;
+  }
+  .ctrl-btn span.label {
+    display: block;
+    font-weight: 600;
+    font-size: 13px;
+  }
+  .ctrl-btn span.sub {
+    display: block;
+    margin-top: 2px;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .ctrl-btn.active {
+    box-shadow: 0 0 0 1px rgba(255, 216, 107, 0.5), 0 0 16px rgba(255, 216, 107, 0.5);
+    transform: translateY(1px);
+  }
+
+  footer {
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header>
+    <div>
+      <div class="title">
+        <span style="font-size:14px">▲</span>
+        <span>Pyramid Pinball</span>
+      </div>
+      <div class="badge">v1 • offline • 2D</div>
+    </div>
+    <div class="stats">
+      <div><span>Score</span> <strong id="scoreEl">0</strong></div>
+      <div><span>Ball</span> <strong id="ballEl">1</strong></div>
+      <div><span>Lives</span> <strong id="lifeEl">3</strong></div>
+      <div><span>FPS</span> <strong id="fpsEl">–</strong></div>
+    </div>
+  </header>
+
+  <div class="top-buttons">
+    <button class="btn-top" id="newGameBtn">New Game</button>
+    <button class="btn-top" id="helpBtn">Help</button>
+  </div>
+
+  <div class="playfield-shell">
+    <canvas id="gameCanvas" width="360" height="640"></canvas>
+    <div class="controls">
+      <div class="ctrl-btn" id="leftBtn">
+        <span class="label">◀ Left Flipper</span>
+        <span class="sub">Tap / hold</span>
+      </div>
+      <div class="ctrl-btn" id="plungeBtn">
+        <span class="label">↑ Plunge</span>
+        <span class="sub">Hold to charge</span>
+      </div>
+      <div class="ctrl-btn" id="rightBtn">
+        <span class="label">Right Flipper ▶</span>
+        <span class="sub">Tap / hold</span>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Escape-guard enabled: if the ball somehow leaves the temple, it is gently
+    returned and you lose a life instead of the universe glitching. 🎩
+  </footer>
+</div>
+
+<script>
+(function () {
+  const canvas = document.getElementById("gameCanvas");
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width;
+  const H = canvas.height;
+
+  // Playfield bounds (inner walls)
+  const marginX = 55;    // side wall x-offset
+  const topY = 80;       // top wall
+  const bottomY = 540;   // drain line (above UI)
+  const pyramidY = 420;
+
+  const ball = {
+    x: W - marginX - 12,
+    y: bottomY - 18,
+    vx: 0,
+    vy: 0,
+    r: 9,
+    active: false,
+  };
+
+  let score = 0;
+  let ballIndex = 1;
+  let lives = 3;
+
+  const flippers = {
+    left:  { x1: marginX + 45, y1: bottomY - 15, width: 70, height: 10, active: false },
+    right: { x1: W - marginX - 45 - 70, y1: bottomY - 15, width: 70, height: 10, active: false },
+  };
+
+  const bumpers = [
+    { x: W * 0.5, y: topY + 80, r: 14, score: 150 },
+    { x: W * 0.35, y: topY + 130, r: 12, score: 100 },
+    { x: W * 0.65, y: topY + 130, r: 12, score: 100 },
+    { x: W * 0.25, y: topY + 190, r: 10, score: 75 },
+    { x: W * 0.75, y: topY + 190, r: 10, score: 75 },
+  ];
+
+  // Controls state
+  let leftHeld = false;
+  let rightHeld = false;
+  let plunging = false;
+  let plungeStartTime = 0;
+
+  // Physics
+  const gravity = 900;      // px/s^2
+  const bounceWall = 0.88;
+  const bounceBumper = 0.95;
+  const maxSpeed = 1400;
+
+  let lastTime = performance.now();
+  let fpsAccum = 0;
+  let fpsFrames = 0;
+  let fps = 0;
+
+  const scoreEl = document.getElementById("scoreEl");
+  const ballEl = document.getElementById("ballEl");
+  const lifeEl = document.getElementById("lifeEl");
+  const fpsEl = document.getElementById("fpsEl");
+
+  function resetBall(hardReset=false) {
+    ball.x = W - marginX - 12;
+    ball.y = bottomY - 18;
+    ball.vx = 0;
+    ball.vy = 0;
+    ball.active = false;
+
+    if (hardReset) {
+      lives--;
+      if (lives <= 0) {
+        lives = 0;
+        updateHUD();
+        setTimeout(() => {
+          alert("Game over, old chap.\nTap New Game to try again.");
+        }, 50);
+        return;
+      } else {
+        ballIndex++;
+      }
+    }
+    updateHUD();
+  }
+
+  function updateHUD() {
+    scoreEl.textContent = score;
+    ballEl.textContent = ballIndex;
+    lifeEl.textContent = lives;
+  }
+
+  function clamp(v, min, max) {
+    return v < min ? min : v > max ? max : v;
+  }
+
+  function handleWallCollisions(dt) {
+    const r = ball.r;
+    // Side walls
+    if (ball.x - r < marginX) {
+      ball.x = marginX + r;
+      ball.vx = Math.abs(ball.vx) * bounceWall;
+    } else if (ball.x + r > W - marginX) {
+      ball.x = W - marginX - r;
+      ball.vx = -Math.abs(ball.vx) * bounceWall;
+    }
+    // Top wall
+    if (ball.y - r < topY) {
+      ball.y = topY + r;
+      ball.vy = Math.abs(ball.vy) * bounceWall;
+    }
+    // Drain zone (no bounce, lose ball)
+    if (ball.y - r > bottomY + 30) {
+      resetBall(true);
+    }
+
+    // Absolute escape guard (just in case numerical nonsense)
+    if (
+      ball.x < -100 || ball.x > W + 100 ||
+      ball.y < -150 || ball.y > H + 200
+    ) {
+      resetBall(true);
+    }
+  }
+
+  function rectHit(fl, r) {
+    // Simple AABB collision
+    const closestX = clamp(ball.x, fl.x1, fl.x1 + fl.width);
+    const closestY = clamp(ball.y, fl.y1, fl.y1 + fl.height);
+    const dx = ball.x - closestX;
+    const dy = ball.y - closestY;
+    return (dx * dx + dy * dy) < r * r;
+  }
+
+  function handleFlippers(dt) {
+    const r = ball.r;
+
+    // Left flipper gives leftwards & upwards impulse
+    if (flippers.left.active && rectHit(flippers.left, r)) {
+      ball.vy = -Math.abs(ball.vy) - 550;
+      ball.vx = -260;
+    }
+
+    // Right flipper gives rightwards & upwards impulse
+    if (flippers.right.active && rectHit(flippers.right, r)) {
+      ball.vy = -Math.abs(ball.vy) - 550;
+      ball.vx = 260;
+    }
+  }
+
+  function handleBumpers() {
+    for (const b of bumpers) {
+      const dx = ball.x - b.x;
+      const dy = ball.y - b.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const minDist = ball.r + b.r;
+      if (dist < minDist && dist > 0.0001) {
+        const nx = dx / dist;
+        const ny = dy / dist;
+        const overlap = minDist - dist;
+        ball.x += nx * overlap;
+        ball.y += ny * overlap;
+
+        const vDotN = ball.vx * nx + ball.vy * ny;
+        ball.vx -= 2 * vDotN * nx;
+        ball.vy -= 2 * vDotN * ny;
+        ball.vx *= bounceBumper;
+        ball.vy *= bounceBumper;
+
+        score += b.score;
+        updateHUD();
+      }
+    }
+  }
+
+  function physicsStep(dt) {
+    if (!ball.active) return;
+
+    ball.vy += gravity * dt;
+
+    // Integrate
+    ball.x += ball.vx * dt;
+    ball.y += ball.vy * dt;
+
+    // Clamp speeds
+    const speed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
+    if (speed > maxSpeed) {
+      const s = maxSpeed / (speed || 1);
+      ball.vx *= s;
+      ball.vy *= s;
+    }
+
+    handleWallCollisions(dt);
+    handleFlippers(dt);
+    handleBumpers();
+  }
+
+  function drawField() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Outer glow
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, "rgba(255,216,107,0.08)");
+    grad.addColorStop(0.5, "rgba(255,216,107,0.02)");
+    grad.addColorStop(1, "rgba(255,216,107,0.08)");
+    ctx.fillStyle = grad;
+    ctx.fillRect(marginX - 10, topY - 10, W - 2 * (marginX - 10), bottomY - topY + 40);
+
+    // Playfield outline (simple coffin / pyramid-ish shape)
+    ctx.strokeStyle = "rgba(255,216,107,0.78)";
+    ctx.lineWidth = 3;
+
+    ctx.beginPath();
+    ctx.moveTo(marginX, bottomY);
+    ctx.lineTo(marginX, topY + 80);
+    ctx.lineTo(W / 2, topY);
+    ctx.lineTo(W - marginX, topY + 80);
+    ctx.lineTo(W - marginX, bottomY);
+    ctx.stroke();
+
+    // Drain line
+    ctx.beginPath();
+    ctx.moveTo(marginX, bottomY);
+    ctx.lineTo(W - marginX, bottomY);
+    ctx.globalAlpha = 0.6;
+    ctx.strokeStyle = "rgba(255,216,107,0.35)";
+    ctx.stroke();
+    ctx.globalAlpha = 1.0;
+
+    // Pyramid at center
+    ctx.beginPath();
+    ctx.moveTo(W / 2, pyramidY - 32);
+    ctx.lineTo(W / 2 - 40, pyramidY + 26);
+    ctx.lineTo(W / 2 + 40, pyramidY + 26);
+    ctx.closePath();
+    ctx.strokeStyle = "rgba(255,216,107,0.5)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  function drawBumpers() {
+    for (const b of bumpers) {
+      const rOuter = b.r + 4;
+      const rInner = b.r - 3;
+
+      const g = ctx.createRadialGradient(b.x, b.y, rInner * 0.4, b.x, b.y, rOuter);
+      g.addColorStop(0, "rgba(255, 248, 210, 1)");
+      g.addColorStop(1, "rgba(255, 216, 107, 0.05)");
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, rOuter, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = "rgba(255,216,107,0.8)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, rInner, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
+
+  function drawFlippers() {
+    ctx.fillStyle = "rgba(255,216,107," + (flippers.left.active ? "0.95" : "0.7") + ")";
+    const lf = flippers.left;
+    ctx.beginPath();
+    ctx.roundRect(lf.x1, lf.y1, lf.width, lf.height, 6);
+    ctx.fill();
+
+    ctx.fillStyle = "rgba(255,216,107," + (flippers.right.active ? "0.95" : "0.7") + ")";
+    const rf = flippers.right;
+    ctx.beginPath();
+    ctx.roundRect(rf.x1, rf.y1, rf.width, rf.height, 6);
+    ctx.fill();
+  }
+
+  function drawBall() {
+    const g = ctx.createRadialGradient(ball.x - 3, ball.y - 4, 1, ball.x, ball.y, ball.r + 2);
+    g.addColorStop(0, "#fff6d4");
+    g.addColorStop(1, "rgba(255,216,107,0.15)");
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function draw(dt) {
+    drawField();
+    drawBumpers();
+    drawFlippers();
+    drawBall();
+  }
+
+  function gameLoop(now) {
+    const dt = Math.min((now - lastTime) / 1000, 0.03); // clamp big jumps
+    lastTime = now;
+
+    physicsStep(dt);
+    draw(dt);
+
+    // FPS calc
+    fpsAccum += dt;
+    fpsFrames++;
+    if (fpsAccum >= 0.5) {
+      fps = Math.round(fpsFrames / fpsAccum);
+      fpsEl.textContent = fps;
+      fpsAccum = 0;
+      fpsFrames = 0;
+    }
+
+    requestAnimationFrame(gameLoop);
+  }
+
+  // ========= Controls =========
+
+  function setBtnActive(el, active) {
+    if (!el) return;
+    if (active) el.classList.add("active");
+    else el.classList.remove("active");
+  }
+
+  function handlePress(id, onDown, onUp) {
+    const el = document.getElementById(id);
+    const down = (e) => {
+      e.preventDefault();
+      onDown();
+      setBtnActive(el, true);
+    };
+    const up = (e) => {
+      e && e.preventDefault();
+      onUp();
+      setBtnActive(el, false);
+    };
+    el.addEventListener("pointerdown", down);
+    el.addEventListener("pointerup", up);
+    el.addEventListener("pointercancel", up);
+    el.addEventListener("pointerleave", (e) => {
+      if (e.pressure === 0) setBtnActive(el, false);
+    });
+  }
+
+  handlePress("leftBtn",
+    () => { leftHeld = true; flippers.left.active = true; },
+    () => { leftHeld = false; flippers.left.active = false; }
+  );
+
+  handlePress("rightBtn",
+    () => { rightHeld = true; flippers.right.active = true; },
+    () => { rightHeld = false; flippers.right.active = false; }
+  );
+
+  handlePress("plungeBtn",
+    () => {
+      if (!ball.active) {
+        plunging = true;
+        plungeStartTime = performance.now();
+      }
+    },
+    () => {
+      if (plunging && !ball.active) {
+        plunging = false;
+        const holdMs = performance.now() - plungeStartTime;
+        const power = clamp(holdMs / 900, 0.25, 1.0);
+        ball.active = true;
+        ball.vy = - (420 + 580 * power);
+        ball.vx = -40 + 80 * Math.random(); // small random offset
+      }
+    }
+  );
+
+  document.getElementById("newGameBtn").addEventListener("click", () => {
+    score = 0;
+    lives = 3;
+    ballIndex = 1;
+    resetBall(false);
+  });
+
+  document.getElementById("helpBtn").addEventListener("click", () => {
+    alert(
+`Pyramid Pinball — Shed Edition 🎩
+
+• Hold the middle button to charge the plunge, release to shoot.
+• Tap / hold left & right buttons to flip.
+• Hit the glowing bumpers to earn points.
+• If the ball leaves the lower drain, you lose a life.
+• If it ever somehow escapes the pyramid, the escape-guard
+  will safely reset it instead of letting it fly off-screen.
+
+Pure toy, no real physics claims — just vibes and gold.`
+    );
+  });
+
+  // Start
+  updateHUD();
+  resetBall(false);
+  requestAnimationFrame(gameLoop);
+})();
+</script>
+</body>
+</html>

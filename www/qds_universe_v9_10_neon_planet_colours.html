@@ -1,0 +1,585 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>QDS Universe V9.2 – Neon Planets</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: radial-gradient(circle at top, #020617 0, #000 55%, #000 100%);
+      touch-action: none;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    #renderCanvas {
+      width: 100vw;
+      height: 100vh;
+      touch-action: none;
+      display: block;
+    }
+    #hud {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      max-width: 420px;
+      padding: 14px 16px 16px 16px;
+      border-radius: 18px;
+      background: linear-gradient(120deg, rgba(250,204,21,0.25), rgba(56,189,248,0.9), rgba(88,28,135,0.95));
+      box-shadow: 0 0 25px rgba(0,0,0,0.9);
+      color: #fff;
+      z-index: 10;
+      box-sizing: border-box;
+    }
+    #hud h1 {
+      font-size: 20px;
+      margin: 0 0 4px 0;
+      letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    #hud p.subtitle {
+      margin: 0 0 8px 0;
+      font-size: 12px;
+      opacity: 0.9;
+    }
+    .slider-row {
+      margin: 4px 0 2px 0;
+    }
+    .slider-row label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      margin-bottom: 2px;
+    }
+    .slider-row input[type=range] {
+      width: 100%;
+    }
+    .button-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 6px;
+    }
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 8px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      color: #fff;
+      background: #020617;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.6);
+    }
+    button:active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: 0 1px 6px rgba(0,0,0,0.7);
+    }
+    #btnCME { background: linear-gradient(90deg,#ff9800,#ff5722); }
+    #btnChaos { background: linear-gradient(90deg,#ff5722,#c2185b); }
+    #btnNormal { background: linear-gradient(90deg,#009688,#26c6da); }
+    #btnRide { background: linear-gradient(90deg,#4caf50,#8bc34a); }
+    #btnMeltdown {
+      grid-column: span 2;
+      background: radial-gradient(circle at top,#ffeb3b,#f44336);
+    }
+    .select-row {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .select-row select {
+      width: 100%;
+      padding: 6px 8px;
+      border-radius: 999px;
+      border: none;
+      font-size: 12px;
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+    }
+    #planetInfo {
+      font-size: 11px;
+      margin-top: 2px;
+      padding: 4px 6px;
+      border-radius: 10px;
+      background: rgba(0,0,0,0.55);
+    }
+    #statusBar {
+      font-size: 10px;
+      margin-top: 4px;
+      opacity: 0.85;
+    }
+    #hudToggle {
+      position: fixed;
+      right: 10px;
+      bottom: 16px;
+      z-index: 11;
+      border-radius: 999px;
+      border: none;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      background: radial-gradient(circle at top, #06b6d4, #2563eb);
+      color: #000;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.9);
+      cursor: pointer;
+    }
+    @media (max-width: 768px) {
+      #hud {
+        max-width: 82vw;
+        padding: 10px 12px 12px 12px;
+      }
+      #hud h1 {
+        font-size: 17px;
+      }
+      button {
+        padding: 7px 8px;
+        font-size: 11px;
+      }
+      .select-row select {
+        font-size: 11px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div id="hud">
+  <h1>QDS Universe V9.2 🧢💥</h1>
+  <p class="subtitle">Neon warp-grid with brighter, clearer planets. Drag sliders, fire CMEs, ride along.</p>
+  <div class="slider-row">
+    <label><span>λ<sub>c</sub> (spatial coherence)</span><span id="lambdaVal">1.0</span></label>
+    <input id="lambdaSlider" type="range" min="0.4" max="3.0" step="0.1" value="1.4" />
+  </div>
+  <div class="slider-row">
+    <label><span>τ<sub>c</sub> (temporal coherence)</span><span id="tauVal">2.0</span></label>
+    <input id="tauSlider" type="range" min="0.4" max="3.0" step="0.1" value="2.0" />
+  </div>
+  <div class="slider-row">
+    <label><span>Orbit speed multiplier</span><span id="orbitVal">1.0×</span></label>
+    <input id="orbitSlider" type="range" min="0.3" max="3.0" step="0.1" value="1.0" />
+  </div>
+  <div class="slider-row">
+    <label><span>Grid warp intensity</span><span id="gridVal">1.0×</span></label>
+    <input id="gridSlider" type="range" min="0.4" max="3.0" step="0.1" value="1.0" />
+  </div>
+  <div class="button-row">
+    <button id="btnCME">💥 Fire CME</button>
+    <button id="btnChaos">🔥 MAX Chaos</button>
+    <button id="btnNormal">💎 Normal</button>
+    <button id="btnRide">🛸 Ride Along</button>
+    <button id="btnMeltdown">☢️ QDS MELTDOWN</button>
+  </div>
+  <div class="select-row">
+    <select id="planetSelect">
+      <option value="none">Select Planet</option>
+      <option value="mercury">Mercury</option>
+      <option value="venus">Venus</option>
+      <option value="earth" selected>Earth</option>
+      <option value="mars">Mars</option>
+      <option value="jupiter">Jupiter</option>
+      <option value="saturn">Saturn</option>
+      <option value="uranus">Uranus</option>
+      <option value="neptune">Neptune</option>
+      <option value="pluto">Pluto (respect)</option>
+    </select>
+    <div id="planetInfo">Planet info will appear here.</div>
+  </div>
+  <div id="statusBar">Status: QDS idling. Grid humming softly.</div>
+</div>
+<button id="hudToggle">HUD</button>
+<canvas id="renderCanvas"></canvas>
+
+<script src="https://cdn.babylonjs.com/babylon.js"></script>
+<script>
+  const canvas = document.getElementById("renderCanvas");
+  const engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true });
+
+  const PLANET_TEXT = {
+    mercury: "Mercury – fast, hot, and a bit crispy.",
+    venus:   "Venus – runaway greenhouse. Do not open windows.",
+    earth:   "Earth – liquid water, plate tectonics, questionable Wi‑Fi.",
+    mars:    "Mars – dusty, cold, working on the whole 'habitable' thing.",
+    jupiter: "Jupiter – big lad. Moon hoarder. Storm enthusiast.",
+    saturn:  "Saturn – brings its own hula hoop collection.",
+    uranus:  "Uranus – tilted like it had a rough day.",
+    neptune: "Neptune – deep blue and very, very windy.",
+    pluto:   "Pluto – tiny, icy, emotionally still a planet."
+  };
+
+  const state = {
+    qdsLambda: 1.4,
+    qdsTau: 2.0,
+    orbitSpeed: 1.0,
+    gridAmp: 1.0,
+    chaosOn: false,
+    meltdown: false,
+    rideTarget: "earth",
+    rideOn: false,
+    cmewaves: [],
+    t: 0
+  };
+
+  function createScene() {
+    const scene = new BABYLON.Scene(engine);
+    scene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
+
+    const camera = new BABYLON.ArcRotateCamera("cam",
+      -Math.PI / 2.2,
+      Math.PI / 2.6,
+      120,
+      new BABYLON.Vector3(0, 8, 0),
+      scene
+    );
+    camera.attachControl(canvas, true);
+    camera.lowerRadiusLimit = 40;
+    camera.upperRadiusLimit = 220;
+
+    const light = new BABYLON.HemisphericLight("hemi",
+      new BABYLON.Vector3(0, 1, 0),
+      scene
+    );
+    light.intensity = 0.6;
+
+    const sunLight = new BABYLON.PointLight("sunLight",
+      new BABYLON.Vector3(0, 6, 0),
+      scene
+    );
+    sunLight.intensity = 1.3;
+
+    const glow = new BABYLON.GlowLayer("glow", scene);
+    glow.intensity = 0.7;
+
+    // QDS grid
+    const grid = BABYLON.MeshBuilder.CreateGround("qdsGrid", {
+      width: 420,
+      height: 420,
+      subdivisions: 140
+    }, scene);
+    grid.position.y = -6;
+
+    const gridMat = new BABYLON.StandardMaterial("gridMat", scene);
+    gridMat.wireframe = true;
+    gridMat.diffuseColor = new BABYLON.Color3(0.05, 0.7, 0.9);
+    gridMat.emissiveColor = new BABYLON.Color3(0.0, 0.4, 0.6);
+    grid.material = gridMat;
+
+    // Warp the grid
+    const positions = grid.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+
+    scene.registerBeforeRender(() => {
+      const t = state.t;
+      const lambda = state.qdsLambda;
+      const tau = state.qdsTau;
+      const ampBase = state.meltdown ? 2.4 : 1.4;
+      const amp = (ampBase + (state.chaosOn ? 0.6 : 0.0)) * state.gridAmp;
+      for (let i = 0; i < positions.length; i += 3) {
+        const x = positions[i];
+        const z = positions[i + 2];
+        const r = Math.sqrt(x*x + z*z);
+        const wobble = Math.sin(r * 0.08 * lambda - t * 0.9 * tau);
+        positions[i + 1] = wobble * amp;
+      }
+      grid.updateVerticesData(BABYLON.VertexBuffer.PositionKind, positions);
+      grid.refreshBoundingInfo();
+
+      state.cmewaves = state.cmewaves.filter(w => {
+        w.radius += w.speed;
+        w.mesh.scaling.setAll(w.radius);
+        const fade = Math.max(0, 1.0 - w.radius / 260);
+        w.material.emissiveColor = new BABYLON.Color3(1.0, 0.8 * fade, 0.2 * fade);
+        if (w.radius > 260) {
+          w.mesh.dispose();
+          return false;
+        }
+        return true;
+      });
+
+      if (state.rideOn && planets[state.rideTarget]) {
+        const target = planets[state.rideTarget].mesh;
+        const pos = target.position;
+        camera.target.copyFrom(pos);
+        camera.alpha += 0.0015;
+      }
+
+      state.t += engine.getDeltaTime() * 0.001;
+    });
+
+    // Sun
+    const sun = BABYLON.MeshBuilder.CreateSphere("sun", { diameter: 18, segments: 32 }, scene);
+    sun.position.y = 6;
+
+    const sunMat = new BABYLON.StandardMaterial("sunMat", scene);
+    sunMat.diffuseColor = new BABYLON.Color3(1.0, 0.95, 0.7);
+    sunMat.emissiveColor = new BABYLON.Color3(1.4, 1.1, 0.4);
+    sun.material = sunMat;
+
+    const corona = BABYLON.MeshBuilder.CreateSphere("corona",
+      { diameter: 30, segments: 32 },
+      scene
+    );
+    const coronaMat = new BABYLON.StandardMaterial("coronaMat", scene);
+    coronaMat.emissiveColor = new BABYLON.Color3(0.9, 0.95, 1.3);
+    coronaMat.alpha = 0.25;
+    corona.material = coronaMat;
+    corona.position = sun.position.clone();
+
+    // Planets: brighter + slightly larger
+    function makePlanet(name, radius, distance, color, emissive, speed) {
+      const planet = BABYLON.MeshBuilder.CreateSphere(name, {
+        diameter: radius * 2.2,
+        segments: 24
+      }, scene);
+      const mat = new BABYLON.StandardMaterial(name + "Mat", scene);
+      mat.diffuseColor = color;
+      mat.specularColor = new BABYLON.Color3(0.2,0.2,0.2);
+      mat.emissiveColor = emissive;
+      planet.material = mat;
+
+      const halo = BABYLON.MeshBuilder.CreateSphere(name + "Halo", {
+        diameter: radius * 3.3,
+        segments: 24
+      }, scene);
+      const haloMat = new BABYLON.StandardMaterial(name + "HaloMat", scene);
+      haloMat.emissiveColor = emissive.scale(1.4);
+      haloMat.alpha = 0.16;
+      halo.material = haloMat;
+
+      planet.position.x = distance;
+      planet.position.y = 4;
+      halo.parent = planet;
+
+      return { mesh: planet, speed, distance, angle: Math.random() * Math.PI * 2 };
+    }
+
+    window.planets = {
+      mercury: makePlanet("mercury", 1.2, 26,
+        // Mercury — hot grey
+        new BABYLON.Color3(0.85, 0.82, 0.78),
+        new BABYLON.Color3(1.00, 0.95, 0.90),
+        0.024),
+      venus: makePlanet("venus", 1.7, 34,
+        // Venus — warm yellow
+        new BABYLON.Color3(1.00, 0.86, 0.50),
+        new BABYLON.Color3(1.15, 0.98, 0.65),
+        0.018),
+      earth: makePlanet("earth", 1.8, 42,
+        // Earth — deep blue
+        new BABYLON.Color3(0.15, 0.35, 1.10),
+        new BABYLON.Color3(0.35, 0.75, 1.35),
+        0.015),
+      mars: makePlanet("mars", 1.4, 50,
+        // Mars — bright red/orange
+        new BABYLON.Color3(1.00, 0.35, 0.10),
+        new BABYLON.Color3(1.15, 0.55, 0.25),
+        0.013),
+      jupiter: makePlanet("jupiter", 3.5, 64,
+        // Jupiter — orange/banded
+        new BABYLON.Color3(1.00, 0.76, 0.48),
+        new BABYLON.Color3(1.20, 0.90, 0.65),
+        0.010),
+      saturn: makePlanet("saturn", 3.0, 80,
+        // Saturn — pale gold
+        new BABYLON.Color3(0.96, 0.84, 0.60),
+        new BABYLON.Color3(1.10, 0.96, 0.72),
+        0.008),
+      uranus: makePlanet("uranus", 2.4, 96,
+        // Uranus — teal
+        new BABYLON.Color3(0.40, 0.90, 0.95),
+        new BABYLON.Color3(0.55, 1.10, 1.25),
+        0.006),
+      neptune: makePlanet("neptune", 2.4, 112,
+        // Neptune — deep indigo
+        new BABYLON.Color3(0.20, 0.35, 1.00),
+        new BABYLON.Color3(0.35, 0.60, 1.35),
+        0.005),
+      pluto: makePlanet("pluto", 1.1, 130,
+        // Pluto — icy grey/blue
+        new BABYLON.Color3(0.80, 0.86, 0.96),
+        new BABYLON.Color3(0.92, 0.98, 1.20),
+        0.004)
+    };
+
+    // Saturn ring
+    const ring = BABYLON.MeshBuilder.CreateTorus("saturnRing", {
+      diameter: 16,
+      thickness: 0.4,
+      tessellation: 80
+    }, scene);
+    const ringMat = new BABYLON.StandardMaterial("ringMat", scene);
+    ringMat.emissiveColor = new BABYLON.Color3(1.0, 0.9, 0.7);
+    ringMat.diffuseColor = new BABYLON.Color3(0.9, 0.8, 0.5);
+    ring.material = ringMat;
+    ring.rotation.x = Math.PI / 2;
+    ring.parent = planets.saturn.mesh;
+
+    // Orbit lines
+    Object.values(planets).forEach(p => {
+      const circle = BABYLON.MeshBuilder.CreateTorus("orbit_"+p.mesh.name, {
+        diameter: p.distance * 2,
+        thickness: 0.08,
+        tessellation: 140
+      }, scene);
+      const om = new BABYLON.StandardMaterial("orbitMat_"+p.mesh.name, scene);
+      om.emissiveColor = new BABYLON.Color3(0.3, 0.6, 1.0);
+      om.alpha = 0.5;
+      circle.material = om;
+      circle.rotation.x = Math.PI / 2;
+      circle.position.y = 4;
+    });
+
+    scene.onBeforeRenderObservable.add(() => {
+      const dt = engine.getDeltaTime() * 0.001;
+      Object.values(planets).forEach(p => {
+        p.angle += p.speed * state.orbitSpeed * (state.chaosOn ? 1.5 : 1.0);
+        const x = Math.cos(p.angle) * p.distance;
+        const z = Math.sin(p.angle) * p.distance;
+        p.mesh.position.x = x;
+        p.mesh.position.z = z;
+      });
+    });
+
+    // CME firing
+    function fireCME(strength = 1.0) {
+      const torus = BABYLON.MeshBuilder.CreateTorus("cmeRing", {
+        diameter: 22,
+        thickness: 0.8,
+        tessellation: 90
+      }, scene);
+      const mat = new BABYLON.StandardMaterial("cmeMat", scene);
+      mat.emissiveColor = new BABYLON.Color3(1.0, 0.9, 0.4);
+      torus.material = mat;
+      torus.position.y = 6;
+      torus.rotation.x = Math.PI / 2;
+      state.cmewaves.push({
+        mesh: torus,
+        material: mat,
+        radius: 1,
+        speed: 0.7 + strength * 0.4
+      });
+    }
+    window.fireCME = fireCME;
+
+    window.applyMode = function(mode) {
+      if (mode === "normal") {
+        state.chaosOn = false;
+        state.meltdown = false;
+        glow.intensity = 0.7;
+        gridMat.emissiveColor = new BABYLON.Color3(0.0, 0.4, 0.6);
+        sunMat.emissiveColor = new BABYLON.Color3(1.4, 1.1, 0.4);
+      } else if (mode === "chaos") {
+        state.chaosOn = !state.chaosOn;
+      } else if (mode === "meltdown") {
+        state.meltdown = !state.meltdown;
+        glow.intensity = state.meltdown ? 1.0 : 0.7;
+      }
+    };
+
+    window.setLambda = v => { state.qdsLambda = v; };
+    window.setTau = v => { state.qdsTau = v; };
+    window.getCamera = () => camera;
+
+    return scene;
+  }
+
+  const scene = createScene();
+
+  engine.runRenderLoop(() => {
+    scene.render();
+  });
+
+  window.addEventListener("resize", () => {
+    engine.resize();
+  });
+
+  // HUD wiring
+  const orbitSlider = document.getElementById("orbitSlider");
+  const gridSlider = document.getElementById("gridSlider");
+  const orbitVal = document.getElementById("orbitVal");
+  const gridVal = document.getElementById("gridVal");
+  const lambdaSlider = document.getElementById("lambdaSlider");
+  const tauSlider = document.getElementById("tauSlider");
+  const lambdaVal = document.getElementById("lambdaVal");
+  const tauVal = document.getElementById("tauVal");
+  const planetSelect = document.getElementById("planetSelect");
+  const planetInfo = document.getElementById("planetInfo");
+  const statusBar = document.getElementById("statusBar");
+
+  lambdaSlider.oninput = e => {
+    const v = parseFloat(e.target.value);
+    lambdaVal.textContent = v.toFixed(1);
+    window.setLambda(v);
+  };
+  tauSlider.oninput = e => {
+    const v = parseFloat(e.target.value);
+    tauVal.textContent = v.toFixed(1);
+    window.setTau(v);
+  };
+
+  orbitSlider.oninput = e => {
+    const v = parseFloat(e.target.value);
+    orbitVal.textContent = v.toFixed(1) + "×";
+    state.orbitSpeed = v;
+  };
+  gridSlider.oninput = e => {
+    const v = parseFloat(e.target.value);
+    gridVal.textContent = v.toFixed(1) + "×";
+    state.gridAmp = v;
+  };
+
+  document.getElementById("btnCME").onclick = () => {
+    window.fireCME(1.0);
+    statusBar.textContent = "Status: CME fired – shock ring through QDS grid.";
+  };
+  document.getElementById("btnChaos").onclick = () => {
+    window.applyMode("chaos");
+    statusBar.textContent = "Status: MAX Chaos toggled – jittery orbits and noisy grid.";
+  };
+  document.getElementById("btnNormal").onclick = () => {
+    window.applyMode("normal");
+    statusBar.textContent = "Status: Back to calmer QDS field.";
+  };
+  document.getElementById("btnMeltdown").onclick = () => {
+    window.applyMode("meltdown");
+    statusBar.textContent = "Status: QDS MELTDOWN – grid amplitude cranked. Hold onto your hat.";
+  };
+  document.getElementById("btnRide").onclick = () => {
+    const cam = window.getCamera();
+    state.rideOn = !state.rideOn;
+    if (!state.rideOn) {
+      statusBar.textContent = "Status: Ride Along disengaged. Camera free.";
+      return;
+    }
+    const targetKey = planetSelect.value === "none" ? "earth" : planetSelect.value;
+    state.rideTarget = targetKey;
+    statusBar.textContent = "Status: Riding along with " + targetKey.toUpperCase() + ".";
+    if (planets[targetKey]) {
+      cam.radius = 22;
+      cam.beta = Math.PI / 2.4;
+    }
+  };
+
+  planetSelect.onchange = e => {
+    const key = e.target.value;
+    if (key === "none") {
+      planetInfo.textContent = "Planet info will appear here.";
+      return;
+    }
+    planetInfo.textContent = PLANET_TEXT[key] || "";
+    state.rideTarget = key;
+  };
+
+  document.getElementById("hudToggle").onclick = () => {
+    const hud = document.getElementById("hud");
+    if (hud.style.display === "none") {
+      hud.style.display = "block";
+    } else {
+      hud.style.display = "none";
+    }
+  };
+</script>
+</body>
+</html>

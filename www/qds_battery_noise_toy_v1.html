@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>QDS Battery Lab — Noise & Lifetime Simulator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #050814;
+      color: #f5f5f5;
+    }
+    h1, h2 {
+      margin: 0 0 0.25rem;
+      font-weight: 600;
+    }
+    h1 { font-size: 1.4rem; }
+    h2 { font-size: 1.1rem; }
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1rem 1rem 2rem;
+    }
+    .subtitle {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      margin-bottom: 0.6rem;
+    }
+    .card {
+      background: radial-gradient(circle at top left, #1b2340, #050814);
+      border-radius: 16px;
+      padding: 1rem;
+      box-shadow: 0 16px 30px rgba(0,0,0,0.45);
+      margin-bottom: 1rem;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .controls-grid {
+      display: grid;
+      grid-template-columns: minmax(0,1fr);
+      gap: 0.75rem 1.25rem;
+    }
+    @media (min-width: 720px) {
+      .controls-grid {
+        grid-template-columns: repeat(2, minmax(0,1fr));
+      }
+    }
+    .control {
+      font-size: 0.85rem;
+    }
+    .control label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.15rem;
+    }
+    .control span.value {
+      font-variant-numeric: tabular-nums;
+      opacity: 0.9;
+      margin-left: 0.5rem;
+    }
+    input[type="range"] {
+      width: 100%;
+    }
+    .btn-row {
+      margin-top: 0.5rem;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 0.45rem 0.9rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      background: linear-gradient(135deg, #37c9ff, #46ff9c);
+      color: #02030a;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    }
+    button.secondary {
+      background: #1b2340;
+      color: #f5f5f5;
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: none;
+    }
+    button:active {
+      transform: translateY(1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    .charts {
+      display: grid;
+      grid-template-columns: minmax(0,1fr);
+      gap: 1rem;
+    }
+    @media (min-width: 820px) {
+      .charts {
+        grid-template-columns: minmax(0,1.4fr) minmax(0,1fr);
+      }
+    }
+    canvas {
+      width: 100% !important;
+      height: 280px !important;
+    }
+    .stats {
+      font-size: 0.82rem;
+      line-height: 1.4;
+      margin-top: 0.5rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 0.5rem;
+      display: grid;
+      grid-template-columns: minmax(0,1fr);
+      gap: 0.35rem 1.5rem;
+    }
+    @media (min-width: 600px) {
+      .stats { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    }
+    .stat-block {
+      opacity: 0.9;
+    }
+    .stat-block span.label {
+      opacity: 0.7;
+    }
+    .badge {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 0.15rem 0.6rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      background: rgba(55,201,255,0.14);
+      border: 1px solid rgba(55,201,255,0.5);
+      margin-bottom: 0.3rem;
+    }
+    .caption {
+      font-size: 0.75rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="card">
+    <h1>QDS Battery Lab — Noise & Lifetime Simulator</h1>
+    <div class="subtitle">
+      Simulate battery health over charge / discharge cycles. Compare
+      <strong>uncorrelated noise</strong> vs
+      <strong>QDS-style correlated noise</strong> and see how it changes
+      lifetime and variability.
+    </div>
+    <div class="badge">Controls</div>
+    <div class="controls-grid">
+      <div class="control">
+        <label>
+          <span>Base drain per cycle (%)</span>
+          <span class="value" id="baseDrainVal"></span>
+        </label>
+        <input id="baseDrain" type="range" min="0.1" max="2.0" step="0.1" value="0.5">
+      </div>
+
+      <div class="control">
+        <label>
+          <span>Noise amplitude (%)</span>
+          <span class="value" id="noiseAmpVal"></span>
+        </label>
+        <input id="noiseAmp" type="range" min="0.0" max="3.0" step="0.1" value="1.0">
+      </div>
+
+      <div class="control">
+        <label>
+          <span>Correlation ρ (0–0.99)</span>
+          <span class="value" id="corrVal"></span>
+        </label>
+        <input id="corr" type="range" min="0" max="0.99" step="0.01" value="0.9">
+      </div>
+
+      <div class="control">
+        <label>
+          <span>Number of cells (runs)</span>
+          <span class="value" id="runsVal"></span>
+        </label>
+        <input id="runs" type="range" min="20" max="500" step="10" value="200">
+      </div>
+
+      <div class="control">
+        <label>
+          <span>Max cycles simulated</span>
+          <span class="value" id="cyclesVal"></span>
+        </label>
+        <input id="cycles" type="range" min="100" max="1200" step="50" value="500">
+      </div>
+
+      <div class="control">
+        <label>
+          <span>Failure threshold (%)</span>
+          <span class="value" id="threshVal"></span>
+        </label>
+        <input id="thresh" type="range" min="0" max="80" step="5" value="0">
+        <div class="caption">
+          Battery is counted as “failed” the first time health drops to or below this threshold.
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button id="runBtn">Run simulation</button>
+      <button id="resetBtn" class="secondary">Reset defaults</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="badge">Results</div>
+    <div class="charts">
+      <div>
+        <h2>Sample health profile</h2>
+        <div class="caption">
+          One representative cell under each noise model.
+        </div>
+        <canvas id="healthChart"></canvas>
+      </div>
+      <div>
+        <h2>Cycles to failure (distribution)</h2>
+        <div class="caption">
+          Histogram of how long cells survive before crossing the threshold.
+        </div>
+        <canvas id="histChart"></canvas>
+      </div>
+    </div>
+
+    <div class="stats" id="statsBox">
+      <!-- Filled by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+(function() {
+  const baseDrain = document.getElementById('baseDrain');
+  const noiseAmp  = document.getElementById('noiseAmp');
+  const corr      = document.getElementById('corr');
+  const runs      = document.getElementById('runs');
+  const cycles    = document.getElementById('cycles');
+  const thresh    = document.getElementById('thresh');
+
+  const baseDrainVal = document.getElementById('baseDrainVal');
+  const noiseAmpVal  = document.getElementById('noiseAmpVal');
+  const corrVal      = document.getElementById('corrVal');
+  const runsVal      = document.getElementById('runsVal');
+  const cyclesVal    = document.getElementById('cyclesVal');
+  const threshVal    = document.getElementById('threshVal');
+
+  function syncLabels() {
+    baseDrainVal.textContent = baseDrain.value + '%';
+    noiseAmpVal.textContent  = noiseAmp.value + '%';
+    corrVal.textContent      = Number(corr.value).toFixed(2);
+    runsVal.textContent      = runs.value;
+    cyclesVal.textContent    = cycles.value;
+    threshVal.textContent    = thresh.value + '%';
+  }
+  [baseDrain, noiseAmp, corr, runs, cycles, thresh].forEach(el => {
+    el.addEventListener('input', syncLabels);
+  });
+  syncLabels();
+
+  const healthCtx = document.getElementById('healthChart');
+  const histCtx   = document.getElementById('histChart');
+  let healthChart, histChart;
+
+  function makeHealthChart(labels, whiteData, qdsData) {
+    if (healthChart) healthChart.destroy();
+    healthChart = new Chart(healthCtx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'White noise',
+            data: whiteData,
+            borderWidth: 2,
+            fill: false,
+            tension: 0.02
+          },
+          {
+            label: 'QDS-style correlated noise',
+            data: qdsData,
+            borderWidth: 2,
+            borderDash: [4,3],
+            fill: false,
+            tension: 0.02
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            title: { display: true, text: 'Cycles', color: '#ccc' },
+            ticks: { color: '#ccc' },
+            grid: { color: 'rgba(255,255,255,0.05)' }
+          },
+          y: {
+            title: { display: true, text: 'Health (%)', color: '#ccc' },
+            min: 0,
+            max: 100,
+            ticks: { color: '#ccc' },
+            grid: { color: 'rgba(255,255,255,0.05)' }
+          }
+        },
+        plugins: {
+          legend: {
+            labels: { color: '#eee', boxWidth: 14 }
+          }
+        }
+      }
+    });
+  }
+
+  function makeHistChart(bins, countsWhite, countsQds) {
+    if (histChart) histChart.destroy();
+    histChart = new Chart(histCtx, {
+      type: 'bar',
+      data: {
+        labels: bins.map(b => b.toString()),
+        datasets: [
+          {
+            label: 'White noise',
+            data: countsWhite,
+          },
+          {
+            label: 'QDS-style',
+            data: countsQds,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            title: { display: true, text: 'Cycles to failure (binned)', color: '#ccc' },
+            ticks: { color: '#ccc', maxRotation: 0, autoSkip: true },
+            grid: { color: 'rgba(255,255,255,0.05)' }
+          },
+          y: {
+            title: { display: true, text: 'Count', color: '#ccc' },
+            ticks: { color: '#ccc' },
+            grid: { color: 'rgba(255,255,255,0.05)' }
+          }
+        },
+        plugins: {
+          legend: { labels: { color: '#eee', boxWidth: 14 } }
+        }
+      }
+    });
+  }
+
+  function normalSample() {
+    // Box-Muller, single sample
+    const u1 = Math.random();
+    const u2 = Math.random();
+    return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2*Math.PI*u2);
+  }
+
+  function simulateCell(maxCycles, base, amp, rho, threshold, useCorrelated) {
+    let health = 100;
+    let corrState = 0;
+    const series = [];
+    let tFail = maxCycles;
+
+    for (let t = 0; t < maxCycles; t++) {
+      let noise;
+      if (useCorrelated) {
+        // AR(1) style correlated noise with variance 1
+        corrState = rho * corrState + Math.sqrt(1 - rho*rho) * normalSample();
+        noise = amp * corrState;
+      } else {
+        noise = amp * normalSample();
+      }
+
+      const drain = base + noise;
+      health -= drain;
+      if (health < 0) health = 0;
+      if (threshold > 0 && health <= threshold && tFail === maxCycles) {
+        tFail = t;
+      } else if (threshold === 0 && health <= 0 && tFail === maxCycles) {
+        tFail = t;
+      }
+      series.push(health);
+    }
+    return { series, tFail };
+  }
+
+  function simulate() {
+    const base = parseFloat(baseDrain.value);
+    const amp  = parseFloat(noiseAmp.value);
+    const rho  = parseFloat(corr.value);
+    const nRuns = parseInt(runs.value, 10);
+    const maxC = parseInt(cycles.value, 10);
+    const thr  = parseFloat(thresh.value);
+
+    const lifetimesWhite = [];
+    const lifetimesQds   = [];
+    let sampleWhite = null, sampleQds = null;
+
+    for (let i = 0; i < nRuns; i++) {
+      const w = simulateCell(maxC, base, amp, 0, thr, false);
+      const q = simulateCell(maxC, base, amp, rho, thr, true);
+      lifetimesWhite.push(w.tFail);
+      lifetimesQds.push(q.tFail);
+      if (i === 0) {
+        sampleWhite = w.series;
+        sampleQds   = q.series;
+      }
+    }
+
+    const labels = Array.from({length: maxC}, (_, i) => i);
+    makeHealthChart(labels, sampleWhite, sampleQds);
+
+    // Histogram bins (10 bins)
+    const minLife = 0;
+    const maxLife = maxC;
+    const binSize = maxC / 10;
+    const bins = [];
+    const countsW = new Array(10).fill(0);
+    const countsQ = new Array(10).fill(0);
+    for (let b = 0; b < 10; b++) {
+      bins.push(Math.round(minLife + (b+0.5)*binSize));
+    }
+    function pushToBins(arr, counts) {
+      arr.forEach(v => {
+        let idx = Math.floor((v - minLife) / binSize);
+        if (idx < 0) idx = 0;
+        if (idx > 9) idx = 9;
+        counts[idx]++;
+      });
+    }
+    pushToBins(lifetimesWhite, countsW);
+    pushToBins(lifetimesQds, countsQ);
+    makeHistChart(bins, countsW, countsQ);
+
+    updateStats(lifetimesWhite, lifetimesQds);
+  }
+
+  function meanAndStd(arr) {
+    const n = arr.length;
+    if (!n) return {mean: 0, std: 0};
+    const m = arr.reduce((a,b)=>a+b,0)/n;
+    const v = arr.reduce((a,b)=>a+(b-m)*(b-m),0)/n;
+    return {mean: m, std: Math.sqrt(v)};
+  }
+
+  function updateStats(lifetimesWhite, lifetimesQds) {
+    const sw = meanAndStd(lifetimesWhite);
+    const sq = meanAndStd(lifetimesQds);
+    const improvement = sw.mean === 0 ? 0 : ((sq.mean - sw.mean) / sw.mean) * 100;
+
+    const box = document.getElementById('statsBox');
+    box.innerHTML = `
+      <div class="stat-block">
+        <span class="label">White noise lifetime:</span><br>
+        Mean = ${sw.mean.toFixed(1)} cycles<br>
+        σ = ${sw.std.toFixed(1)} cycles
+      </div>
+      <div class="stat-block">
+        <span class="label">QDS-style lifetime:</span><br>
+        Mean = ${sq.mean.toFixed(1)} cycles<br>
+        σ = ${sq.std.toFixed(1)} cycles
+      </div>
+      <div class="stat-block">
+        <span class="label">Relative change (QDS vs white):</span><br>
+        ${improvement >= 0 ? '+' : ''}${improvement.toFixed(1)}% in mean lifetime
+      </div>
+      <div class="stat-block">
+        <span class="label">Runs simulated:</span><br>
+        ${lifetimesWhite.length} cells per model
+      </div>
+    `;
+  }
+
+  document.getElementById('runBtn').addEventListener('click', simulate);
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    baseDrain.value = 0.5;
+    noiseAmp.value  = 1.0;
+    corr.value      = 0.9;
+    runs.value      = 200;
+    cycles.value    = 500;
+    thresh.value    = 0;
+    syncLabels();
+    simulate();
+  });
+
+  // initial run
+  simulate();
+})();
+</script>
+</body>
+</html>

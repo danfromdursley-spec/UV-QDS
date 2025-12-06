@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Solar System V8 — Offline QDS</title>
+<script src="https://cdn.babylonjs.com/babylon.js"></script>
+<style>
+body { background:#000; color:white; margin:0; overflow:hidden; }
+#ui {
+  position:fixed; top:10px; left:10px;
+  background:rgba(0,0,0,0.7); padding:15px;
+  border-radius:12px; font-family:Arial;
+}
+button, select, input[type=range] {
+  width:100%; margin:6px 0; font-size:14px;
+}
+</style>
+</head>
+
+<body>
+<div id="ui">
+  <h3>QDS Controls 🎩</h3>
+  λc <input type="range" id="lambdaSlider" min="0.1" max="5" step="0.1" value="1.5">
+  τc <input type="range" id="tauSlider" min="0.1" max="5" step="0.1" value="1.2">
+  <button onclick="fireCME()">💥 Fire CME</button>
+  <button onclick="maxChaos()">🔥 MAX Chaos</button>
+  <button onclick="normalMode()">💎 Normal Mode</button>
+  <button onclick="rideAlong()">🚀 Ride Along</button>
+  <select id="planetSelect">
+    <option>Mercury</option><option>Venus</option><option>Earth</option>
+    <option>Mars</option><option>Jupiter</option><option>Saturn</option>
+    <option>Uranus</option><option>Neptune</option><option>Pluto</option>
+  </select>
+  <button onclick="planetInfo()">📘 Planet Info</button>
+</div>
+
+<canvas id="renderCanvas"></canvas>
+
+<script>
+const canvas = document.getElementById("renderCanvas");
+const engine = new BABYLON.Engine(canvas, true);
+const scene = new BABYLON.Scene(engine);
+scene.clearColor = new BABYLON.Color3(0,0,0);
+
+const camera = new BABYLON.ArcRotateCamera("cam", Math.PI/2, Math.PI/2.5, 120, BABYLON.Vector3.Zero(), scene);
+camera.attachControl(canvas, true);
+
+new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1,1,0), scene);
+</script>
+
+</body>
+</html>
