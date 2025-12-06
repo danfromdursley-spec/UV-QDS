@@ -11,3 +11,7 @@ www/*.zip
 
 # Python tools (optional - remove if you want them tracked)
 www/*.py
+
+# Python caches
+**/__pycache__/
+*.pyc
