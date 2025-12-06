@@ -1,0 +1,202 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Stinchcombe HER Field Map</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background: #050608;
+    color: #f5f7fa;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+#map {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 380px;
+}
+#sidepanel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 380px;
+    background: rgba(5, 8, 12, 0.96);
+    box-shadow: -4px 0 18px rgba(0,0,0,0.6);
+    padding: 14px 18px;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+h1 {
+    font-size: 18px;
+    margin: 0 0 8px 0;
+}
+.badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 6px 0 10px 0;
+}
+.badge {
+    font-size: 11px;
+    padding: 3px 7px;
+    border-radius: 999px;
+    border: 1px solid rgba(124, 210, 255, 0.6);
+    background: rgba(9, 20, 35, 0.85);
+}
+.card {
+    border-radius: 10px;
+    border: 1px solid rgba(90, 120, 150, 0.6);
+    padding: 8px 10px;
+    margin: 8px 0;
+    background: radial-gradient(circle at top left, rgba(80, 140, 255, 0.24), rgba(5, 8, 12, 0.95));
+    font-size: 13px;
+}
+.card strong {
+    display: block;
+    margin-bottom: 4px;
+}
+small {
+    opacity: 0.8;
+}
+.legend {
+    margin-top: 10px;
+    font-size: 12px;
+}
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 3px;
+}
+.legend-swatch {
+    width: 11px;
+    height: 11px;
+    border-radius: 999px;
+    margin-right: 6px;
+}
+footer {
+    margin-top: 10px;
+    font-size: 11px;
+    opacity: 0.8;
+}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="sidepanel">
+  <h1>Stinchcombe — HER field view</h1>
+  <div class="badge-row">
+    <span class="badge">Drakestone hillfort bubble</span>
+    <span class="badge">Taits Hill 2025 survey</span>
+    <span class="badge">Radius rings: 800 m / 600 m</span>
+  </div>
+
+  <div class="card">
+    <strong>Drakestone / hillfort bubble</strong>
+    <small>Centre ≈ ST 737 981 • radius 800 m</small>
+    <div>
+      HER records: <strong>23</strong> within 800 m.<br>By layer: General: 11, LB: 8, Event: 4<br>By period: Unknown: 11, Industrial / Modern: 5, Prehistoric: 5, Medieval: 1, Roman: 1<br><br><em>Nearest entries:</em><br>[  36 m] TAG 32757 (General, Prehistoric) — Possible iron age ditch, indicating by geophysical survey, at Drakestone Point, Stinchcomb…<br>[  39 m] TAG 32755 (Event, Unknown) — Geophysical survey at Drakestone Point, Stinchcombe Hill, Dursley - January 2005<br>[  60 m] TAG 32758 (General, Prehistoric) — Second possible iron age ditch at Drakestone Point, Stinchcombe Hill<br>[  75 m] TAG 27586 (Event, Unknown) — 2005 Desk-based assessment at Drakestone Point, Stinchcombe Hill<br>[  83 m] TAG 32763 (Event, Unknown) — 2005 Evaluation at Drakestone Point, Stinchcombe Hill<br>
+    </div>
+  </div>
+
+  <div class="card">
+    <strong>Taits Hill Road bubble</strong>
+    <small>Centre ≈ ST 736 997 • radius 600 m</small>
+    <div>
+      HER records: <strong>8</strong> within 600 m.<br>By layer: General: 4, Event: 2, LB: 1, Military: 1<br>By period: Unknown: 4, Medieval: 2, Industrial / Modern: 1, Roman: 1<br><br><em>Nearest entries:</em><br>[   1 m] TAG 54427 (Event, Unknown) — 2025 Desk based assessment Land At Taits Hill Road, Stinchcombe, Gloucestershire<br>[   1 m] TAG 54428 (Event, Unknown) — 2025 gradiometer survey Land At Taits Hill Road, Stinchcombe, Gloucestershire<br>[ 272 m] TAG 6928 (General, Roman) — Roman Coins and Pottery<br>[ 314 m] TAG 48784 (General, Medieval) — Medieval strip lynchets, lynchets and scarped field boundaries visible as earthworks on ae…<br>[ 322 m] TAG 21042 (Military, Unknown) — Royal Observation Corps (ROC) post, Dursley.<br>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <span class="legend-swatch" style="background:#4fd1c5;"></span> Drakestone bubble centre
+    </div>
+    <div class="legend-item">
+      <span class="legend-swatch" style="background:#f6ad55;"></span> Taits Hill bubble centre
+    </div>
+    <div class="legend-item">
+      <span class="legend-swatch" style="background:rgba(79, 209, 197, 0.25); border:1px solid #4fd1c5;"></span> 800 m radius
+    </div>
+    <div class="legend-item">
+      <span class="legend-swatch" style="background:rgba(246, 173, 85, 0.25); border:1px solid #f6ad55;"></span> 600 m radius
+    </div>
+  </div>
+
+  <footer>
+    Tip: use this as a quick visual anchor, then run your CLI tools
+    (<code>her_survey_pack.py</code>, <code>her_field_hub.sh</code>, etc.)
+    for the line-by-line detail while you're out on the hill.
+  </footer>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+var map = L.map('map', {
+    zoomControl: true
+}).setView([51.687, -2.375], 13);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 18,
+    attribution: '&copy; OpenStreetMap'
+}).addTo(map);
+
+// Drakestone approx centre
+var drakeLat = 51.680120;
+var drakeLon = -2.382320;
+
+// Taits Hill approx centre
+var taitsLat = 51.695400;
+var taitsLon = -2.379860;
+
+var meta = {"drake": {"popup": "<b>HER records: 23</b><br>By period: Unknown: 11, Industrial / Modern: 5, Prehistoric: 5, Medieval: 1, Roman: 1"}, "taits": {"popup": "<b>HER records: 8</b><br>By period: Unknown: 4, Medieval: 2, Industrial / Modern: 1, Roman: 1"}};
+
+// Drakestone bubble
+var drakeMarker = L.circleMarker([drakeLat, drakeLon], {
+    radius: 7,
+    color: '#4fd1c5',
+    weight: 2,
+    fillColor: '#4fd1c5',
+    fillOpacity: 0.9
+}).addTo(map).bindPopup(meta.drake.popup);
+
+// Radius ring 800 m
+L.circle([drakeLat, drakeLon], {
+    radius: 800,
+    color: '#4fd1c5',
+    weight: 1,
+    dashArray: '4,4',
+    fillColor: '#4fd1c5',
+    fillOpacity: 0.10
+}).addTo(map);
+
+// Taits Hill bubble
+var taitsMarker = L.circleMarker([taitsLat, taitsLon], {
+    radius: 7,
+    color: '#f6ad55',
+    weight: 2,
+    fillColor: '#f6ad55',
+    fillOpacity: 0.9
+}).addTo(map).bindPopup(meta.taits.popup);
+
+// Radius ring 600 m
+L.circle([taitsLat, taitsLon], {
+    radius: 600,
+    color: '#f6ad55',
+    weight: 1,
+    dashArray: '4,4',
+    fillColor: '#f6ad55',
+    fillOpacity: 0.10
+}).addTo(map);
+
+// Fit bounds to both markers
+var group = L.featureGroup([drakeMarker, taitsMarker]);
+map.fitBounds(group.getBounds().pad(0.25));
+</script>
+</body>
+</html>

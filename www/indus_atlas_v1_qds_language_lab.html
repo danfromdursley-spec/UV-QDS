@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Indus Atlas · QDS Language Lab v1.0</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #020617;
+      --bg-alt: #020617;
+      --panel: #020617f2;
+      --accent: #22c4f5;
+      --accent-soft: rgba(34,196,245,0.4);
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --border: #0f172a;
+      --danger: #fb7185;
+      --radius-lg: 0.9rem;
+      --radius-md: 0.6rem;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    body {
+      background:
+        radial-gradient(circle at top, #020617 0, #020617 40%, #000 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    header {
+      position: relative;
+      z-index: 5;
+      padding: 0.5rem 0.8rem 0.45rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem;
+      background: linear-gradient(120deg,
+        rgba(250,204,21,0.16),
+        rgba(56,189,248,0.7),
+        rgba(88,28,135,0.92));
+      border-bottom: 1px solid #020617;
+      box-shadow:
+        0 10px 30px rgba(15,23,42,0.95),
+        0 0 40px rgba(15,23,42,0.95);
+    }
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 0.12rem;
+    }
+    h1 {
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: #e0f2fe;
+      text-shadow: 0 0 8px rgba(15,23,42,0.9);
+    }
+    .tag {
+      font-size: 0.66rem;
+      padding: 0.14rem 0.55rem;
+      border-radius: 999px;
+      border: 1px solid rgba(15,23,42,0.9);
+      background: radial-gradient(circle at top, rgba(15,23,42,0.95), rgba(15,23,42,0.9));
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .subtitle {
+      font-size: 0.7rem;
+      color: #e5e7eb;
+      text-shadow: 0 0 8px rgba(15,23,42,0.9);
+    }
+    .subtitle span {
+      color: #fef9c3;
+      font-weight: 500;
+    }
+    .header-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.14rem;
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+    .pill-header {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.18rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid rgba(15,23,42,0.95);
+      background: #020617d9;
+      box-shadow:
+        0 0 18px rgba(15,23,42,0.95),
+        0 0 24px rgba(15,23,42,0.9);
+    }
+    .pill-header-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: radial-gradient(circle at center,#22c55e,#16a34a);
+      box-shadow: 0 0 12px rgba(34,197,94,0.9);
+    }
+    .pill-header strong {
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+    .pill-header span {
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .header-right small {
+      font-size: 0.68rem;
+    }
+
+    main {
+      position: relative;
+      flex: 1 1 auto;
+      display: flex;
+      min-height: 0;
+      padding: 0.6rem;
+      gap: 0.6rem;
+    }
+    .bg-orbit-ring {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 20% 0%, rgba(56,189,248,0.16) 0, transparent 55%),
+        radial-gradient(circle at 80% 100%, rgba(147,51,234,0.22) 0, transparent 60%);
+      mix-blend-mode: screen;
+      opacity: 0.6;
+      z-index: 0;
+    }
+
+    .column {
+      position: relative;
+      z-index: 1;
+      background: radial-gradient(circle at top left, rgba(15,23,42,0.96), rgba(2,6,23,0.98));
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      box-shadow:
+        0 18px 40px rgba(15,23,42,0.95),
+        0 0 28px rgba(15,23,42,0.95);
+      padding: 0.5rem 0.55rem;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .column.left {
+      flex: 0 0 56%;
+      max-width: 56%;
+    }
+    .column.right {
+      flex: 0 0 44%;
+      max-width: 44%;
+    }
+
+    @media (max-width: 880px) {
+      main {
+        flex-direction: column;
+      }
+      .column.left,
+      .column.right {
+        flex: 1 1 auto;
+        max-width: 100%;
+      }
+    }
+
+    .column-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.35rem;
+      gap: 0.4rem;
+    }
+    .column-title {
+      display: flex;
+      flex-direction: column;
+      gap: 0.05rem;
+    }
+    .column-title h2 {
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .column-title span {
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+    .chip {
+      font-size: 0.65rem;
+      padding: 0.16rem 0.55rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.85);
+      background: radial-gradient(circle at top, #020617, #020617);
+      color: #e5e7eb;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .chip span {
+      color: var(--muted);
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-bottom: 0.35rem;
+      font-size: 0.68rem;
+    }
+    .filter-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+      background: rgba(15,23,42,0.98);
+      border-radius: var(--radius-md);
+      padding: 0.22rem 0.4rem;
+      border: 1px solid rgba(15,23,42,0.95);
+    }
+    .filter-group label {
+      color: var(--muted);
+      font-size: 0.68rem;
+    }
+    .filters select,
+    .filters input[type="range"],
+    .filters input[type="search"] {
+      font-size: 0.68rem;
+      background: #020617;
+      border-radius: 999px;
+      border: 1px solid #0f172a;
+      color: var(--text);
+      padding: 0.16rem 0.45rem;
+      outline: none;
+    }
+    .filters input[type="search"] {
+      border-radius: 999px;
+      min-width: 130px;
+    }
+    .filters input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 3px;
+      border-radius: 999px;
+      padding: 0;
+      width: 90px;
+    }
+    .filters input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 1px solid #e0f2fe;
+      box-shadow: 0 0 0 4px var(--accent-soft);
+    }
+    .filters input[type="range"]::-moz-range-thumb {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 1px solid #e0f2fe;
+      box-shadow: 0 0 0 4px var(--accent-soft);
+    }
+    .filters input[type="range"]::-moz-range-track {
+      height: 3px;
+      border-radius: 999px;
+      background: #020617;
+    }
+    .filter-badge {
+      font-variant-numeric: tabular-nums;
+      color: var(--muted);
+    }
+
+    .glyph-grid {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      padding-right: 0.25rem;
+      margin-right: -0.2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+      gap: 0.35rem;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(51,65,85,0.9) transparent;
+    }
+    .glyph-grid::-webkit-scrollbar {
+      width: 6px;
+    }
+    .glyph-grid::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .glyph-grid::-webkit-scrollbar-thumb {
+      background: rgba(30,64,175,0.7);
+      border-radius: 999px;
+    }
+
+    .glyph-card {
+      position: relative;
+      background: radial-gradient(circle at top left, rgba(15,23,42,0.96), rgba(15,23,42,0.98));
+      border-radius: 0.75rem;
+      border: 1px solid rgba(15,23,42,0.95);
+      padding: 0.25rem 0.3rem 0.28rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.16rem;
+      cursor: pointer;
+      transition: border 0.15s ease, box-shadow 0.15s ease, transform 0.06s ease, background 0.15s ease;
+    }
+    .glyph-card:hover {
+      border-color: rgba(56,189,248,0.85);
+      box-shadow: 0 0 18px rgba(56,189,248,0.35);
+    }
+    .glyph-card:active {
+      transform: scale(0.97);
+    }
+    .glyph-card.selected {
+      border-color: rgba(56,189,248,0.95);
+      box-shadow:
+        0 0 22px rgba(56,189,248,0.8),
+        0 0 32px rgba(15,23,42,0.9);
+      background: radial-gradient(circle at top,
+        rgba(15,23,42,0.96),
+        rgba(15,23,42,0.98));
+    }
+    .glyph-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .glyph-id {
+      font-size: 0.66rem;
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+    .glyph-role-pill {
+      font-size: 0.6rem;
+      padding: 0.1rem 0.38rem;
+      border-radius: 999px;
+      border: 1px solid rgba(51,65,85,0.95);
+      background: #020617;
+    }
+    .glyph-role-pill[data-role="marker"] {
+      border-color: rgba(251,191,36,0.95);
+      color: #facc15;
+    }
+    .glyph-role-pill[data-role="number"] {
+      border-color: rgba(52,211,153,0.95);
+      color: #4ade80;
+    }
+    .glyph-role-pill[data-role="vessel"] {
+      border-color: rgba(129,140,248,0.95);
+      color: #a5b4fc;
+    }
+    .glyph-role-pill[data-role="route"] {
+      border-color: rgba(56,189,248,0.95);
+      color: #7dd3fc;
+    }
+    .glyph-role-pill[data-role="deity"] {
+      border-color: rgba(248,113,113,0.95);
+      color: #fecaca;
+    }
+    .glyph-sign {
+      font-size: 1.15rem;
+      text-align: center;
+      line-height: 1.4;
+    }
+    .glyph-sign span {
+      display: inline-block;
+      padding: 0.08rem 0.2rem;
+      border-radius: 0.6rem;
+      background: radial-gradient(circle at top, rgba(15,23,42,0.9), rgba(15,23,42,0.98));
+      box-shadow: 0 0 16px rgba(15,23,42,0.9);
+    }
+    .glyph-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.6rem;
+      color: var(--muted);
+    }
+    .glyph-meta strong {
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+    .glyph-meta span.freq {
+      font-variant-numeric: tabular-nums;
+    }
+    .glyph-pos {
+      font-size: 0.6rem;
+      color: var(--muted);
+      display: flex;
+      gap: 0.2rem;
+      flex-wrap: wrap;
+    }
+    .glyph-pos span {
+      padding: 0.06rem 0.28rem;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.95);
+      border: 1px solid rgba(15,23,42,0.95);
+    }
+
+    .detail-scroll {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      padding-right: 0.25rem;
+      margin-right: -0.2rem;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(51,65,85,0.9) transparent;
+    }
+    .detail-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+    .detail-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .detail-scroll::-webkit-scrollbar-thumb {
+      background: rgba(30,64,175,0.7);
+      border-radius: 999px;
+    }
+
+    .detail-block {
+      background: radial-gradient(circle at top left, rgba(15,23,42,0.98), rgba(15,23,42,1));
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(15,23,42,0.95);
+      padding: 0.45rem 0.5rem 0.5rem;
+      margin-bottom: 0.4rem;
+      font-size: 0.7rem;
+    }
+    .detail-block-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.4rem;
+      margin-bottom: 0.25rem;
+    }
+    .detail-block-title h3 {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+    .detail-block-title span {
+      font-size: 0.66rem;
+      color: var(--muted);
+    }
+    .detail-glyph-main {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.3rem;
+    }
+    .detail-glyph-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 0.8rem;
+      border: 1px solid rgba(30,64,175,0.95);
+      background:
+        radial-gradient(circle at top, rgba(15,23,42,0.96), rgba(15,23,42,0.98)),
+        repeating-linear-gradient(90deg, rgba(30,64,175,0.25) 0, rgba(30,64,175,0.25) 1px, transparent 1px, transparent 4px),
+        repeating-linear-gradient(180deg, rgba(30,64,175,0.16) 0, rgba(30,64,175,0.16) 1px, transparent 1px, transparent 4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+    }
+    .detail-glyph-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.18rem;
+    }
+    .detail-glyph-meta strong {
+      font-size: 0.8rem;
+    }
+    .detail-glyph-meta span {
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+    .detail-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+      margin-top: 0.18rem;
+    }
+    .badge {
+      font-size: 0.62rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 999px;
+      border: 1px solid rgba(51,65,85,0.95);
+      background: #020617;
+      color: var(--muted);
+    }
+    .badge-key {
+      border-color: rgba(56,189,248,0.9);
+      color: #7dd3fc;
+    }
+    .badge-rare {
+      border-color: rgba(148,163,184,0.9);
+      color: #cbd5f5;
+    }
+    .badge-qds {
+      border-color: rgba(52,211,153,0.9);
+      color: #6ee7b7;
+    }
+    .grid-meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.1rem;
+    }
+    .grid-meta-pill {
+      padding: 0.12rem 0.4rem;
+      border-radius: 999px;
+      border: 1px solid rgba(15,23,42,0.95);
+      font-size: 0.66rem;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .grid-meta-pill strong {
+      color: #e5e7eb;
+      font-weight: 500;
+      margin-right: 0.2rem;
+    }
+    .role-explainer {
+      margin-top: 0.08rem;
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+
+    .sequence-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+      margin-bottom: 0.25rem;
+    }
+    .seq-label {
+      font-size: 0.66rem;
+      color: var(--muted);
+      margin-bottom: 0.1rem;
+    }
+    .glyph-chip {
+      font-size: 0.74rem;
+      padding: 0.12rem 0.38rem;
+      border-radius: 999px;
+      border: 1px solid rgba(30,64,175,0.9);
+      background: #020617;
+    }
+    .glyph-chip.highlight {
+      border-color: rgba(56,189,248,0.95);
+      background: radial-gradient(circle at top, rgba(15,23,42,0.98), rgba(15,23,42,0.96));
+      box-shadow: 0 0 14px rgba(56,189,248,0.55);
+    }
+
+    .para {
+      font-size: 0.7rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .para strong {
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+
+    .footer-strip {
+      font-size: 0.64rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 0.4rem;
+      margin-top: 0.25rem;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .header-right {
+        align-items: flex-start;
+      }
+      main {
+        padding: 0.45rem;
+      }
+      .filters {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <h1>Indus Atlas <span class="tag">QDS Language Lab · v1.0</span></h1>
+      <div class="subtitle">
+        <span>Goal:</span> make the Indus script <em>playable</em> — glyphs, roles, coherence, all in one HUD.
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="pill-header">
+        <div class="pill-header-dot"></div>
+        <strong>Kernel status:</strong>
+        <span>τ<sub>c</sub> ≈ 0.35 s · λ<sub>c</sub> ≈ 2.4 glyphs · K ≈ 0.73</span>
+      </div>
+      <small>Tap a glyph tile to inspect. Filters just thin the grid, nothing disappears from the archive.</small>
+    </div>
+  </header>
+
+  <main>
+    <div class="bg-orbit-ring"></div>
+
+    <!-- LEFT: GLYPH GRID -->
+    <section class="column left">
+      <div class="column-header">
+        <div class="column-title">
+          <h2>Glyph field</h2>
+          <span><span id="glyphCount">0</span> signs · filtered view</span>
+        </div>
+        <div class="chip">
+          🌐
+          <span>Browser-safe · offline</span>
+        </div>
+      </div>
+
+      <div class="filters">
+        <div class="filter-group">
+          <label for="roleFilter">Role</label>
+          <select id="roleFilter">
+            <option value="all">All</option>
+            <option value="marker">Marker</option>
+            <option value="number">Number</option>
+            <option value="vessel">Vessel / container</option>
+            <option value="route">Route / path</option>
+            <option value="deity">Deity / clan</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="freqFilter">Min freq</label>
+          <input id="freqFilter" type="range" min="1" max="100" step="1" value="1" />
+          <span class="filter-badge" id="freqFilterLabel">≥ 1</span>
+        </div>
+
+        <div class="filter-group">
+          <label for="searchInput">Search</label>
+          <input id="searchInput" type="search" placeholder="id / nickname / tag" />
+        </div>
+      </div>
+
+      <div class="glyph-grid" id="glyphGrid">
+        <!-- tiles injected by JS -->
+      </div>
+    </section>
+
+    <!-- RIGHT: DETAIL PANEL -->
+    <section class="column right">
+      <div class="column-header">
+        <div class="column-title">
+          <h2>Glyph detail &amp; sequences</h2>
+          <span id="detailHeader">Tap a glyph to open its dossier.</span>
+        </div>
+        <div class="chip">
+          🎩
+          <span>Indus · QDS · Shed edition</span>
+        </div>
+      </div>
+
+      <div class="detail-scroll" id="detailScroll">
+        <!-- detail blocks injected by JS -->
+      </div>
+
+      <div class="footer-strip">
+        <span>Long-press text to copy; single file, safe for phone + museum kiosk.</span>
+        <span>QDS link: coherence &amp; position stats come from kernel-style analysis.</span>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // --- Sample Indus dataset (can be swapped for a real JSON export later) ---
+    const INDUS_DATA = [
+      {
+        id: "M-001",
+        glyph: "𐓣",
+        nickname: "Unicorn",
+        role: "marker",
+        rolesHuman: "Harbour / standard marker; often anchors a sequence.",
+        freq: 96,
+        positions: ["start", "middle"],
+        tags: ["unicorn", "standard", "harbour", "marker"],
+        keyGlyph: true,
+        qds: { entropy: 0.34, tau_c: 0.36, lambda_c: 2.5, K: 0.74 },
+        sequences: [
+          ["M-001","N-010","V-023","R-045"],
+          ["M-001","N-004","C-031"],
+          ["M-001","V-015","R-020"]
+        ],
+        gloss: "Behaves like a port-flag: tells you 'this inscription belongs to X route / house / standard' before the details.",
+        notes: "Extremely stable across the corpus. Low entropy and tight τc cluster: classic QDS 'anchor' behaviour."
+      },
+      {
+        id: "N-004",
+        glyph: "𐓤",
+        nickname: "Grain stack",
+        role: "number",
+        rolesHuman: "Count / capacity marker; like '3 sacks' or '5 units'.",
+        freq: 88,
+        positions: ["middle","end"],
+        tags: ["grain","number","count","capacity"],
+        keyGlyph: true,
+        qds: { entropy: 0.37, tau_c: 0.34, lambda_c: 2.2, K: 0.72 },
+        sequences: [
+          ["M-001","N-004","C-031"],
+          ["B-012","N-004","V-019"],
+          ["R-020","N-004","C-008"]
+        ],
+        gloss: "Pairs naturally with containers and route signs; behaves like a quantity field in a database.",
+        notes: "Frequency profile peaks in mid–end positions, matching 'amount then stop' behaviour in living trade languages."
+      },
+      {
+        id: "C-031",
+        glyph: "𐓥",
+        nickname: "Jar / vessel",
+        role: "vessel",
+        rolesHuman: "Container / goods type; often follows a number.",
+        freq: 61,
+        positions: ["middle","end"],
+        tags: ["jar","vessel","goods","container"],
+        keyGlyph: true,
+        qds: { entropy: 0.39, tau_c: 0.32, lambda_c: 2.1, K: 0.71 },
+        sequences: [
+          ["M-001","N-004","C-031"],
+          ["C-031","R-045"],
+          ["B-012","N-008","C-031"]
+        ],
+        gloss: "Reads like 'jar / container of X'; the workhorse for cargo-type marking.",
+        notes: "Co-occurrence stats with numbers and route signs are strong; screams 'logistics paperwork' more than myth."
+      },
+      {
+        id: "R-045",
+        glyph: "𐓧",
+        nickname: "Forked path",
+        role: "route",
+        rolesHuman: "Route / direction marker; likely indicates a branch or crossing.",
+        freq: 53,
+        positions: ["end"],
+        tags: ["route","path","fork","harbour-exit"],
+        keyGlyph: false,
+        qds: { entropy: 0.41, tau_c: 0.33, lambda_c: 2.3, K: 0.70 },
+        sequences: [
+          ["M-001","N-010","V-023","R-045"],
+          ["C-031","R-045"],
+          ["U-018","R-045"]
+        ],
+        gloss: "Regularly seals a line: 'this shipment goes via route Y' kind of behaviour.",
+        notes: "Almost never at the start; QDS position weights mark it as a classic 'line full stop with direction flavour'."
+      },
+      {
+        id: "D-011",
+        glyph: "𐓪",
+        nickname: "Twin peaks",
+        role: "deity",
+        rolesHuman: "Clan / deity / patron marker; low frequency but very stable when used.",
+        freq: 18,
+        positions: ["start"],
+        tags: ["deity","clan","elite","patron"],
+        keyGlyph: false,
+        qds: { entropy: 0.29, tau_c: 0.40, lambda_c: 2.6, K: 0.76 },
+        sequences: [
+          ["D-011","M-001","N-004","C-031"],
+          ["D-011","B-012","N-010"],
+          ["D-011","U-018","R-020"]
+        ],
+        gloss: "Behaves like a house name or divine header: 'by authority of X' above an otherwise normal trade line.",
+        notes: "Despite low count, the kernel sees it as hyper-coherent: appears in tight clusters with specific standards."
+      },
+      {
+        id: "B-012",
+        glyph: "𐓬",
+        nickname: "Boat hull",
+        role: "vessel",
+        rolesHuman: "Water-craft / shipping container; favours riverine / coastal sites.",
+        freq: 42,
+        positions: ["start","middle"],
+        tags: ["boat","shipping","river","vessel"],
+        keyGlyph: false,
+        qds: { entropy: 0.38, tau_c: 0.33, lambda_c: 2.0, K: 0.71 },
+        sequences: [
+          ["B-012","N-004","V-019"],
+          ["D-011","B-012","N-010"],
+          ["B-012","C-031","R-020"]
+        ],
+        gloss: "Looks like a special case of 'vessel' tuned for boats or barges — an Indus shipping line marker.",
+        notes: "Spatial distribution lines up suspiciously well with known ports and river mouths."
+      },
+      {
+        id: "U-018",
+        glyph: "𐓰",
+        nickname: "Upstream curve",
+        role: "route",
+        rolesHuman: "Journey / upriver indicator; likely a directional modifier.",
+        freq: 37,
+        positions: ["middle","end"],
+        tags: ["route","upstream","journey"],
+        keyGlyph: false,
+        qds: { entropy: 0.40, tau_c: 0.35, lambda_c: 2.3, K: 0.71 },
+        sequences: [
+          ["U-018","R-045"],
+          ["D-011","U-018","R-020"],
+          ["B-012","N-006","U-018"]
+        ],
+        gloss: "Acts as a directional accent; 'this one goes upriver / inland' layered on top of the base route.",
+        notes: "Pairs nicely with forked-path and boat hull in specific site clusters."
+      },
+      {
+        id: "V-023",
+        glyph: "𐓱",
+        nickname: "Stacked wedge",
+        role: "number",
+        rolesHuman: "Count / tally; distribution skewed towards inland sites.",
+        freq: 44,
+        positions: ["middle","end"],
+        tags: ["number","tally","count"],
+        keyGlyph: false,
+        qds: { entropy: 0.36, tau_c: 0.34, lambda_c: 2.1, K: 0.72 },
+        sequences: [
+          ["M-001","N-010","V-023","R-045"],
+          ["B-012","V-023","C-031"],
+          ["V-023","U-018","R-020"]
+        ],
+        gloss: "Numeral-like behaviour; probably a count that complements other numeric signs in specific trade contexts.",
+        notes: "Coherence profile suggests a modular number system rather than pure pictographs."
+      },
+      {
+        id: "N-010",
+        glyph: "𐓲",
+        nickname: "Tall stack",
+        role: "number",
+        rolesHuman: "Higher-order count; like 'bundle' or 'lot'.",
+        freq: 39,
+        positions: ["middle"],
+        tags: ["number","bundle","lot"],
+        keyGlyph: false,
+        qds: { entropy: 0.37, tau_c: 0.34, lambda_c: 2.0, K: 0.72 },
+        sequences: [
+          ["M-001","N-010","V-023","R-045"],
+          ["D-011","B-012","N-010"],
+          ["N-010","C-031","R-020"]
+        ],
+        gloss: "Comes in between marker and goods; behaves like 'X lots of...', then a container / route.",
+        notes: "Position stats show very strong mid-line anchoring, rarely at extremes."
+      },
+      {
+        id: "R-020",
+        glyph: "𐓵",
+        nickname: "River line",
+        role: "route",
+        rolesHuman: "Straight route / mainline; contrasts with forked path.",
+        freq: 47,
+        positions: ["end"],
+        tags: ["route","river","mainline"],
+        keyGlyph: false,
+        qds: { entropy: 0.39, tau_c: 0.33, lambda_c: 2.2, K: 0.71 },
+        sequences: [
+          ["C-031","R-020"],
+          ["D-011","U-018","R-020"],
+          ["B-012","C-031","R-020"]
+        ],
+        gloss: "Neatly terminates many inscriptions; reads like 'via main route' marker.",
+        notes: "Sits in the same information 'slot' as R-045 but with a simpler, straighter distribution."
+      }
+    ];
+
+    // --- State ---
+    let selectedId = null;
+
+    const gridEl = document.getElementById("glyphGrid");
+    const glyphCountEl = document.getElementById("glyphCount");
+    const detailScrollEl = document.getElementById("detailScroll");
+    const detailHeaderEl = document.getElementById("detailHeader");
+
+    const roleFilterEl = document.getElementById("roleFilter");
+    const freqFilterEl = document.getElementById("freqFilter");
+    const freqFilterLabelEl = document.getElementById("freqFilterLabel");
+    const searchInputEl = document.getElementById("searchInput");
+
+    // --- Rendering helpers ---
+
+    function filterData() {
+      const role = roleFilterEl.value;
+      const minFreq = parseInt(freqFilterEl.value, 10) || 1;
+      const query = searchInputEl.value.trim().toLowerCase();
+
+      freqFilterLabelEl.textContent = "≥ " + minFreq;
+
+      return INDUS_DATA.filter(g => {
+        if (role !== "all" && g.role !== role) return false;
+        if (g.freq < minFreq) return false;
+        if (query) {
+          const hay = [
+            g.id,
+            g.nickname,
+            g.role,
+            (g.tags || []).join(" "),
+            (g.rolesHuman || ""),
+            (g.gloss || "")
+          ].join(" ").toLowerCase();
+          if (!hay.includes(query)) return false;
+        }
+        return true;
+      });
+    }
+
+    function renderGrid() {
+      const data = filterData();
+      glyphCountEl.textContent = data.length;
+      gridEl.innerHTML = "";
+
+      if (!selectedId && data.length > 0) {
+        selectedId = data[0].id;
+        renderDetails();
+      }
+
+      data.forEach(g => {
+        const card = document.createElement("article");
+        card.className = "glyph-card";
+        card.dataset.id = g.id;
+        if (g.id === selectedId) card.classList.add("selected");
+
+        const headerRow = document.createElement("div");
+        headerRow.className = "glyph-header-row";
+
+        const idEl = document.createElement("div");
+        idEl.className = "glyph-id";
+        idEl.textContent = g.id;
+
+        const rolePill = document.createElement("div");
+        rolePill.className = "glyph-role-pill";
+        rolePill.dataset.role = g.role;
+        rolePill.textContent = g.role;
+
+        headerRow.appendChild(idEl);
+        headerRow.appendChild(rolePill);
+
+        const sign = document.createElement("div");
+        sign.className = "glyph-sign";
+        const signInner = document.createElement("span");
+        signInner.textContent = g.glyph || "𐌀";
+        sign.appendChild(signInner);
+
+        const metaRow = document.createElement("div");
+        metaRow.className = "glyph-meta";
+        const leftMeta = document.createElement("div");
+        leftMeta.innerHTML = "<strong>" + (g.nickname || "—") + "</strong>";
+        const freqEl = document.createElement("div");
+        freqEl.className = "freq";
+        freqEl.textContent = "f=" + g.freq;
+        metaRow.appendChild(leftMeta);
+        metaRow.appendChild(freqEl);
+
+        const posRow = document.createElement("div");
+        posRow.className = "glyph-pos";
+        (g.positions || []).forEach(p => {
+          const span = document.createElement("span");
+          span.textContent = p;
+          posRow.appendChild(span);
+        });
+
+        card.appendChild(headerRow);
+        card.appendChild(sign);
+        card.appendChild(metaRow);
+        card.appendChild(posRow);
+
+        card.addEventListener("click", () => {
+          selectedId = g.id;
+          renderGrid();
+          renderDetails();
+        });
+
+        gridEl.appendChild(card);
+      });
+
+      if (data.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "para";
+        empty.style.padding = "0.2rem 0.1rem 0.3rem";
+        empty.textContent = "No glyphs match this filter. Ease off the sliders a bit, old chap.";
+        gridEl.appendChild(empty);
+      }
+    }
+
+    function renderDetails() {
+      const glyph = INDUS_DATA.find(g => g.id === selectedId) || INDUS_DATA[0];
+      if (!glyph) return;
+
+      detailHeaderEl.textContent = glyph.id + " · " + glyph.nickname + " — " + glyph.role;
+
+      detailScrollEl.innerHTML = "";
+
+      // Block 1: main glyph & QDS stats
+      const b1 = document.createElement("section");
+      b1.className = "detail-block";
+
+      const title1 = document.createElement("div");
+      title1.className = "detail-block-title";
+      const h3 = document.createElement("h3");
+      h3.textContent = "Glyph summary";
+      const spanMeta = document.createElement("span");
+      spanMeta.textContent = "Frequency f=" + glyph.freq + " · positions: " + (glyph.positions || []).join(", ");
+      title1.appendChild(h3);
+      title1.appendChild(spanMeta);
+
+      const mainRow = document.createElement("div");
+      mainRow.className = "detail-glyph-main";
+
+      const box = document.createElement("div");
+      box.className = "detail-glyph-box";
+      box.textContent = glyph.glyph || "𐌀";
+
+      const meta = document.createElement("div");
+      meta.className = "detail-glyph-meta";
+      const strongLabel = document.createElement("strong");
+      strongLabel.textContent = glyph.id + " · " + glyph.nickname;
+      const spanRole = document.createElement("span");
+      spanRole.textContent = glyph.rolesHuman || glyph.role;
+      meta.appendChild(strongLabel);
+      meta.appendChild(spanRole);
+
+      const badges = document.createElement("div");
+      badges.className = "detail-badges";
+      if (glyph.keyGlyph) {
+        const bKey = document.createElement("span");
+        bKey.className = "badge badge-key";
+        bKey.textContent = "Key glyph";
+        badges.appendChild(bKey);
+      }
+      const bFreq = document.createElement("span");
+      bFreq.className = "badge";
+      bFreq.textContent = glyph.freq > 60 ? "High frequency" : glyph.freq < 25 ? "Rare" : "Medium frequency";
+      badges.appendChild(bFreq);
+
+      const bQds = document.createElement("span");
+      bQds.className = "badge badge-qds";
+      bQds.textContent = "QDS-coherent (K ≈ " + glyph.qds.K.toFixed(2) + ")";
+      badges.appendChild(bQds);
+
+      meta.appendChild(badges);
+
+      mainRow.appendChild(box);
+      mainRow.appendChild(meta);
+
+      const gridMetaRow = document.createElement("div");
+      gridMetaRow.className = "grid-meta-row";
+
+      const mkPill = (label, value) => {
+        const p = document.createElement("div");
+        p.className = "grid-meta-pill";
+        const s = document.createElement("strong");
+        s.textContent = label;
+        p.appendChild(s);
+        const t = document.createTextNode(value);
+        p.appendChild(t);
+        return p;
+      };
+      gridMetaRow.appendChild(mkPill("H (entropy)", glyph.qds.entropy.toFixed(2)));
+      gridMetaRow.appendChild(mkPill("τc", glyph.qds.tau_c.toFixed(2) + " s"));
+      gridMetaRow.appendChild(mkPill("λc", glyph.qds.lambda_c.toFixed(1) + " glyphs"));
+      gridMetaRow.appendChild(mkPill("K", glyph.qds.K.toFixed(2)));
+
+      const roleExplainer = document.createElement("div");
+      roleExplainer.className = "role-explainer";
+      roleExplainer.textContent = glyph.rolesHuman || "";
+
+      b1.appendChild(title1);
+      b1.appendChild(mainRow);
+      b1.appendChild(gridMetaRow);
+      b1.appendChild(roleExplainer);
+
+      detailScrollEl.appendChild(b1);
+
+      // Block 2: sequences
+      const b2 = document.createElement("section");
+      b2.className = "detail-block";
+
+      const title2 = document.createElement("div");
+      title2.className = "detail-block-title";
+      const h32 = document.createElement("h3");
+      h32.textContent = "Example sequences";
+      const spanMeta2 = document.createElement("span");
+      spanMeta2.textContent = (glyph.sequences || []).length + " sample lines";
+      title2.appendChild(h32);
+      title2.appendChild(spanMeta2);
+      b2.appendChild(title2);
+
+      const seqLabel = document.createElement("div");
+      seqLabel.className = "seq-label";
+      seqLabel.textContent = "Tap different glyphs in the grid; they light up here when present.";
+      b2.appendChild(seqLabel);
+
+      (glyph.sequences || []).forEach((seq, idx) => {
+        const row = document.createElement("div");
+        row.className = "sequence-row";
+        seq.forEach(id => {
+          const chip = document.createElement("span");
+          chip.className = "glyph-chip";
+          if (id === glyph.id) chip.classList.add("highlight");
+          chip.textContent = id;
+          row.appendChild(chip);
+        });
+        b2.appendChild(row);
+      });
+
+      if (!glyph.sequences || glyph.sequences.length === 0) {
+        const para = document.createElement("div");
+        para.className = "para";
+        para.textContent = "No example sequences stored yet for this glyph in the Atlas stub.";
+        b2.appendChild(para);
+      }
+
+      detailScrollEl.appendChild(b2);
+
+      // Block 3: narrative / gloss
+      const b3 = document.createElement("section");
+      b3.className = "detail-block";
+
+      const title3 = document.createElement("div");
+      title3.className = "detail-block-title";
+      const h33 = document.createElement("h3");
+      h33.textContent = "Interpretation";
+      const spanMeta3 = document.createElement("span");
+      spanMeta3.textContent = "Blunt English, QDS-aware.";
+      title3.appendChild(h33);
+      title3.appendChild(spanMeta3);
+
+      const p1 = document.createElement("p");
+      p1.className = "para";
+      p1.innerHTML = "<strong>Working gloss:</strong> " + (glyph.gloss || "");
+
+      const p2 = document.createElement("p");
+      p2.className = "para";
+      p2.style.marginTop = "0.25rem";
+      p2.innerHTML = "<strong>QDS note:</strong> " + (glyph.notes || "");
+
+      b3.appendChild(title3);
+      b3.appendChild(p1);
+      b3.appendChild(p2);
+
+      detailScrollEl.appendChild(b3);
+
+      // ensure scroll starts at top for new glyph
+      detailScrollEl.scrollTop = 0;
+    }
+
+    // --- Event wiring ---
+    roleFilterEl.addEventListener("change", () => {
+      renderGrid();
+    });
+    freqFilterEl.addEventListener("input", () => {
+      renderGrid();
+    });
+    searchInputEl.addEventListener("input", () => {
+      renderGrid();
+    });
+
+    // Init
+    if (INDUS_DATA.length > 0) {
+      selectedId = INDUS_DATA[0].id;
+    }
+    renderGrid();
+    renderDetails();
+  </script>
+</body>
+</html>

@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+<title>QDS Test Task Pack v1 (Phone Offline)</title>
+<style>
+  :root{
+    --bg:#05070c; --fg:#eef4ff; --mut:#a8b6d1; --acc:#7dd3fc;
+    --panel: rgba(12,18,32,0.82);
+    --btn: rgba(120,160,255,0.12);
+    --btn2: rgba(120,160,255,0.22);
+    --good:#9bffb1; --warn:#ffd48a;
+  }
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);
+    font:14px/1.25 system-ui,Segoe UI,Roboto,Arial}
+  #wrap{position:fixed;inset:0;overflow:auto}
+  .page{max-width:980px;margin:0 auto;padding:14px 12px 40px}
+  h1{font-size:20px;margin:10px 0 6px}
+  h2{font-size:16px;margin:18px 0 8px;color:var(--acc)}
+  .panel{
+    background:var(--panel);border:1px solid rgba(140,180,255,0.14);
+    border-radius:14px;padding:12px;margin:10px 0;
+    box-shadow:0 6px 22px rgba(0,0,0,0.35)
+  }
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .mut{color:var(--mut)}
+  button{
+    background:var(--btn);color:var(--fg);
+    border:1px solid rgba(140,180,255,0.18);
+    padding:8px 10px;border-radius:10px;font-weight:600;
+  }
+  button:active{background:var(--btn2);transform: translateY(1px)}
+  textarea,input{
+    background:rgba(255,255,255,0.04);color:var(--fg);
+    border:1px solid rgba(140,180,255,0.14);
+    border-radius:10px;padding:8px;
+  }
+  textarea{width:100%;min-height:120px}
+  .small{font-size:11px}
+  .tag{display:inline-block;padding:2px 8px;border-radius:999px;
+    background:rgba(125,211,252,0.12);border:1px solid rgba(125,211,252,0.22);
+    font-size:10px;color:var(--acc)}
+  canvas{width:100%;height:220px;background:rgba(255,255,255,0.03);
+    border-radius:10px;border:1px solid rgba(140,180,255,0.12)}
+  .checklist label{display:flex;gap:8px;align-items:flex-start;padding:6px 0}
+  .checklist input{margin-top:2px}
+  .good{color:var(--good)} .warn{color:var(--warn)}
+  .grid{display:grid;grid-template-columns:1fr;gap:10px}
+  @media(min-width:860px){
+    .grid{grid-template-columns:1.1fr 0.9fr}
+  }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div class="page">
+    <div class="row">
+      <span class="tag">Offline-first</span>
+      <span class="tag">Phone-safe</span>
+      <span class="tag">No libs</span>
+      <span class="tag">QDS Test Pack v1</span>
+    </div>
+
+    <h1>QDS Test Task Pack v1</h1>
+    <div class="mut small">
+      A lightweight, reproducibility-first checklist + micro-fit tools.
+      This does not prove anything by itself — it helps keep tests clean, logged and shareable.
+    </div>
+
+    <div class="panel grid">
+      <div>
+        <h2>1) Core Task Checklist</h2>
+        <div class="checklist" id="checklist"></div>
+        <div class="row">
+          <button id="btnAll">Mark All</button>
+          <button id="btnNone">Clear</button>
+          <span class="mut small" id="progressTxt">0%</span>
+        </div>
+      </div>
+
+      <div>
+        <h2>2) Session Metadata</h2>
+        <div class="row">
+          <input id="sessionName" placeholder="Session label (e.g., QDS_TestPack_Run_01)" style="flex:1"/>
+          <input id="dateStamp" placeholder="Date" style="width:160px"/>
+        </div>
+        <div class="row">
+          <input id="device" placeholder="Device (e.g., OPPO X2 Find Neo)" style="flex:1"/>
+          <input id="datasetRef" placeholder="Dataset refs (Pantheon+/SH0ES/...)" style="flex:1"/>
+        </div>
+        <div class="row">
+          <button id="btnSaveMeta">Save Meta</button>
+          <button id="btnExport">Export JSON</button>
+        </div>
+        <div class="mut small" id="metaStatus"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>3) H₀ Variance Micro-Fit (Power Law)</h2>
+      <div class="mut small">
+        Paste CSV with columns: <b>R</b>, <b>sigmaH_over_H</b>.
+        Tool fits: <b>y = A * R^-p</b> using a log–log linear regression.
+      </div>
+
+      <div class="row">
+        <button id="btnLoadSample">Load Sample</button>
+        <button id="btnFit">Run Fit</button>
+        <button id="btnClearData">Clear Data</button>
+      </div>
+
+      <textarea id="csvBox" spellcheck="false"
+        placeholder="R,sigmaH_over_H
+50,0.030
+100,0.022
+200,0.017
+400,0.013
+..."></textarea>
+
+      <div class="row">
+        <div class="panel" style="flex:1;margin:0">
+          <div class="mut small">Fit output</div>
+          <div id="fitOut" class="small"></div>
+        </div>
+        <div class="panel" style="flex:1;margin:0">
+          <div class="mut small">Interpretation helper</div>
+          <div id="fitHint" class="small mut"></div>
+        </div>
+      </div>
+
+      <canvas id="plot"></canvas>
+    </div>
+
+    <div class="panel">
+      <h2>4) Notes</h2>
+      <textarea id="notes" placeholder="Observations, anomalies, tweaks, TODOs..."></textarea>
+      <div class="row">
+        <button id="btnSaveNotes">Save Notes</button>
+        <button id="btnWipeAll">Wipe Local Save</button>
+        <span class="mut small" id="saveStatus"></span>
+      </div>
+    </div>
+
+    <div class="mut small">
+      Tip: keep this pack alongside your other UV_QDS toys.
+      It’s meant to be your “field clipboard” for clean, repeatable runs.
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  // ============================
+  // QDS Test Task Pack v1
+  // Offline localStorage runner
+  // ============================
+
+  const KEY = "QDS_TEST_PACK_V1";
+
+  const TASKS = [
+    "Confirm dataset source + version and record reference IDs.",
+    "Define the exact hypothesis statement for this session.",
+    "Write falsification thresholds (what would count as a fail).",
+    "Run H₀-variance micro-fit with raw pasted data.",
+    "Capture screenshot of fit + plot for record.",
+    "If using galaxy data, confirm units + distance conventions.",
+    "Record device + browser + performance notes.",
+    "Export JSON log for archive."
+  ];
+
+  // ---- elements ----
+  const checklistEl = document.getElementById("checklist");
+  const progressTxt = document.getElementById("progressTxt");
+
+  const sessionName = document.getElementById("sessionName");
+  const dateStamp = document.getElementById("dateStamp");
+  const device = document.getElementById("device");
+  const datasetRef = document.getElementById("datasetRef");
+  const metaStatus = document.getElementById("metaStatus");
+
+  const csvBox = document.getElementById("csvBox");
+  const fitOut = document.getElementById("fitOut");
+  const fitHint = document.getElementById("fitHint");
+  const plot = document.getElementById("plot");
+  const pctx = plot.getContext("2d");
+
+  const notes = document.getElementById("notes");
+  const saveStatus = document.getElementById("saveStatus");
+
+  // ---- state ----
+  let state = loadState();
+
+  // ---- init date guess ----
+  if (!state.meta.dateStamp) {
+    const d = new Date();
+    const pad = n => String(n).padStart(2,"0");
+    state.meta.dateStamp = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+    saveState();
+  }
+
+  // ---- build checklist UI ----
+  function renderChecklist(){
+    checklistEl.innerHTML = "";
+    TASKS.forEach((t, i) => {
+      const id = "task_" + i;
+      const row = document.createElement("label");
+      row.innerHTML = `
+        <input type="checkbox" id="${id}">
+        <span>${t}</span>
+      `;
+      checklistEl.appendChild(row);
+      const cb = row.querySelector("input");
+      cb.checked = !!state.tasks[i];
+      cb.addEventListener("change", () => {
+        state.tasks[i] = cb.checked;
+        saveState();
+        updateProgress();
+      });
+    });
+    updateProgress();
+  }
+
+  function updateProgress(){
+    const done = state.tasks.filter(Boolean).length;
+    const pct = Math.round((done / TASKS.length) * 100);
+    progressTxt.textContent = `${pct}% (${done}/${TASKS.length})`;
+  }
+
+  // ---- meta ----
+  function renderMeta(){
+    sessionName.value = state.meta.sessionName || "";
+    dateStamp.value = state.meta.dateStamp || "";
+    device.value = state.meta.device || "";
+    datasetRef.value = state.meta.datasetRef || "";
+  }
+
+  document.getElementById("btnSaveMeta").addEventListener("click", () => {
+    state.meta.sessionName = sessionName.value.trim();
+    state.meta.dateStamp = dateStamp.value.trim();
+    state.meta.device = device.value.trim();
+    state.meta.datasetRef = datasetRef.value.trim();
+    saveState();
+    metaStatus.textContent = "Meta saved ✓";
+    setTimeout(()=>metaStatus.textContent="", 900);
+  });
+
+  // ---- notes ----
+  function renderNotes(){
+    notes.value = state.notes || "";
+  }
+  document.getElementById("btnSaveNotes").addEventListener("click", () => {
+    state.notes = notes.value;
+    saveState();
+    saveStatus.textContent = "Saved ✓";
+    setTimeout(()=>saveStatus.textContent="", 900);
+  });
+
+  // ---- checklist buttons ----
+  document.getElementById("btnAll").addEventListener("click", () => {
+    state.tasks = TASKS.map(()=>true);
+    saveState();
+    renderChecklist();
+  });
+  document.getElementById("btnNone").addEventListener("click", () => {
+    state.tasks = TASKS.map(()=>false);
+    saveState();
+    renderChecklist();
+  });
+
+  // ---- export ----
+  document.getElementById("btnExport").addEventListener("click", () => {
+    // ensure latest text inputs captured
+    state.meta.sessionName = sessionName.value.trim();
+    state.meta.dateStamp = dateStamp.value.trim();
+    state.meta.device = device.value.trim();
+    state.meta.datasetRef = datasetRef.value.trim();
+    state.notes = notes.value;
+    state.h0 = state.h0 || {};
+
+    const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
+    const a = document.createElement("a");
+    const stamp = (state.meta.dateStamp || "date").replace(/[^0-9\-]/g,"");
+    const name = (state.meta.sessionName || "QDS_TestPack").replace(/[^\w\-]+/g,"_");
+    a.href = URL.createObjectURL(blob);
+    a.download = `${name}_${stamp}_testpack.json`;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+  });
+
+  // ---- wipe ----
+  document.getElementById("btnWipeAll").addEventListener("click", () => {
+    localStorage.removeItem(KEY);
+    state = defaultState();
+    renderChecklist(); renderMeta(); renderNotes();
+    fitOut.textContent = ""; fitHint.textContent = "";
+    drawPlot([], null);
+  });
+
+  // ============================
+  // H0 variance micro-fit
+  // ============================
+
+  const SAMPLE = `R,sigmaH_over_H
+50,0.030
+80,0.025
+120,0.021
+200,0.017
+300,0.0145
+450,0.0125
+700,0.0108`;
+
+  document.getElementById("btnLoadSample").addEventListener("click", () => {
+    csvBox.value = SAMPLE;
+  });
+
+  document.getElementById("btnClearData").addEventListener("click", () => {
+    csvBox.value = "";
+    fitOut.textContent = "";
+    fitHint.textContent = "";
+    drawPlot([], null);
+  });
+
+  document.getElementById("btnFit").addEventListener("click", () => {
+    const rows = parseCSV(csvBox.value);
+    if (!rows.length){
+      fitOut.textContent = "No valid data found.";
+      fitHint.textContent = "";
+      drawPlot([], null);
+      return;
+    }
+
+    const R = rows.map(r => r.R).filter(n => n>0);
+    const Y = rows.map(r => r.Y).filter(n => n>0);
+
+    if (R.length < 2 || Y.length < 2){
+      fitOut.textContent = "Need at least 2 positive data points.";
+      fitHint.textContent = "";
+      drawPlot(rows, null);
+      return;
+    }
+
+    // Fit log(y) = log(A) - p log(R)
+    const x = rows.map(r => Math.log(r.R));
+    const y = rows.map(r => Math.log(r.Y));
+
+    const fit = linReg(x, y);
+    const slope = fit.m;             // slope = -p
+    const intercept = fit.b;         // intercept = log(A)
+
+    const p = -slope;
+    const A = Math.exp(intercept);
+
+    // simple R^2
+    const r2 = fit.r2;
+
+    state.h0 = {
+      model: "sigmaH_over_H = A * R^-p",
+      A, p, r2,
+      n: rows.length,
+      data: rows
+    };
+    saveState();
+
+    fitOut.innerHTML =
+      `<span class="good">Fit OK</span><br>` +
+      `A ≈ <b>${A.toFixed(5)}</b><br>` +
+      `p ≈ <b>${p.toFixed(4)}</b><br>` +
+      `R² ≈ <b>${r2.toFixed(3)}</b><br>` +
+      `N = ${rows.length}`;
+
+    fitHint.textContent =
+      `Interpretation: lower p means a slower drop with scale R. ` +
+      `Use this as a compact check before deeper, external analysis.`;
+
+    drawPlot(rows, {A, p});
+  });
+
+  function parseCSV(txt){
+    const out = [];
+    const lines = (txt||"").split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    for (const line of lines){
+      if (/^[A-Za-z]/.test(line)) continue; // skip header-ish
+      const parts = line.split(/[,\t; ]+/).filter(Boolean);
+      if (parts.length < 2) continue;
+      const R = parseFloat(parts[0]);
+      const Y = parseFloat(parts[1]);
+      if (!isFinite(R) || !isFinite(Y)) continue;
+      out.push({R, Y});
+    }
+    return out;
+  }
+
+  function linReg(x, y){
+    const n = Math.min(x.length, y.length);
+    let sx=0, sy=0, sxx=0, sxy=0;
+    for (let i=0;i<n;i++){
+      sx += x[i]; sy += y[i];
+      sxx += x[i]*x[i];
+      sxy += x[i]*y[i];
+    }
+    const denom = (n*sxx - sx*sx) || 1e-12;
+    const m = (n*sxy - sx*sy) / denom;
+    const b = (sy - m*sx) / n;
+
+    // r^2
+    let ssTot=0, ssRes=0;
+    const yMean = sy/n;
+    for (let i=0;i<n;i++){
+      const yi = y[i];
+      const yhat = m*x[i] + b;
+      ssTot += (yi - yMean)**2;
+      ssRes += (yi - yhat)**2;
+    }
+    const r2 = ssTot > 0 ? (1 - ssRes/ssTot) : 0;
+
+    return {m,b,r2};
+  }
+
+  function drawPlot(rows, fit){
+    // retina-safe resize
+    const dpr = Math.min(2, window.devicePixelRatio||1);
+    plot.width = Math.floor(plot.clientWidth * dpr);
+    plot.height = Math.floor(plot.clientHeight * dpr);
+    pctx.setTransform(dpr,0,0,dpr,0,0);
+
+    const W = plot.clientWidth;
+    const H = plot.clientHeight;
+    pctx.clearRect(0,0,W,H);
+
+    // background
+    pctx.fillStyle = "rgba(255,255,255,0.02)";
+    pctx.fillRect(0,0,W,H);
+
+    // axes padding
+    const padL=38, padR=10, padT=10, padB=28;
+    const x0=padL, y0=H-padB, x1=W-padR, y1=padT;
+
+    // grid
+    pctx.strokeStyle = "rgba(140,180,255,0.08)";
+    pctx.lineWidth = 1;
+    for(let i=0;i<=4;i++){
+      const gx = x0 + (x1-x0)*(i/4);
+      pctx.beginPath(); pctx.moveTo(gx,y0); pctx.lineTo(gx,y1); pctx.stroke();
+      const gy = y0 - (y0-y1)*(i/4);
+      pctx.beginPath(); pctx.moveTo(x0,gy); pctx.lineTo(x1,gy); pctx.stroke();
+    }
+
+    if (!rows || !rows.length){
+      // axes labels
+      pctx.fillStyle = "rgba(200,220,255,0.5)";
+      pctx.font = "11px system-ui";
+      pctx.fillText("log R", x1-36, H-8);
+      pctx.fillText("log σ(H)/H", 6, 14);
+      return;
+    }
+
+    // log space bounds
+    const xs = rows.map(r => Math.log(r.R));
+    const ys = rows.map(r => Math.log(r.Y));
+    let xmin=Math.min(...xs), xmax=Math.max(...xs);
+    let ymin=Math.min(...ys), ymax=Math.max(...ys);
+    if (xmax-xmin < 1e-6){ xmax=xmin+1; }
+    if (ymax-ymin < 1e-6){ ymax=ymin+1; }
+
+    const sx = v => x0 + (v-xmin)/(xmax-xmin) * (x1-x0);
+    const sy = v => y0 - (v-ymin)/(ymax-ymin) * (y0-y1);
+
+    // points
+    pctx.fillStyle = "rgba(125,211,252,0.9)";
+    for(let i=0;i<rows.length;i++){
+      const px = sx(xs[i]);
+      const py = sy(ys[i]);
+      pctx.beginPath();
+      pctx.arc(px,py,3.2,0,Math.PI*2);
+      pctx.fill();
+    }
+
+    // fit line
+    if (fit && isFinite(fit.A) && isFinite(fit.p)){
+      // y = A R^-p -> log y = log A - p log R
+      const a = Math.log(fit.A);
+      const p = fit.p;
+
+      const xA = xmin, xB = xmax;
+      const yA = a - p*xA;
+      const yB = a - p*xB;
+
+      pctx.strokeStyle = "rgba(200,240,255,0.7)";
+      pctx.lineWidth = 2;
+      pctx.beginPath();
+      pctx.moveTo(sx(xA), sy(yA));
+      pctx.lineTo(sx(xB), sy(yB));
+      pctx.stroke();
+    }
+
+    // labels
+    pctx.fillStyle = "rgba(200,220,255,0.6)";
+    pctx.font = "11px system-ui";
+    pctx.fillText("log R", x1-36, H-8);
+    pctx.fillText("log σ(H)/H", 6, 14);
+  }
+
+  // ---- storage ----
+  function defaultState(){
+    return {
+      tasks: TASKS.map(()=>false),
+      meta: {
+        sessionName:"",
+        dateStamp:"",
+        device:"",
+        datasetRef:""
+      },
+      notes:"",
+      h0:null
+    };
+  }
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return defaultState();
+      const obj = JSON.parse(raw);
+
+      // soft-migrate
+      if (!obj.tasks || obj.tasks.length !== TASKS.length){
+        obj.tasks = TASKS.map((_,i)=>!!(obj.tasks && obj.tasks[i]));
+      }
+      obj.meta = obj.meta || {};
+      obj.notes = obj.notes || "";
+      return obj;
+    }catch(e){
+      return defaultState();
+    }
+  }
+
+  function saveState(){
+    localStorage.setItem(KEY, JSON.stringify(state));
+  }
+
+  // ---- initial render ----
+  renderChecklist();
+  renderMeta();
+  renderNotes();
+
+  // attempt to redraw plot if saved data exists
+  if (state.h0 && state.h0.data){
+    drawPlot(state.h0.data, {A:state.h0.A, p:state.h0.p});
+    fitOut.innerHTML =
+      `<span class="mut">Loaded saved fit</span><br>` +
+      `A ≈ <b>${(state.h0.A||0).toFixed(5)}</b><br>` +
+      `p ≈ <b>${(state.h0.p||0).toFixed(4)}</b><br>` +
+      `R² ≈ <b>${(state.h0.r2||0).toFixed(3)}</b><br>` +
+      `N = ${state.h0.n||0}`;
+  } else {
+    drawPlot([], null);
+  }
+
+})();
+</script>
+</body>
+</html>

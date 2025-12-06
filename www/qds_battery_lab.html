@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>QDS Battery Lab — Noise & Lifetime Simulator (Showcase)</title>
+<style>
+  :root{
+    --bg:#070b16; --panel:#0d1427; --panel2:#0b1020;
+    --text:#e8f0ff; --muted:#9bb0d6;
+    --accent:#4cc9f0; --accent2:#7cf2c8; --warn:#ff7a7a;
+    --chip:#121b33; --line:#1b2747; --shadow:0 10px 30px rgba(0,0,0,.35);
+    --radius:18px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background: radial-gradient(1200px 800px at 20% -10%, #13214a 0%, transparent 55%),
+                radial-gradient(1200px 800px at 110% 10%, #0e2b2a 0%, transparent 55%),
+                var(--bg);
+    color:var(--text);
+  }
+  .wrap{max-width:980px; margin:0 auto; padding:18px 14px 60px;}
+  .hero{
+    background: linear-gradient(135deg, rgba(76,201,240,.08), rgba(124,242,200,.08));
+    border:1px solid var(--line); border-radius: var(--radius);
+    padding:18px 18px 14px; box-shadow: var(--shadow);
+  }
+  h1{margin:0 0 6px; font-size: 1.35rem; letter-spacing:.2px}
+  .sub{color:var(--muted); font-size:.95rem}
+  .row{display:grid; grid-template-columns: 1fr; gap:14px; margin-top:14px;}
+  @media(min-width:900px){
+    .row{grid-template-columns: 360px 1fr;}
+  }
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,.02), transparent), var(--panel);
+    border:1px solid var(--line); border-radius: var(--radius);
+    padding:14px; box-shadow: var(--shadow);
+  }
+  .card h3{margin:0 0 10px; font-size:1.05rem}
+  .chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px}
+  .chip{
+    background: var(--chip); border:1px solid var(--line);
+    padding:4px 8px; border-radius: 999px; font-size:.75rem; color:var(--muted)
+  }
+  label{display:flex; justify-content:space-between; align-items:center; gap:10px;
+        font-size:.9rem; color:var(--muted); margin:10px 0 4px}
+  .val{color:var(--text); font-weight:600; font-size:.9rem}
+  input[type=range]{width:100%}
+  .btnrow{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px}
+  button{
+    border:1px solid var(--line); background: var(--panel2);
+    color:var(--text); padding:10px 12px; border-radius: 12px;
+    font-weight:600; font-size:.9rem;
+  }
+  button.primary{
+    background: linear-gradient(90deg, rgba(76,201,240,.18), rgba(124,242,200,.18));
+    border-color: rgba(124,242,200,.35);
+  }
+  button.good{
+    background: linear-gradient(90deg, rgba(124,242,200,.22), rgba(76,201,240,.12));
+    border-color: rgba(124,242,200,.45);
+  }
+  button.warn{
+    background: linear-gradient(90deg, rgba(255,122,122,.18), rgba(255,170,90,.12));
+    border-color: rgba(255,122,122,.45);
+  }
+  button:active{transform: translateY(1px)}
+  .small{font-size:.78rem; color:var(--muted)}
+  .divider{height:1px; background: var(--line); margin:12px 0}
+  .kpi{
+    display:grid; grid-template-columns: 1fr 1fr; gap:10px;
+  }
+  .kbox{
+    background: rgba(255,255,255,.02);
+    border:1px solid var(--line); border-radius: 14px; padding:10px;
+  }
+  .kbox .t{font-size:.72rem; color:var(--muted)}
+  .kbox .v{font-size:1.05rem; font-weight:700}
+  .history{
+    border:1px dashed rgba(124,242,200,.28);
+    background: rgba(124,242,200,.05);
+  }
+  .hist-item{
+    padding:8px 0; border-top:1px solid rgba(255,255,255,.06);
+    font-size:.85rem;
+  }
+  .hist-item:first-child{border-top:none}
+  canvas{
+    width:100%; height:260px; background: rgba(255,255,255,.02);
+    border:1px solid var(--line); border-radius: 14px;
+  }
+  .twocharts{display:grid; grid-template-columns:1fr; gap:12px;}
+  @media(min-width:900px){
+    .twocharts{grid-template-columns:1fr 1fr;}
+  }
+  .note{color:var(--muted); font-size:.85rem}
+  .accent{color:var(--accent2)}
+  .warntext{color:var(--warn)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <h1>QDS Battery Lab — Noise & Lifetime Simulator</h1>
+    <div class="sub">
+      Offline, phone-safe simulator showing how <b>uncorrelated</b> vs <b>QDS-style correlated</b> noise
+      changes battery health spread and cycles-to-failure. Built for intuition and fast demo.
+    </div>
+    <div class="chips">
+      <span class="chip">No dependencies</span>
+      <span class="chip">Canvas charts</span>
+      <span class="chip">Run history</span>
+      <span class="chip">Export JSON</span>
+      <span class="chip">Shed Edition stable</span>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- CONTROLS -->
+    <div class="card">
+      <h3>Controls</h3>
+
+      <label>Base drain per cycle (%) <span class="val" id="vBase">2.0</span></label>
+      <input id="baseDrain" type="range" min="0.1" max="5" step="0.1" value="2" />
+
+      <label>Noise amplitude (%) <span class="val" id="vAmp">3.0</span></label>
+      <input id="noiseAmp" type="range" min="0" max="8" step="0.1" value="3" />
+
+      <label>Correlation ρ (0–0.99) <span class="val" id="vRho">0.90</span></label>
+      <input id="rho" type="range" min="0" max="0.99" step="0.01" value="0.90" />
+
+      <label>Number of cells (runs) <span class="val" id="vN">500</span></label>
+      <input id="cells" type="range" min="50" max="2000" step="50" value="500" />
+
+      <label>Max cycles simulated <span class="val" id="vMax">1200</span></label>
+      <input id="maxCycles" type="range" min="100" max="3000" step="50" value="1200" />
+
+      <label>Failure threshold (%) <span class="val" id="vThr">80</span></label>
+      <input id="threshold" type="range" min="5" max="95" step="1" value="80" />
+
+      <div class="divider"></div>
+
+      <div class="btnrow">
+        <button class="primary" id="runBtn">Run simulation</button>
+        <button id="resetBtn">Reset defaults</button>
+      </div>
+
+      <div class="btnrow">
+        <button class="good" id="presetReal">Preset: Realistic phone</button>
+        <button class="good" id="presetQDS">Preset: QDS contrast</button>
+        <button class="warn" id="presetChaos">Preset: Chaos</button>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="btnrow">
+        <button id="copyBtn">Copy summary</button>
+        <button id="exportBtn">Export JSON</button>
+        <button id="clearHistBtn">Clear history</button>
+      </div>
+
+      <p class="small">
+        Model: health starts at 100%. Each cycle decreases by
+        <span class="accent">base drain</span> + noise term.
+        White noise = independent. QDS-style = AR(1) correlated noise using ρ.
+      </p>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="card">
+      <h3>Results</h3>
+
+      <div class="kpi">
+        <div class="kbox">
+          <div class="t">White noise mean lifetime</div>
+          <div class="v" id="whiteMean">—</div>
+        </div>
+        <div class="kbox">
+          <div class="t">White noise σ</div>
+          <div class="v" id="whiteStd">—</div>
+        </div>
+        <div class="kbox">
+          <div class="t">QDS-style mean lifetime</div>
+          <div class="v" id="qdsMean">—</div>
+        </div>
+        <div class="kbox">
+          <div class="t">QDS-style σ</div>
+          <div class="v" id="qdsStd">—</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="kpi">
+        <div class="kbox">
+          <div class="t">Relative change (QDS vs white)</div>
+          <div class="v" id="relChange">—</div>
+        </div>
+        <div class="kbox">
+          <div class="t">Runs simulated per model</div>
+          <div class="v" id="runsOut">—</div>
+        </div>
+      </div>
+
+      <p class="note" id="runNote">
+        Run a simulation to populate charts and history.
+      </p>
+
+      <div class="twocharts">
+        <div>
+          <div class="small">Sample health profile (1 representative cell each)</div>
+          <canvas id="profileCanvas" width="600" height="260"></canvas>
+          <div class="small" id="profileNote"></div>
+        </div>
+        <div>
+          <div class="small">Cycles to failure (distribution)</div>
+          <canvas id="histCanvas" width="600" height="260"></canvas>
+          <div class="small">Binned histogram for both models.</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="card history">
+        <h3 style="margin-bottom:6px">Recent run history (local)</h3>
+        <div class="small">Stored on your device. Shows last 5 entries.</div>
+        <div id="historyList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================
+   QDS Battery Lab (Showcase)
+   No deps • Mobile-safe
+   ============================ */
+
+const $ = (id)=>document.getElementById(id);
+
+const els = {
+  baseDrain:$("baseDrain"), noiseAmp:$("noiseAmp"), rho:$("rho"),
+  cells:$("cells"), maxCycles:$("maxCycles"), threshold:$("threshold"),
+  vBase:$("vBase"), vAmp:$("vAmp"), vRho:$("vRho"),
+  vN:$("vN"), vMax:$("vMax"), vThr:$("vThr"),
+  runBtn:$("runBtn"), resetBtn:$("resetBtn"),
+  presetReal:$("presetReal"), presetQDS:$("presetQDS"), presetChaos:$("presetChaos"),
+  whiteMean:$("whiteMean"), whiteStd:$("whiteStd"),
+  qdsMean:$("qdsMean"), qdsStd:$("qdsStd"),
+  relChange:$("relChange"), runsOut:$("runsOut"),
+  runNote:$("runNote"), profileCanvas:$("profileCanvas"), histCanvas:$("histCanvas"),
+  profileNote:$("profileNote"),
+  copyBtn:$("copyBtn"), exportBtn:$("exportBtn"),
+  clearHistBtn:$("clearHistBtn"),
+  historyList:$("historyList")
+};
+
+const HIST_KEY = "QDS_BATTERY_HISTORY_V1";
+
+function fmt(n, d=1){ return Number.isFinite(n) ? n.toFixed(d) : "—"; }
+
+function syncLabels(){
+  els.vBase.textContent = fmt(parseFloat(els.baseDrain.value),1);
+  els.vAmp.textContent  = fmt(parseFloat(els.noiseAmp.value),1);
+  els.vRho.textContent  = fmt(parseFloat(els.rho.value),2);
+  els.vN.textContent    = parseInt(els.cells.value,10);
+  els.vMax.textContent  = parseInt(els.maxCycles.value,10);
+  els.vThr.textContent  = parseInt(els.threshold.value,10);
+}
+["input","change"].forEach(evt=>{
+  [els.baseDrain, els.noiseAmp, els.rho, els.cells, els.maxCycles, els.threshold]
+    .forEach(x=>x.addEventListener(evt, syncLabels));
+});
+syncLabels();
+
+/* ---- Random helpers ---- */
+function randn(){
+  // Box-Muller
+  let u=0, v=0;
+  while(u===0) u=Math.random();
+  while(v===0) v=Math.random();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+}
+
+/* ---- Core simulation ----
+   health_{t+1} = health_t - baseDrain - noise_t
+   white: noise_t = amp * N(0,1)
+   qds:   noise_t = rho*noise_{t-1} + sqrt(1-rho^2)*amp*N(0,1)
+*/
+function simulateOneCell(baseDrain, amp, rho, maxCycles, threshold, correlated){
+  let h=100;
+  let noisePrev=0;
+  const series=[];
+  let failAt=null;
+
+  for(let c=1; c<=maxCycles; c++){
+    let noise;
+    if(!correlated){
+      noise = amp * randn();
+    }else{
+      const eps = amp * randn();
+      const k = Math.sqrt(Math.max(0, 1 - rho*rho));
+      noise = rho*noisePrev + k*eps;
+      noisePrev = noise;
+    }
+    // drain is always positive on average; noise can add/subtract
+    h = h - baseDrain - noise;
+
+    if(h<0) h=0;
+    if(h>100) h=100;
+
+    series.push({c, h});
+
+    if(failAt===null && h<=threshold){
+      failAt = c;
+      // we keep series for profile plotting even after fail,
+      // but for lifetime we record first-crossing.
+    }
+    if(h===0 && failAt!==null){
+      // allow loop to continue for profile shape, but early stop for speed
+      // for bulk sims:
+      // (handled separately below)
+    }
+  }
+  if(failAt===null) failAt = maxCycles;
+  return {failAt, series};
+}
+
+function simulateBulk(params){
+  const {baseDrain, amp, rho, maxCycles, threshold, n} = params;
+  const whiteFails = new Array(n);
+  const qdsFails   = new Array(n);
+
+  // representative profiles
+  const whiteProfile = simulateOneCell(baseDrain, amp, rho, maxCycles, threshold, false);
+  const qdsProfile   = simulateOneCell(baseDrain, amp, rho, maxCycles, threshold, true);
+
+  // bulk loops with early stop
+  for(let i=0; i<n; i++){
+    // white
+    let h=100, fail=null;
+    for(let c=1; c<=maxCycles; c++){
+      const noise = amp * randn();
+      h = h - baseDrain - noise;
+      if(h<0) h=0; if(h>100) h=100;
+      if(fail===null && h<=threshold) fail=c;
+      if(h===0 && fail!==null){ break; }
+    }
+    if(fail===null) fail=maxCycles;
+    whiteFails[i]=fail;
+
+    // qds correlated
+    h=100; fail=null;
+    let noisePrev=0;
+    for(let c=1; c<=maxCycles; c++){
+      const eps = amp * randn();
+      const k = Math.sqrt(Math.max(0, 1 - rho*rho));
+      const noise = rho*noisePrev + k*eps;
+      noisePrev = noise;
+      h = h - baseDrain - noise;
+      if(h<0) h=0; if(h>100) h=100;
+      if(fail===null && h<=threshold) fail=c;
+      if(h===0 && fail!==null){ break; }
+    }
+    if(fail===null) fail=maxCycles;
+    qdsFails[i]=fail;
+  }
+
+  return {whiteFails, qdsFails, whiteProfile, qdsProfile};
+}
+
+/* ---- Stats ---- */
+function mean(arr){
+  let s=0; for(const x of arr) s+=x; return s/arr.length;
+}
+function std(arr){
+  const m=mean(arr);
+  let s=0; for(const x of arr){ const d=x-m; s+=d*d; }
+  return Math.sqrt(s/Math.max(1, arr.length-1));
+}
+
+/* ---- Simple canvas plotting ---- */
+function clearCanvas(ctx){
+  const {width:w, height:h} = ctx.canvas;
+  ctx.clearRect(0,0,w,h);
+  // background grid hint
+  ctx.globalAlpha=0.25;
+  ctx.strokeStyle="#223155";
+  ctx.lineWidth=1;
+  for(let i=1;i<6;i++){
+    ctx.beginPath();
+    ctx.moveTo(0, h*i/6);
+    ctx.lineTo(w, h*i/6);
+    ctx.stroke();
+  }
+  for(let i=1;i<8;i++){
+    ctx.beginPath();
+    ctx.moveTo(w*i/8, 0);
+    ctx.lineTo(w*i/8, h);
+    ctx.stroke();
+  }
+  ctx.globalAlpha=1;
+}
+
+function plotProfile(canvas, whiteSeries, qdsSeries, threshold){
+  const ctx = canvas.getContext("2d");
+  clearCanvas(ctx);
+  const w=canvas.width, h=canvas.height;
+
+  const maxC = Math.max(
+    whiteSeries[whiteSeries.length-1]?.c||1,
+    qdsSeries[qdsSeries.length-1]?.c||1
+  );
+
+  function mapX(c){ return (c/maxC)* (w-40) + 30; }
+  function mapY(health){ return h-30 - (health/100)*(h-60); }
+
+  // threshold line
+  ctx.strokeStyle = "#ff7a7a";
+  ctx.globalAlpha = 0.5;
+  ctx.beginPath();
+  ctx.moveTo(30, mapY(threshold));
+  ctx.lineTo(w-10, mapY(threshold));
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+
+  // white
+  ctx.strokeStyle = "#4cc9f0";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  whiteSeries.forEach((p, i)=>{
+    const x=mapX(p.c), y=mapY(p.h);
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  // qds
+  ctx.strokeStyle = "#7cf2c8";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  qdsSeries.forEach((p,i)=>{
+    const x=mapX(p.c), y=mapY(p.h);
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  // axes labels (minimal)
+  ctx.fillStyle="#9bb0d6";
+  ctx.font="12px system-ui";
+  ctx.fillText("Health (%)", 6, 14);
+  ctx.fillText("Cycles →", w-70, h-8);
+}
+
+function plotHistogram(canvas, whiteFails, qdsFails){
+  const ctx = canvas.getContext("2d");
+  clearCanvas(ctx);
+  const w=canvas.width, h=canvas.height;
+
+  const all = whiteFails.concat(qdsFails);
+  const maxV = Math.max(...all);
+  const minV = Math.min(...all);
+
+  const bins = 14;
+  const binSize = Math.max(1, Math.ceil((maxV-minV+1)/bins));
+
+  function buildHist(arr){
+    const counts = new Array(bins).fill(0);
+    for(const v of arr){
+      let idx = Math.floor((v-minV)/binSize);
+      if(idx<0) idx=0; if(idx>=bins) idx=bins-1;
+      counts[idx]++;
+    }
+    return counts;
+  }
+
+  const hcW = buildHist(whiteFails);
+  const hcQ = buildHist(qdsFails);
+  const maxCount = Math.max(...hcW, ...hcQ, 1);
+
+  const padL=30, padB=26, padT=10, padR=10;
+  const plotW = w - padL - padR;
+  const plotH = h - padT - padB;
+  const barW = plotW / bins;
+
+  for(let i=0;i<bins;i++){
+    const x = padL + i*barW;
+
+    const hW = (hcW[i]/maxCount)*plotH;
+    const hQ = (hcQ[i]/maxCount)*plotH;
+
+    // white bar
+    ctx.globalAlpha=0.9;
+    ctx.fillStyle="#4cc9f0";
+    ctx.fillRect(x + 2, padT + (plotH - hW), barW*0.45, hW);
+
+    // qds bar
+    ctx.fillStyle="#ff7ab6";
+    ctx.fillRect(x + barW*0.5, padT + (plotH - hQ), barW*0.45, hQ);
+    ctx.globalAlpha=1;
+  }
+
+  ctx.fillStyle="#9bb0d6";
+  ctx.font="11px system-ui";
+  ctx.fillText("Count", 6, 14);
+  ctx.fillText("Cycles to failure (binned)", w/2 - 70, h-6);
+}
+
+/* ---- History ---- */
+function loadHistory(){
+  try{
+    const raw = localStorage.getItem(HIST_KEY);
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){ return []; }
+}
+function saveHistory(arr){
+  localStorage.setItem(HIST_KEY, JSON.stringify(arr.slice(0,50)));
+}
+function renderHistory(){
+  const hist = loadHistory();
+  const last5 = hist.slice(0,5);
+  els.historyList.innerHTML = last5.length ? "" : "<div class='hist-item small'>(No runs yet)</div>";
+
+  last5.forEach(h=>{
+    const div=document.createElement("div");
+    div.className="hist-item";
+    div.innerHTML = `
+      <div><b>${h.time}</b></div>
+      <div class="small">
+        base=${h.base}% • amp=${h.amp}% • ρ=${h.rho} • thr=${h.threshold}% • n=${h.n}
+      </div>
+      <div class="small">
+        white μ=${h.whiteMean} σ=${h.whiteStd} • QDS μ=${h.qdsMean} σ=${h.qdsStd}
+        • Δ=${h.relChange}
+      </div>
+    `;
+    els.historyList.appendChild(div);
+  });
+}
+renderHistory();
+
+/* ---- Presets ---- */
+function setPreset(p){
+  els.baseDrain.value = p.base;
+  els.noiseAmp.value  = p.amp;
+  els.rho.value       = p.rho;
+  els.cells.value     = p.n;
+  els.maxCycles.value = p.max;
+  els.threshold.value = p.thr;
+  syncLabels();
+}
+els.presetReal.onclick = ()=>setPreset({base:0.5, amp:0.4, rho:0.35, n:500, max:1200, thr:80});
+els.presetQDS.onclick  = ()=>setPreset({base:1.5, amp:3.0, rho:0.9,  n:500, max:1200, thr:80});
+els.presetChaos.onclick= ()=>setPreset({base:2.0, amp:5.0, rho:0.95, n:800, max:1500, thr:85});
+els.resetBtn.onclick   = ()=>setPreset({base:2.0, amp:3.0, rho:0.90, n:500, max:1200, thr:80});
+
+/* ---- Main run ---- */
+let lastRunData = null;
+
+function runSimulation(){
+  const params = {
+    baseDrain: parseFloat(els.baseDrain.value),
+    amp: parseFloat(els.noiseAmp.value),
+    rho: parseFloat(els.rho.value),
+    n: parseInt(els.cells.value,10),
+    maxCycles: parseInt(els.maxCycles.value,10),
+    threshold: parseFloat(els.threshold.value)
+  };
+
+  const out = simulateBulk(params);
+
+  const wMean = mean(out.whiteFails);
+  const wStd  = std(out.whiteFails);
+  const qMean = mean(out.qdsFails);
+  const qStd  = std(out.qdsFails);
+
+  const rel = (qMean - wMean) / Math.max(1e-9, wMean) * 100;
+
+  els.whiteMean.textContent = fmt(wMean,1) + " cycles";
+  els.whiteStd.textContent  = fmt(wStd,1);
+  els.qdsMean.textContent   = fmt(qMean,1) + " cycles";
+  els.qdsStd.textContent    = fmt(qStd,1);
+  els.relChange.textContent = (rel>=0?"+":"") + fmt(rel,1) + "%";
+  els.runsOut.textContent   = params.n + " per model";
+
+  // Profile plot + early failure messaging
+  plotProfile(els.profileCanvas,
+    out.whiteProfile.series, out.qdsProfile.series, params.threshold
+  );
+
+  const wFail = out.whiteProfile.failAt;
+  const qFail = out.qdsProfile.failAt;
+
+  const wMsg = (wFail < params.maxCycles)
+    ? `White: failed at cycle ${wFail} (profile may clamp afterwards).`
+    : `White: no threshold crossing within ${params.maxCycles} cycles.`;
+
+  const qMsg = (qFail < params.maxCycles)
+    ? `QDS: failed at cycle ${qFail} (profile may clamp afterwards).`
+    : `QDS: no threshold crossing within ${params.maxCycles} cycles.`;
+
+  els.profileNote.innerHTML = `<span class="small">${wMsg} ${qMsg}</span>`;
+
+  // Histogram
+  plotHistogram(els.histCanvas, out.whiteFails, out.qdsFails);
+
+  // Narrative note
+  let note = "";
+  if(params.amp===0){
+    note = "Noise amplitude is 0 → models converge. This is a good sanity baseline.";
+  }else if(params.rho < 0.1){
+    note = "ρ near 0 → QDS-style behaves like white noise. Expect similar lifetimes.";
+  }else if(params.rho > 0.8){
+    note = "High ρ → correlated noise can create larger spread and occasional long-tail survivors.";
+  }else{
+    note = "Moderate ρ → subtle but visible widening of lifetime distribution.";
+  }
+  els.runNote.innerHTML = `<span class="note">${note}</span>`;
+
+  // Save lastRunData for export/copy
+  lastRunData = {
+    meta:{
+      tool:"QDS Battery Lab — Showcase",
+      timeISO: new Date().toISOString(),
+      params
+    },
+    stats:{
+      whiteMean:wMean, whiteStd:wStd,
+      qdsMean:qMean, qdsStd:qStd,
+      relChangePct: rel
+    },
+    samples:{
+      whiteProfile: out.whiteProfile,
+      qdsProfile: out.qdsProfile
+    },
+    distributions:{
+      whiteFails: out.whiteFails,
+      qdsFails: out.qdsFails
+    }
+  };
+
+  // Push history (latest-first)
+  const hist = loadHistory();
+  const stamp = new Date();
+  const entry = {
+    time: stamp.toLocaleString(),
+    base: fmt(params.baseDrain,1),
+    amp: fmt(params.amp,1),
+    rho: fmt(params.rho,2),
+    threshold: fmt(params.threshold,0),
+    n: params.n,
+    whiteMean: fmt(wMean,1),
+    whiteStd: fmt(wStd,1),
+    qdsMean: fmt(qMean,1),
+    qdsStd: fmt(qStd,1),
+    relChange: (rel>=0?"+":"") + fmt(rel,1) + "%"
+  };
+  hist.unshift(entry);
+  saveHistory(hist);
+  renderHistory();
+}
+
+els.runBtn.onclick = runSimulation;
+
+/* ---- Copy summary ---- */
+async function copySummary(){
+  if(!lastRunData){
+    // try to run quickly with current params
+    runSimulation();
+  }
+  const p = lastRunData.meta.params;
+  const s = lastRunData.stats;
+
+  const text =
+`QDS Battery Lab — Run Summary
+Time: ${new Date().toLocaleString()}
+Params: base=${p.baseDrain}%/cycle, amp=${p.amp}%, rho=${p.rho}, threshold=${p.threshold}%, n=${p.n}, max=${p.maxCycles}
+White: mean=${s.whiteMean.toFixed(1)} cycles, sd=${s.whiteStd.toFixed(1)}
+QDS:   mean=${s.qdsMean.toFixed(1)} cycles, sd=${s.qdsStd.toFixed(1)}
+Relative change (QDS vs white): ${s.relChangePct>=0?"+":""}${s.relChangePct.toFixed(1)}%`;
+
+  try{
+    await navigator.clipboard.writeText(text);
+    els.runNote.innerHTML = `<span class="note accent">Summary copied to clipboard.</span>`;
+  }catch(e){
+    // fallback
+    const ta=document.createElement("textarea");
+    ta.value=text; document.body.appendChild(ta);
+    ta.select(); document.execCommand("copy");
+    document.body.removeChild(ta);
+    els.runNote.innerHTML = `<span class="note accent">Summary copied (fallback).</span>`;
+  }
+}
+els.copyBtn.onclick = copySummary;
+
+/* ---- Export JSON ---- */
+function exportJSON(){
+  if(!lastRunData) runSimulation();
+  const blob = new Blob([JSON.stringify(lastRunData, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  const t = new Date().toISOString().replace(/[:.]/g,"-");
+  a.download = `qds_battery_lab_run_${t}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  els.runNote.innerHTML = `<span class="note accent">Exported JSON of last run.</span>`;
+}
+els.exportBtn.onclick = exportJSON;
+
+/* ---- Clear history ---- */
+els.clearHistBtn.onclick = ()=>{
+  localStorage.removeItem(HIST_KEY);
+  renderHistory();
+  els.runNote.innerHTML = `<span class="note warntext">History cleared.</span>`;
+};
+
+/* Auto-run a light first render for showcase feel */
+setTimeout(()=>{
+  // gentle default run so page isn't empty
+  try{ runSimulation(); }catch(e){}
+}, 120);
+</script>
+</body>
+</html>

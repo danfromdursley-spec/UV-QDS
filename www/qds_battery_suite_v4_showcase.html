@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>QDS Battery Suite v4 — Coach + Lab + Sweeps 🔋🎩</title>
+<style>
+:root{
+  --bg:#060a13; --bg2:#0a1222; --panel:#0c1529; --panel2:#0a1120;
+  --txt:#ecf1ff; --muted:#a6b1c9; --line:rgba(255,255,255,0.07);
+  --accent:#7aa2ff; --accent2:#ff73b3; --good:#7dffb3; --warn:#ffd479; --bad:#ff8080;
+  --radius:16px; --shadow:0 10px 26px rgba(0,0,0,0.45);
+}
+*{box-sizing:border-box}
+body{
+  margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  color:var(--txt);
+  background:
+    radial-gradient(1200px 800px at 10% -10%, #1a2450 0%, transparent 55%),
+    radial-gradient(1200px 800px at 90% 0%, #2a0d3d 0%, transparent 55%),
+    linear-gradient(180deg,var(--bg),var(--bg2) 48%,var(--bg));
+  min-height:100vh;
+}
+.wrap{max-width:1100px; margin:0 auto; padding:14px 12px 50px}
+.hero{
+  border:1px solid var(--line); border-radius:22px; padding:16px 16px 10px;
+  background:linear-gradient(135deg, rgba(122,162,255,0.08), rgba(255,115,179,0.08));
+  box-shadow:var(--shadow);
+}
+h1{margin:0 0 4px; font-size:22px}
+.sub{color:var(--muted); font-size:12px; line-height:1.35}
+.badges{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px}
+.badge{
+  font-size:10px; color:var(--muted);
+  padding:4px 9px; border-radius:999px; border:1px solid var(--line);
+  background:rgba(255,255,255,0.03);
+}
+.tabs{display:flex; gap:6px; flex-wrap:wrap; margin:12px 0}
+.tab{
+  padding:8px 10px; border-radius:12px; border:1px solid var(--line);
+  background:rgba(255,255,255,0.03); font-size:11px; font-weight:650; cursor:pointer;
+}
+.tab.active{background:linear-gradient(135deg, rgba(122,162,255,0.18), rgba(122,162,255,0.05));}
+.panel{
+  border:1px solid var(--line); border-radius:var(--radius);
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0));
+  padding:12px; box-shadow:var(--shadow);
+}
+.grid{display:grid; gap:10px}
+@media(min-width:900px){ .grid.cols-2{grid-template-columns:1fr 1.1fr} }
+@media(min-width:900px){ .grid.cols-3{grid-template-columns:1fr 1fr 1fr} }
+.section-title{font-size:14px; font-weight:700; margin:0 0 8px}
+.control{
+  border:1px solid var(--line); border-radius:12px; padding:9px 9px 7px;
+  background:rgba(255,255,255,0.02);
+}
+.control label{
+  display:flex; justify-content:space-between; gap:8px;
+  font-size:11px; color:var(--muted);
+}
+.control small{color:var(--muted); font-size:10px}
+input[type="range"]{width:100%}
+.row{display:flex; gap:8px; flex-wrap:wrap}
+.btn{
+  border:1px solid var(--line); border-radius:12px; padding:9px 11px;
+  background:linear-gradient(135deg, rgba(122,162,255,0.16), rgba(122,162,255,0.04));
+  color:var(--txt); font-size:11.5px; font-weight:650; cursor:pointer;
+}
+.btn.secondary{background:rgba(255,255,255,0.05)}
+.btn.danger{background:linear-gradient(135deg, rgba(255,128,128,0.18), rgba(255,128,128,0.05))}
+.toggle{display:flex; align-items:center; gap:7px; font-size:11px; color:var(--muted); margin:5px 0}
+.toggle input{transform:translateY(1px)}
+.hr{height:1px; background:var(--line); margin:10px 0}
+.metrics{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+@media(min-width:900px){ .metrics{grid-template-columns:repeat(3,1fr)} }
+.metric{
+  border:1px solid var(--line); border-radius:12px; padding:10px;
+  background:rgba(255,255,255,0.02);
+}
+.metric .k{font-size:10px; color:var(--muted)}
+.metric .v{font-size:22px; font-weight:800; margin-top:2px}
+.metric .u{font-size:10px; color:var(--muted)}
+.flag{
+  border:1px solid rgba(255,128,128,0.35);
+  background:rgba(255,128,128,0.08);
+  border-radius:12px; padding:9px; font-size:11px; color:#ffd6d6;
+}
+.coach{
+  border:1px solid var(--line); border-radius:12px; padding:10px;
+  background:linear-gradient(135deg, rgba(122,162,255,0.08), rgba(255,115,179,0.06));
+}
+.risk{font-size:9px; padding:3px 7px; border-radius:999px; border:1px solid var(--line)}
+.risk.good{color:var(--good)} .risk.warn{color:var(--warn)} .risk.bad{color:var(--bad)}
+.small{font-size:10px; color:var(--muted)}
+canvas{
+  width:100%; height:220px; border:1px solid var(--line); border-radius:12px;
+  background:rgba(255,255,255,0.02);
+}
+.history{
+  max-height:180px; overflow:auto; border:1px solid var(--line); border-radius:12px;
+  padding:8px; background:rgba(255,255,255,0.02);
+  font-size:10px; color:var(--muted);
+}
+.hist-item{padding:6px; border-bottom:1px dashed rgba(255,255,255,0.06); white-space:pre-wrap}
+textarea{
+  width:100%; min-height:120px; background:rgba(255,255,255,0.03); color:var(--txt);
+  border:1px solid var(--line); border-radius:12px; padding:10px; font-size:10.5px;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <h1>QDS Battery Suite v4 — Coach + Lab + Sweeps 🔋🎩</h1>
+    <div class="sub">
+      One-file showcase that merges your best battery engines:
+      fair QDS-vs-White harness, stress hammers, noise visualiser,
+      coach brain, p/threshold sweeps, and exportable logs.
+    </div>
+    <div class="badges">
+      <span class="badge">single-file</span>
+      <span class="badge">no dependencies</span>
+      <span class="badge">Termux + mobile safe</span>
+      <span class="badge">Paired Fair + No Regen</span>
+      <span class="badge">Coach learning</span>
+      <span class="badge">Auto sweeps</span>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="lab">Lab Run</div>
+    <div class="tab" data-tab="coach">Coach</div>
+    <div class="tab" data-tab="sweeps">Sweeps</div>
+    <div class="tab" data-tab="noise">Noise Toy</div>
+    <div class="tab" data-tab="export">Export</div>
+  </div>
+
+  <!-- LAB -->
+  <div class="panel" id="tab-lab">
+    <div class="grid cols-2">
+      <div>
+        <div class="section-title">Core Controls</div>
+
+        <div class="grid cols-3">
+          <div class="control">
+            <label><span>Base drain %</span><b id="v_base">2.0</b></label>
+            <input id="base" type="range" min="0.2" max="8" step="0.1" value="2.0">
+            <small>Deterministic wear</small>
+          </div>
+          <div class="control">
+            <label><span>Noise amp %</span><b id="v_amp">3.0</b></label>
+            <input id="amp" type="range" min="0" max="14" step="0.1" value="3.0">
+            <small>Stochastic strength</small>
+          </div>
+          <div class="control">
+            <label><span>Correlation p</span><b id="v_p">0.60</b></label>
+            <input id="p" type="range" min="0" max="0.99" step="0.01" value="0.60">
+            <small>AR(1) memory</small>
+          </div>
+        </div>
+
+        <div class="grid cols-3">
+          <div class="control">
+            <label><span>Cells (n)</span><b id="v_n">1550</b></label>
+            <input id="n" type="range" min="100" max="5000" step="50" value="1550">
+            <small>Monte Carlo size</small>
+          </div>
+          <div class="control">
+            <label><span>Max cycles</span><b id="v_max">3000</b></label>
+            <input id="maxc" type="range" min="200" max="8000" step="50" value="3000">
+            <small>Safety cap</small>
+          </div>
+          <div class="control">
+            <label><span>Failure thr %</span><b id="v_thr">80</b></label>
+            <input id="thr" type="range" min="5" max="95" step="1" value="80">
+            <small>Health ≤ thr fails</small>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+        <div class="section-title">Presets</div>
+        <div class="row">
+          <button class="btn secondary" id="pre_real">Realistic phone</button>
+          <button class="btn secondary" id="pre_clean">Clean baseline</button>
+          <button class="btn secondary" id="pre_stress">Controlled stress</button>
+          <button class="btn danger" id="pre_chaos">Chaos (demo)</button>
+        </div>
+
+        <div class="hr"></div>
+        <div class="section-title">Stress Hammers</div>
+        <label class="toggle"><input type="checkbox" id="ham_nonlin" checked> Nonlinear wear</label>
+        <label class="toggle"><input type="checkbox" id="ham_heat" checked> Heat epochs</label>
+        <label class="toggle"><input type="checkbox" id="ham_out" checked> Rare outliers</label>
+
+        <div class="hr"></div>
+        <div class="section-title">Bias Integrity</div>
+        <label class="toggle"><input type="checkbox" id="fair_paired" checked> Paired Fair Mode</label>
+        <label class="toggle"><input type="checkbox" id="fair_noregen" checked> No Regen</label>
+        <label class="toggle"><input type="checkbox" id="fair_blind"> Blind labels</label>
+        <div class="row">
+          <button class="btn secondary" id="hard_null">Hard null (p=0)</button>
+        </div>
+
+        <div class="hr"></div>
+        <div class="row">
+          <button class="btn" id="run_once">Run simulation</button>
+          <button class="btn secondary" id="reset_all">Reset defaults</button>
+        </div>
+
+      </div>
+
+      <div>
+        <div class="section-title">Results</div>
+        <div id="flags" class="flag" style="display:none"></div>
+
+        <div class="metrics" style="margin-top:8px">
+          <div class="metric"><div class="k" id="lbl_wm">White mean</div><div class="v" id="wm">—</div><div class="u">cycles</div></div>
+          <div class="metric"><div class="k">White σ</div><div class="v" id="ws">—</div><div class="u">cycles</div></div>
+          <div class="metric"><div class="k" id="lbl_qm">QDS mean</div><div class="v" id="qm">—</div><div class="u">cycles</div></div>
+          <div class="metric"><div class="k">QDS σ</div><div class="v" id="qs">—</div><div class="u">cycles</div></div>
+          <div class="metric"><div class="k">Δ (QDS vs White)</div><div class="v" id="drel">—</div><div class="u">%</div></div>
+          <div class="metric"><div class="k">Mean Δ cycles</div><div class="v" id="ddir">—</div><div class="u">cycles</div></div>
+        </div>
+
+        <div class="hr"></div>
+        <div class="section-title">Sample paired profile</div>
+        <canvas id="profile"></canvas>
+        <div class="small" id="profile_note">—</div>
+
+        <div class="hr"></div>
+        <div class="section-title">Distribution</div>
+        <canvas id="hist"></canvas>
+
+        <div class="hr"></div>
+        <div class="section-title">Local run history</div>
+        <div class="history" id="history"></div>
+        <div class="row">
+          <button class="btn secondary" id="clear_history">Clear history</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COACH -->
+  <div class="panel" id="tab-coach" style="display:none">
+    <div class="grid cols-2">
+      <div>
+        <div class="section-title">Coach Intelligence</div>
+        <div class="coach">
+          <div class="row" style="justify-content:space-between; width:100%">
+            <b>Battery Coach 🧠🔋</b>
+            <span class="risk" id="risk_badge">—</span>
+          </div>
+          <div class="small" id="risk_line">Run a Lab sim first.</div>
+          <div class="hr"></div>
+          <div id="coach_advice" class="small" style="font-size:12px; line-height:1.4"></div>
+          <div class="hr"></div>
+          <div class="small" id="coach_learning">Learning idle.</div>
+        </div>
+
+        <div class="hr"></div>
+        <div class="section-title">Suggested Real-World Translation (conservative)</div>
+        <div class="small">
+          This suite is a toy. But the coach converts patterns into
+          safe user guidance: SoC cap suggestions, heat avoidance,
+          and “don’t cluster stress” reminders.
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title">Auto “Routine Planner”</div>
+        <div class="control">
+          <label><span>Tomorrow intent</span><b id="intent_label">Normal day</b></label>
+          <input id="intent" type="range" min="0" max="2" step="1" value="0">
+          <small>0=Normal • 1=Long day • 2=Travel/critical</small>
+        </div>
+        <div class="control">
+          <label><span>Ambient heat risk</span><b id="heat_label">Normal</b></label>
+          <input id="heat_risk" type="range" min="0" max="2" step="1" value="0">
+          <small>0=Normal • 1=Warm • 2=Hot</small>
+        </div>
+        <div class="row">
+          <button class="btn" id="plan_day">Generate plan</button>
+        </div>
+        <div class="hr"></div>
+        <div class="coach">
+          <b>Plan output</b>
+          <div class="small" id="plan_out">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SWEEPS -->
+  <div class="panel" id="tab-sweeps" style="display:none">
+    <div class="section-title">One-Tap Experiment Sweeps</div>
+    <div class="small">
+      Uses your current base/amp/n/max/hammers/fairness, then scans p or threshold.
+      Designed for clean demo panels.
+    </div>
+
+    <div class="hr"></div>
+    <div class="grid cols-2">
+      <div>
+        <div class="section-title">p sweep</div>
+        <div class="row">
+          <button class="btn secondary" id="psweep_quick">Quick p sweep (0, .3, .6, .9)</button>
+          <button class="btn secondary" id="psweep_dense">Dense p sweep (0 → 0.9 step 0.1)</button>
+        </div>
+        <div class="hr"></div>
+        <textarea id="psweep_out" readonly></textarea>
+      </div>
+
+      <div>
+        <div class="section-title">threshold sweep</div>
+        <div class="row">
+          <button class="btn secondary" id="tsweep_3">Thr sweep (30, 50, 80)</button>
+          <button class="btn secondary" id="tsweep_5">Thr sweep (20, 30, 50, 75, 80)</button>
+        </div>
+        <div class="hr"></div>
+        <textarea id="tsweep_out" readonly></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOISE -->
+  <div class="panel" id="tab-noise" style="display:none">
+    <div class="grid cols-2">
+      <div>
+        <div class="section-title">Noise Visual Toy</div>
+        <div class="small">
+          Shows one AR(1) trace vs white trace using your current amp + p.
+          This is a nice “explain the mechanism” slide.
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <button class="btn secondary" id="noise_gen">Generate noise trace</button>
+        </div>
+        <div class="small" id="noise_note">—</div>
+      </div>
+      <div>
+        <div class="section-title">Trace</div>
+        <canvas id="noise_canvas"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPORT -->
+  <div class="panel" id="tab-export" style="display:none">
+    <div class="section-title">Export + Report</div>
+    <div class="small">
+      Copies your last 20 run logs to clipboard-friendly text.
+      You can paste into your QDS archive or emails.
+    </div>
+    <div class="hr"></div>
+    <div class="row">
+      <button class="btn" id="copy_logs">Copy logs</button>
+      <button class="btn secondary" id="copy_last">Copy last run only</button>
+    </div>
+    <div class="hr"></div>
+    <textarea id="export_out" readonly></textarea>
+  </div>
+
+</div>
+
+<script>
+/* =========================================================
+   QDS Battery Suite v4 — single file
+   - Lab runner with fairness + stress
+   - Coach panel
+   - p/threshold sweeps
+   - Noise visualiser
+   - Export text logs
+   ========================================================= */
+
+const $ = id => document.getElementById(id);
+const HIST_KEY = "QDS_BATT_SUITE_V4_HIST";
+
+const S = {
+  base:$("base"), amp:$("amp"), p:$("p"), n:$("n"), maxc:$("maxc"), thr:$("thr"),
+  intent:$("intent"), heat_risk:$("heat_risk")
+};
+const V = {
+  base:$("v_base"), amp:$("v_amp"), p:$("v_p"), n:$("v_n"), maxc:$("v_max"), thr:$("v_thr"),
+  intent_label:$("intent_label"), heat_label:$("heat_label")
+};
+const T = {
+  nonlin:$("ham_nonlin"), heat:$("ham_heat"), out:$("ham_out"),
+  paired:$("fair_paired"), noregen:$("fair_noregen"), blind:$("fair_blind")
+};
+
+let LAST_RUN = null;
+
+// ---------- UI bind ----------
+function bindSlider(sl, out, fmt=1){
+  const upd = ()=> out.textContent = Number(sl.value).toFixed(fmt);
+  sl.addEventListener("input", upd); upd();
+}
+bindSlider(S.base,V.base,1);
+bindSlider(S.amp,V.amp,1);
+bindSlider(S.p,V.p,2);
+bindSlider(S.n,V.n,0);
+bindSlider(S.maxc,V.maxc,0);
+bindSlider(S.thr,V.thr,0);
+
+function updIntent(){
+  const v = +S.intent.value;
+  V.intent_label.textContent = v===0?"Normal day":v===1?"Long day":"Travel/critical";
+}
+function updHeatRisk(){
+  const v = +S.heat_risk.value;
+  V.heat_label.textContent = v===0?"Normal":v===1?"Warm":"Hot";
+}
+S.intent.addEventListener("input", updIntent); updIntent();
+S.heat_risk.addEventListener("input", updHeatRisk); updHeatRisk();
+
+// ---------- Tabs ----------
+document.querySelectorAll(".tab").forEach(t=>{
+  t.addEventListener("click", ()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+    t.classList.add("active");
+    const name = t.dataset.tab;
+    ["lab","coach","sweeps","noise","export"].forEach(n=>{
+      $("tab-"+n).style.display = (n===name) ? "block" : "none";
+    });
+  });
+});
+
+// ---------- RNG normal ----------
+function randn(){
+  let u=0,v=0;
+  while(u===0) u=Math.random();
+  while(v===0) v=Math.random();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+}
+
+// ---------- Stress helpers ----------
+function heatMultiplier(c,on){
+  if(!on) return 1.0;
+  const period=60, band=12;
+  return (c % period) < band ? 1.6 : 1.0;
+}
+function nonlinearMult(health,on){
+  if(!on) return 1.0;
+  const frag = Math.max(0, (40-health)/40);
+  return 1 + 0.9*frag;
+}
+function outlierKick(on){
+  if(!on) return 0;
+  return (Math.random()<0.005) ? (3 + Math.random()*6) : 0;
+}
+function clamp(x,a,b){ return Math.max(a, Math.min(b,x)); }
+
+// ---------- Core drain ----------
+function computeDrain(step, health, c, cfg){
+  let d = cfg.base + cfg.amp * step;
+  d *= heatMultiplier(c, cfg.ham_heat);
+  d += outlierKick(cfg.ham_out);
+  d *= nonlinearMult(health, cfg.ham_nonlin);
+  if(cfg.noregen && d < 0) d = 0;
+  else if(!cfg.noregen && d < -3) d = -3;
+  return d;
+}
+
+// ---------- Cell sim ----------
+function simulateOne(model, cfg){
+  let health=100, prev=0;
+  let c=0;
+  while(c < cfg.maxc && health > cfg.thr){
+    c++;
+    const eps = randn();
+    let step = eps;
+    if(model==="qds"){
+      const s = Math.sqrt(Math.max(0, 1 - cfg.p*cfg.p));
+      step = cfg.p*prev + s*eps;
+      prev = step;
+    }
+    health -= computeDrain(step, health, c, cfg);
+    health = clamp(health, -50, 120);
+  }
+  return c;
+}
+
+function simulateProfile(cfg, len=260){
+  let hW=100, hQ=100, prevQ=0;
+  const arrW=[hW], arrQ=[hQ];
+  for(let c=1;c<=Math.min(cfg.maxc,len);c++){
+    const eps = randn();
+    const stepW = eps;
+    const s = Math.sqrt(Math.max(0, 1 - cfg.p*cfg.p));
+    const stepQ = cfg.p*prevQ + s*eps;
+    prevQ = stepQ;
+
+    if(hW > cfg.thr) hW -= computeDrain(stepW, hW, c, cfg);
+    if(hQ > cfg.thr) hQ -= computeDrain(stepQ, hQ, c, cfg);
+
+    arrW.push(hW); arrQ.push(hQ);
+    if(hW <= cfg.thr && hQ <= cfg.thr) break;
+  }
+  return {arrW, arrQ};
+}
+
+// ---------- Stats ----------
+function mean(a){ return a.reduce((s,x)=>s+x,0)/a.length; }
+function sd(a){
+  const m=mean(a);
+  const v=a.reduce((s,x)=>s+(x-m)*(x-m),0)/Math.max(1,a.length-1);
+  return Math.sqrt(v);
+}
+
+// ---------- Charts ----------
+function drawLine(canvas, seriesA, seriesB, thr){
+  const ctx=canvas.getContext("2d");
+  const W=canvas.width=canvas.clientWidth*devicePixelRatio;
+  const H=canvas.height=canvas.clientHeight*devicePixelRatio;
+  ctx.clearRect(0,0,W,H);
+
+  ctx.strokeStyle="rgba(255,255,255,0.06)";
+  ctx.lineWidth=1*devicePixelRatio;
+  for(let i=1;i<6;i++){
+    const y=H*i/6; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+  }
+
+  function plot(arr, color){
+    const n=arr.length, maxX=Math.max(10,n-1), minY=0, maxY=110;
+    ctx.strokeStyle=color; ctx.lineWidth=2.2*devicePixelRatio;
+    ctx.beginPath();
+    for(let i=0;i<n;i++){
+      const x=(i/maxX)*W;
+      const y=H-((arr[i]-minY)/(maxY-minY))*H;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+  plot(seriesA, "rgba(122,162,255,0.95)");
+  plot(seriesB, "rgba(255,115,179,0.9)");
+
+  // thr line
+  const yThr = H - (thr/110)*H;
+  ctx.setLineDash([6*devicePixelRatio,6*devicePixelRatio]);
+  ctx.strokeStyle="rgba(255,255,255,0.12)";
+  ctx.beginPath(); ctx.moveTo(0,yThr); ctx.lineTo(W,yThr); ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function drawHist(canvas, w, q){
+  const ctx=canvas.getContext("2d");
+  const W=canvas.width=canvas.clientWidth*devicePixelRatio;
+  const H=canvas.height=canvas.clientHeight*devicePixelRatio;
+  ctx.clearRect(0,0,W,H);
+
+  const all=w.concat(q);
+  const min=Math.min(...all), max=Math.max(...all);
+  const bins=16, binW=(max-min+1)/bins;
+  const cw=new Array(bins).fill(0), cq=new Array(bins).fill(0);
+  for(const x of w){
+    let b=Math.floor((x-min)/binW); b=clamp(b,0,bins-1); cw[b]++;
+  }
+  for(const x of q){
+    let b=Math.floor((x-min)/binW); b=clamp(b,0,bins-1); cq[b]++;
+  }
+  const top=Math.max(...cw,...cq,1);
+  const pad=0.08, innerW=W*(1-2*pad), innerH=H*(1-2*pad);
+  const group=innerW/bins;
+
+  ctx.strokeStyle="rgba(255,255,255,0.06)";
+  for(let i=1;i<6;i++){
+    const y=H*pad + innerH*i/6;
+    ctx.beginPath(); ctx.moveTo(W*pad,y); ctx.lineTo(W*(1-pad),y); ctx.stroke();
+  }
+
+  for(let i=0;i<bins;i++){
+    const x0=W*pad + i*group;
+    const bw=group*0.38, gap=group*0.08;
+    const hw=(cw[i]/top)*innerH, hq=(cq[i]/top)*innerH;
+
+    ctx.fillStyle="rgba(122,162,255,0.6)";
+    ctx.fillRect(x0, H*pad + (innerH-hw), bw, hw);
+
+    ctx.fillStyle="rgba(255,115,179,0.55)";
+    ctx.fillRect(x0+bw+gap, H*pad + (innerH-hq), bw, hq);
+  }
+}
+
+// ---------- Flags ----------
+function renderFlags(cfg){
+  const f=[];
+  if(cfg.p > 0.95) f.push("Extremely high p.");
+  if(cfg.amp > 10) f.push("Very high noise amplitude.");
+  if(cfg.base > 6) f.push("High base drain.");
+  if(cfg.thr > 85) f.push("High failure threshold amplifies % deltas.");
+  if(cfg.thr < 20) f.push("Low threshold = long-life regime.");
+  if(cfg.paired) f.push("Paired Fair Mode ON.");
+  if(cfg.noregen) f.push("No Regen ON.");
+  if(cfg.blind) f.push("Blind labels ON.");
+
+  const box=$("flags");
+  if(!f.length){ box.style.display="none"; box.textContent=""; return; }
+  box.style.display="block";
+  box.innerHTML="<b>Sanity flags:</b><br>• "+f.join("<br>• ");
+}
+
+// ---------- History ----------
+function loadHist(){
+  try{ return JSON.parse(localStorage.getItem(HIST_KEY)||"[]")||[]; }catch(e){ return []; }
+}
+function saveHist(arr){
+  try{ localStorage.setItem(HIST_KEY, JSON.stringify(arr.slice(-50))); }catch(e){}
+}
+function pushHist(obj){
+  const arr=loadHist(); arr.push(obj); saveHist(arr);
+}
+function renderHist(){
+  const arr=loadHist().slice().reverse();
+  const box=$("history");
+  if(!arr.length){ box.innerHTML="<div class='hist-item'>No runs yet.</div>"; return; }
+  box.innerHTML="";
+  arr.slice(0,20).forEach(r=>{
+    const d=document.createElement("div");
+    d.className="hist-item";
+    d.textContent =
+`${r.local}
+base=${r.base}% amp=${r.amp}% p=${r.p} thr=${r.thr}% n=${r.n} max=${r.maxc}
+white μ=${r.wm} σ=${r.ws} · QDS μ=${r.qm} σ=${r.qs}
+Δ=${r.drel}% · meanΔ=${r.ddir}
+stress: nonlin=${r.ham_nonlin} heat=${r.ham_heat} out=${r.ham_out}
+bias: paired=${r.paired} noRegen=${r.noregen} blind=${r.blind}`;
+    box.appendChild(d);
+  });
+}
+
+// ---------- Blind label swap (display only) ----------
+function maybeBlindDisplay(res, blind){
+  if(!blind) return {res, labels:{w:"White", q:"QDS"}};
+  if(Math.random()<0.5) return {res, labels:{w:"White", q:"QDS"}};
+
+  const swapped={
+    wm:res.qm, ws:res.qs, qm:res.wm, qs:res.ws,
+    drel:-res.drel, ddir:-res.ddir
+  };
+  return {res:swapped, labels:{w:"QDS", q:"White"}};
+}
+
+// ---------- Read config ----------
+function cfgFromUI(){
+  return {
+    base:+S.base.value,
+    amp:+S.amp.value,
+    p:+S.p.value,
+    n:+S.n.value|0,
+    maxc:+S.maxc.value|0,
+    thr:+S.thr.value|0,
+
+    ham_nonlin:T.nonlin.checked,
+    ham_heat:T.heat.checked,
+    ham_out:T.out.checked,
+
+    paired:T.paired.checked,
+    noregen:T.noregen.checked,
+    blind:T.blind.checked
+  };
+}
+
+// ---------- LAB run ----------
+function runLab(){
+  const cfg=cfgFromUI();
+  const white=[], qds=[];
+  for(let i=0;i<cfg.n;i++){
+    white.push(simulateOne("white", cfg));
+    qds.push(simulateOne("qds", cfg));
+  }
+
+  const resCore={
+    wm:mean(white), ws:sd(white),
+    qm:mean(qds), qs:sd(qds)
+  };
+  resCore.drel = ((resCore.qm-resCore.wm)/Math.max(1e-9,resCore.wm))*100;
+  resCore.ddir = (resCore.qm-resCore.wm);
+
+  const disp = maybeBlindDisplay(resCore, cfg.blind);
+
+  $("lbl_wm").textContent = disp.labels.w+" mean";
+  $("lbl_qm").textContent = disp.labels.q+" mean";
+  $("wm").textContent = disp.res.wm.toFixed(1);
+  $("ws").textContent = disp.res.ws.toFixed(1);
+  $("qm").textContent = disp.res.qm.toFixed(1);
+  $("qs").textContent = disp.res.qs.toFixed(1);
+  $("drel").textContent = (disp.res.drel>=0?"+":"")+disp.res.drel.toFixed(1);
+  $("ddir").textContent = (disp.res.ddir>=0?"+":"")+disp.res.ddir.toFixed(2);
+
+  renderFlags(cfg);
+
+  const prof=simulateProfile(cfg);
+  drawLine($("profile"), prof.arrW, prof.arrQ, cfg.thr);
+  drawHist($("hist"), white, qds);
+
+  $("profile_note").textContent =
+    `Profile length: White ~${prof.arrW.length-1} cycles, QDS ~${prof.arrQ.length-1} cycles.`;
+
+  const now = new Date();
+  const logObj = {
+    local: now.toLocaleString(),
+    base:cfg.base.toFixed(1), amp:cfg.amp.toFixed(1), p:cfg.p.toFixed(2),
+    thr:cfg.thr, n:cfg.n, maxc:cfg.maxc,
+    ham_nonlin:cfg.ham_nonlin, ham_heat:cfg.ham_heat, ham_out:cfg.ham_out,
+    paired:cfg.paired, noregen:cfg.noregen, blind:cfg.blind,
+    wm:resCore.wm.toFixed(1), ws:resCore.ws.toFixed(1),
+    qm:resCore.qm.toFixed(1), qs:resCore.qs.toFixed(1),
+    drel:resCore.drel.toFixed(1), ddir:resCore.ddir.toFixed(2)
+  };
+
+  LAST_RUN = logObj;
+  pushHist(logObj);
+  renderHist();
+  updateCoachFromLast();
+}
+
+// ---------- COACH ----------
+function updateCoachFromLast(){
+  const cfg=cfgFromUI();
+  const hist=loadHist();
+  const recent=hist.slice(-5);
+
+  let risk=0;
+  risk += cfg.base*10;
+  risk += cfg.amp*6;
+  risk += cfg.p*25;
+  risk += cfg.ham_heat?12:0;
+  risk += cfg.ham_out?10:0;
+  risk += cfg.ham_nonlin?8:0;
+  risk = clamp(risk,0,100);
+
+  let band="good";
+  if(risk>=65) band="bad";
+  else if(risk>=38) band="warn";
+
+  const badge=$("risk_badge");
+  badge.className="risk "+band;
+  badge.textContent = band==="good"?"LOW STRESS":band==="warn"?"MEDIUM STRESS":"HIGH STRESS";
+
+  const cap = band==="bad"?80:band==="warn"?85:90;
+
+  let learned = null;
+  if(recent.length){
+    learned = recent.reduce((s,r)=>s+Number(r.drel),0)/recent.length;
+  }
+
+  $("risk_line").textContent = `Risk score ≈ ${risk.toFixed(0)}/100. Suggested daily cap: ${cap}%.`;
+
+  const corrText = cfg.p>=0.6 ? "Strong correlation: avoid clustering heat + high charge + spikes."
+                    : cfg.p>=0.25 ? "Moderate correlation: expect 'good weeks / bad weeks'."
+                    : "Low correlation: wear is closer to random scatter.";
+
+  const heatText = cfg.ham_heat ? "Heat epochs ON — avoid charging hot; cool first."
+                    : "Heat epochs OFF — good for longevity tests.";
+  const outText = cfg.ham_out ? "Outliers ON — current spikes are the enemy."
+                    : "Outliers OFF — smoother scenario.";
+
+  const last = LAST_RUN;
+  const outcome = last
+    ? `Last run: white μ=${last.wm} vs QDS μ=${last.qm} (Δ ${last.drel}%).`
+    : "Run the Lab to generate an outcome line.";
+
+  $("coach_advice").innerHTML =
+`• <b>Routine window:</b> aim for <b>25–${cap}%</b> on normal days.<br>
+• <b>Travel day:</b> top to 100% closer to departure.<br>
+• <b>Thermal discipline:</b> ${heatText}<br>
+• <b>Shock control:</b> ${outText}<br>
+• <b>Correlation read:</b> ${corrText}<br>
+• <b>Outcome:</b> ${outcome}`;
+
+  $("coach_learning").textContent =
+    learned==null ? "Learning: not enough stored runs yet."
+    : `Learning (last ${recent.length} runs): mean Δ ≈ ${(learned>=0?"+":"")+learned.toFixed(1)}%.`;
+}
+
+// ---------- Routine Planner ----------
+function planDay(){
+  updateCoachFromLast();
+  const intent=+S.intent.value;
+  const heatRisk=+S.heat_risk.value;
+
+  let targetCap = 85;
+  const badgeText = $("risk_badge").textContent;
+  if(badgeText.includes("LOW")) targetCap=90;
+  if(badgeText.includes("HIGH")) targetCap=80;
+
+  if(intent===1) targetCap = Math.min(95, targetCap+5);
+  if(intent===2) targetCap = 100;
+
+  let heatAdvice = heatRisk===0 ? "Normal temps: standard routine."
+                 : heatRisk===1 ? "Warm day: avoid fast-charge while hot."
+                 : "Hot day: prioritise cooling; delay charging if possible.";
+
+  $("plan_out").innerHTML =
+`<b>Suggested plan:</b><br>
+• Target cap tonight: <b>${targetCap}%</b><br>
+• If you need full charge: finish closer to departure.<br>
+• ${heatAdvice}`;
+}
+
+// ---------- Sweeps ----------
+function formatSweepLine(cfg, res){
+  return `base=${cfg.base.toFixed(1)} amp=${cfg.amp.toFixed(1)} p=${cfg.p.toFixed(2)} thr=${cfg.thr}% n=${cfg.n}
+white μ=${res.wm.toFixed(1)} σ=${res.ws.toFixed(1)} · QDS μ=${res.qm.toFixed(1)} σ=${res.qs.toFixed(1)}
+Δ=${(res.drel>=0?"+":"")+res.drel.toFixed(1)}% · meanΔ=${(res.ddir>=0?"+":"")+res.ddir.toFixed(2)}`;
+}
+
+function runOnceWith(cfg){
+  const white=[], qds=[];
+  for(let i=0;i<cfg.n;i++){
+    white.push(simulateOne("white", cfg));
+    qds.push(simulateOne("qds", cfg));
+  }
+  const res={
+    wm:mean(white), ws:sd(white),
+    qm:mean(qds), qs:sd(qds)
+  };
+  res.drel=((res.qm-res.wm)/Math.max(1e-9,res.wm))*100;
+  res.ddir=(res.qm-res.wm);
+  return res;
+}
+
+function pSweep(list){
+  const baseCfg=cfgFromUI();
+  const lines=[];
+  for(const pv of list){
+    const cfg={...baseCfg, p:pv, blind:false};
+    const res=runOnceWith(cfg);
+    lines.push(formatSweepLine(cfg,res));
+  }
+  $("psweep_out").value = lines.join("\n\n");
+}
+
+function tSweep(list){
+  const baseCfg=cfgFromUI();
+  const lines=[];
+  for(const tv of list){
+    const cfg={...baseCfg, thr:tv, blind:false};
+    const res=runOnceWith(cfg);
+    lines.push(formatSweepLine(cfg,res));
+  }
+  $("tsweep_out").value = lines.join("\n\n");
+}
+
+// ---------- Noise toy ----------
+function noiseToy(){
+  const amp=+S.amp.value;
+  const p=+S.p.value;
+  const N=160;
+  let prev=0;
+  const white=[], qds=[];
+  for(let i=0;i<N;i++){
+    const eps = randn()*amp;
+    white.push(eps);
+    const s=Math.sqrt(Math.max(0,1-p*p));
+    const v = p*prev + s*eps;
+    prev=v;
+    qds.push(v);
+  }
+
+  const c=$("noise_canvas");
+  const ctx=c.getContext("2d");
+  const W=c.width=c.clientWidth*devicePixelRatio;
+  const H=c.height=c.clientHeight*devicePixelRatio;
+  ctx.clearRect(0,0,W,H);
+
+  ctx.strokeStyle="rgba(255,255,255,0.06)";
+  ctx.lineWidth=1*devicePixelRatio;
+  for(let i=1;i<5;i++){
+    const y=H*i/5; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+  }
+
+  const all=white.concat(qds);
+  const maxA=Math.max(...all.map(x=>Math.abs(x)), 1e-6);
+
+  function plot(arr, color){
+    ctx.strokeStyle=color; ctx.lineWidth=2*devicePixelRatio;
+    ctx.beginPath();
+    for(let i=0;i<arr.length;i++){
+      const x=(i/(arr.length-1))*W;
+      const y=H/2 - (arr[i]/maxA)*(H*0.35);
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+  plot(white, "rgba(122,162,255,0.9)");
+  plot(qds, "rgba(255,115,179,0.85)");
+
+  $("noise_note").textContent = `Trace length ${N}. amp=${amp.toFixed(1)} p=${p.toFixed(2)}.`;
+}
+
+// ---------- Export ----------
+function exportLogs(all=false){
+  const hist=loadHist();
+  if(!hist.length){
+    $("export_out").value="No logs yet.";
+    return;
+  }
+  const pick = all ? hist.slice(-20) : [hist[hist.length-1]];
+  const lines = pick.map(r=>
+`${r.local} · base=${r.base}% · amp=${r.amp}% · p=${r.p} · thr=${r.thr}% · n=${r.n} · max=${r.maxc}
+white μ=${r.wm} σ=${r.ws} · QDS μ=${r.qm} σ=${r.qs} · Δ=${r.drel}% · meanΔ=${r.ddir}
+stress: nonlin=${r.ham_nonlin} heat=${r.ham_heat} out=${r.ham_out} · bias: paired=${r.paired} noRegen=${r.noregen} blind=${r.blind}`
+  );
+  $("export_out").value = lines.join("\n\n");
+  return $("export_out").value;
+}
+
+async function copyText(txt){
+  try{
+    await navigator.clipboard.writeText(txt);
+  }catch(e){}
+}
+
+// ---------- Presets ----------
+function setPreset(obj){
+  S.base.value=obj.base; S.amp.value=obj.amp; S.p.value=obj.p;
+  S.n.value=obj.n; S.maxc.value=obj.maxc; S.thr.value=obj.thr;
+  T.nonlin.checked=obj.nonlin; T.heat.checked=obj.heat; T.out.checked=obj.out;
+  T.paired.checked=obj.paired; T.noregen.checked=obj.noregen; T.blind.checked=obj.blind;
+  ["base","amp","p","n","maxc","thr"].forEach(k=>{
+    const el = S[k]; el.dispatchEvent(new Event("input"));
+  });
+}
+
+const PRE = {
+  real:{base:1.2, amp:1.8, p:0.25, n:1200, maxc:4000, thr:75, nonlin:true, heat:true, out:true, paired:true, noregen:true, blind:false},
+  clean:{base:2.0, amp:3.0, p:0.60, n:2000, maxc:3000, thr:30, nonlin:true, heat:true, out:true, paired:true, noregen:true, blind:false},
+  stress:{base:3.5, amp:6.0, p:0.70, n:2000, maxc:5000, thr:50, nonlin:true, heat:true, out:true, paired:true, noregen:true, blind:false},
+  chaos:{base:6.5, amp:10.0, p:0.95, n:2000, maxc:2600, thr:90, nonlin:true, heat:true, out:true, paired:true, noregen:true, blind:false}
+};
+
+// ---------- Buttons ----------
+$("run_once").onclick = runLab;
+$("reset_all").onclick = ()=>setPreset(PRE.real);
+$("clear_history").onclick = ()=>{ localStorage.removeItem(HIST_KEY); renderHist(); };
+
+$("pre_real").onclick = ()=>setPreset(PRE.real);
+$("pre_clean").onclick = ()=>setPreset(PRE.clean);
+$("pre_stress").onclick = ()=>setPreset(PRE.stress);
+$("pre_chaos").onclick = ()=>setPreset(PRE.chaos);
+
+$("hard_null").onclick = ()=>{ S.p.value=0; S.p.dispatchEvent(new Event("input")); };
+
+$("psweep_quick").onclick = ()=>pSweep([0.00,0.30,0.60,0.90]);
+$("psweep_dense").onclick = ()=>{
+  const list=[]; for(let x=0;x<=0.9+1e-9;x+=0.1) list.push(Number(x.toFixed(2)));
+  pSweep(list);
+};
+$("tsweep_3").onclick = ()=>tSweep([30,50,80]);
+$("tsweep_5").onclick = ()=>tSweep([20,30,50,75,80]);
+
+$("noise_gen").onclick = noiseToy;
+
+$("copy_logs").onclick = async ()=>{
+  const txt = exportLogs(true);
+  if(txt) await copyText(txt);
+};
+$("copy_last").onclick = async ()=>{
+  const txt = exportLogs(false);
+  if(txt) await copyText(txt);
+};
+
+$("plan_day").onclick = planDay;
+
+// ---------- Boot ----------
+setPreset(PRE.real);
+renderHist();
+updateCoachFromLast();
+noiseToy();
+</script>
+</body>
+</html>

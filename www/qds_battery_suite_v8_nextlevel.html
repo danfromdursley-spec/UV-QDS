@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>QDS Battery Suite v8 — Next Level 🔋🎩</title>
+<style>
+  :root{
+    --bg:#070b11; --panel:#0f172a; --panel2:#0b1220;
+    --text:#e6edf3; --muted:#9aa7b2; --accent:#7dd3fc;
+    --good:#86efac; --warn:#fbbf24; --bad:#f87171; --border:#1f2a3a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;
+    background:linear-gradient(180deg,#05070d,#0a1020 45%,#05070d);color:var(--text);}
+  .wrap{max-width:1120px;margin:0 auto;padding:14px}
+  .title{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    background:linear-gradient(90deg,#0f172a,#0b1220,#0f172a);
+    border:1px solid var(--border);border-radius:18px;padding:14px 16px;
+  }
+  h1{font-size:20px;margin:0}
+  .sub{color:var(--muted);font-size:12px}
+  .pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:10px;
+    border:1px solid var(--border);color:var(--muted)}
+  .grid{display:grid;grid-template-columns:1.05fr 0.95fr;gap:12px;margin-top:12px}
+  .card{background:linear-gradient(180deg,var(--panel),var(--panel2));
+    border:1px solid var(--border);border-radius:16px;padding:12px}
+  .card h3{margin:0 0 8px 0;font-size:14px}
+  label{display:block;font-size:11px;color:var(--muted);margin:8px 0 4px}
+  input[type="number"],select{
+    width:100%;padding:8px 10px;border-radius:10px;border:1px solid var(--border);
+    background:#070e1b;color:var(--text);font-size:12px;
+  }
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .checks{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .check{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+  .check input{transform:scale(1.05)}
+  .btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  button{
+    border:1px solid var(--border);background:#070e1b;color:var(--text);
+    padding:9px 11px;border-radius:10px;font-size:12px;cursor:pointer;
+  }
+  button.primary{background:linear-gradient(90deg,#0ea5e9,#38bdf8);
+    color:#00131d;border:none}
+  button.warn{background:linear-gradient(90deg,#f59e0b,#fbbf24);
+    color:#1b0d00;border:none}
+  button.bad{background:linear-gradient(90deg,#ef4444,#f87171);
+    color:#1b0000;border:none}
+  .kpi{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .kbox{border:1px solid var(--border);border-radius:12px;padding:10px;background:#050b16}
+  .kname{font-size:10px;color:var(--muted)}
+  .kval{font-size:18px;font-weight:700}
+  .good{color:var(--good)} .warnTxt{color:var(--warn)} .badTxt{color:var(--bad)}
+  .log{
+    height:360px;overflow:auto;white-space:pre-wrap;background:#03060d;
+    border:1px solid var(--border);border-radius:12px;padding:10px;font-size:11px;
+  }
+  .small{font-size:10px;color:var(--muted)}
+  hr{border:0;border-top:1px solid var(--border);margin:12px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title">
+    <div>
+      <h1>QDS Battery Suite v8 — Next Level 🔋🎩</h1>
+      <div class="sub">Single-file • no libs • mobile-safe ladder • full stress button • 3-seed stability</div>
+    </div>
+    <div class="pill">v8</div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>Core Controls</h3>
+      <div class="row3">
+        <div><label>Base drain per cycle (%)</label><input id="base" type="number" step="0.1" value="1.2"></div>
+        <div><label>Noise amplitude (%)</label><input id="amp" type="number" step="0.1" value="1.8"></div>
+        <div><label>Correlation p (0–0.99)</label><input id="p" type="number" step="0.01" min="0" max="0.99" value="0.25"></div>
+      </div>
+      <div class="row3">
+        <div><label>Cells (n)</label><input id="n" type="number" step="100" value="1200"></div>
+        <div><label>Max cycles cap</label><input id="maxc" type="number" step="100" value="4000"></div>
+        <div><label>Failure threshold (%)</label><input id="thr" type="number" step="1" value="50"></div>
+      </div>
+
+      <label>Stress Hammers</label>
+      <div class="checks">
+        <label class="check"><input id="nonlin" type="checkbox"> Nonlinear wear</label>
+        <label class="check"><input id="heat" type="checkbox"> Heat epochs</label>
+        <label class="check"><input id="outlier" type="checkbox"> Rare outliers</label>
+      </div>
+
+      <label>Bias Integrity</label>
+      <div class="checks">
+        <label class="check"><input id="paired" type="checkbox" checked> Paired Fair Mode</label>
+        <label class="check"><input id="noregen" type="checkbox" checked> No Regen</label>
+        <label class="check"><input id="blind" type="checkbox"> Blind labels (UI swap)</label>
+        <label class="check"><input id="hardnull" type="checkbox"> Hard null (force p=0)</label>
+      </div>
+
+      <label>Performance & Demo Safety</label>
+      <div class="checks">
+        <label class="check"><input id="mobileSafe" type="checkbox" checked> Mobile Safe Mode</label>
+        <label class="check"><input id="lockSeed" type="checkbox" checked> Lock seed for repeats</label>
+      </div>
+
+      <div class="row">
+        <div><label>Seed (reproducible demos)</label><input id="seed" type="number" step="1" value="12345"></div>
+        <div><label>AutoBench sampler count</label><input id="benchCount" type="number" step="1" value="12"></div>
+      </div>
+
+      <div class="btns">
+        <button class="primary" id="runOne">Run single sim</button>
+        <button id="reset">Reset defaults</button>
+      </div>
+
+      <hr>
+
+      <h3>Boss Buttons</h3>
+      <div class="btns">
+        <button class="primary" id="runLadder">Poster Ladder (no-freeze)</button>
+        <button class="warn" id="runStability">3-Seed Stability</button>
+        <button class="primary" id="runBench">AutoBench (ladder + sampler)</button>
+        <button class="bad" id="runFullPath">Full Pathological Run</button>
+        <button id="clearLog" class="ghost">Clear report</button>
+      </div>
+
+      <div class="small">
+        Mobile Safe Mode downscales Ladder E/F to prevent freezes.
+        “Full Pathological Run” runs the heavy stress block separately.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Latest Results</h3>
+      <div class="kpi">
+        <div class="kbox"><div class="kname">White mean cycles</div><div id="wMean" class="kval">—</div></div>
+        <div class="kbox"><div class="kname">QDS mean cycles</div><div id="qMean" class="kval">—</div></div>
+        <div class="kbox"><div class="kname">Δ (QDS vs White)</div><div id="delta" class="kval">—</div></div>
+        <div class="kbox"><div class="kname">Mean paired Δ cycles</div><div id="pdelta" class="kval">—</div></div>
+      </div>
+
+      <label>Report</label>
+      <div id="log" class="log"></div>
+      <div class="small">
+        Toy correlated-noise harness for fairness + regime mapping.
+        Not a claim of real battery extension.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================
+   QDS Battery Suite v8
+   Next Level (mobile-safe)
+========================= */
+
+const $ = id => document.getElementById(id);
+const logEl = $("log");
+
+function pad(n){ return String(n).padStart(2,"0"); }
+function nowStamp(){
+  const d=new Date();
+  return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}, ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+function appendLog(s){
+  logEl.textContent += s + "\n";
+  logEl.scrollTop = logEl.scrollHeight;
+}
+function clamp(x,a,b){ return Math.max(a, Math.min(b,x)); }
+function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
+
+/* Seeded RNG (LCG) */
+function makeRNG(seed){
+  let s=(seed>>>0)||123456789;
+  return function(){
+    s=(1664525*s+1013904223)>>>0;
+    return s/4294967296;
+  }
+}
+function gauss(rng){
+  let u=0,v=0;
+  while(u===0) u=rng();
+  while(v===0) v=rng();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+}
+function ar1Eps(rng,p,len){
+  const eps=new Array(len);
+  let e=gauss(rng);
+  eps[0]=e;
+  const scale=Math.sqrt(1-p*p);
+  for(let i=1;i<len;i++){
+    e=p*e + scale*gauss(rng);
+    eps[i]=e;
+  }
+  return eps;
+}
+
+/* Deterministic RNG for outliers (seeded) */
+function rand01(rng){ return rng(); }
+
+/* Simulate one cell */
+function simulateCell(params, epsStream, rng){
+  const {base, amp, thr, maxc, nonlin, heat, outlier, noregen} = params;
+  let health=100.0, cycles=0;
+
+  const heatPeriod=12;
+  const outProb=0.015;
+
+  for(let i=0;i<maxc;i++){
+    const eps = epsStream[i] || 0;
+    let drain = base + amp*eps;
+
+    if(nonlin){
+      const low = clamp((50-health)/50, 0, 1);
+      drain *= (1 + 0.6*low);
+    }
+    if(heat && (i%heatPeriod===0) && i>0){
+      drain *= 1.35;
+    }
+    if(outlier && rand01(rng) < outProb){
+      drain *= 2.2;
+    }
+    if(noregen) drain = Math.max(0, drain);
+
+    health -= drain;
+    cycles++;
+    if(health <= thr) break;
+  }
+  return cycles;
+}
+
+/* Paired sim (always paired in v8 identity) */
+function runPairedSim(params){
+  const n=params.n, maxc=params.maxc;
+  const p=clamp(params.p,0,0.99);
+
+  const rng = makeRNG(params.seed||12345);
+  const rngShock = makeRNG((params.seed||12345) ^ 0xDEADBEEF);
+
+  const whiteLives=new Array(n);
+  const qdsLives=new Array(n);
+  const deltas=new Array(n);
+
+  for(let k=0;k<n;k++){
+    const epsWhite=new Array(maxc);
+    for(let i=0;i<maxc;i++) epsWhite[i]=gauss(rng);
+
+    const epsQDS = (p>0) ? ar1Eps(rng, p, maxc) : epsWhite.slice();
+
+    const Lw = simulateCell(params, epsWhite, rngShock);
+    const Lq = simulateCell(params, epsQDS,  rngShock);
+
+    whiteLives[k]=Lw; qdsLives[k]=Lq; deltas[k]=Lq-Lw;
+  }
+
+  const mean = arr => arr.reduce((a,b)=>a+b,0)/arr.length;
+  const std = (arr,m) => Math.sqrt(arr.reduce((s,x)=>{const d=x-m;return s+d*d;},0)/arr.length);
+
+  const wMean=mean(whiteLives), qMean=mean(qdsLives);
+  const wStd=std(whiteLives,wMean), qStd=std(qdsLives,qMean);
+  const dMean=mean(deltas);
+  const pct=(qMean-wMean)/Math.max(1e-9,wMean)*100;
+
+  return {wMean,qMean,wStd,qStd,dMean,pct};
+}
+
+/* UI params */
+function readParams(){
+  let p=parseFloat($("p").value);
+  if($("hardnull").checked) p=0;
+
+  const seed = parseInt($("seed").value,10) || 12345;
+
+  return {
+    base: parseFloat($("base").value),
+    amp: parseFloat($("amp").value),
+    p: clamp(p,0,0.99),
+    n: Math.max(50, parseInt($("n").value,10)),
+    maxc: Math.max(100, parseInt($("maxc").value,10)),
+    thr: clamp(parseFloat($("thr").value),0,99),
+    nonlin: $("nonlin").checked,
+    heat: $("heat").checked,
+    outlier: $("outlier").checked,
+    paired: $("paired").checked,
+    noregen: $("noregen").checked,
+    blind: $("blind").checked,
+    mobileSafe: $("mobileSafe").checked,
+    lockSeed: $("lockSeed").checked,
+    seed
+  };
+}
+
+/* KPI */
+function updateKPI(r){
+  $("wMean").textContent = r ? r.wMean.toFixed(1) : "—";
+  $("qMean").textContent = r ? r.qMean.toFixed(1) : "—";
+  const pct = r ? r.pct : 0;
+  const d = $("delta");
+  d.textContent = r ? `${pct.toFixed(1)}%` : "—";
+  d.className = "kval " + (pct>1 ? "good" : (pct<-1 ? "badTxt" : "warnTxt"));
+  $("pdelta").textContent = r ? r.dMean.toFixed(2) : "—";
+}
+
+/* Record line */
+function recordLine(tag, params, r){
+  return `${nowStamp()} · ${tag}
+base=${params.base}% amp=${params.amp}% p=${params.p} thr=${params.thr}% n=${params.n} max=${params.maxc}
+white μ=${r.wMean.toFixed(1)} σ=${r.wStd.toFixed(1)} · QDS μ=${r.qMean.toFixed(1)} σ=${r.qStd.toFixed(1)}
+Δ=${r.pct.toFixed(1)}% · meanΔ=${r.dMean.toFixed(2)}
+stress: nonlin=${params.nonlin} heat=${params.heat} out=${params.outlier}
+bias: paired=${params.paired} noRegen=${params.noregen} blind=${params.blind}\n`;
+}
+
+/* Run with params (seed handling) */
+function runWithParams(tag, params, seedBump=0){
+  const baseSeed = readParams().seed;
+  params.seed = params.lockSeed ? (baseSeed + seedBump) >>> 0 : ((Date.now() + seedBump) >>> 0);
+
+  const r = runPairedSim(params);
+  updateKPI(r);
+  appendLog(recordLine(tag, params, r));
+  return r;
+}
+
+/* Manual single run */
+function runSingle(){
+  const params = readParams();
+  return runWithParams("Manual", params, 17);
+}
+
+/* Ladder presets (mobile-safe scaling) */
+function ladderPresets(){
+  const baseParams = readParams();
+  const C = o => JSON.parse(JSON.stringify(o));
+  const safe = baseParams.mobileSafe;
+
+  const A = C(baseParams);
+  A.amp=0.0; A.p=0.25; A.thr=50; A.n= safe? 900:1200; A.maxc=safe? 3000:4000;
+
+  const B = C(baseParams);
+  B.amp=1.8; B.p=0.0;  B.thr=50; B.n= safe? 900:1200; B.maxc=safe? 3000:4000; B.blind=false;
+
+  const Cb = C(B);
+  Cb.blind=true;
+
+  const D = C(baseParams);
+  D.base=1.2; D.amp=1.8; D.p=0.25; D.thr=30;
+  D.n=safe? 1200:1600; D.maxc=safe? 3500:4000;
+
+  const E = C(baseParams);
+  E.base=3.0; E.amp=5.0; E.p=0.60; E.thr=50;
+  E.n=safe? 1400:2000; E.maxc=safe? 4000:5000;
+
+  const F = C(baseParams);
+  F.base=8.0; F.amp=14.0; F.p=0.99; F.thr=95;
+  F.n=safe? 1200:2000; F.maxc=safe? 4000:6000;
+
+  return [
+    {tag:`Ladder A — amp=0 control${safe?" (safe)":""}`, params:A},
+    {tag:`Ladder B — hard null p=0${safe?" (safe)":""}`, params:B},
+    {tag:`Ladder C — blind null${safe?" (safe)":""}`, params:Cb},
+    {tag:`Ladder D — realistic phone${safe?" (safe)":""}`, params:D},
+    {tag:`Ladder E — controlled stress${safe?" (safe)":""}`, params:E},
+    {tag:`Ladder F — pathological honesty${safe?" (safe)":""}`, params:F},
+  ];
+}
+
+/* Full pathological (separate nuke) */
+function fullPathPreset(){
+  const p = readParams();
+  return {
+    ...p,
+    base: 8.0, amp: 14.0, p: 0.99, thr: 95,
+    n: 5000, maxc: 8000,
+    nonlin: true, heat: true, outlier: true,
+    mobileSafe: false
+  };
+}
+
+/* Sampler (lightweight families) */
+function sampleScenarios(count){
+  const base = readParams();
+  const rng = makeRNG(base.seed ^ 0xA5A5A5A5);
+  const out=[];
+
+  for(let i=0;i<count;i++){
+    const fam = i%4;
+    let baseD, amp, p, thr, n, maxc;
+
+    if(fam===0){ // phone
+      baseD=1.0+0.6*rng(); amp=1.2+1.4*rng(); p=0.10+0.25*rng();
+      thr=[20,30,50][Math.floor(rng()*3)]; n=1200; maxc=4000;
+    } else if(fam===1){ // laptop
+      baseD=0.6+0.5*rng(); amp=0.8+1.2*rng(); p=0.05+0.20*rng();
+      thr=[20,30,40][Math.floor(rng()*3)]; n=1400; maxc=6000;
+    } else if(fam===2){ // EV-toy
+      baseD=0.25+0.25*rng(); amp=0.3+0.5*rng(); p=0.05+0.25*rng();
+      thr=[60,70,80][Math.floor(rng()*3)]; n=1800; maxc=12000;
+    } else { // grid-toy
+      baseD=0.15+0.20*rng(); amp=0.2+0.4*rng(); p=0.02+0.18*rng();
+      thr=[70,80,85][Math.floor(rng()*3)]; n=2000; maxc=20000;
+    }
+
+    out.push({
+      tag:`Sampler ${i+1} — ${["phone","laptop","EV-toy","grid-toy"][fam]}`,
+      params:{
+        ...base,
+        base:+baseD.toFixed(2), amp:+amp.toFixed(2), p:+p.toFixed(2),
+        thr, n, maxc
+      }
+    });
+  }
+  return out;
+}
+
+/* Buttons */
+$("runOne").onclick = runSingle;
+
+$("runLadder").onclick = async () => {
+  appendLog("=== Poster Ladder v8 (async, safe-aware) ===\n");
+  const ladder = ladderPresets();
+  let bump=0;
+  for(const item of ladder){
+    await sleep(35);
+    runWithParams(item.tag, item.params, bump+=101);
+  }
+  appendLog("=== End ladder ===\n");
+};
+
+$("runStability").onclick = async () => {
+  const p = readParams();
+  appendLog("=== 3-Seed Stability ===");
+  const seeds = [111,222,333];
+  let pctSum=0, dSum=0, min=999, max=-999;
+
+  for(let i=0;i<3;i++){
+    await sleep(25);
+    const params = {...p, seed: seeds[i], lockSeed:true};
+    const r = runPairedSim(params);
+    pctSum += r.pct; dSum += r.dMean;
+    min = Math.min(min, r.pct); max = Math.max(max, r.pct);
+    updateKPI(r);
+    appendLog(recordLine(`Stability seed=${seeds[i]}`, params, r));
+  }
+
+  const pctAvg = pctSum/3;
+  const dAvg = dSum/3;
+  const grade = Math.abs(pctAvg) < 0.6 ? "A (neutral/stable)" :
+                Math.abs(pctAvg) < 1.5 ? "B (mild signal)" :
+                "C (strongly regime-sensitive)";
+
+  appendLog(`Stability summary: mean Δ=${pctAvg.toFixed(2)}% (range ${min.toFixed(2)} → ${max.toFixed(2)}), meanΔcycles=${dAvg.toFixed(2)} · Grade ${grade}\n`);
+};
+
+$("runBench").onclick = async () => {
+  const count = Math.max(4, parseInt($("benchCount").value,10) || 12);
+  appendLog("=== AutoBench v8 start ===");
+  appendLog(`Seed=${readParams().seed} • Sampler=${count} • MobileSafe=${readParams().mobileSafe}\n`);
+
+  const ladder = ladderPresets();
+  let bump=0;
+  for(const item of ladder){
+    await sleep(25);
+    runWithParams(item.tag, item.params, bump+=77);
+  }
+
+  appendLog("=== Sampler ===");
+  const samples = sampleScenarios(count);
+  for(const s of samples){
+    await sleep(15);
+    runWithParams(s.tag, s.params, bump+=33);
+  }
+
+  appendLog("=== AutoBench end ===\n");
+};
+
+$("runFullPath").onclick = async () => {
+  appendLog("=== FULL PATHOLOGICAL RUN (heavy) ===");
+  appendLog("If this stutters on mobile, lower n/max or toggle Mobile Safe back ON.\n");
+  await sleep(30);
+  const params = fullPathPreset();
+  runWithParams("Pathological — full load", params, 999);
+  appendLog("=== End full pathological ===\n");
+};
+
+$("clearLog").onclick = () => logEl.textContent="";
+
+$("reset").onclick = () => {
+  $("base").value=1.2; $("amp").value=1.8; $("p").value=0.25;
+  $("n").value=1200; $("maxc").value=4000; $("thr").value=50;
+  $("nonlin").checked=false; $("heat").checked=false; $("outlier").checked=false;
+  $("paired").checked=true; $("noregen").checked=true; $("blind").checked=false; $("hardnull").checked=false;
+  $("mobileSafe").checked=true; $("lockSeed").checked=true;
+  $("seed").value=12345; $("benchCount").value=12;
+  updateKPI(null); appendLog("— Reset to defaults —\n");
+};
+</script>
+</body>
+</html>

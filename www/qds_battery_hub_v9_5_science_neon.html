@@ -1,0 +1,1244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>QDS Battery Hub v9.5 — Science Neon</title>
+<style>
+  :root{
+    --bg:#07020d;
+    --panel:#0e061a;
+    --panel-2:#120a22;
+    --ink:#e9e6ff;
+    --muted:#b9b2e6;
+    --accent:#b400ff;      /* purple */
+    --accent-2:#39ff14;    /* neon green */
+    --warn:#ff4d9a;
+    --good:#7CFF6B;
+    --line:#2b0f45;
+    --shadow:0 10px 30px rgba(0,0,0,.45);
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, rgba(180,0,255,.18), transparent 60%),
+      radial-gradient(900px 500px at 90% 0%, rgba(57,255,20,.12), transparent 60%),
+      linear-gradient(180deg, #030106, var(--bg) 35%, #05010b 100%);
+    color:var(--ink);
+  }
+  header{
+    padding:18px 16px 8px 16px;
+  }
+  .title{
+    font-weight:800; letter-spacing:.3px;
+    font-size: clamp(20px, 4.8vw, 28px);
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+  }
+  .subtitle{
+    color:var(--muted); font-size:12.5px; margin-top:4px;
+  }
+  .badge{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:2px 8px; border-radius:999px;
+    border:1px solid rgba(57,255,20,.35);
+    color:#dfffd8; font-size:11px;
+    background: linear-gradient(90deg, rgba(57,255,20,.10), rgba(180,0,255,.12));
+  }
+
+  .tabs{
+    display:flex; gap:8px; padding:0 12px 12px 12px; flex-wrap:wrap;
+  }
+  .tab-btn{
+    border:1px solid var(--line);
+    background: linear-gradient(135deg, rgba(180,0,255,.08), rgba(57,255,20,.06));
+    color:var(--ink);
+    padding:8px 12px; border-radius:12px;
+    font-size:12.5px; cursor:pointer;
+  }
+  .tab-btn.active{
+    border-color: rgba(57,255,20,.6);
+    box-shadow: 0 0 0 1px rgba(180,0,255,.35) inset;
+    background:
+      linear-gradient(135deg, rgba(180,0,255,.22), rgba(57,255,20,.16));
+  }
+
+  .wrap{ padding:0 12px 22px 12px; }
+  .grid{
+    display:grid;
+    grid-template-columns: 1.05fr .95fr;
+    gap:12px;
+  }
+  @media (max-width: 980px){
+    .grid{ grid-template-columns: 1fr; }
+  }
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,.02), transparent 35%),
+                linear-gradient(135deg, var(--panel), var(--panel-2));
+    border:1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding:14px;
+  }
+  .card h3{
+    margin:0 0 10px 0; font-size:14.5px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .hint{
+    color:var(--muted); font-size:11.5px; line-height:1.35;
+  }
+
+  label{
+    display:flex; justify-content:space-between; align-items:center;
+    gap:10px; font-size:12px; color:var(--ink);
+    padding:6px 0 2px;
+  }
+  .val{ color:var(--accent-2); font-variant-numeric: tabular-nums; }
+  input[type="range"]{ width:100%; }
+  input[type="number"], select, textarea{
+    background:#0a0415; color:var(--ink);
+    border:1px solid var(--line); border-radius:10px;
+    padding:8px 10px; font-size:12px; outline:none;
+  }
+  textarea{ min-height:120px; width:100%; resize:vertical; }
+
+  .row{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .btn{
+    border:1px solid rgba(180,0,255,.45);
+    background:
+      linear-gradient(135deg, rgba(180,0,255,.22), rgba(57,255,20,.10));
+    color:var(--ink);
+    padding:9px 12px; border-radius:12px;
+    font-size:12px; cursor:pointer;
+  }
+  .btn.secondary{
+    border-color: rgba(57,255,20,.45);
+  }
+  .btn.ghost{
+    background: transparent;
+  }
+  .btn:active{ transform: translateY(1px); }
+
+  .kpi{
+    display:grid; grid-template-columns: 1fr 1fr; gap:10px;
+  }
+  @media(max-width:560px){ .kpi{ grid-template-columns: 1fr; } }
+  .kbox{
+    border:1px solid var(--line);
+    background: rgba(0,0,0,.12);
+    border-radius: 12px; padding:10px;
+  }
+  .kbox .label{ color:var(--muted); font-size:11px; }
+  .kbox .big{
+    font-size:22px; font-weight:800;
+    letter-spacing:.2px; margin-top:2px;
+    font-variant-numeric: tabular-nums;
+  }
+  .kbox .small{ font-size:11px; color:var(--muted); }
+
+  .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .divider{ height:1px; background: var(--line); margin:10px 0; }
+
+  canvas{
+    width:100%; height:220px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.02), transparent 40%),
+      rgba(0,0,0,.10);
+    border:1px solid var(--line);
+    border-radius: 12px;
+  }
+  .small-canvas{ height:170px; }
+
+  .history{
+    display:grid; gap:8px;
+    max-height: 260px; overflow:auto; padding-right:4px;
+  }
+  .hitem{
+    border:1px solid var(--line);
+    background: rgba(255,255,255,.02);
+    border-radius: 10px; padding:8px 9px;
+  }
+  .tag{
+    display:inline-block; padding:1px 6px; border-radius:999px;
+    font-size:9.5px; letter-spacing:.2px;
+    border:1px solid rgba(57,255,20,.35);
+    color:#dfffd8; margin-right:6px;
+  }
+  .good{ color: var(--good); }
+  .warn{ color: var(--warn); }
+
+  .tab{
+    display:none;
+  }
+  .tab.active{
+    display:block;
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="title">
+    QDS Battery Hub v9.5 — Science Neon
+    <span class="badge">Offline</span>
+    <span class="badge">Phone-safe</span>
+    <span class="badge">White vs QDS AR(1) stress</span>
+    <span class="badge">Shed Edition ⚙️🔋</span>
+  </div>
+  <div class="subtitle">
+    Semi-empirical capacity-fade toy for intuition. Not a chemistry-grade predictor.
+    Goal: correct qualitative behaviour (spread, tails, regime flips) without fake certainty.
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="lab">Overview & Lab</button>
+  <button class="tab-btn" data-tab="coach">Battery Coach</button>
+  <button class="tab-btn" data-tab="bench">AutoBench Viewer</button>
+</div>
+
+<div class="wrap">
+
+  <!-- ===================== LAB TAB ===================== -->
+  <section id="lab" class="tab active">
+    <div class="grid">
+
+      <div class="card">
+        <h3>Controls</h3>
+
+        <label>Base cycle fade scale (k₁)
+          <span class="val mono" id="k1Val"></span>
+        </label>
+        <input id="k1" type="range" min="0.0006" max="0.0060" step="0.0001" value="0.0018"/>
+
+        <label>Secondary linear wear (k₂)
+          <span class="val mono" id="k2Val"></span>
+        </label>
+        <input id="k2" type="range" min="0.0001" max="0.0020" step="0.0001" value="0.0004"/>
+
+        <label>Noise amplitude (operating stress %)
+          <span class="val mono" id="ampVal"></span>
+        </label>
+        <input id="amp" type="range" min="0.2" max="6.0" step="0.1" value="2.4"/>
+
+        <label>Correlation ρ (0–0.99)
+          <span class="val mono" id="rhoVal"></span>
+        </label>
+        <input id="rho" type="range" min="0" max="0.99" step="0.01" value="0.60"/>
+
+        <div class="row">
+          <div style="flex:1; min-width:160px;">
+            <label>Temperature (°C) <span class="val mono" id="tVal"></span></label>
+            <input id="temp" type="range" min="5" max="60" step="1" value="25"/>
+          </div>
+          <div style="flex:1; min-width:160px;">
+            <label>Failure threshold (capacity %)
+              <span class="val mono" id="thrVal"></span>
+            </label>
+            <input id="thr" type="range" min="50" max="95" step="1" value="80"/>
+          </div>
+        </div>
+
+        <div class="row">
+          <div style="flex:1; min-width:160px;">
+            <label>DoD window</label>
+            <select id="dod">
+              <option value="20-80" selected>20–80 (phone-friendly)</option>
+              <option value="0-100">0–100 (full depth)</option>
+              <option value="10-90">10–90</option>
+              <option value="40-80">40–80 (gentle)</option>
+              <option value="60-100">60–100 (stressful)</option>
+            </select>
+          </div>
+          <div style="flex:1; min-width:160px;">
+            <label>Cell count (Monte Carlo)
+              <span class="val mono" id="nVal"></span>
+            </label>
+            <input id="n" type="range" min="100" max="2000" step="50" value="1200"/>
+          </div>
+        </div>
+
+        <label>Max cycles simulated
+          <span class="val mono" id="maxVal"></span>
+        </label>
+        <input id="maxCycles" type="range" min="400" max="4000" step="50" value="2500"/>
+
+        <div class="divider"></div>
+
+        <div class="row">
+          <label style="gap:8px;">
+            <input id="seedLock" type="checkbox" checked/>
+            Seed lock (same seed = cleaner A/B)
+          </label>
+          <input id="seed" type="number" min="1" max="999999" value="21991" style="width:120px;"/>
+        </div>
+
+        <div class="row">
+          <label style="gap:8px;">
+            <input id="poster" type="checkbox" checked/>
+            Poster Mode (tames extremes)
+          </label>
+          <label style="gap:8px;">
+            <input id="noRegen" type="checkbox" checked/>
+            NoRegen ON
+          </label>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="row">
+          <button class="btn" id="runBtn">Run simulation</button>
+          <button class="btn ghost" id="resetBtn">Reset defaults</button>
+          <button class="btn secondary" id="sweepBtn">QuickSweep ×10</button>
+        </div>
+
+        <div class="row">
+          <button class="btn ghost" id="presetPhone">Preset: Realistic phone</button>
+          <button class="btn ghost" id="presetContrast">Preset: QDS contrast</button>
+          <button class="btn ghost" id="presetChaos">Preset: Chaos</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="row">
+          <button class="btn ghost" id="copyBtn">Copy summary</button>
+          <button class="btn ghost" id="exportLastBtn">Export last JSON</button>
+          <button class="btn ghost" id="exportHistBtn">Export full history</button>
+          <button class="btn ghost warn" id="clearHistBtn">Clear history</button>
+        </div>
+
+        <div class="hint">
+          Model: capacity starts at 100%.
+          Per-cycle loss uses a gentle composite:
+          <span class="mono">ΔC(t) ≈ [k₁·√t + k₂·t] · S · F(T) · F(DoD)</span>.
+          White: S i.i.d.  |  QDS: S is AR(1) correlated with ρ.
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Results</h3>
+
+        <div class="kpi">
+          <div class="kbox">
+            <div class="label">White mean cycles to threshold</div>
+            <div class="big" id="wMean">—</div>
+            <div class="small mono" id="wP">P10/P50/P90 —</div>
+          </div>
+          <div class="kbox">
+            <div class="label">QDS mean cycles to threshold</div>
+            <div class="big" id="qMean">—</div>
+            <div class="small mono" id="qP">P10/P50/P90 —</div>
+          </div>
+          <div class="kbox">
+            <div class="label">White σ</div>
+            <div class="big" id="wSd">—</div>
+            <div class="small">Independent operating stress</div>
+          </div>
+          <div class="kbox">
+            <div class="label">QDS σ</div>
+            <div class="big" id="qSd">—</div>
+            <div class="small">AR(1) correlated stress</div>
+          </div>
+          <div class="kbox">
+            <div class="label">Relative change (QDS vs White)</div>
+            <div class="big" id="delta">—</div>
+            <div class="small mono" id="modeLine">—</div>
+          </div>
+          <div class="kbox">
+            <div class="label">Runs per model</div>
+            <div class="big" id="runsLine">—</div>
+            <div class="small">Monte Carlo per model</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <h3>Cycles-to-threshold distribution</h3>
+        <canvas id="histCanvas"></canvas>
+        <div class="hint">Histogram is binned for mobile speed. Expect subtle mean shifts, stronger tail/spread effects at higher ρ and amp.</div>
+
+        <div class="divider"></div>
+
+        <h3>Sample capacity traces (1 each)</h3>
+        <canvas id="traceCanvas" class="small-canvas"></canvas>
+        <div class="hint" id="traceNote">—</div>
+
+        <div class="divider"></div>
+
+        <h3>Recent run history (local)</h3>
+        <div class="history" id="historyBox"></div>
+        <div class="hint">Stored on-device via localStorage. Dedupe active: identical settings replace newest entry instead of spamming.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== COACH TAB ===================== -->
+  <section id="coach" class="tab">
+    <div class="grid">
+      <div class="card">
+        <h3>Battery Coach — Quick Advice</h3>
+        <div class="hint">
+          This is a friendly ruleset mapping your lab inputs to practical battery care.
+          It’s not medical or manufacturer policy — just sensible heuristics.
+        </div>
+
+        <div class="divider"></div>
+        <div class="row">
+          <button class="btn" id="coachSync">Sync from Lab sliders</button>
+          <button class="btn ghost" id="coachDemoGood">Demo: Good habits</button>
+          <button class="btn ghost" id="coachDemoBad">Demo: Battery torture</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <label>Temperature (°C) <span class="val mono" id="cTVal"></span></label>
+        <input id="cTemp" type="range" min="5" max="60" step="1" value="25"/>
+
+        <label>DoD window</label>
+        <select id="cDoD">
+          <option value="20-80" selected>20–80</option>
+          <option value="40-80">40–80</option>
+          <option value="10-90">10–90</option>
+          <option value="0-100">0–100</option>
+          <option value="60-100">60–100</option>
+        </select>
+
+        <label>Fast-charge intensity (toy) <span class="val mono" id="cFastVal"></span></label>
+        <input id="cFast" type="range" min="0" max="10" step="1" value="4"/>
+
+        <label>Daily full-charge habit (0–10) <span class="val mono" id="cFullVal"></span></label>
+        <input id="cFull" type="range" min="0" max="10" step="1" value="3"/>
+
+        <div class="divider"></div>
+        <button class="btn secondary" id="coachScoreBtn">Compute Care Score</button>
+
+        <div class="divider"></div>
+        <div class="kbox">
+          <div class="label">Care score (toy index)</div>
+          <div class="big" id="careScore">—</div>
+          <div class="small" id="careExplain">—</div>
+        </div>
+
+      </div>
+
+      <div class="card">
+        <h3>What this coach prioritises</h3>
+        <ul class="hint">
+          <li>Lower average temperature where practical.</li>
+          <li>Avoid sitting at 100% for long stretches.</li>
+          <li>Prefer mid-band charging (roughly 20–80) for daily life.</li>
+          <li>Fast charging is fine when needed — just don’t bake the phone.</li>
+          <li>Heat + high DoD + high charge stress stacks multiplicatively.</li>
+        </ul>
+
+        <div class="divider"></div>
+        <h3>Quick rules of thumb</h3>
+        <div id="coachRules" class="history"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== AUTOBENCH TAB ===================== -->
+  <section id="bench" class="tab">
+    <div class="grid">
+      <div class="card">
+        <h3>AutoBench Viewer (offline)</h3>
+        <div class="hint">
+          Browser security can’t auto-read your Termux folders.
+          So this viewer supports:
+          <b>paste JSON</b> or <b>import a .json file</b>.
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="row">
+          <input type="file" id="benchFile" accept=".json"/>
+          <button class="btn ghost" id="benchLoadSample">Load sample format</button>
+          <button class="btn secondary" id="benchParseBtn">Parse JSON</button>
+          <button class="btn ghost warn" id="benchClearBtn">Clear</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <textarea id="benchText" class="mono" placeholder='Paste your AutoBench JSON here...'></textarea>
+
+        <div class="divider"></div>
+        <div class="kpi">
+          <div class="kbox">
+            <div class="label">Scenarios found</div>
+            <div class="big" id="bCount">—</div>
+          </div>
+          <div class="kbox">
+            <div class="label">Mean Δ (QDS vs White)</div>
+            <div class="big" id="bMeanDelta">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Parsed scenarios</h3>
+        <div id="benchList" class="history"></div>
+        <div class="hint">
+          Tip: your Termux logs (e.g. QDS_BATTERY_LOGS/*.json) can be opened in a file manager
+          and copied into this box.
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* =========================
+   QDS Battery Hub v9.5
+   Offline, phone-safe
+   ========================= */
+
+/* ---------- tiny seeded RNG ---------- */
+function mulberry32(a){
+  return function(){
+    let t = a += 0x6D2B79F5;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  }
+}
+function randn(rng){
+  // Box-Muller
+  let u=0, v=0;
+  while(u===0) u=rng();
+  while(v===0) v=rng();
+  return Math.sqrt(-2*Math.log(u)) * Math.cos(2*Math.PI*v);
+}
+function clamp(x, lo, hi){ return Math.max(lo, Math.min(hi, x)); }
+
+/* ---------- model scalers (gentle, not pretend-precise) ---------- */
+function tempFactor(T){
+  // 25°C baseline. Mild acceleration outside.
+  // This is a toy: keep it smooth and conservative.
+  const d = T - 25;
+  const f = 1 + (d/25)*0.35;    // ~+35% at 50°C, ~-14% at 15°C
+  return clamp(f, 0.75, 1.7);
+}
+function dodFactor(dodStr){
+  // Smaller DoD window = less mechanical/chemical strain (toy)
+  const map = {
+    "40-80": 0.85,
+    "20-80": 0.92,
+    "10-90": 1.00,
+    "0-100": 1.12,
+    "60-100": 1.18
+  };
+  return map[dodStr] ?? 1.0;
+}
+
+/* ---------- stress generator ---------- */
+function makeStressSeries({ampPct, rho, cycles, rng, poster, noRegen}){
+  const amp = ampPct/100; // convert to fractional
+  const series = new Float32Array(cycles);
+  let x = 0;
+  const epsScale = amp * Math.sqrt(Math.max(1e-6, 1 - rho*rho));
+  for(let t=0; t<cycles; t++){
+    const eps = randn(rng) * epsScale;
+    x = rho*x + eps;
+
+    // stress multiplier around 1
+    let s = 1 + x;
+
+    if(noRegen){
+      // Prevent ultra-lucky negative streaks from "healing" the toy too much
+      // (i.e., don't allow stress to go unrealistically below mild relief)
+      s = Math.max(s, 0.85);
+    }
+
+    if(poster){
+      // Tame extremes to keep demos honest
+      s = clamp(s, 0.7, 1.6);
+    } else {
+      s = clamp(s, 0.4, 2.2);
+    }
+
+    series[t]=s;
+  }
+  return series;
+}
+
+/* ---------- capacity fade simulator ---------- */
+function simulateModel(params, modelKind){
+  const {
+    k1, k2, ampPct, rho, T, DoD, thr,
+    nCells, maxCycles, seedBase, poster, noRegen, seedLock
+  } = params;
+
+  const cyclesToFail = new Array(nCells);
+  const trace = { cap: [], failAt: null };
+
+  // baseline factors
+  const fT = tempFactor(T);
+  const fD = dodFactor(DoD);
+
+  // per-cell variability (tiny)
+  const cellJitter = 0.06; // 6% SD
+
+  for(let i=0; i<nCells; i++){
+    const seed = seedLock
+      ? (seedBase + i*101 + (modelKind==="QDS"? 0 : 0))
+      : (seedBase + i*101 + (modelKind==="QDS"? 7777 : 3333));
+
+    const rng = mulberry32(seed|0);
+
+    const k1i = k1 * (1 + randn(rng)*cellJitter);
+    const k2i = k2 * (1 + randn(rng)*cellJitter);
+
+    const useRho = (modelKind==="QDS") ? rho : 0.0;
+    const stress = makeStressSeries({
+      ampPct, rho: useRho, cycles: maxCycles,
+      rng, poster, noRegen
+    });
+
+    let cap = 1.0; // 100%
+    let failAt = maxCycles;
+
+    for(let t=1; t<=maxCycles; t++){
+      // composite fade per cycle (toy)
+      // small positive drift with time
+      const baseLoss = (k1i*Math.sqrt(t) + k2i*t);
+
+      // stress + environment
+      const loss = baseLoss * stress[t-1] * fT * fD;
+
+      cap -= loss;
+
+      if(cap*100 <= thr){
+        failAt = t;
+        break;
+      }
+    }
+
+    cyclesToFail[i] = failAt;
+
+    // store a representative trace (first cell)
+    if(i===0){
+      cap = 1.0;
+      trace.cap.length = 0;
+      trace.failAt = null;
+
+      const rng2 = mulberry32(seed|0);
+      const k1j = k1 * (1 + randn(rng2)*cellJitter);
+      const k2j = k2 * (1 + randn(rng2)*cellJitter);
+      const stress2 = makeStressSeries({
+        ampPct, rho: useRho, cycles: maxCycles,
+        rng: rng2, poster, noRegen
+      });
+
+      for(let t=1; t<=maxCycles; t++){
+        const baseLoss = (k1j*Math.sqrt(t) + k2j*t);
+        const loss = baseLoss * stress2[t-1] * fT * fD;
+        cap -= loss;
+        trace.cap.push(Math.max(0, cap*100));
+        if(trace.failAt===null && cap*100 <= thr){
+          trace.failAt = t;
+        }
+        if(t>1800 && trace.cap.length>1800) break; // mobile sanity
+      }
+    }
+  }
+
+  return { cyclesToFail, trace };
+}
+
+/* ---------- stats helpers ---------- */
+function mean(arr){
+  let s=0; for(const x of arr) s+=x; return s/arr.length;
+}
+function std(arr, mu){
+  let s=0; for(const x of arr){ const d=x-mu; s+=d*d; }
+  return Math.sqrt(s/(arr.length||1));
+}
+function quantile(sorted, q){
+  const n = sorted.length;
+  if(n===0) return 0;
+  const pos = (n-1)*q;
+  const lo = Math.floor(pos), hi = Math.ceil(pos);
+  if(lo===hi) return sorted[lo];
+  const t = pos-lo;
+  return sorted[lo]*(1-t)+sorted[hi]*t;
+}
+
+/* ---------- history store with dedupe ---------- */
+const HIST_KEY = "QDS_BATT_HISTORY_V9_5";
+
+function sameRun(a,b){
+  const keys=["k1","k2","ampPct","rho","T","DoD","thr","nCells","maxCycles","poster","noRegen"];
+  return keys.every(k => String(a[k])===String(b[k]));
+}
+function loadHist(){
+  try{ return JSON.parse(localStorage.getItem(HIST_KEY)||"[]"); }
+  catch(e){ return []; }
+}
+function saveHist(hist){
+  localStorage.setItem(HIST_KEY, JSON.stringify(hist.slice(0,200)));
+}
+function addRunToHist(run){
+  const hist = loadHist();
+  if(hist.length && sameRun(hist[0], run)){
+    hist[0]=run;
+  } else {
+    hist.unshift(run);
+  }
+  saveHist(hist);
+  renderHistory();
+}
+
+/* ---------- UI wiring ---------- */
+const $ = id => document.getElementById(id);
+
+const controls = {
+  k1:$("k1"), k2:$("k2"), amp:$("amp"), rho:$("rho"),
+  temp:$("temp"), thr:$("thr"), n:$("n"), maxCycles:$("maxCycles"),
+  dod:$("dod"), seed:$("seed"),
+  seedLock:$("seedLock"), poster:$("poster"), noRegen:$("noRegen")
+};
+
+function syncVals(){
+  $("k1Val").textContent = Number(controls.k1.value).toFixed(4);
+  $("k2Val").textContent = Number(controls.k2.value).toFixed(4);
+  $("ampVal").textContent = Number(controls.amp.value).toFixed(2)+"%";
+  $("rhoVal").textContent = Number(controls.rho.value).toFixed(2);
+  $("tVal").textContent = Number(controls.temp.value)+"°C";
+  $("thrVal").textContent = Number(controls.thr.value)+"%";
+  $("nVal").textContent = Number(controls.n.value);
+  $("maxVal").textContent = Number(controls.maxCycles.value);
+}
+Object.values(controls).forEach(el=>{
+  if(el && el.tagName==="INPUT" && el.type==="range"){
+    el.addEventListener("input", syncVals);
+  }
+});
+controls.dod.addEventListener("change", syncVals);
+syncVals();
+
+/* ---------- charts ---------- */
+function drawHistogram(canvas, whiteArr, qdsArr){
+  const ctx = canvas.getContext("2d");
+  const w = canvas.width = canvas.clientWidth*devicePixelRatio;
+  const h = canvas.height = canvas.clientHeight*devicePixelRatio;
+  ctx.clearRect(0,0,w,h);
+
+  const all = whiteArr.concat(qdsArr);
+  const max = Math.max(...all);
+  const min = Math.min(...all);
+  const bins = 28;
+
+  const binW = (max-min)/bins || 1;
+  const countW = new Array(bins).fill(0);
+  const countQ = new Array(bins).fill(0);
+
+  for(const x of whiteArr){
+    const b = clamp(Math.floor((x-min)/binW), 0, bins-1);
+    countW[b]++;
+  }
+  for(const x of qdsArr){
+    const b = clamp(Math.floor((x-min)/binW), 0, bins-1);
+    countQ[b]++;
+  }
+  const peak = Math.max(...countW, ...countQ) || 1;
+
+  // axes baseline
+  ctx.globalAlpha = 0.9;
+  ctx.lineWidth = 1*devicePixelRatio;
+
+  const padL = 28*devicePixelRatio, padR = 10*devicePixelRatio;
+  const padT = 8*devicePixelRatio, padB = 24*devicePixelRatio;
+
+  const plotW = w - padL - padR;
+  const plotH = h - padT - padB;
+
+  // subtle grid
+  ctx.strokeStyle = "rgba(180,0,255,0.18)";
+  for(let i=0; i<=4; i++){
+    const y = padT + plotH*(i/4);
+    ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(padL+plotW,y); ctx.stroke();
+  }
+
+  // bars
+  const barGap = 1*devicePixelRatio;
+  const barW = plotW/bins;
+
+  for(let i=0; i<bins; i++){
+    const x0 = padL + i*barW;
+    const hw = (countW[i]/peak)*plotH;
+    const hq = (countQ[i]/peak)*plotH;
+
+    // White (purple tint)
+    ctx.fillStyle = "rgba(180,0,255,0.35)";
+    ctx.fillRect(x0+barGap, padT+plotH-hw, barW*0.48-barGap, hw);
+
+    // QDS (green tint)
+    ctx.fillStyle = "rgba(57,255,20,0.35)";
+    ctx.fillRect(x0+barW*0.5, padT+plotH-hq, barW*0.48-barGap, hq);
+  }
+
+  // labels
+  ctx.fillStyle = "rgba(233,230,255,0.75)";
+  ctx.font = `${10*devicePixelRatio}px system-ui`;
+  ctx.fillText("cycles", 4*devicePixelRatio, h-6*devicePixelRatio);
+}
+
+function drawTraces(canvas, whiteTrace, qdsTrace, thr){
+  const ctx = canvas.getContext("2d");
+  const w = canvas.width = canvas.clientWidth*devicePixelRatio;
+  const h = canvas.height = canvas.clientHeight*devicePixelRatio;
+  ctx.clearRect(0,0,w,h);
+
+  const pad = 10*devicePixelRatio;
+  const plotW = w-2*pad, plotH = h-2*pad;
+
+  function line(trace, color){
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.8*devicePixelRatio;
+    ctx.beginPath();
+    const n = trace.length;
+    for(let i=0; i<n; i++){
+      const x = pad + (i/(n-1||1))*plotW;
+      const y = pad + (1 - trace[i]/100)*plotH;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+
+  // threshold line
+  const yThr = pad + (1 - thr/100)*plotH;
+  ctx.strokeStyle = "rgba(255,77,154,0.45)";
+  ctx.lineWidth = 1*devicePixelRatio;
+  ctx.setLineDash([4*devicePixelRatio, 4*devicePixelRatio]);
+  ctx.beginPath(); ctx.moveTo(pad, yThr); ctx.lineTo(pad+plotW, yThr); ctx.stroke();
+  ctx.setLineDash([]);
+
+  line(whiteTrace, "rgba(180,0,255,0.85)");
+  line(qdsTrace, "rgba(57,255,20,0.85)");
+}
+
+/* ---------- core run ---------- */
+let lastRun = null;
+
+function readParams(){
+  return {
+    k1: Number(controls.k1.value),
+    k2: Number(controls.k2.value),
+    ampPct: Number(controls.amp.value),
+    rho: Number(controls.rho.value),
+    T: Number(controls.temp.value),
+    DoD: String(controls.dod.value),
+    thr: Number(controls.thr.value),
+    nCells: Number(controls.n.value),
+    maxCycles: Number(controls.maxCycles.value),
+    seedBase: Number(controls.seed.value)||12345,
+    seedLock: !!controls.seedLock.checked,
+    poster: !!controls.poster.checked,
+    noRegen: !!controls.noRegen.checked
+  };
+}
+
+function runOnce(tag="RUN"){
+  const p = readParams();
+  const ts = new Date();
+
+  const white = simulateModel(p, "WHITE");
+  const qds  = simulateModel(p, "QDS");
+
+  const wArr = white.cyclesToFail;
+  const qArr = qds.cyclesToFail;
+
+  const wMu = mean(wArr);
+  const qMu = mean(qArr);
+  const wSd = std(wArr, wMu);
+  const qSd = std(qArr, qMu);
+
+  const wSorted = [...wArr].sort((a,b)=>a-b);
+  const qSorted = [...qArr].sort((a,b)=>a-b);
+
+  const wP10 = quantile(wSorted, 0.10);
+  const wP50 = quantile(wSorted, 0.50);
+  const wP90 = quantile(wSorted, 0.90);
+
+  const qP10 = quantile(qSorted, 0.10);
+  const qP50 = quantile(qSorted, 0.50);
+  const qP90 = quantile(qSorted, 0.90);
+
+  const deltaPct = ((qMu - wMu) / Math.max(1e-9, wMu))*100;
+
+  lastRun = {
+    tag,
+    time: ts.toISOString(),
+    timeLocal: ts.toLocaleString(),
+    ...p,
+    white: { mean:wMu, sd:wSd, p10:wP10, p50:wP50, p90:wP90 },
+    qds:   { mean:qMu, sd:qSd, p10:qP10, p50:qP50, p90:qP90 },
+    deltaPct,
+    notes: "Semi-empirical toy: k1*sqrt(t) + k2*t with temp/DoD multipliers. White vs AR(1) stress."
+  };
+
+  // update UI
+  $("wMean").textContent = wMu.toFixed(1);
+  $("qMean").textContent = qMu.toFixed(1);
+  $("wSd").textContent   = wSd.toFixed(1);
+  $("qSd").textContent   = qSd.toFixed(1);
+
+  $("wP").textContent = `P10/P50/P90 ${wP10.toFixed(0)} / ${wP50.toFixed(0)} / ${wP90.toFixed(0)}`;
+  $("qP").textContent = `P10/P50/P90 ${qP10.toFixed(0)} / ${qP50.toFixed(0)} / ${qP90.toFixed(0)}`;
+
+  const dTxt = (deltaPct>=0?"+":"") + deltaPct.toFixed(2) + "%";
+  $("delta").textContent = dTxt;
+  $("delta").className = "big " + (Math.abs(deltaPct) < 0.6 ? "" : (deltaPct>0 ? "good":"warn"));
+
+  $("runsLine").textContent = `${p.nCells} per model`;
+  $("modeLine").textContent =
+    `ρ=${p.rho.toFixed(2)} · T=${p.T}°C · DoD=${p.DoD} · Poster=${p.poster} · NoRegen=${p.noRegen}`;
+
+  drawHistogram($("histCanvas"), wArr, qArr);
+
+  const wTrace = white.trace.cap.slice(0, 800);
+  const qTrace = qds.trace.cap.slice(0, 800);
+  drawTraces($("traceCanvas"), wTrace, qTrace, p.thr);
+
+  const wFail = white.trace.failAt ?? "—";
+  const qFail = qds.trace.failAt ?? "—";
+  $("traceNote").textContent =
+    `Sample cell traces. White fail≈${wFail} · QDS fail≈${qFail} (if within displayed window).`;
+
+  addRunToHist(lastRun);
+  return lastRun;
+}
+
+/* ---------- QuickSweep ×10 ---------- */
+function quickSweep(){
+  const baseSeed = Number(controls.seed.value)||12345;
+  const deltas = [];
+  const oldLock = controls.seedLock.checked;
+  controls.seedLock.checked = true; // enforce fairness
+
+  for(let i=0; i<10; i++){
+    controls.seed.value = String(baseSeed + i*999);
+    const r = runOnce("SWEEP");
+    deltas.push(r.deltaPct);
+  }
+  controls.seed.value = String(baseSeed);
+  controls.seedLock.checked = oldLock;
+  syncVals();
+
+  const mu = mean(deltas);
+  alert(`QuickSweep ×10 complete.\nMean Δ = ${(mu>=0?"+":"")}${mu.toFixed(2)}%\n(Seed-locked A/B)`);
+}
+
+/* ---------- presets ---------- */
+function presetPhone(){
+  controls.k1.value = 0.0018;
+  controls.k2.value = 0.0004;
+  controls.amp.value = 2.4;
+  controls.rho.value = 0.60;
+  controls.temp.value = 25;
+  controls.dod.value = "20-80";
+  controls.thr.value = 80;
+  controls.n.value = 1200;
+  controls.maxCycles.value = 2500;
+  controls.poster.checked = true;
+  controls.noRegen.checked = true;
+  controls.seedLock.checked = true;
+  syncVals();
+}
+function presetContrast(){
+  presetPhone();
+  controls.rho.value = 0.70;
+  controls.amp.value = 2.4;
+  syncVals();
+}
+function presetChaos(){
+  controls.k1.value = 0.0022;
+  controls.k2.value = 0.0005;
+  controls.amp.value = 3.2;
+  controls.rho.value = 0.99;
+  controls.temp.value = 40;
+  controls.dod.value = "0-100";
+  controls.thr.value = 80;
+  controls.n.value = 600;
+  controls.maxCycles.value = 1800;
+  controls.poster.checked = false;
+  controls.noRegen.checked = true;
+  controls.seedLock.checked = true;
+  syncVals();
+}
+
+/* ---------- history render ---------- */
+function renderHistory(){
+  const box = $("historyBox");
+  const hist = loadHist();
+  box.innerHTML = "";
+  if(hist.length===0){
+    const d = document.createElement("div");
+    d.className="hitem hint";
+    d.textContent="No runs yet. Smash Run simulation.";
+    box.appendChild(d);
+    return;
+  }
+  const show = hist.slice(0,6);
+  for(const h of show){
+    const div = document.createElement("div");
+    div.className = "hitem";
+    const d = h.deltaPct ?? 0;
+    const dTxt = (d>=0?"+":"") + Number(d).toFixed(2) + "%";
+    const cls = Math.abs(d)<0.6 ? "" : (d>0 ? "good":"warn");
+    div.innerHTML = `
+      <span class="tag">${h.tag||"RUN"}</span>
+      <b class="mono">${h.timeLocal||""}</b><br/>
+      <span class="mono">
+      k1=${Number(h.k1).toFixed(4)} • k2=${Number(h.k2).toFixed(4)} •
+      amp=${Number(h.ampPct).toFixed(2)}% • ρ=${Number(h.rho).toFixed(2)} •
+      T=${h.T}°C • DoD=${h.DoD} • thr=${h.thr}% • n=${h.nCells}
+      </span><br/>
+      <span class="mono">
+        white μ=${Number(h.white?.mean||0).toFixed(2)} σ=${Number(h.white?.sd||0).toFixed(2)} •
+        QDS μ=${Number(h.qds?.mean||0).toFixed(2)} σ=${Number(h.qds?.sd||0).toFixed(2)} •
+        <b class="${cls}">Δ=${dTxt}</b>
+      </span>
+    `;
+    box.appendChild(div);
+  }
+}
+renderHistory();
+
+/* ---------- export helpers ---------- */
+function downloadJSON(obj, name){
+  const blob = new Blob([JSON.stringify(obj, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+function copySummary(){
+  if(!lastRun){ alert("Run a simulation first."); return; }
+  const r = lastRun;
+  const text =
+`${r.tag||"RUN"} ${r.timeLocal}
+k1=${r.k1.toFixed(4)} • k2=${r.k2.toFixed(4)} • amp=${r.ampPct.toFixed(2)}% • ρ=${r.rho.toFixed(2)}
+T=${r.T}°C • DoD=${r.DoD} • thr=${r.thr}% • n=${r.nCells}
+white μ=${r.white.mean.toFixed(2)} σ=${r.white.sd.toFixed(2)}
+QDS   μ=${r.qds.mean.toFixed(2)} σ=${r.qds.sd.toFixed(2)}
+Δ=${(r.deltaPct>=0?"+":"")}${r.deltaPct.toFixed(2)}%
+Poster=${r.poster} • NoRegen=${r.noRegen} • SeedLock=${r.seedLock}`;
+  navigator.clipboard?.writeText(text).then(()=> {
+    alert("Summary copied.");
+  }).catch(()=> alert(text));
+}
+
+/* ---------- buttons ---------- */
+$("runBtn").addEventListener("click", ()=>runOnce("RUN"));
+$("resetBtn").addEventListener("click", ()=>{ presetPhone(); });
+$("sweepBtn").addEventListener("click", quickSweep);
+
+$("presetPhone").addEventListener("click", presetPhone);
+$("presetContrast").addEventListener("click", presetContrast);
+$("presetChaos").addEventListener("click", presetChaos);
+
+$("copyBtn").addEventListener("click", copySummary);
+$("exportLastBtn").addEventListener("click", ()=>{
+  if(!lastRun){ alert("No last run yet."); return; }
+  downloadJSON(lastRun, `QDS_BatteryHub_v9.5_last_${Date.now()}.json`);
+});
+$("exportHistBtn").addEventListener("click", ()=>{
+  const hist = loadHist();
+  downloadJSON(hist, `QDS_BatteryHub_v9.5_history_${Date.now()}.json`);
+});
+$("clearHistBtn").addEventListener("click", ()=>{
+  if(confirm("Clear local history?")){
+    localStorage.removeItem(HIST_KEY);
+    renderHistory();
+  }
+});
+
+/* ---------- tabs ---------- */
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+    btn.classList.add("active");
+    $(btn.dataset.tab).classList.add("active");
+  });
+});
+
+/* =========================
+   Battery Coach
+   ========================= */
+const cTemp = $("cTemp"), cDoD=$("cDoD"), cFast=$("cFast"), cFull=$("cFull");
+function syncCoachVals(){
+  $("cTVal").textContent = Number(cTemp.value)+"°C";
+  $("cFastVal").textContent = Number(cFast.value);
+  $("cFullVal").textContent = Number(cFull.value);
+}
+[cTemp,cFast,cFull].forEach(el=>el.addEventListener("input", syncCoachVals));
+cDoD.addEventListener("change", syncCoachVals);
+syncCoachVals();
+
+function coachRules(){
+  const T = Number(cTemp.value);
+  const DoD = cDoD.value;
+  const fast = Number(cFast.value);
+  const full = Number(cFull.value);
+
+  const rules = [];
+  if(T>=40) rules.push("Heat alert: avoid gaming/fast-charge while hot.");
+  else if(T<=10) rules.push("Cold zone: charging slowly is kinder.");
+  else rules.push("Temp zone looks friendly.");
+
+  if(DoD==="20-80" || DoD==="40-80") rules.push("Mid-band DoD is a solid daily default.");
+  if(DoD==="0-100") rules.push("Full-depth cycling increases wear rate (toy + real-world trend).");
+  if(DoD==="60-100") rules.push("High SoC window + heat is a common wear combo.");
+
+  if(fast>=8) rules.push("Fast-charge heavy: use when needed, not as a lifestyle.");
+  else if(fast<=3) rules.push("Fast-charge modest: good long-term posture.");
+
+  if(full>=7) rules.push("Sitting at 100% often: consider 80–90% cap if your phone supports it.");
+  else if(full<=3) rules.push("Low 100%-habit: strong care pattern.");
+
+  return rules;
+}
+
+function computeCareScore(){
+  const T = Number(cTemp.value);
+  const DoD = cDoD.value;
+  const fast = Number(cFast.value);
+  const full = Number(cFull.value);
+
+  // score out of 100
+  let score = 100;
+
+  // temperature penalties
+  if(T>25) score -= (T-25)*1.2;  // gentle
+  if(T>40) score -= (T-40)*1.8;  // extra heat penalty
+  if(T<10) score -= (10-T)*0.6;  // cold inconvenience (minor)
+
+  // DoD window
+  const dF = dodFactor(DoD);
+  score -= (dF-0.85)*80; // map to penalty
+
+  // fast/full habits
+  score -= fast*2.2;
+  score -= full*2.6;
+
+  score = clamp(score, 0, 100);
+
+  $("careScore").textContent = Math.round(score);
+  $("careExplain").textContent =
+    score>=85 ? "Green zone: gentle thermal + DoD habits." :
+    score>=65 ? "Good zone: a few easy wins remain." :
+    score>=45 ? "Yellow zone: heat/DoD habits likely dominate wear." :
+                "Red zone: this looks like deliberate battery torture 😅";
+
+  const rb = $("coachRules");
+  rb.innerHTML = "";
+  for(const r of coachRules()){
+    const div = document.createElement("div");
+    div.className="hitem hint";
+    div.textContent = "• " + r;
+    rb.appendChild(div);
+  }
+}
+
+$("coachScoreBtn").addEventListener("click", computeCareScore);
+$("coachSync").addEventListener("click", ()=>{
+  cTemp.value = controls.temp.value;
+  cDoD.value = controls.dod.value;
+  cFast.value = 4;
+  cFull.value = 3;
+  syncCoachVals();
+  computeCareScore();
+});
+$("coachDemoGood").addEventListener("click", ()=>{
+  cTemp.value = 22; cDoD.value="40-80"; cFast.value=2; cFull.value=2;
+  syncCoachVals(); computeCareScore();
+});
+$("coachDemoBad").addEventListener("click", ()=>{
+  cTemp.value = 52; cDoD.value="0-100"; cFast.value=9; cFull.value=9;
+  syncCoachVals(); computeCareScore();
+});
+computeCareScore();
+
+/* =========================
+   AutoBench Viewer
+   ========================= */
+$("benchLoadSample").addEventListener("click", ()=>{
+  const sample = {
+    tool:"QDS_AutoBench",
+    version:"9.1-PRO",
+    created:new Date().toISOString(),
+    scenarios:[
+      {tag:"Ladder D", base:1.2, amp:1.8, p:0.25, thr:30, n:1200,
+       white:{mean:56.7, sd:5.9}, qds:{mean:58.8, sd:6.4}, deltaPct:3.4},
+      {tag:"Stability", seed:222, base:1.2, amp:1.8, p:0.25, thr:50, n:1200,
+       white:{mean:35.6, sd:5.0}, qds:{mean:36.4, sd:5.3}, deltaPct:2.31}
+    ]
+  };
+  $("benchText").value = JSON.stringify(sample, null, 2);
+});
+
+$("benchClearBtn").addEventListener("click", ()=>{
+  $("benchText").value="";
+  $("bCount").textContent="—";
+  $("bMeanDelta").textContent="—";
+  $("benchList").innerHTML="";
+});
+
+$("benchFile").addEventListener("change", (e)=>{
+  const file = e.target.files?.[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => $("benchText").value = String(reader.result||"");
+  reader.readAsText(file);
+});
+
+$("benchParseBtn").addEventListener("click", ()=>{
+  let obj=null;
+  try{
+    obj = JSON.parse($("benchText").value||"{}");
+  }catch(e){
+    alert("JSON parse error.");
+    return;
+  }
+  const scenarios = obj.scenarios || obj.results || [];
+  $("bCount").textContent = scenarios.length;
+
+  const deltas = [];
+  const list = $("benchList");
+  list.innerHTML = "";
+
+  for(const s of scenarios){
+    const d = Number(s.deltaPct ?? s.delta ?? 0);
+    deltas.push(d);
+
+    const div = document.createElement("div");
+    div.className="hitem";
+    const dTxt = (d>=0?"+":"") + d.toFixed(2) + "%";
+    div.innerHTML = `
+      <span class="tag">${s.tag||"Scenario"}</span>
+      <span class="mono">
+        white μ=${Number(s.white?.mean ?? s.white_mu ?? 0).toFixed(2)} σ=${Number(s.white?.sd ?? s.white_sigma ?? 0).toFixed(2)} •
+        QDS μ=${Number(s.qds?.mean ?? s.qds_mu ?? 0).toFixed(2)} σ=${Number(s.qds?.sd ?? s.qds_sigma ?? 0).toFixed(2)} •
+        <b>${dTxt}</b>
+      </span>
+    `;
+    list.appendChild(div);
+  }
+
+  const mu = deltas.length ? mean(deltas) : 0;
+  $("bMeanDelta").textContent = (mu>=0?"+":"") + mu.toFixed(2) + "%";
+});
+
+/* ---------- boot default preset ---------- */
+presetPhone();
+runOnce("POSTER-SAFE");
+</script>
+</body>
+</html>
