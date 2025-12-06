@@ -1,0 +1,13 @@
+# Logs / scratch
+www/QDS_logs/
+www/QDS_BATTERY_LOGS/
+www/QDS_Battery_Lab/
+www/*.bak_*
+www/*backup*
+www/*_logs*
+
+# Big bundles unless deliberately released
+www/*.zip
+
+# Python tools (optional - remove if you want them tracked)
+www/*.py
