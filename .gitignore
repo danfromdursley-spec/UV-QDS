@@ -26,3 +26,23 @@ www/*.py
 
 # Generated lists (if treated as build output)
 www/recent_releases.json
+
+# ---- QDS sanity shield ----
+# logs / caches
+*.log
+*.tmp
+*.swp
+*~ 
+.DS_Store
+
+# backups / archives
+*_backup_*
+*.bak_*
+*.zip
+*.tar
+*.tar.gz
+*.7z
+
+# big rip folders / generated outputs (adjust names to yours)
+news_rips/
+**/news_rips/
