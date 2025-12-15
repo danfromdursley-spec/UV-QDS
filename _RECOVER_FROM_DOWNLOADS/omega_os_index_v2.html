@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ω-OS Index v2 — Shed Edition</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #050714;
+      --bg-soft: #090c1b;
+      --card: #0f1324;
+      --card-soft: #161a30;
+      --accent: #38f9a5;
+      --accent-soft: rgba(56,249,165,0.1);
+      --accent-gold: #f2d37a;
+      --text-main: #f7f7ff;
+      --text-soft: #a5b1d8;
+      --border-soft: #232846;
+      --shadow-soft: 0 18px 40px rgba(0,0,0,0.6);
+      --radius-lg: 18px;
+      --radius-pill: 999px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 16px 12px 40px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #141a35 0, #050714 48%, #020309 100%);
+      color: var(--text-main);
+    }
+
+    .shell {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 1.7rem;
+      margin: 0 0 4px;
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: var(--text-soft);
+      margin-bottom: 10px;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .tag {
+      font-size: 0.7rem;
+      padding: 4px 9px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(143,167,255,0.4);
+      color: #b7c3ff;
+      background: linear-gradient(120deg, rgba(51,65,145,0.6), rgba(12,18,60,0.8));
+    }
+
+    .tag.green {
+      border-color: rgba(56,249,165,0.6);
+      color: var(--accent);
+      background: radial-gradient(circle at top left, rgba(56,249,165,0.18), rgba(8,20,24,0.85));
+    }
+
+    .tag.gold {
+      border-color: rgba(242,211,122,0.7);
+      color: var(--accent-gold);
+      background: radial-gradient(circle at top left, rgba(242,211,122,0.18), rgba(28,20,8,0.92));
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .pill-link {
+      font-size: 0.8rem;
+      padding: 7px 13px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(120,140,230,0.7);
+      color: #dadfff;
+      text-decoration: none;
+      background: linear-gradient(120deg, rgba(18,28,80,0.95), rgba(7,16,40,0.95));
+      box-shadow: 0 0 0 1px rgba(7,10,30,0.9), 0 12px 25px rgba(0,0,0,0.55);
+    }
+
+    .pill-link.green {
+      border-color: rgba(56,249,165,0.8);
+      color: #eafff7;
+      background: linear-gradient(120deg, rgba(7,40,33,0.98), rgba(4,18,13,0.96));
+    }
+
+    .pill-link:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 36px rgba(0,0,0,0.7);
+    }
+
+    .section {
+      margin-top: 20px;
+      padding: 14px 10px 4px;
+      border-radius: 20px;
+      border: 1px solid rgba(40,52,120,0.7);
+      background: linear-gradient(145deg, rgba(7,10,32,0.96), rgba(6,8,24,0.98));
+      box-shadow: var(--shadow-soft);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      padding: 0 4px 6px;
+      border-bottom: 1px solid rgba(40,52,120,0.7);
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+
+    .section-tag {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(90,110,210,0.9);
+      color: #b9c5ff;
+      background: rgba(14,18,48,0.9);
+      white-space: nowrap;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(150px,1fr));
+      gap: 10px;
+      padding: 6px 0 10px;
+    }
+
+    .card {
+      position: relative;
+      padding: 11px 11px 12px;
+      border-radius: var(--radius-lg);
+      background: radial-gradient(circle at top left, rgba(56,249,165,0.05), rgba(8,10,26,0.98));
+      border: 1px solid rgba(48,64,150,0.85);
+      box-shadow: 0 10px 26px rgba(0,0,0,0.7);
+    }
+
+    .card.accent {
+      border-color: rgba(56,249,165,0.82);
+      background: radial-gradient(circle at top left, rgba(56,249,165,0.13), rgba(6,12,26,0.98));
+    }
+
+    .card.gold {
+      border-color: rgba(242,211,122,0.85);
+      background: radial-gradient(circle at top left, rgba(242,211,122,0.16), rgba(22,12,4,0.97));
+    }
+
+    .card-title {
+      display: block;
+      font-size: 0.93rem;
+      font-weight: 600;
+      margin-bottom: 3px;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .card-title span {
+      border-bottom: 1px solid rgba(143,167,255,0.55);
+    }
+
+    .card-sub {
+      font-size: 0.78rem;
+      color: var(--text-soft);
+      line-height: 1.25;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 6px;
+    }
+
+    .badge {
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(92,112,220,0.9);
+      color: #c1cbff;
+      background: rgba(11,16,50,0.96);
+      white-space: nowrap;
+    }
+
+    .badge.green {
+      border-color: rgba(56,249,165,0.9);
+      color: #e4fff6;
+      background: rgba(10,32,24,0.96);
+    }
+
+    .badge.gold {
+      border-color: rgba(242,211,122,0.95);
+      color: #fff6dc;
+      background: rgba(40,28,8,0.96);
+    }
+
+    .footer-note {
+      margin-top: 14px;
+      font-size: 0.7rem;
+      color: var(--text-soft);
+      text-align: center;
+      opacity: 0.8;
+    }
+
+    .footer-note span {
+      color: var(--accent-gold);
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <h1>Ω-OS Index v2 — Shed Edition</h1>
+      <div class="subtitle">
+        One home button for your local QDS / Ω toys.  
+        Relative links only → works on any <code>localhost</code> port.
+      </div>
+      <div class="tags">
+        <div class="tag green">Offline</div>
+        <div class="tag">Phone-safe</div>
+        <div class="tag gold">QDS · LifeFirst</div>
+        <div class="tag">v2 · Pyramid Pinball era</div>
+      </div>
+
+      <div class="pill-row">
+        <a href="omega_qds_lab.html" class="pill-link green">Open Ω-QDS Lab</a>
+        <a href="qds_battery_os_index_v1.html" class="pill-link">Open Battery OS</a>
+        <a href="qds_battery_index_v1_neon_os.html" class="pill-link">Battery Neon Index</a>
+        <!-- set this href to your actual Indus file, e.g. indus_atlas_v1.html -->
+        <a href="#" class="pill-link">Indus Atlas (set href)</a>
+      </div>
+    </header>
+
+    <!-- CORE HOMES -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-title">Core Homes</div>
+        <div class="section-tag">dashboards · launchpads</div>
+      </div>
+      <div class="card-grid">
+        <div class="card accent">
+          <a href="qds_battery_os_index_v1.html" class="card-title"><span>QDS Battery OS — Index v1</span></a>
+          <div class="card-sub">
+            Main battery launchpad: hubs, suites, coach, logs.
+          </div>
+          <div class="badge-row">
+            <div class="badge green">Recommended</div>
+            <div class="badge">Battery family</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <a href="omega_qds_lab.html" class="card-title"><span>Ω-QDS Lab Dashboard</span></a>
+          <div class="card-sub">
+            Unified lab: Solar v8, Universe v9.x, maps, toys.
+          </div>
+          <div class="badge-row">
+            <div class="badge">Unified lab</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <!-- update href when you know the file -->
+          <a href="#" class="card-title"><span>Indus Atlas</span></a>
+          <div class="card-sub">
+            Script + coherence mini-portal. Set href to your atlas file.
+          </div>
+          <div class="badge-row">
+            <div class="badge">Language</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <a href="qds_test_task_pack_v1.html" class="card-title"><span>QDS Test Task Pack v1</span></a>
+          <div class="card-sub">
+            Reproducibility checklist + H₀ micro-fit tools.
+          </div>
+          <div class="badge-row">
+            <div class="badge">Testing</div>
+            <div class="badge">H₀ variance</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ENERGY / BATTERIES -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-title">Energy / Batteries</div>
+        <div class="section-tag">near-term · stress models</div>
+      </div>
+      <div class="card-grid">
+        <div class="card accent">
+          <a href="qds_battery_hub_v9_7_science_neon_lab.html" class="card-title"><span>Battery Hub v9.7 — Lab-Shaped Neon</span></a>
+          <div class="card-sub">
+            Cycle + calendar · capacity + resistance · AR(1) stress.
+          </div>
+          <div class="badge-row">
+            <div class="badge green">Most accurate (toy)</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <a href="qds_battery_hub_v9_6_science_neon.html" class="card-title"><span>Battery Hub v9.6 — Science Neon</span></a>
+          <div class="card-sub">
+            Fast semi-empirical stress toy for quick sanity checks.
+          </div>
+          <div class="badge-row">
+            <div class="badge">Stable</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <a href="qds_battery_coach_v3.html" class="card-title"><span>Battery Coach v3</span></a>
+          <div class="card-sub">
+            Friendly advice layer on top of the models.
+          </div>
+          <div class="badge-row">
+            <div class="badge">Coach</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <a href="qds_battery_whisperer_v2.html" class="card-title"><span>Battery Whisperer v2</span></a>
+          <div class="card-sub">
+            Lightweight helper for quick checks & habits.
+          </div>
+          <div class="badge-row">
+            <div class="badge">Utility</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <a href="qds_battery_lab_showcase_v1.html" class="card-title"><span>Battery Lab Showcase v1</span></a>
+          <div class="card-sub">
+            Guided visuals for stress, health, and bias variants.
+          </div>
+          <div class="badge-row">
+            <div class="badge">Showcase</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <a href="qds_battery_lab_showcase_stress_bias_v1.html" class="card-title"><span>Stress Bias v1</span></a>
+          <div class="card-sub">
+            Variant demo for bias-shaped stress tests.
+          </div>
+          <div class="badge-row">
+            <div class="badge">Experiment</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <a href="qds_battery_noise_toy_v1.html" class="card-title"><span>Battery Noise Toy v1</span></a>
+          <div class="card-sub">
+            Noise-only intuition lab for correlated battery stress.
+          </div>
+          <div class="badge-row">
+            <div class="badge">Demo</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 PILLARS / FIELD TOYS -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-title">QDS — 5 Pillars & Field Toys</div>
+        <div class="section-tag">structure · fast proof</div>
+      </div>
+      <div class="card-grid">
+        <!-- Set href when you know file name -->
+        <div class="card">
+          <a href="#" class="card-title"><span>QDS — 5 Pillars Hub</span></a>
+          <div class="card-sub">
+            Phone-safe launcher for batteries, chips, compression, sensors, field.
+          </div>
+          <div class="badge-row">
+            <div class="badge">Launcher</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <a href="qds_chips_noise_v1.html" class="card-title"><span>Semiconductor & Quantum Noise</span></a>
+          <div class="card-sub">
+            Correlated-jitter slider mapped to a fake “stability” score.
+          </div>
+          <div class="badge-row">
+            <div class="badge">Chips</div>
+            <div class="badge">Credibility toy</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <a href="qds_sensors_metrology_v1.html" class="card-title"><span>Sensors / Metrology (LifeFirst)</span></a>
+          <div class="card-sub">
+            Noise-floor toy: how correlation wrecks or boosts averaging.
+          </div>
+          <div class="badge-row">
+            <div class="badge">Sensors</div>
+            <div class="badge green">LifeFirst</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <a href="qds_compression_lab_v1.html" class="card-title"><span>Compression / Signals Lab v1</span></a>
+          <div class="card-sub">
+            Mini structure-preserving benchmark: naive vs kernel-ish thinning.
+          </div>
+          <div class="badge-row">
+            <div class="badge">Compression</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SPACE & MAPS -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-title">Space & Maps</div>
+        <div class="section-tag">visual · grounding</div>
+      </div>
+      <div class="card-grid">
+        <div class="card">
+          <a href="solar_system_v8_offline.html" class="card-title"><span>Solar System v8</span></a>
+          <div class="card-sub">
+            Clean lightweight solar toy. Offline and phone-friendly.
+          </div>
+          <div class="badge-row">
+            <div class="badge">Offline</div>
+          </div>
+        </div>
+
+        <!-- fill in with your actual universe file name -->
+        <div class="card">
+          <a href="#" class="card-title"><span>Universe v9.x Neon</span></a>
+          <div class="card-sub">
+            Pretty orbit chaos for the eyeballs. Set href to your universe file.
+          </div>
+          <div class="badge-row">
+            <div class="badge">Neon</div>
+          </div>
+        </div>
+
+        <!-- set href when known -->
+        <div class="card">
+          <a href="#" class="card-title"><span>Stinchcombe Map</span></a>
+          <div class="card-sub">
+            Local turf layer. Hook this to your map HTML when ready.
+          </div>
+          <div class="badge-row">
+            <div class="badge">Local</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TOYS & GAMES -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-title">Toys & Experiments</div>
+        <div class="section-tag">fun · chaos therapy</div>
+      </div>
+      <div class="card-grid">
+        <!-- set href when you know the filename -->
+        <div class="card">
+          <a href="#" class="card-title"><span>Catapult Balloon Pop</span></a>
+          <div class="card-sub">
+            Chaos therapy, scientifically approved by vibes. Link when known.
+          </div>
+          <div class="badge-row">
+            <div class="badge">Fun</div>
+          </div>
+        </div>
+
+        <div class="card gold">
+          <a href="pyramid_pinball_v1.html" class="card-title"><span>Pyramid Pinball v1</span></a>
+          <div class="card-sub">
+            2D black-and-gold temple table · offline · phone-safe.
+          </div>
+          <div class="badge-row">
+            <div class="badge gold">New</div>
+            <div class="badge">Pinball</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer-note">
+      Ω-OS Index v2 • Curated shed list.  
+      Add new tools by copying a card and updating the <code>href</code> + labels. <span>🎩</span>
+    </div>
+  </div>
+</body>
+</html>

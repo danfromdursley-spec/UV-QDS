@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GrowthHub QDS — All-in-One Board Pack</title>
+  <link rel="manifest" href="manifest-growthhub.json" />
+  <meta name="theme-color" content="#05070b" />
+  <style>
+    :root{--bg:#05070b;--bg2:#0b0f16;--text:#e8f1ff;--muted:#a7b3c7;--accent1:#00e5ff;--accent2:#00ff88;--shadow:0 10px 30px rgba(0,0,0,.45);--r:18px;}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--text);
+      background:radial-gradient(1200px 700px at 10% -10%, rgba(0,229,255,.10), transparent 50%),
+      radial-gradient(1200px 700px at 90% 10%, rgba(0,255,136,.10), transparent 50%),
+      linear-gradient(180deg,var(--bg),var(--bg2));}
+    header{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);background:rgba(5,7,11,.7);border-bottom:1px solid rgba(255,255,255,.06);}
+    .wrap{max-width:980px;margin:0 auto;padding:18px 16px 40px}
+    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+    .brand{display:flex;gap:12px;align-items:center;padding:8px 0}
+    .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg, rgba(0,229,255,.25), rgba(0,255,136,.25));
+      border:1px solid rgba(255,255,255,.07);display:grid;place-items:center;box-shadow:inset 0 0 0 1px rgba(255,255,255,.03);}
+    .logo-dot{width:16px;height:16px;border-radius:5px;background:linear-gradient(135deg,var(--accent1),var(--accent2));filter:drop-shadow(0 0 8px rgba(0,229,255,.35));}
+    h1{font-size:1.15rem;margin:0}.sub{font-size:.85rem;color:var(--muted)}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.06);font-size:.78rem;color:var(--muted)}
+    nav{display:flex;gap:8px;flex-wrap:wrap;padding:10px 0 4px}
+    nav a{text-decoration:none;color:var(--muted);padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.03);font-size:.82rem}
+    nav a:hover{color:var(--text);border-color:rgba(0,229,255,.25)}
+    .btn{appearance:none;border:0;cursor:pointer;padding:10px 14px;border-radius:12px;font-weight:650;letter-spacing:.2px;
+      background:linear-gradient(135deg, rgba(0,229,255,.18), rgba(0,255,136,.18));color:var(--text);border:1px solid rgba(255,255,255,.08);box-shadow:var(--shadow);}
+    .btn-strong{background:linear-gradient(135deg, rgba(0,229,255,.35), rgba(0,255,136,.35));border:1px solid rgba(0,255,136,.35);}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));border:1px solid rgba(255,255,255,.06);
+      border-radius:var(--r);padding:18px 18px 16px;box-shadow:var(--shadow);}
+    .grid{display:grid;gap:14px;grid-template-columns:1fr;}
+    @media (min-width:860px){.grid-2{grid-template-columns:1.1fr .9fr}}
+    .muted{color:var(--muted)} .divider{height:1px;background:rgba(255,255,255,.06);margin:14px 0;}
+    .tag{display:inline-block;padding:3px 8px;border-radius:999px;font-size:.72rem;margin-right:6px;background:rgba(0,229,255,.08);
+      border:1px solid rgba(0,229,255,.18);color:#cfefff;}
+    .tag.green{background:rgba(0,255,136,.08);border-color:rgba(0,255,136,.2);color:#d7ffec;}
+    .tag.warn{background:rgba(255,211,106,.08);border-color:rgba(255,211,106,.2);color:#fff0c9;}
+    .quote{padding:12px 14px;border-left:3px solid rgba(0,229,255,.45);background:rgba(255,255,255,.03);border-radius:10px}
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="row">
+      <div class="brand">
+        <div class="logo"><div class="logo-dot"></div></div>
+        <div>
+          <h1>GrowthHub QDS — All-in-One Board Pack</h1>
+          <div class="sub">Revenue • Battery • Compression • Board-safe flow</div>
+        </div>
+      </div>
+      <div class="row">
+        <span class="pill">Phone-first • Local-ready • Stroud/Dursley rooted</span>
+        <button id="installBtn" class="btn btn-strong" style="display:none;">Add to Home Screen</button>
+      </div>
+    </div>
+
+    <nav>
+      <a href="#mindset">Board Mindset</a>
+      <a href="#opening">60-sec Opener</a>
+      <a href="#demo">Tap Demo Flow</a>
+      <a href="#live">Launch Live Demos</a>
+      <a href="#ask">The Ask</a>
+      <a href="#pillars">Three Pillars</a>
+      <a href="#cred">Credibility</a>
+      <a href="#pricing">Value & Retainers</a>
+      <a href="#qds">QDS Exec Summary</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="grid grid-2">
+    <div class="card">
+      <span class="tag">Meeting-Ready</span>
+      <span class="tag green">Three-Pillar Focus</span>
+      <span class="tag warn">No Overclaiming</span>
+      <h2 id="mindset">Board mindset (north star)</h2>
+      <p class="muted">Anchor framing to keep everything calm and credible.</p>
+      <ul>
+        <li>They are not judging deep physics today.</li>
+        <li>They are judging credibility, practicality, and 12-month support fit.</li>
+        <li>They are judging local benefit for Stroud District.</li>
+      </ul>
+      <div class="divider"></div>
+      <div class="quote">“I’m not asking you to fund a dream — I’m asking you to fund proof.”</div>
+    </div>
+
+    <div class="card">
+      <h2>Fast summary for the room</h2>
+      <ul>
+        <li><strong>3 Pillars:</strong> Revenue Truth • Battery Habitat • QDS-SAVE Compression</li>
+        <li><strong>Demo built:</strong> Phone-first working suite</li>
+        <li><strong>Pilot-first:</strong> Measurable uplift bands, not magic claims</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="card" style="margin-top:14px;">
+    <h2 id="opening">Your 60–second opener</h2>
+    <div class="quote">
+      “I’m Dan Williams from Dursley. I build practical physics-informed tools that run on cheap hardware — even an Android phone.
+      I’ve packaged the most usable parts into a three-pillar toolkit: Revenue, Battery reliability, and Compression.
+      Today I’ll show what each does and what support would help turn this into a small, local pilot-ready lab.”
+    </div>
+  </section>
+
+  <section class="card" id="demo" style="margin-top:14px;">
+    <h2>Exact demo order (safe tap sequence)</h2>
+    <ol>
+      <li>Start on GrowthHub home screen. Hold 2–3 seconds.</li>
+      <li>Open <strong>Revenue Pillar</strong> — honest-mode funnel + capacity.</li>
+      <li>Back → <strong>Battery Habitat</strong> — presets + uplift bands.</li>
+      <li>Back → <strong>Compression</strong> — quick bench.</li>
+    </ol>
+  </section>
+
+  <section class="card" id="live" style="margin-top:14px;">
+    <h2>Launch Live Demos (zero dead links)</h2>
+    <p class="muted">Buttons appear only if the file exists in this folder.</p>
+    <div id="liveDemoButtons" class="row"></div>
+  </section>
+
+  <section class="card" id="ask" style="margin-top:14px;">
+    <h2>Your ask (board-safe)</h2>
+    <div class="quote">
+      “I’d like help turning this from a one-man shed lab into a small local tech and education lab.
+      Guidance on structure, introductions to partners, and support for a 12-month pilot — around £150–£250k — to harden tools and run pilots.”
+    </div>
+  </section>
+
+  <section class="card" id="pillars" style="margin-top:14px;">
+    <h2>The three pillars (tight commercial framing)</h2>
+    <ul>
+      <li><strong>Battery Habitat:</strong> housing, airflow symmetry, duty-cycle stress, cheap wins before expensive mistakes.</li>
+      <li><strong>Revenue Truth:</strong> honest-mode forecasting with capacity caps.</li>
+      <li><strong>QDS-SAVE:</strong> keep structure, drop waste — telemetry thinning and signal clarity.</li>
+    </ul>
+  </section>
+
+  <section class="card" id="cred" style="margin-top:14px;">
+    <h2>Credibility snapshot</h2>
+    <ul>
+      <li>Working phone-first demo already built.</li>
+      <li>Clear 12-month pilot scope.</li>
+      <li>Local-first intent and practical delivery.</li>
+    </ul>
+  </section>
+
+  <section class="card" id="pricing" style="margin-top:14px;">
+    <h2>Value & retainers</h2>
+    <ul>
+      <li><strong>Demo replacement value:</strong> ~£47k–£105k</li>
+      <li><strong>Prod v1 hardening band:</strong> ~£100k–£180k</li>
+      <li><strong>Retainers:</strong> £350 / £750 / £1,500 + VAT (1/2/3 pillars)</li>
+    </ul>
+  </section>
+
+  <section class="card" id="qds" style="margin-top:14px;">
+    <h2>QDS executive summary (ultra-short)</h2>
+    <p>QDS is a GR-compatible stochastic extension that preserves standard cosmology in the mean-field limit while predicting small, measurable deviations and improved galaxy-scale fits.</p>
+  </section>
+
+  <footer class="muted" style="margin-top:30px;padding-top:16px;border-top:1px solid rgba(255,255,255,.06);font-size:.8rem;">
+    GrowthHub QDS — All-in-One board pack • v1.1
+  </footer>
+</main>
+
+<script>
+  // PWA install
+  let deferredPrompt = null;
+  const btn = document.getElementById("installBtn");
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    btn.style.display = "inline-block";
+  });
+  btn.addEventListener("click", async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    btn.style.display = "none";
+  });
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw-growthhub.js").catch(()=>{});
+    });
+  }
+
+  // Smart live demo buttons (no dead links)
+  const liveTargets = [
+    { href: "growthhub_meeting_script_v1.html", label: "GrowthHub Meeting Script" },
+    { href: "all_pages_index.html", label: "All Pages Index" },
+    { href: "all_pages_min.html", label: "All Pages (Min)" },
+    { href: "all_pages.html", label: "All Pages (Full)" }
+  ];
+  const liveWrap = document.getElementById("liveDemoButtons");
+  async function exists(url){
+    try{
+      let r = await fetch(url, { method: "HEAD" });
+      if (r.ok) return true;
+      r = await fetch(url, { method: "GET", cache: "no-store" });
+      return r.ok;
+    }catch(e){ return false; }
+  }
+  (async () => {
+    if (!liveWrap) return;
+    let any = false;
+    for (const t of liveTargets){
+      if (await exists(t.href)){
+        any = true;
+        const a = document.createElement("a");
+        a.href = t.href;
+        a.className = "btn";
+        a.textContent = t.label;
+        liveWrap.appendChild(a);
+      }
+    }
+    if (!any){
+      const span = document.createElement("span");
+      span.className = "muted";
+      span.textContent = "No linked demo files detected yet in this folder.";
+      liveWrap.appendChild(span);
+    }
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,244 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NASA RW3 Battery Report</title>
+<style>
+  body{margin:0;background:#06070c;color:#e9f7ff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial}
+  header{padding:18px 16px;border-bottom:1px solid rgba(120,255,220,.18);
+         background:linear-gradient(90deg, rgba(0,255,200,.08), rgba(0,120,255,.06))}
+  h1{margin:0;font-size:18px;letter-spacing:.4px}
+  .sub{opacity:.75;margin-top:6px;font-size:12px}
+  .wrap{padding:14px;display:grid;grid-template-columns:1fr;gap:12px;max-width:980px;margin:0 auto}
+  .card{border:1px solid rgba(120,255,220,.18);border-radius:16px;padding:12px 12px 10px;
+        background:rgba(10,12,20,.72);box-shadow:0 0 0 1px rgba(0,140,255,.08) inset}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .pill{padding:6px 10px;border-radius:999px;border:1px solid rgba(120,255,220,.22);
+        background:rgba(0,255,200,.06);font-size:12px}
+  canvas{width:100%;height:260px;border-radius:12px;background:rgba(0,0,0,.28);border:1px solid rgba(0,140,255,.14)}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th,td{padding:8px 6px;border-bottom:1px solid rgba(120,255,220,.12)}
+  th{opacity:.9;text-align:left}
+  .muted{opacity:.75}
+  a{color:#7fffd4}
+</style>
+</head>
+<body>
+<header>
+  <h1>NASA RW3 — Battery Degradation Condensed Report</h1>
+  <div class="sub">Files used: <span class="muted">NASA_RW3_model_table_cidx.csv</span> + <span class="muted">NASA_RW3_anchors_plot.csv</span></div>
+</header>
+
+<div class="wrap">
+  <div class="card">
+    <div class="row" id="pills"></div>
+  </div>
+
+  <div class="card">
+    <h2 style="margin:0 0 10px;font-size:14px">Anchor Capacity (Ah) vs checkpoint</h2>
+    <canvas id="cAnch"></canvas>
+    <div class="muted" style="margin-top:8px">Each line is a cell (RW1/RW2/RW7/RW8). Higher drop = degradation.</div>
+  </div>
+
+  <div class="card">
+    <h2 style="margin:0 0 10px;font-size:14px">Scatter: Stress vs Ah drop (per block)</h2>
+    <canvas id="cScat"></canvas>
+    <div class="muted" style="margin-top:8px">x = rw_Ah, y = Ah_drop (block-to-block). Points are all blocks across cells.</div>
+  </div>
+
+  <div class="card">
+    <h2 style="margin:0 0 10px;font-size:14px">Top 12 blocks (rw_Ah)</h2>
+    <table id="topTable">
+      <thead><tr><th>cell</th><th>block</th><th>rw_Ah</th><th>rw_Wh</th><th>steps</th><th>highA_s</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="card muted">
+    Tip: serve this folder with <code>python -m http.server 8011 --bind 127.0.0.1</code> and open this page.
+  </div>
+</div>
+
+<script>
+function parseCSV(text){
+  const lines = text.trim().split(/\r?\n/);
+  const hdr = lines[0].split(",");
+  const rows = [];
+  for(let i=1;i<lines.length;i++){
+    const parts = lines[i].split(",");
+    const obj = {};
+    for(let j=0;j<hdr.length;j++) obj[hdr[j]] = parts[j];
+    rows.push(obj);
+  }
+  return rows;
+}
+
+function drawLineChart(canvas, seriesByName){
+  const ctx = canvas.getContext("2d");
+  const w = canvas.width = canvas.clientWidth * devicePixelRatio;
+  const h = canvas.height = canvas.clientHeight * devicePixelRatio;
+
+  ctx.clearRect(0,0,w,h);
+
+  // gather bounds
+  let xmin=Infinity,xmax=-Infinity,ymin=Infinity,ymax=-Infinity;
+  for(const name in seriesByName){
+    for(const p of seriesByName[name]){
+      xmin=Math.min(xmin,p.x); xmax=Math.max(xmax,p.x);
+      ymin=Math.min(ymin,p.y); ymax=Math.max(ymax,p.y);
+    }
+  }
+  if(!isFinite(xmin)) return;
+  const pad = 28*devicePixelRatio;
+  const X = x => pad + (x-xmin) * (w-2*pad) / ((xmax-xmin)||1);
+  const Y = y => h-pad - (y-ymin) * (h-2*pad) / ((ymax-ymin)||1);
+
+  // grid
+  ctx.globalAlpha = 0.35;
+  ctx.strokeStyle = "rgba(0,140,255,.35)";
+  ctx.lineWidth = 1*devicePixelRatio;
+  for(let i=0;i<5;i++){
+    const gx = pad + i*(w-2*pad)/4;
+    const gy = pad + i*(h-2*pad)/4;
+    ctx.beginPath(); ctx.moveTo(gx,pad); ctx.lineTo(gx,h-pad); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(pad,gy); ctx.lineTo(w-pad,gy); ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+
+  // axes labels
+  ctx.fillStyle = "rgba(233,247,255,.7)";
+  ctx.font = `${12*devicePixelRatio}px system-ui`;
+  ctx.fillText(`x: checkpoint`, pad, h-10*devicePixelRatio);
+  ctx.save();
+  ctx.translate(10*devicePixelRatio, h/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillText(`y: Ah`, 0, 0);
+  ctx.restore();
+
+  // lines
+  const colors = {
+    RW1:"rgba(0,255,200,.95)",
+    RW2:"rgba(0,180,255,.95)",
+    RW7:"rgba(170,120,255,.95)",
+    RW8:"rgba(255,120,180,.95)"
+  };
+
+  for(const name in seriesByName){
+    const pts = seriesByName[name].slice().sort((a,b)=>a.x-b.x);
+    ctx.strokeStyle = colors[name] || "rgba(120,255,220,.9)";
+    ctx.lineWidth = 2*devicePixelRatio;
+    ctx.beginPath();
+    pts.forEach((p,idx)=>{
+      const x=X(p.x), y=Y(p.y);
+      if(idx===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+
+    // dots
+    ctx.fillStyle = ctx.strokeStyle;
+    for(const p of pts){
+      const x=X(p.x), y=Y(p.y);
+      ctx.beginPath(); ctx.arc(x,y,2.5*devicePixelRatio,0,Math.PI*2); ctx.fill();
+    }
+  }
+}
+
+function drawScatter(canvas, pts){
+  const ctx = canvas.getContext("2d");
+  const w = canvas.width = canvas.clientWidth * devicePixelRatio;
+  const h = canvas.height = canvas.clientHeight * devicePixelRatio;
+  ctx.clearRect(0,0,w,h);
+
+  let xmin=Infinity,xmax=-Infinity,ymin=Infinity,ymax=-Infinity;
+  for(const p of pts){
+    xmin=Math.min(xmin,p.x); xmax=Math.max(xmax,p.x);
+    ymin=Math.min(ymin,p.y); ymax=Math.max(ymax,p.y);
+  }
+  const pad=28*devicePixelRatio;
+  const X = x => pad + (x-xmin) * (w-2*pad) / ((xmax-xmin)||1);
+  const Y = y => h-pad - (y-ymin) * (h-2*pad) / ((ymax-ymin)||1);
+
+  // grid
+  ctx.globalAlpha = 0.35;
+  ctx.strokeStyle = "rgba(0,140,255,.35)";
+  ctx.lineWidth = 1*devicePixelRatio;
+  for(let i=0;i<5;i++){
+    const gx = pad + i*(w-2*pad)/4;
+    const gy = pad + i*(h-2*pad)/4;
+    ctx.beginPath(); ctx.moveTo(gx,pad); ctx.lineTo(gx,h-pad); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(pad,gy); ctx.lineTo(w-pad,gy); ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+
+  ctx.fillStyle = "rgba(233,247,255,.7)";
+  ctx.font = `${12*devicePixelRatio}px system-ui`;
+  ctx.fillText(`x: rw_Ah`, pad, h-10*devicePixelRatio);
+  ctx.save();
+  ctx.translate(10*devicePixelRatio, h/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillText(`y: Ah_drop`, 0, 0);
+  ctx.restore();
+
+  ctx.fillStyle = "rgba(0,255,200,.65)";
+  for(const p of pts){
+    const x=X(p.x), y=Y(p.y);
+    ctx.beginPath(); ctx.arc(x,y,2.2*devicePixelRatio,0,Math.PI*2); ctx.fill();
+  }
+}
+
+async function main(){
+  const [modelTxt, anchTxt] = await Promise.all([
+    fetch("NASA_RW3_model_table_cidx.csv").then(r=>r.text()),
+    fetch("NASA_RW3_anchors_plot.csv").then(r=>r.text())
+  ]);
+
+  const model = parseCSV(modelTxt);
+  const anchors = parseCSV(anchTxt);
+
+  // pills (quick stats)
+  const n = model.length;
+  const sumDrop = model.reduce((a,r)=>a + (+r.Ah_drop||0), 0);
+  const sumAh = model.reduce((a,r)=>a + (+r.rw_Ah||0), 0);
+  const sumHi = model.reduce((a,r)=>a + (+r.highA_s||0), 0);
+
+  const pills = document.getElementById("pills");
+  const mk = (t)=>{const s=document.createElement("div"); s.className="pill"; s.textContent=t; return s;};
+  pills.appendChild(mk(`blocks: ${n}`));
+  pills.appendChild(mk(`Σ Ah_drop: ${sumDrop.toFixed(3)}`));
+  pills.appendChild(mk(`Σ rw_Ah: ${sumAh.toFixed(1)}`));
+  pills.appendChild(mk(`Σ highA_s: ${sumHi.toFixed(0)} s`));
+
+  // anchor chart
+  const series = {};
+  for(const r of anchors){
+    const cell=r.cell;
+    if(!series[cell]) series[cell]=[];
+    series[cell].push({x:+r.cidx, y:+r.Ah});
+  }
+  drawLineChart(document.getElementById("cAnch"), series);
+
+  // scatter
+  const scat = model.map(r=>({x:+r.rw_Ah, y:+r.Ah_drop}));
+  drawScatter(document.getElementById("cScat"), scat);
+
+  // top table by rw_Ah
+  const top = model.slice().sort((a,b)=>(+b.rw_Ah)-(+a.rw_Ah)).slice(0,12);
+  const tb = document.querySelector("#topTable tbody");
+  tb.innerHTML="";
+  for(const r of top){
+    const tr=document.createElement("tr");
+    tr.innerHTML = `<td>${r.cell}</td><td>${r.block_id}</td><td>${(+r.rw_Ah).toFixed(3)}</td><td>${(+r.rw_Wh).toFixed(3)}</td><td>${r.rw_D_steps}</td><td>${(+r.highA_s).toFixed(0)}</td>`;
+    tb.appendChild(tr);
+  }
+
+  window.addEventListener("resize", ()=>{
+    drawLineChart(document.getElementById("cAnch"), series);
+    drawScatter(document.getElementById("cScat"), scat);
+  });
+}
+
+main().catch(e=>alert(e));
+</script>
+</body>
+</html>

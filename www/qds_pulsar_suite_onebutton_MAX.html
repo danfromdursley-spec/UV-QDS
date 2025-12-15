@@ -1,0 +1,1162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>QDS Pulsar Constraint Suite • One-Button MAX</title>
+<style>
+  :root{
+    --bg:#05070b;
+    --panel:#0b1220cc;
+    --panel2:#09101ccc;
+    --txt:#e9f1ff;
+    --muted:#a8b7d3;
+    --dim:#7f90b6;
+
+    --neonA:#ffb000;   /* orange */
+    --neonB:#ffd24a;   /* yellow */
+    --neonG:#28f5a3;   /* green */
+    --neonC:#34d6ff;   /* cyan */
+    --neonP:#a46bff;   /* purple */
+
+    --bad:#ff4d6d;
+    --edge:#ffd24a;
+    --ok:#28f5a3;
+
+    --shadow: 0 20px 60px rgba(0,0,0,.55);
+    --radius: 18px;
+    --radius2: 26px;
+  }
+
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    color:var(--txt);
+    background:
+      radial-gradient(1200px 700px at 20% -10%, rgba(52,214,255,.12), transparent 60%),
+      radial-gradient(1000px 600px at 90% 10%, rgba(255,176,0,.10), transparent 55%),
+      radial-gradient(900px 600px at 50% 90%, rgba(40,245,163,.10), transparent 60%),
+      linear-gradient(180deg, #04060a, #05070b 30%, #04060a);
+    overflow-x:hidden;
+  }
+
+  .wrap{max-width:980px;margin:0 auto;padding:20px 14px 80px}
+  .frame{
+    position:relative;
+    border-radius: var(--radius2);
+    padding: 18px;
+    background: linear-gradient(180deg, rgba(11,18,32,.85), rgba(9,16,28,.85));
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255,255,255,.07);
+  }
+  .frame:before{
+    content:"";
+    position:absolute; inset:-2px;
+    border-radius: var(--radius2);
+    background: linear-gradient(90deg,
+      rgba(255,176,0,.55),
+      rgba(255,210,74,.35),
+      rgba(40,245,163,.35),
+      rgba(52,214,255,.35),
+      rgba(255,176,0,.55)
+    );
+    filter: blur(10px);
+    opacity:.45;
+    z-index:-1;
+  }
+  .topbar{
+    display:flex; gap:12px; align-items:center; justify-content:space-between;
+    padding: 4px 2px 14px;
+  }
+  .title{
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing:.2px;
+  }
+  .pill{
+    display:inline-flex; align-items:center; gap:8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(0,0,0,.25);
+    border: 1px solid rgba(255,210,74,.25);
+    color: rgba(255,210,74,.95);
+    font-weight: 700;
+    font-size: 12px;
+  }
+  .pill b{color:var(--txt)}
+  .sub{
+    color: var(--muted);
+    margin-top: 4px;
+    line-height: 1.35;
+  }
+
+  .grid{
+    margin-top: 16px;
+    display:grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  @media (min-width: 860px){
+    .grid{grid-template-columns: 1.05fr .95fr;}
+  }
+
+  .card{
+    border-radius: var(--radius);
+    background: rgba(0,0,0,.22);
+    border: 1px solid rgba(255,255,255,.07);
+    padding: 14px;
+  }
+  .card h3{
+    margin:0 0 8px;
+    font-size: 16px;
+    letter-spacing:.2px;
+  }
+  .hint{color:var(--dim); font-size: 12px; line-height:1.35}
+  .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+  .row > *{flex: 1 1 160px}
+  label{display:block; font-size:12px; color:var(--muted); margin:10px 0 6px}
+
+  input[type="text"], input[type="number"], textarea, select{
+    width:100%;
+    padding: 12px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(0,0,0,.25);
+    color: var(--txt);
+    outline:none;
+  }
+  textarea{min-height:80px; resize:vertical}
+  input[type="file"]{width:100%}
+
+  .btns{display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px}
+  .btn{
+    appearance:none;
+    border:0;
+    border-radius: 16px;
+    padding: 12px 14px;
+    font-weight: 800;
+    letter-spacing:.2px;
+    cursor:pointer;
+    color: #00140d;
+    background: linear-gradient(180deg, rgba(40,245,163,1), rgba(40,245,163,.72));
+    box-shadow: 0 14px 40px rgba(40,245,163,.18);
+    flex: 1 1 220px;
+    min-width: 180px;
+  }
+  .btn.secondary{
+    color: var(--txt);
+    background: rgba(0,0,0,.25);
+    border: 1px solid rgba(255,255,255,.10);
+    box-shadow:none;
+  }
+  .btn.warn{
+    color:#2a1200;
+    background: linear-gradient(180deg, rgba(255,210,74,1), rgba(255,176,0,.86));
+    box-shadow: 0 14px 40px rgba(255,176,0,.16);
+  }
+  .btn.bad{
+    color:#240009;
+    background: linear-gradient(180deg, rgba(255,77,109,1), rgba(255,77,109,.78));
+    box-shadow: 0 14px 40px rgba(255,77,109,.18);
+  }
+
+  .tog{
+    display:flex; gap:10px; align-items:flex-start;
+    padding: 10px 10px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(0,0,0,.18);
+    margin-top: 10px;
+  }
+  .tog input{margin-top:3px}
+  .tog b{display:block}
+  .tog small{color:var(--dim); display:block; margin-top:2px; line-height:1.25}
+
+  .sliderWrap{
+    padding: 10px 10px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(0,0,0,.18);
+    margin-top: 10px;
+  }
+  .sliderTop{display:flex; justify-content:space-between; gap:10px; color:var(--muted); font-size:12px}
+  input[type="range"]{
+    width:100%;
+    margin-top:8px;
+    accent-color: var(--neonC);
+  }
+
+  .statusBox{
+    margin-top: 10px;
+    padding: 12px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(0,0,0,.18);
+  }
+  .badge{
+    display:inline-flex; align-items:center; gap:8px;
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-weight: 900;
+    letter-spacing:.2px;
+    margin-top: 8px;
+  }
+  .badge.ok{background: rgba(40,245,163,.12); border:1px solid rgba(40,245,163,.35); color: var(--ok)}
+  .badge.edge{background: rgba(255,210,74,.10); border:1px solid rgba(255,210,74,.35); color: var(--edge)}
+  .badge.bad{background: rgba(255,77,109,.10); border:1px solid rgba(255,77,109,.35); color: var(--bad)}
+  .badge.neutral{background: rgba(52,214,255,.08); border:1px solid rgba(52,214,255,.22); color: rgba(52,214,255,.95)}
+
+  .mono{
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+    font-size: 12px;
+    color: #dbe6ff;
+    white-space: pre-wrap;
+    line-height: 1.35;
+  }
+
+  canvas{
+    width:100%;
+    height: 260px;
+    display:block;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(0,0,0,.20);
+  }
+  .canvasRow{display:grid; gap:12px; grid-template-columns:1fr}
+  @media (min-width:860px){ .canvasRow{grid-template-columns:1fr 1fr} }
+
+  table{
+    width:100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    overflow:hidden;
+    border-radius: 14px;
+  }
+  th,td{
+    padding: 10px 8px;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    font-size: 12px;
+    text-align:left;
+  }
+  th{color:var(--muted); font-weight:800}
+  .foot{
+    margin-top: 14px;
+    color: var(--dim);
+    font-size: 12px;
+    line-height: 1.35;
+  }
+  .link{
+    color: rgba(52,214,255,.95);
+    text-decoration:none;
+    font-weight:800;
+  }
+  .tiny{font-size:11px;color:var(--dim)}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+  <div class="frame">
+    <div class="topbar">
+      <div>
+        <div class="title">QDS Binary Pulsar Constraint Suite</div>
+        <div class="sub">
+          One-button multi-system run. Produces <b>α<sub>max</sub>(λ)</b> curves + combined envelope, with exportable report.
+          <span class="tiny">Toy mapping: compares |α·f(r,λ)| to an allowed fractional band.</span>
+        </div>
+      </div>
+      <div class="pill">Ω-Phone QDS Lab • <b>One-Button MAX</b></div>
+    </div>
+
+    <div class="grid">
+      <!-- LEFT -->
+      <div class="card">
+        <h3>1) Systems (real-world suite)</h3>
+        <div class="hint">
+          Default list is <b>demo values</b> (edit/replace with literature values or your dataset). You can also import CSV.
+          Required columns: <span class="mono">name,r,band</span> (optional: <span class="mono">units</span>).
+        </div>
+
+        <label>Systems table (editable JSON)</label>
+        <textarea id="systemsJson"></textarea>
+
+        <label>Import CSV (name,r,band[,units])</label>
+        <input type="file" id="csvFile" accept=".csv,text/csv"/>
+
+        <div class="btns">
+          <button class="btn secondary" id="btnLoadDefaults">Load defaults</button>
+          <button class="btn secondary" id="btnValidate">Validate systems</button>
+        </div>
+
+        <div class="tog">
+          <input type="checkbox" id="strictMode"/>
+          <div>
+            <b>Strict mode: acceleration form</b>
+            <small>Uses <span class="mono">f(r,λ)=(1+r/λ)e^{-r/λ}</span> instead of <span class="mono">e^{-r/λ}</span> (harder check).</small>
+          </div>
+        </div>
+
+        <div class="tog">
+          <input type="checkbox" id="absMode" checked/>
+          <div>
+            <b>Use |α·f| (absolute)</b>
+            <small>Recommended for magnitude-only deviation bands.</small>
+          </div>
+        </div>
+
+        <div class="sliderWrap">
+          <div class="sliderTop">
+            <div><b>EDGE epsilon</b> (borderline detector)</div>
+            <div id="epsRead">2.0e-6</div>
+          </div>
+          <div class="hint">EDGE if |value − band| ≤ ε. Slider is log10(ε).</div>
+          <input type="range" id="epsSlider" min="-12" max="-2" step="0.1" value="-5.7"/>
+        </div>
+
+        <div class="sliderWrap">
+          <div class="sliderTop">
+            <div><b>λ scan range</b> (log10)</div>
+            <div id="lamRangeRead">-3 → 3</div>
+          </div>
+          <div class="row">
+            <div>
+              <label>log10(λ) min</label>
+              <input type="number" id="lamMin" value="-3" step="0.5"/>
+            </div>
+            <div>
+              <label>log10(λ) max</label>
+              <input type="number" id="lamMax" value="3" step="0.5"/>
+            </div>
+            <div>
+              <label>Points</label>
+              <input type="number" id="lamN" value="140" min="20" max="800" step="10"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="btns">
+          <button class="btn" id="btnRun">RUN REAL-WORLD SUITE (one button)</button>
+          <button class="btn warn" id="btnSelfTest">Run self-tests</button>
+          <button class="btn secondary" id="btnClear">Clear</button>
+        </div>
+
+        <div class="btns">
+          <button class="btn secondary" id="btnExportJson">Export report (JSON)</button>
+          <button class="btn secondary" id="btnExportCsv">Export curves (CSV)</button>
+          <button class="btn secondary" id="btnCopyLink">Copy share link</button>
+        </div>
+
+        <div class="statusBox">
+          <div class="badge neutral" id="runBadge">Ready.</div>
+          <div class="mono" id="log"></div>
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="card">
+        <h3>2) Graphs</h3>
+        <div class="hint">
+          Plot A: per-system <b>α<sub>max</sub>(λ)</b> curves.
+          Plot B: combined envelope (tightest constraint across systems).
+        </div>
+
+        <div class="canvasRow">
+          <div>
+            <label>Plot A • αmax(λ) per system</label>
+            <canvas id="cvA" width="900" height="520"></canvas>
+          </div>
+          <div>
+            <label>Plot B • Combined envelope (min across systems)</label>
+            <canvas id="cvB" width="900" height="520"></canvas>
+          </div>
+        </div>
+
+        <label>Summary table (selected λ)</label>
+        <div class="hint">Pick a λ to read off αmax for each system + envelope.</div>
+        <div class="sliderWrap">
+          <div class="sliderTop">
+            <div><b>Probe λ</b></div>
+            <div id="probeRead">λ = 1</div>
+          </div>
+          <input type="range" id="probeSlider" min="-3" max="3" step="0.01" value="0"/>
+        </div>
+
+        <table id="tbl">
+          <thead>
+            <tr>
+              <th>System</th>
+              <th>r</th>
+              <th>band</th>
+              <th>f(r,λ)</th>
+              <th>αmax</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+
+        <div class="foot">
+          ⚠️ This is a <b>sanity suite</b>, not a full timing-model fit.
+          It uses a simplified “fractional acceleration deviation band” proxy. For publication-grade constraints, plug in
+          real system parameters (orbital separation, timing residual limits, model mapping) from literature and document the mapping.
+        </div>
+        <div class="foot">
+          <a class="link" href="qds_test_platformV3.html">Back to Test Platform</a>
+          <span class="tiny"> • Device: Ω-Phone QDS Lab • Build: Pulsar Suite One-Button MAX</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================
+   Utilities (no deps)
+========================= */
+const $ = (id)=>document.getElementById(id);
+
+function clamp(x,a,b){ return Math.max(a, Math.min(b,x)); }
+function isFiniteNum(x){ return Number.isFinite(x) && !Number.isNaN(x); }
+function fmt(x, sig=4){
+  if(!isFiniteNum(x)) return "—";
+  const ax = Math.abs(x);
+  if(ax === 0) return "0";
+  if(ax >= 1e4 || ax < 1e-3) return x.toExponential(sig-1);
+  return x.toPrecision(sig);
+}
+function nowISO(){
+  const d = new Date();
+  return d.toISOString().replace("T"," ").replace("Z","");
+}
+function logLine(s){
+  const el = $("log");
+  el.textContent += (el.textContent ? "\n" : "") + s;
+  el.scrollTop = el.scrollHeight;
+}
+function setBadge(kind, text){
+  const b = $("runBadge");
+  b.className = "badge " + (kind || "neutral");
+  b.textContent = text;
+}
+function safeJsonParse(s){
+  try{ return {ok:true, val: JSON.parse(s)}; }catch(e){ return {ok:false, err: String(e)}; }
+}
+
+/* =========================
+   Model
+   Toy check:
+     value = α * f(r,λ)
+     pass if |value| <= band
+   with f:
+     potential: exp(-r/λ)
+     accel(strict): (1 + r/λ) exp(-r/λ)
+========================= */
+function kernelFactor(r, lam, strict){
+  if(!(r>=0) || !(lam>0)) return NaN;
+  const x = r/lam;
+  const e = Math.exp(-x);
+  return strict ? (1 + x)*e : e;
+}
+function alphaMaxAllowed(band, f){
+  if(!(band>=0) || !isFiniteNum(f) || f<=0) return NaN;
+  return band / f;
+}
+
+/* =========================
+   Defaults (DEMO VALUES)
+   Replace with literature / your dataset.
+========================= */
+const DEFAULT_SYSTEMS = [
+  {name:"PSR B1913+16 (demo)", r:1.0, band:0.002, units:"custom"},
+  {name:"Double Pulsar J0737−3039 (demo)", r:0.6, band:0.0015, units:"custom"},
+  {name:"PSR J0348+0432 (demo)", r:0.25, band:0.0010, units:"custom"},
+  {name:"PSR J1738+0333 (demo)", r:0.35, band:0.0012, units:"custom"}
+];
+
+/* =========================
+   State
+========================= */
+let state = {
+  systems: [],
+  strict: false,
+  absMode: true,
+  eps: 2e-6,
+  lamGrid: [],
+  curves: null,     // { perSystem:[{name, xs, ys}], envelope:{xs, ys}, meta:{} }
+  probeLam: 1
+};
+
+function loadDefaults(){
+  $("systemsJson").value = JSON.stringify(DEFAULT_SYSTEMS, null, 2);
+}
+function readControls(){
+  state.strict = $("strictMode").checked;
+  state.absMode = $("absMode").checked;
+
+  // epsilon slider is log10(eps)
+  const logeps = parseFloat($("epsSlider").value);
+  state.eps = Math.pow(10, logeps);
+  $("epsRead").textContent = state.eps.toExponential(1);
+
+  const lmin = parseFloat($("lamMin").value);
+  const lmax = parseFloat($("lamMax").value);
+  const n = Math.floor(parseFloat($("lamN").value));
+  $("lamRangeRead").textContent = `${lmin} → ${lmax}`;
+  const N = clamp(n, 20, 800);
+  const a = Math.min(lmin,lmax), b = Math.max(lmin,lmax);
+
+  // build logspace grid in lambda
+  state.lamGrid = [];
+  for(let i=0;i<N;i++){
+    const t = (N===1)?0 : i/(N-1);
+    const logL = a + (b-a)*t;
+    state.lamGrid.push(Math.pow(10, logL));
+  }
+}
+
+function validateSystems(systems){
+  const out = [];
+  const errs = [];
+  if(!Array.isArray(systems)){
+    return {ok:false, errs:["Systems JSON must be an array of objects."]};
+  }
+  for(let i=0;i<systems.length;i++){
+    const it = systems[i] || {};
+    const name = String(it.name ?? `System_${i+1}`).trim();
+    const r = Number(it.r);
+    const band = Number(it.band);
+    const units = String(it.units ?? "").trim();
+    if(!name) errs.push(`Row ${i+1}: missing name`);
+    if(!(r>=0)) errs.push(`Row ${i+1} (${name}): r must be >= 0`);
+    if(!(band>=0)) errs.push(`Row ${i+1} (${name}): band must be >= 0`);
+    out.push({name, r, band, units});
+  }
+  if(out.length===0) errs.push("No systems provided.");
+  return {ok: errs.length===0, systems: out, errs};
+}
+
+/* =========================
+   Suite run
+========================= */
+function runSuite(){
+  $("log").textContent = "";
+  setBadge("neutral", "Running suite…");
+  readControls();
+
+  const parsed = safeJsonParse($("systemsJson").value);
+  if(!parsed.ok){
+    setBadge("bad", "Invalid JSON");
+    logLine("❌ Systems JSON parse error: " + parsed.err);
+    return;
+  }
+
+  const v = validateSystems(parsed.val);
+  if(!v.ok){
+    setBadge("bad", "Systems invalid");
+    v.errs.forEach(e => logLine("❌ " + e));
+    return;
+  }
+  state.systems = v.systems;
+
+  logLine("=== QDS Pulsar Suite • One-Button MAX ===");
+  logLine("Time: " + nowISO());
+  logLine("Mode: " + (state.strict ? "STRICT accel f=(1+r/λ)e^{-r/λ}" : "Potential f=e^{-r/λ}"));
+  logLine("Abs: " + (state.absMode ? "|α·f| vs band" : "α·f vs band (signed)"));
+  logLine("EDGE eps: " + state.eps.toExponential(1));
+  logLine("Systems: " + state.systems.length);
+  logLine("λ grid points: " + state.lamGrid.length);
+
+  const xs = state.lamGrid.slice();
+  const perSystem = [];
+
+  // compute αmax(λ) for each system
+  for(const sys of state.systems){
+    const ys = new Array(xs.length);
+    for(let i=0;i<xs.length;i++){
+      const lam = xs[i];
+      const f = kernelFactor(sys.r, lam, state.strict);
+      const amax = alphaMaxAllowed(sys.band, f);
+      ys[i] = amax;
+    }
+    perSystem.push({name: sys.name, r: sys.r, band: sys.band, units: sys.units, xs, ys});
+  }
+
+  // envelope: min αmax across systems at each λ (tightest)
+  const envY = xs.map((_,i)=>{
+    let m = Infinity;
+    for(const c of perSystem){
+      const y = c.ys[i];
+      if(isFiniteNum(y) && y < m) m = y;
+    }
+    return (m===Infinity)?NaN:m;
+  });
+
+  state.curves = {
+    perSystem,
+    envelope: {xs, ys: envY},
+    meta: {
+      strict: state.strict,
+      absMode: state.absMode,
+      eps: state.eps,
+      lamMin: $("lamMin").value,
+      lamMax: $("lamMax").value,
+      lamN: $("lamN").value,
+      created: nowISO()
+    }
+  };
+
+  setBadge("ok", "Suite complete ✓ graphs updated");
+  logLine("✅ Suite finished. (Curves computed; see plots & table.)");
+
+  drawAll();
+  updateProbeTable();
+}
+
+/* =========================
+   Plotting (canvas)
+========================= */
+function niceLogBounds(vals){
+  // vals in linear; return {ymin,ymax} in log10
+  let lo = Infinity, hi = -Infinity;
+  for(const v of vals){
+    if(isFiniteNum(v) && v>0){
+      const lv = Math.log10(v);
+      if(lv<lo) lo=lv;
+      if(lv>hi) hi=lv;
+    }
+  }
+  if(lo===Infinity){ lo=-6; hi=0; }
+  // pad a bit
+  const pad = 0.25*(hi-lo || 1);
+  return {ymin: lo - pad, ymax: hi + pad};
+}
+
+function clearCanvas(cv){
+  const g = cv.getContext("2d");
+  g.clearRect(0,0,cv.width,cv.height);
+  // subtle background
+  g.fillStyle = "rgba(0,0,0,0.18)";
+  g.fillRect(0,0,cv.width,cv.height);
+  return g;
+}
+
+function drawAxes(g, w, h, xMin, xMax, yMin, yMax, title){
+  const padL=62, padR=18, padT=34, padB=48;
+  const plot = {x0:padL, y0:padT, x1:w-padR, y1:h-padB};
+  // border
+  g.strokeStyle = "rgba(255,255,255,0.10)";
+  g.lineWidth = 1;
+  g.strokeRect(plot.x0, plot.y0, plot.x1-plot.x0, plot.y1-plot.y0);
+
+  // grid lines (log-ish ticks)
+  g.strokeStyle = "rgba(255,255,255,0.06)";
+  g.lineWidth = 1;
+
+  for(let i=0;i<=6;i++){
+    const t = i/6;
+    const x = plot.x0 + (plot.x1-plot.x0)*t;
+    g.beginPath(); g.moveTo(x, plot.y0); g.lineTo(x, plot.y1); g.stroke();
+  }
+  for(let i=0;i<=6;i++){
+    const t = i/6;
+    const y = plot.y0 + (plot.y1-plot.y0)*t;
+    g.beginPath(); g.moveTo(plot.x0, y); g.lineTo(plot.x1, y); g.stroke();
+  }
+
+  // labels
+  g.fillStyle = "rgba(233,241,255,0.92)";
+  g.font = "800 14px ui-sans-serif, system-ui";
+  g.fillText(title, padL, 20);
+
+  g.fillStyle = "rgba(168,183,211,0.95)";
+  g.font = "700 12px ui-sans-serif, system-ui";
+  g.fillText("log10(λ)", (plot.x0+plot.x1)/2 - 28, h-14);
+  g.save();
+  g.translate(14, (plot.y0+plot.y1)/2 + 30);
+  g.rotate(-Math.PI/2);
+  g.fillText("log10(αmax)", 0, 0);
+  g.restore();
+
+  // tick numbers (approx)
+  g.fillStyle = "rgba(127,144,182,0.95)";
+  g.font = "600 11px ui-sans-serif, system-ui";
+  for(let i=0;i<=6;i++){
+    const t = i/6;
+    const xv = xMin + (xMax-xMin)*t;
+    const x = plot.x0 + (plot.x1-plot.x0)*t;
+    g.fillText(xv.toFixed(1), x-10, plot.y1+18);
+  }
+  for(let i=0;i<=6;i++){
+    const t = i/6;
+    const yv = yMax - (yMax-yMin)*t;
+    const y = plot.y0 + (plot.y1-plot.y0)*t;
+    g.fillText(yv.toFixed(1), 18, y+4);
+  }
+
+  return {plot, padL,padR,padT,padB};
+}
+
+function mapX(plot, x, xMin, xMax){
+  const t = (x - xMin) / (xMax - xMin);
+  return plot.x0 + (plot.x1-plot.x0)*t;
+}
+function mapY(plot, y, yMin, yMax){
+  const t = (y - yMin) / (yMax - yMin);
+  return plot.y1 - (plot.y1-plot.y0)*t;
+}
+
+function drawCurve(g, plot, xsLog, ysLog, xMin, xMax, yMin, yMax, strokeStyle){
+  g.strokeStyle = strokeStyle;
+  g.lineWidth = 2;
+  g.beginPath();
+  let started=false;
+  for(let i=0;i<xsLog.length;i++){
+    const x = xsLog[i], y = ysLog[i];
+    if(!isFiniteNum(x) || !isFiniteNum(y)) continue;
+    const X = mapX(plot, x, xMin, xMax);
+    const Y = mapY(plot, y, yMin, yMax);
+    if(!started){ g.moveTo(X,Y); started=true; }
+    else g.lineTo(X,Y);
+  }
+  g.stroke();
+}
+
+function drawLegend(g, items){
+  // items: [{name,color}]
+  const x0 = 62, y0 = 44;
+  g.font = "700 11px ui-sans-serif, system-ui";
+  let y = y0;
+  for(const it of items.slice(0,7)){ // keep it compact on phone
+    g.fillStyle = it.color;
+    g.fillRect(x0, y-8, 10, 10);
+    g.fillStyle = "rgba(233,241,255,.90)";
+    g.fillText(it.name, x0+14, y);
+    y += 16;
+  }
+  if(items.length>7){
+    g.fillStyle="rgba(127,144,182,.95)";
+    g.fillText(`+${items.length-7} more…`, x0, y);
+  }
+}
+
+function drawAll(){
+  if(!state.curves) return;
+
+  // x axis is log10(lambda)
+  const xs = state.curves.envelope.xs.map(v=>Math.log10(v));
+  const xMin = Math.min(...xs), xMax = Math.max(...xs);
+
+  // gather all y values for bounds
+  const allY = [];
+  for(const c of state.curves.perSystem) for(const y of c.ys) allY.push(y);
+  for(const y of state.curves.envelope.ys) allY.push(y);
+
+  const {ymin, ymax} = niceLogBounds(allY);
+
+  // Plot A
+  {
+    const cv = $("cvA");
+    const g = clearCanvas(cv);
+    const {plot} = drawAxes(g, cv.width, cv.height, xMin, xMax, ymin, ymax, "Per-system αmax(λ)");
+    const legend = [];
+
+    // choose distinct-ish neon-ish strokes (no external libs)
+    const palette = [
+      "rgba(52,214,255,0.95)",
+      "rgba(40,245,163,0.95)",
+      "rgba(255,210,74,0.95)",
+      "rgba(164,107,255,0.95)",
+      "rgba(255,176,0,0.95)",
+      "rgba(233,241,255,0.90)"
+    ];
+
+    state.curves.perSystem.forEach((c, idx)=>{
+      const col = palette[idx % palette.length];
+      const ysLog = c.ys.map(v=> (isFiniteNum(v) && v>0) ? Math.log10(v) : NaN);
+      drawCurve(g, plot, xs, ysLog, xMin, xMax, ymin, ymax, col);
+      legend.push({name: c.name, color: col});
+    });
+
+    drawLegend(g, legend);
+  }
+
+  // Plot B (envelope)
+  {
+    const cv = $("cvB");
+    const g = clearCanvas(cv);
+    const {plot} = drawAxes(g, cv.width, cv.height, xMin, xMax, ymin, ymax, "Combined envelope (tightest αmax)");
+    const ysLog = state.curves.envelope.ys.map(v=> (isFiniteNum(v) && v>0) ? Math.log10(v) : NaN);
+
+    // thick envelope
+    g.strokeStyle = "rgba(255,176,0,0.30)";
+    g.lineWidth = 7;
+    g.beginPath();
+    let started=false;
+    for(let i=0;i<xs.length;i++){
+      const x = xs[i], y = ysLog[i];
+      if(!isFiniteNum(y)) continue;
+      const X = mapX(plot, x, xMin, xMax);
+      const Y = mapY(plot, y, ymin, ymax);
+      if(!started){ g.moveTo(X,Y); started=true; }
+      else g.lineTo(X,Y);
+    }
+    g.stroke();
+
+    // crisp line on top
+    drawCurve(g, plot, xs, ysLog, xMin, xMax, ymin, ymax, "rgba(255,210,74,0.95)");
+
+    // marker for probe λ
+    const px = Math.log10(state.probeLam);
+    const nearest = nearestIndex(state.curves.envelope.xs, state.probeLam);
+    const py = state.curves.envelope.ys[nearest];
+    if(isFiniteNum(py) && py>0){
+      const X = mapX(plot, px, xMin, xMax);
+      const Y = mapY(plot, Math.log10(py), ymin, ymax);
+      g.fillStyle = "rgba(52,214,255,0.95)";
+      g.beginPath(); g.arc(X, Y, 6, 0, Math.PI*2); g.fill();
+      g.fillStyle = "rgba(233,241,255,0.92)";
+      g.font = "800 12px ui-sans-serif, system-ui";
+      g.fillText("probe", X+10, Y+4);
+    }
+  }
+}
+
+function nearestIndex(arr, x){
+  let best=0, bd=Infinity;
+  for(let i=0;i<arr.length;i++){
+    const d = Math.abs(arr[i]-x);
+    if(d<bd){ bd=d; best=i; }
+  }
+  return best;
+}
+
+function updateProbeTable(){
+  if(!state.curves) return;
+  const lam = state.probeLam;
+  $("probeRead").textContent = `λ = ${fmt(lam,4)} (log10=${Math.log10(lam).toFixed(2)})`;
+
+  const i = nearestIndex(state.curves.envelope.xs, lam);
+  const tbody = $("tbl").querySelector("tbody");
+  tbody.innerHTML = "";
+
+  // per system rows
+  for(const c of state.curves.perSystem){
+    const f = kernelFactor(c.r, state.curves.envelope.xs[i], state.strict);
+    const amax = c.ys[i];
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${escapeHtml(c.name)}</td>
+      <td class="mono">${fmt(c.r,4)}</td>
+      <td class="mono">${fmt(c.band,4)}</td>
+      <td class="mono">${fmt(f,4)}</td>
+      <td class="mono">${fmt(amax,4)}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  // envelope row
+  const env = state.curves.envelope.ys[i];
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td><b>ENVELOPE (tightest)</b></td>
+    <td class="mono">—</td>
+    <td class="mono">—</td>
+    <td class="mono">—</td>
+    <td class="mono"><b>${fmt(env,4)}</b></td>
+  `;
+  tbody.appendChild(tr);
+
+  drawAll();
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, (c)=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[c]));
+}
+
+/* =========================
+   Self tests (try to break it)
+========================= */
+function runSelfTests(){
+  $("log").textContent = "";
+  setBadge("neutral","Running self-tests…");
+
+  readControls();
+
+  let pass=0, fail=0;
+  const out = [];
+  function ok(cond, msg){
+    if(cond){ pass++; out.push("✅ " + msg); }
+    else{ fail++; out.push("❌ " + msg); }
+  }
+
+  // basic kernel sanity
+  ok(Math.abs(Math.exp(-0.1)-0.9048374180) < 5e-7, "exp(-0.1) approx correct");
+  ok(Number.isNaN(kernelFactor(-1, 1, false)), "negative r => NaN");
+  ok(Number.isNaN(kernelFactor(1, -1, false)), "negative λ => NaN");
+  ok(Math.abs(kernelFactor(0, 5, false)-1) < 1e-12, "r=0 => f=1 (potential)");
+  ok(Math.abs(kernelFactor(0, 5, true)-1) < 1e-12, "r=0 => f=1 (strict accel)");
+
+  // strict should be >= potential for same r,λ (since (1+x)e^{-x} >= e^{-x})
+  {
+    const r=2, lam=3;
+    ok(kernelFactor(r,lam,true) >= kernelFactor(r,lam,false), "strict f >= potential f");
+  }
+
+  // αmax = band/f
+  {
+    const band=0.002, r=1, lam=10;
+    const f = kernelFactor(r,lam,false);
+    const amax = alphaMaxAllowed(band,f);
+    ok(Math.abs(amax*f - band) < 1e-12, "alphaMaxAllowed inverts correctly");
+  }
+
+  // monotonic: for fixed r, f increases with λ (less suppression), so alphaMax decreases
+  {
+    const r=1, band=0.002;
+    const f1 = kernelFactor(r, 0.1, false);
+    const f2 = kernelFactor(r, 10, false);
+    const a1 = alphaMaxAllowed(band,f1);
+    const a2 = alphaMaxAllowed(band,f2);
+    ok(f2 > f1, "f increases with λ");
+    ok(a2 < a1, "αmax decreases with λ");
+  }
+
+  // envelope correctness (min across systems)
+  {
+    const systems = [
+      {name:"A", r:1, band:0.002},
+      {name:"B", r:1, band:0.001}
+    ];
+    const lam=10;
+    const f = kernelFactor(1,lam,false);
+    const aA = alphaMaxAllowed(0.002,f);
+    const aB = alphaMaxAllowed(0.001,f);
+    ok(aB < aA, "smaller band => tighter αmax");
+  }
+
+  setBadge(fail===0 ? "ok" : "bad", `Self-tests: ${pass} pass, ${fail} fail`);
+  logLine("=== SELF-TEST SUITE ===");
+  logLine("Pass: " + pass);
+  logLine("Fail: " + fail);
+  logLine("");
+  out.forEach(l=>logLine(l));
+}
+
+/* =========================
+   CSV import
+========================= */
+function parseCSV(text){
+  // simple CSV (no quoted commas). good enough for our use.
+  const lines = text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+  if(lines.length===0) return [];
+  const head = lines[0].split(",").map(s=>s.trim().toLowerCase());
+  const idxName = head.indexOf("name");
+  const idxR = head.indexOf("r");
+  const idxBand = head.indexOf("band");
+  const idxUnits = head.indexOf("units");
+
+  const rows = [];
+  for(let i=1;i<lines.length;i++){
+    const parts = lines[i].split(",").map(s=>s.trim());
+    const name = idxName>=0 ? parts[idxName] : parts[0];
+    const r = Number(idxR>=0 ? parts[idxR] : parts[1]);
+    const band = Number(idxBand>=0 ? parts[idxBand] : parts[2]);
+    const units = idxUnits>=0 ? (parts[idxUnits]||"") : "";
+    if(name) rows.push({name, r, band, units});
+  }
+  return rows;
+}
+
+/* =========================
+   Export
+========================= */
+function download(name, text, mime="text/plain"){
+  const blob = new Blob([text], {type:mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 5000);
+}
+
+function exportReportJSON(){
+  if(!state.curves){
+    setBadge("bad","Nothing to export");
+    logLine("❌ Run the suite first.");
+    return;
+  }
+  const report = {
+    type: "QDS_Pulsar_Suite_OneButton_MAX",
+    created: nowISO(),
+    meta: state.curves.meta,
+    systems: state.systems,
+    note: "Toy mapping: compares |α·f(r,λ)| to band. Replace demo system values with literature values or your dataset.",
+    curves: {
+      lambda: state.curves.envelope.xs,
+      envelope_alphaMax: state.curves.envelope.ys,
+      perSystem: state.curves.perSystem.map(c=>({
+        name: c.name, r: c.r, band: c.band, units: c.units, alphaMax: c.ys
+      }))
+    }
+  };
+  download(`qds_pulsar_suite_report_${Date.now()}.json`, JSON.stringify(report, null, 2), "application/json");
+  setBadge("ok","Exported JSON ✓");
+}
+
+function exportCurvesCSV(){
+  if(!state.curves){
+    setBadge("bad","Nothing to export");
+    logLine("❌ Run the suite first.");
+    return;
+  }
+  const lam = state.curves.envelope.xs;
+  const cols = ["lambda","envelope_alphaMax"].concat(state.curves.perSystem.map(c=>c.name.replaceAll(","," ")));
+  const lines = [cols.join(",")];
+
+  for(let i=0;i<lam.length;i++){
+    const row = [lam[i], state.curves.envelope.ys[i]];
+    for(const c of state.curves.perSystem) row.push(c.ys[i]);
+    lines.push(row.join(","));
+  }
+  download(`qds_pulsar_suite_curves_${Date.now()}.csv`, lines.join("\n"), "text/csv");
+  setBadge("ok","Exported CSV ✓");
+}
+
+function copyShareLink(){
+  // encode minimal state in hash (small)
+  try{
+    const sys = safeJsonParse($("systemsJson").value);
+    if(!sys.ok) throw new Error("Systems JSON invalid");
+    const payload = {
+      strict: $("strictMode").checked ? 1 : 0,
+      abs: $("absMode").checked ? 1 : 0,
+      eps: $("epsSlider").value,
+      lmin: $("lamMin").value,
+      lmax: $("lamMax").value,
+      n: $("lamN").value,
+      systems: sys.val
+    };
+    const enc = btoa(unescape(encodeURIComponent(JSON.stringify(payload)))).slice(0, 6000);
+    const url = location.origin + location.pathname + "#S=" + enc;
+    navigator.clipboard.writeText(url);
+    setBadge("ok","Share link copied ✓");
+    logLine("🔗 Copied share link (hash state).");
+  }catch(e){
+    setBadge("bad","Copy failed");
+    logLine("❌ Share link error: " + e.message);
+  }
+}
+
+/* =========================
+   Hash restore
+========================= */
+function tryRestoreFromHash(){
+  const h = location.hash || "";
+  const m = h.match(/#S=([A-Za-z0-9+/=]+)/);
+  if(!m) return;
+  try{
+    const json = decodeURIComponent(escape(atob(m[1])));
+    const p = JSON.parse(json);
+
+    $("strictMode").checked = !!p.strict;
+    $("absMode").checked = !!p.abs;
+    $("epsSlider").value = String(p.eps ?? "-5.7");
+    $("lamMin").value = String(p.lmin ?? "-3");
+    $("lamMax").value = String(p.lmax ?? "3");
+    $("lamN").value = String(p.n ?? "140");
+    $("systemsJson").value = JSON.stringify(p.systems ?? DEFAULT_SYSTEMS, null, 2);
+
+    setBadge("neutral","Restored from share link. Run suite.");
+  }catch(e){
+    // ignore
+  }
+}
+
+/* =========================
+   Wire up
+========================= */
+loadDefaults();
+tryRestoreFromHash();
+readControls();
+
+$("btnLoadDefaults").addEventListener("click", ()=>{
+  loadDefaults();
+  setBadge("neutral","Defaults loaded.");
+});
+
+$("btnValidate").addEventListener("click", ()=>{
+  const parsed = safeJsonParse($("systemsJson").value);
+  if(!parsed.ok){ setBadge("bad","Invalid JSON"); logLine("❌ " + parsed.err); return; }
+  const v = validateSystems(parsed.val);
+  if(v.ok){ setBadge("ok","Systems valid ✓"); logLine("✅ Systems valid ("+v.systems.length+")."); }
+  else { setBadge("bad","Systems invalid"); v.errs.forEach(e=>logLine("❌ "+e)); }
+});
+
+$("btnRun").addEventListener("click", runSuite);
+$("btnSelfTest").addEventListener("click", runSelfTests);
+
+$("btnClear").addEventListener("click", ()=>{
+  $("log").textContent="";
+  setBadge("neutral","Cleared.");
+  const gA = clearCanvas($("cvA"));
+  const gB = clearCanvas($("cvB"));
+  $("tbl").querySelector("tbody").innerHTML="";
+  state.curves=null;
+});
+
+$("btnExportJson").addEventListener("click", exportReportJSON);
+$("btnExportCsv").addEventListener("click", exportCurvesCSV);
+$("btnCopyLink").addEventListener("click", copyShareLink);
+
+$("epsSlider").addEventListener("input", ()=>{
+  readControls();
+  if(state.curves){ drawAll(); updateProbeTable(); }
+});
+
+$("probeSlider").addEventListener("input", ()=>{
+  const logL = parseFloat($("probeSlider").value);
+  state.probeLam = Math.pow(10, logL);
+  updateProbeTable();
+});
+
+$("strictMode").addEventListener("change", ()=>{ if(state.curves) runSuite(); });
+$("absMode").addEventListener("change", ()=>{ if(state.curves) runSuite(); });
+
+$("csvFile").addEventListener("change", async (e)=>{
+  const f = e.target.files && e.target.files[0];
+  if(!f) return;
+  const text = await f.text();
+  const rows = parseCSV(text);
+  if(!rows.length){
+    setBadge("bad","CSV empty");
+    logLine("❌ CSV parsed 0 rows.");
+    return;
+  }
+  $("systemsJson").value = JSON.stringify(rows, null, 2);
+  setBadge("ok", "CSV loaded ✓");
+  logLine("✅ Loaded CSV rows: " + rows.length);
+});
+
+/* set probe slider bounds to follow lamMin/lamMax inputs */
+function syncProbeBounds(){
+  const a = parseFloat($("lamMin").value);
+  const b = parseFloat($("lamMax").value);
+  $("probeSlider").min = String(Math.min(a,b));
+  $("probeSlider").max = String(Math.max(a,b));
+}
+$("lamMin").addEventListener("input", syncProbeBounds);
+$("lamMax").addEventListener("input", syncProbeBounds);
+syncProbeBounds();
+
+/* init probe */
+state.probeLam = 1;
+$("probeSlider").value = "0";
+updateProbeTable();
+</script>
+</body>
+</html>

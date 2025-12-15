@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Test slider page 3</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --qds-bg: #050410;
+      --qds-panel: #0c0c1c;
+      --qds-border: #25254a;
+      --qds-text: #f6f7ff;
+      --qds-muted: #8e94c5;
+      --qds-primary: #1eff6b;
+      --qds-secondary: #41ffb0;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #141432 0, var(--qds-bg) 55%, #020208 100%);
+      color: var(--qds-text);
+      min-height: 100vh;
+      padding: 12px;
+    }
+    .qds-shell {
+      max-width: 1200px;
+      margin: 0 auto 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .qds-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: linear-gradient(120deg, rgba(0,0,0,0.75), rgba(20,20,60,0.9));
+      box-shadow: 0 0 22px rgba(0,0,0,0.65), 0 0 30px rgba(30, 255, 107, 0.45);
+    }
+    .qds-nav-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .qds-orb {
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #fff, var(--qds-primary));
+      box-shadow: 0 0 14px var(--qds-primary), 0 0 26px var(--qds-secondary);
+    }
+    .qds-nav-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .qds-nav-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--qds-muted);
+    }
+    .qds-nav-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .qds-nav-right {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .qds-pill {
+      font-size: 0.7rem;
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.09);
+      background: rgba(5,5,14,0.95);
+      color: var(--qds-muted);
+    }
+    .qds-pill-accent {
+      border-color: var(--qds-primary);
+      color: var(--qds-primary);
+    }
+    .qds-hero {
+      margin-top: 8px;
+      padding: 14px 14px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--qds-border);
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.12), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(0,0,0,0.85), #050414);
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.3fr);
+      gap: 10px;
+    }
+    @media (max-width: 800px) {
+      .qds-hero {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+    .qds-hero-main h1 {
+      margin: 0 0 4px;
+      font-size: 1.4rem;
+    }
+    .qds-hero-main p {
+      margin: 0 0 7px;
+      font-size: 0.9rem;
+      color: var(--qds-muted);
+    }
+    .qds-hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 3px;
+    }
+    .qds-tag {
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(5,5,18,0.9);
+    }
+    .qds-hero-meta {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+      align-content: flex-start;
+    }
+    .qds-metric {
+      padding: 7px 9px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(3,5,18,0.95);
+    }
+    .qds-metric-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.11em;
+      color: var(--qds-muted);
+      margin-bottom: 3px;
+    }
+    .qds-metric-value {
+      font-size: 0.9rem;
+    }
+    .qds-strip {
+      margin-top: 10px;
+      padding: 8px 11px;
+      border-radius: 999px;
+      border: 1px dashed rgba(255,255,255,0.12);
+      background: rgba(5,6,20,0.92);
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+      font-size: 0.78rem;
+    }
+    @media (max-width: 640px) {
+      .qds-strip {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+    .qds-strip-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .qds-strip-label {
+      color: var(--qds-muted);
+    }
+    .qds-strip-value {
+      font-weight: 600;
+    }
+    .qds-online {
+      color: var(--qds-primary);
+    }
+    .qds-main-grid {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+    }
+    .qds-panel {
+      border-radius: 18px;
+      border: 1px solid var(--qds-border);
+      background: radial-gradient(circle at top left, rgba(255,255,255,0.08), transparent 60%), #050412;
+      padding: 10px 11px 12px;
+      min-height: 80px;
+    }
+    .qds-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .qds-panel-header h2,
+    .qds-panel-header h3 {
+      margin: 0;
+      font-size: 0.95rem;
+    }
+    .qds-panel-pill {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--qds-muted);
+    }
+    .qds-panel-body {
+      font-size: 0.82rem;
+      color: var(--qds-muted);
+    }
+    .qds-main-single {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .qds-panel-full {
+      width: 100%;
+    }
+    .qds-panel-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+    }
+    .qds-panel-mini h3 {
+      font-size: 0.9rem;
+    }
+    .qds-main-news {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.3fr);
+      gap: 12px;
+    }
+    @media (max-width: 880px) {
+      .qds-main-news {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+    .qds-news-column h2 {
+      margin: 0 0 4px;
+      font-size: 1.05rem;
+    }
+    .qds-news-hint {
+      margin: 0 0 8px;
+      font-size: 0.78rem;
+      color: var(--qds-muted);
+    }
+    .qds-news-lane {
+      border-radius: 14px;
+      border: 1px solid var(--qds-border);
+      background: rgba(5,5,20,0.95);
+      padding: 8px 10px;
+      margin-bottom: 8px;
+    }
+    .qds-news-lane h3 {
+      margin: 0 0 4px;
+      font-size: 0.9rem;
+    }
+    .qds-news-lane-vs { border-color: #ff6a88; }
+    .qds-news-lane-comp { border-color: var(--qds-primary); }
+    .qds-news-lane-neutral { border-style: dashed; }
+    .qds-list {
+      margin: 0;
+      padding-left: 14px;
+      font-size: 0.8rem;
+      color: var(--qds-muted);
+    }
+    .qds-scratch {
+      width: 100%;
+      min-height: 150px;
+      border-radius: 14px;
+      border: 1px solid var(--qds-border);
+      background: rgba(5,6,24,0.96);
+      color: var(--qds-text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.8rem;
+      padding: 8px 9px;
+      resize: vertical;
+    }
+    .qds-main-blank {
+      margin-top: 10px;
+    }
+    .qds-footer {
+      margin-top: 12px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.09);
+      background: rgba(4,4,16,0.94);
+      font-size: 0.78rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: space-between;
+      color: var(--qds-muted);
+    }
+    .qds-footer-meta {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="qds-shell">
+
+  <header class="qds-nav">
+    <div class="qds-nav-left">
+      <div class="qds-orb"></div>
+      <div class="qds-nav-text">
+        <span class="qds-nav-label">QDS LAB</span>
+        <span class="qds-nav-title">Experimental Board</span>
+      </div>
+    </div>
+    <div class="qds-nav-right">
+      <span class="qds-pill">LOCAL</span>
+      <span class="qds-pill qds-pill-accent">News / QDS Vault</span>
+    </div>
+  </header>
+  <section class="qds-hero">
+    <div class="qds-hero-main">
+      <h1>Experimental Board</h1>
+      <p>Fast neon scaffold for the next micro-lab idea.</p>
+      <div class="qds-hero-tags">
+        <span class="qds-tag">Phone-lab</span>
+        <span class="qds-tag">Offline-ready</span>
+        <span class="qds-tag">Neon-HTML</span>
+      </div>
+    </div>
+    <div class="qds-hero-meta">
+      <div class="qds-metric">
+        <div class="qds-metric-label">LAYOUT</div>
+        <div class="qds-metric-value">NEWS</div>
+      </div>
+      <div class="qds-metric">
+        <div class="qds-metric-label">THEME</div>
+        <div class="qds-metric-value">Matrix Green</div>
+      </div>
+      <div class="qds-metric">
+        <div class="qds-metric-label">SECTIONS</div>
+        <div class="qds-metric-value">3</div>
+      </div>
+    </div>
+  </section>
+  <section class="qds-strip">
+    <div class="qds-strip-item">
+      <span class="qds-strip-label">MODE</span>
+      <span class="qds-strip-value">Design</span>
+    </div>
+    <div class="qds-strip-item">
+      <span class="qds-strip-label">DEVICE</span>
+      <span class="qds-strip-value">Termux Micro-Lab</span>
+    </div>
+    <div class="qds-strip-item">
+      <span class="qds-strip-label">STATUS</span>
+      <span class="qds-strip-value qds-online">Ready</span>
+    </div>
+  </section>
+  <main class="qds-main-news">
+    <section class="qds-news-column">
+      <h2>QDS vs Mainstream</h2>
+      <p class="qds-news-hint">Paste articles and mark: supports, contradicts, or neutral to a QDS prediction.</p>
+      <div class="qds-news-lane qds-news-lane-vs">
+        <h3>Potentially vs QDS</h3>
+        <ul class="qds-list" id="qds-vs-list">
+          <li>• Drop bullet points here while reading.</li>
+        </ul>
+      </div>
+      <div class="qds-news-lane qds-news-lane-comp">
+        <h3>Complementary / supporting</h3>
+        <ul class="qds-list" id="qds-comp-list">
+          <li>• Use this lane for “nice match” notes.</li>
+        </ul>
+      </div>
+      <div class="qds-news-lane qds-news-lane-neutral">
+        <h3>Neutral / background</h3>
+        <ul class="qds-list" id="qds-neutral-list">
+          <li>• Good context, but not decisive.</li>
+        </ul>
+      </div>
+    </section>
+    <section class="qds-news-column">
+      <h2>Triage scratchpad</h2>
+      <textarea class="qds-scratch" placeholder="Drop quotes, numbers, and quick verdicts here…"></textarea>
+      <p class="qds-news-hint">When done, copy this whole block into your QDS log / evidence pack.</p>
+    </section>
+  </main>
+  <footer class="qds-footer">
+    <span>Built with <strong>QDS Page Forge v1</strong> on a phone-lab.</span>
+    <span class="qds-footer-meta">File: qds_new_lab_test_demo.html</span>
+  </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>Ω Marble Run — True 3D-ish v3</title>
+<style>
+  :root{
+    --panel1:#0b0f1f;
+    --panel2:#0a132e;
+    --accent:#7ad7ff;
+    --accent2:#c79bff;
+    --text:#eef3ff;
+    --muted:rgba(238,243,255,0.75);
+  }
+  html,body{
+    margin:0; padding:0;
+    background:#04050b;
+    color:var(--text);
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    overflow:hidden;
+    touch-action:none;
+  }
+  canvas{
+    position:fixed; inset:0;
+    width:100vw; height:100vh;
+    display:block;
+  }
+
+  #hud{
+    position:fixed;
+    top:10px; left:10px;
+    width:min(92vw, 460px);
+    background:
+      radial-gradient(900px 320px at 10% 0%, rgba(122,215,255,0.12), transparent 60%),
+      linear-gradient(135deg, var(--panel1), var(--panel2));
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:18px;
+    padding:14px 14px 12px 14px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.65),
+                inset 0 0 0 1px rgba(255,255,255,0.03);
+    backdrop-filter: blur(6px);
+    z-index:5;
+  }
+  #hud.hidden{ display:none; }
+
+  #title{
+    font-weight:800;
+    font-size:18px;
+    letter-spacing:0.02em;
+    margin:0 0 2px 0;
+  }
+  #subtitle{
+    margin:0 0 10px 0;
+    font-size:11px; color:var(--muted);
+  }
+
+  .row{ margin:8px 0; }
+  label{
+    display:flex; justify-content:space-between;
+    font-size:11px; color:var(--muted);
+    margin-bottom:4px;
+  }
+  input[type="range"]{ width:100%; }
+
+  .btnrow{
+    display:grid;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap:6px;
+    margin-top:6px;
+  }
+  button{
+    border:0;
+    border-radius:999px;
+    padding:9px 10px;
+    font-size:11px;
+    font-weight:700;
+    color:#0a0a12;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    box-shadow: 0 6px 14px rgba(0,0,0,0.5);
+    cursor:pointer;
+  }
+  button.secondary{
+    color:var(--text);
+    background: linear-gradient(90deg, #1a2244, #141a36);
+    border:1px solid rgba(255,255,255,0.06);
+  }
+  button.warn{
+    color:#120000;
+    background: linear-gradient(90deg, #ff9d00, #ff3d7a);
+  }
+
+  #hudToggle{
+    position:fixed;
+    right:10px; top:10px;
+    z-index:6;
+    padding:10px 14px;
+    font-size:12px;
+    border-radius:14px;
+    color:#001018;
+    background: radial-gradient(circle at 20% 20%, #c8f5ff, #6fd0ff 55%, #3b7bff 100%);
+    border:0;
+    box-shadow: 0 10px 22px rgba(0,0,0,0.6);
+  }
+
+  #footerPill{
+    position:fixed;
+    left:50%; bottom:10px;
+    transform: translateX(-50%);
+    background: rgba(5,8,20,0.6);
+    border:1px solid rgba(255,255,255,0.06);
+    color:var(--muted);
+    font-size:10px;
+    padding:6px 10px;
+    border-radius:999px;
+    z-index:4;
+    backdrop-filter: blur(6px);
+    max-width:92vw;
+    text-align:center;
+  }
+
+  .status{
+    margin-top:8px;
+    font-size:10px;
+    color:var(--muted);
+    padding:6px 8px;
+    border-radius:10px;
+    background: rgba(0,0,0,0.25);
+    border:1px solid rgba(255,255,255,0.04);
+  }
+</style>
+</head>
+<body>
+<button id="hudToggle">HUD: ON</button>
+
+<div id="hud">
+  <div id="title">Ω Marble Run — True 3D-ish v3 🎩</div>
+  <div id="subtitle">Single-file • phone-safe • orbit camera • neon space • no eye-melt guarantee.</div>
+
+  <div class="row">
+    <label><span>Camera Yaw</span><span id="yawVal">40°</span></label>
+    <input id="yaw" type="range" min="0" max="360" step="1" value="40">
+  </div>
+
+  <div class="row">
+    <label><span>Camera Pitch</span><span id="pitchVal">-22°</span></label>
+    <input id="pitch" type="range" min="-75" max="5" step="1" value="-22">
+  </div>
+
+  <div class="row">
+    <label><span>Zoom</span><span id="zoomVal">1.00×</span></label>
+    <input id="zoom" type="range" min="0.6" max="1.6" step="0.01" value="1.00">
+  </div>
+
+  <div class="row">
+    <label><span>Speed</span><span id="speedVal">1.40×</span></label>
+    <input id="speed" type="range" min="0.4" max="3.0" step="0.01" value="1.40">
+  </div>
+
+  <div class="row">
+    <label><span>Friction</span><span id="fricVal">0.028</span></label>
+    <input id="fric" type="range" min="0.000" max="0.120" step="0.001" value="0.028">
+  </div>
+
+  <div class="row">
+    <label><span>Gravity</span><span id="gravVal">9.0</span></label>
+    <input id="grav" type="range" min="2" max="18" step="0.1" value="9.0">
+  </div>
+
+  <div class="row">
+    <label><span>Marble Size</span><span id="sizeVal">1.00×</span></label>
+    <input id="size" type="range" min="0.6" max="1.8" step="0.01" value="1.00">
+  </div>
+
+  <div class="btnrow">
+    <button id="reset" class="secondary">RESET RUN</button>
+    <button id="add">ADD MARBLE</button>
+    <button id="chaos" class="warn">MAX CHAOS</button>
+  </div>
+
+  <div class="btnrow">
+    <button id="autoCam" class="secondary">AUTO CAM: ON</button>
+    <button id="topView" class="secondary">CINEMA VIEW</button>
+    <button id="snap" class="secondary">SNAP NEON</button>
+  </div>
+
+  <div class="status" id="status">Status: Orbit ready. Drag the screen to rotate the camera.</div>
+</div>
+
+<canvas id="c"></canvas>
+<div id="footerPill">Drag the screen to orbit. Two-finger pinch not needed. Pure finger wizardry. ☕</div>
+
+<script>
+(() => {
+  "use strict";
+
+  // ------------------------------------------------------------
+  // Canvas
+  // ------------------------------------------------------------
+  const canvas = document.getElementById("c");
+  const ctx = canvas.getContext("2d", { alpha: false });
+
+  function resize(){
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    canvas.width = Math.floor(innerWidth * dpr);
+    canvas.height = Math.floor(innerHeight * dpr);
+    canvas.style.width = innerWidth + "px";
+    canvas.style.height = innerHeight + "px";
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  addEventListener("resize", resize, { passive:true });
+  resize();
+
+  // ------------------------------------------------------------
+  // HUD + persistence
+  // ------------------------------------------------------------
+  const hud = document.getElementById("hud");
+  const hudToggle = document.getElementById("hudToggle");
+  const statusEl = document.getElementById("status");
+  const HUD_KEY = "omega_marble_hud_visible_v3";
+
+  function setStatus(msg){ statusEl.textContent = "Status: " + msg; }
+
+  function getHudVisible(){
+    const v = localStorage.getItem(HUD_KEY);
+    return v === null ? true : (v === "1");
+  }
+  function applyHudVisible(v){
+    if(v){
+      hud.classList.remove("hidden");
+      hudToggle.textContent = "HUD: ON";
+      localStorage.setItem(HUD_KEY, "1");
+    }else{
+      hud.classList.add("hidden");
+      hudToggle.textContent = "HUD: OFF";
+      localStorage.setItem(HUD_KEY, "0");
+    }
+  }
+  applyHudVisible(getHudVisible());
+  hudToggle.addEventListener("click", () => applyHudVisible(hud.classList.contains("hidden")));
+
+  // ------------------------------------------------------------
+  // Controls
+  // ------------------------------------------------------------
+  const yaw = document.getElementById("yaw");
+  const pitch = document.getElementById("pitch");
+  const zoom = document.getElementById("zoom");
+  const speed = document.getElementById("speed");
+  const fric = document.getElementById("fric");
+  const grav = document.getElementById("grav");
+  const size = document.getElementById("size");
+
+  const yawVal = document.getElementById("yawVal");
+  const pitchVal = document.getElementById("pitchVal");
+  const zoomVal = document.getElementById("zoomVal");
+  const speedVal = document.getElementById("speedVal");
+  const fricVal = document.getElementById("fricVal");
+  const gravVal = document.getElementById("gravVal");
+  const sizeVal = document.getElementById("sizeVal");
+
+  function syncLabels(){
+    yawVal.textContent = `${Math.round(+yaw.value)}°`;
+    pitchVal.textContent = `${Math.round(+pitch.value)}°`;
+    zoomVal.textContent = `${(+zoom.value).toFixed(2)}×`;
+    speedVal.textContent = `${(+speed.value).toFixed(2)}×`;
+    fricVal.textContent = (+fric.value).toFixed(3);
+    gravVal.textContent = (+grav.value).toFixed(1);
+    sizeVal.textContent = `${(+size.value).toFixed(2)}×`;
+  }
+  syncLabels();
+
+  // ------------------------------------------------------------
+  // "True 3D-ish" orbit camera
+  // ------------------------------------------------------------
+  const cam = {
+    yaw: deg(+yaw.value),
+    pitch: deg(+pitch.value),
+    dist: 520,
+    auto: true,
+    zoom: +zoom.value
+  };
+  function deg(d){ return d*Math.PI/180; }
+
+  function updateCamFromSliders(){
+    cam.yaw = deg(+yaw.value);
+    cam.pitch = deg(+pitch.value);
+    cam.zoom = +zoom.value;
+  }
+
+  yaw.addEventListener("input", () => { updateCamFromSliders(); syncLabels(); });
+  pitch.addEventListener("input", () => { updateCamFromSliders(); syncLabels(); });
+  zoom.addEventListener("input", () => { updateCamFromSliders(); syncLabels(); });
+  speed.addEventListener("input", syncLabels);
+  fric.addEventListener("input", syncLabels);
+  grav.addEventListener("input", syncLabels);
+  size.addEventListener("input", syncLabels);
+
+  // Touch drag to orbit (V9.2 solar feel)
+  let dragging=false, lastX=0, lastY=0;
+
+  function onDown(e){
+    dragging=true;
+    const t = e.touches ? e.touches[0] : e;
+    lastX=t.clientX; lastY=t.clientY;
+  }
+  function onMove(e){
+    if(!dragging) return;
+    const t = e.touches ? e.touches[0] : e;
+    const dx = t.clientX - lastX;
+    const dy = t.clientY - lastY;
+    lastX=t.clientX; lastY=t.clientY;
+
+    // If user is actively dragging, pause auto cam
+    cam.auto = false;
+    autoCamBtn.textContent = "AUTO CAM: OFF";
+
+    cam.yaw += dx * 0.005;
+    cam.pitch += dy * 0.005;
+
+    // Clamp pitch
+    const minP = deg(-80), maxP = deg(8);
+    cam.pitch = Math.max(minP, Math.min(maxP, cam.pitch));
+
+    // Reflect into sliders for sanity
+    yaw.value = String(Math.round((cam.yaw*180/Math.PI)%360 + 360)%360);
+    pitch.value = String(Math.round(cam.pitch*180/Math.PI));
+    syncLabels();
+  }
+  function onUp(){ dragging=false; }
+
+  window.addEventListener("touchstart", onDown, { passive:true });
+  window.addEventListener("touchmove", onMove, { passive:true });
+  window.addEventListener("touchend", onUp, { passive:true });
+  window.addEventListener("mousedown", onDown);
+  window.addEventListener("mousemove", onMove);
+  window.addEventListener("mouseup", onUp);
+
+  // ------------------------------------------------------------
+  // 3D transforms + projection
+  // ------------------------------------------------------------
+  function rotateY(p, a){
+    const ca=Math.cos(a), sa=Math.sin(a);
+    return { x: p.x*ca + p.z*sa, y:p.y, z: -p.x*sa + p.z*ca };
+  }
+  function rotateX(p, a){
+    const ca=Math.cos(a), sa=Math.sin(a);
+    return { x:p.x, y: p.y*ca - p.z*sa, z: p.y*sa + p.z*ca };
+  }
+
+  function project(p){
+    // Orbit camera: rotate world opposite camera angles
+    let v = rotateY(p, cam.yaw);
+    v = rotateX(v, cam.pitch);
+
+    const dist = cam.dist / cam.zoom;
+    const z = v.z + dist;
+
+    // Perspective factor
+    const f = 520 / Math.max(120, z);
+
+    const cx = innerWidth * 0.5;
+    const cy = innerHeight * 0.58;
+
+    return { x: cx + v.x*f, y: cy - v.y*f, s: f, z: z };
+  }
+
+  // ------------------------------------------------------------
+  // Track — more verticality so 3D reads clearly
+  // ------------------------------------------------------------
+  function buildTrack(){
+    const pts = [];
+
+    // Upper run (left -> right)
+    for(let i=0;i<=18;i++){
+      pts.push({ x: -120 + i*14, y: 70, z: -60 });
+    }
+
+    // Drop + turn
+    for(let i=0;i<=16;i++){
+      const t=i/16;
+      pts.push({
+        x: 130 + Math.cos(t*Math.PI/2)*28,
+        y: 70 - t*32,
+        z: -60 + Math.sin(t*Math.PI/2)*95
+      });
+    }
+
+    // Mid sweeping wave
+    for(let i=0;i<=32;i++){
+      const t=i/32;
+      pts.push({
+        x: 90 - t*210,
+        y: 38 - t*10,
+        z: 35 + Math.sin(t*Math.PI*2)*35
+      });
+    }
+
+    // Big vertical chute (Cuboro drop vibe)
+    for(let i=0;i<=14;i++){
+      const t=i/14;
+      pts.push({ x: -120, y: 28 - t*70, z: 35 + t*20 });
+    }
+
+    // Lower spiral bowl
+    const cx=-30, cz=95, r=70;
+    for(let i=0;i<=46;i++){
+      const t=i/46;
+      const ang = t*Math.PI*1.8 + 0.3;
+      pts.push({
+        x: cx + Math.cos(ang)*r,
+        y: -42 + Math.sin(t*Math.PI)*10,
+        z: cz + Math.sin(ang)*r
+      });
+    }
+
+    // Exit ramp up
+    for(let i=0;i<=20;i++){
+      const t=i/20;
+      pts.push({
+        x: 10 + t*130,
+        y: -40 + t*30,
+        z: 55 - t*75
+      });
+    }
+
+    // Final settle
+    for(let i=0;i<=10;i++){
+      const t=i/10;
+      pts.push({
+        x: 140 - t*35,
+        y: -10 - t*4,
+        z: -20
+      });
+    }
+
+    return smoothPath(pts, 6);
+  }
+
+  function smoothPath(base, rounds=4){
+    let pts = base.slice();
+    for(let r=0;r<rounds;r++){
+      const out=[];
+      for(let i=0;i<pts.length-1;i++){
+        const a=pts[i], b=pts[i+1];
+        out.push(a);
+        out.push({ x:(a.x+b.x)/2, y:(a.y+b.y)/2, z:(a.z+b.z)/2 });
+      }
+      out.push(pts[pts.length-1]);
+      pts=out;
+    }
+    return pts;
+  }
+
+  const track = buildTrack();
+
+  // Distances
+  const distArr=[0];
+  for(let i=1;i<track.length;i++){
+    const a=track[i-1], b=track[i];
+    distArr.push(distArr[i-1] + Math.hypot(b.x-a.x, b.y-a.y, b.z-a.z));
+  }
+  const trackLen = distArr[distArr.length-1];
+
+  function sampleTrack(s){
+    s = ((s % trackLen) + trackLen) % trackLen;
+    let lo=0, hi=distArr.length-1;
+    while(lo<hi){
+      const mid=(lo+hi)>>1;
+      if(distArr[mid] < s) lo=mid+1; else hi=mid;
+    }
+    const i = Math.max(1, lo);
+    const s0=distArr[i-1], s1=distArr[i];
+    const t = (s - s0) / Math.max(1e-6, (s1-s0));
+    const a=track[i-1], b=track[i];
+    return { x:a.x+(b.x-a.x)*t, y:a.y+(b.y-a.y)*t, z:a.z+(b.z-a.z)*t, i0:i-1 };
+  }
+
+  function tangentAt(i){
+    const i0=Math.max(0,i-1), i1=Math.min(track.length-1,i+1);
+    const a=track[i0], b=track[i1];
+    const dx=b.x-a.x, dy=b.y-a.y, dz=b.z-a.z;
+    const L=Math.hypot(dx,dy,dz)||1;
+    return { x:dx/L, y:dy/L, z:dz/L };
+  }
+
+  // ------------------------------------------------------------
+  // Marbles (1D along track, slope accel)
+  // ------------------------------------------------------------
+  const marbles=[];
+  let marbleId=0;
+
+  function spawnMarble(boost=0){
+    const hue = Math.floor(160 + Math.random()*180);
+    marbles.push({
+      id: ++marbleId,
+      s: Math.random()*40,
+      v: 10 + Math.random()*6 + boost,
+      r: 7.2,
+      hue
+    });
+  }
+
+  function resetRun(){
+    marbles.length=0;
+    marbleId=0;
+    spawnMarble();
+    spawnMarble();
+    spawnMarble();
+    setStatus("Run reset. Track now 3D-readable. Eyes safe(ish).");
+  }
+
+  // ------------------------------------------------------------
+  // Buttons
+  // ------------------------------------------------------------
+  document.getElementById("reset").addEventListener("click", resetRun);
+  document.getElementById("add").addEventListener("click", () => {
+    spawnMarble(6);
+    setStatus("Marble added. Gravity pretending to be professional.");
+  });
+  document.getElementById("chaos").addEventListener("click", () => {
+    const n = 20 + Math.floor(Math.random()*16);
+    for(let i=0;i<n;i++) spawnMarble(12);
+    setStatus("MAX CHAOS. The marbles have discovered free will.");
+  });
+
+  const autoCamBtn = document.getElementById("autoCam");
+  autoCamBtn.addEventListener("click", () => {
+    cam.auto = !cam.auto;
+    autoCamBtn.textContent = cam.auto ? "AUTO CAM: ON" : "AUTO CAM: OFF";
+    setStatus(cam.auto ? "Auto orbit engaged." : "Auto orbit disabled.");
+  });
+
+  const topViewBtn = document.getElementById("topView");
+  topViewBtn.addEventListener("click", () => {
+    // Snap to a more cinematic angle
+    cam.pitch = deg(-28);
+    cam.yaw = deg(35);
+    cam.zoom = 1.0;
+    yaw.value = "35";
+    pitch.value = "-28";
+    zoom.value = "1.00";
+    cam.auto = true;
+    autoCamBtn.textContent = "AUTO CAM: ON";
+    syncLabels();
+    setStatus("Cinema view snapped. Solar-vibe orbit restored.");
+  });
+
+  document.getElementById("snap").addEventListener("click", () => {
+    // Random pleasing orbit angle
+    const y = Math.floor(Math.random()*360);
+    const p = -10 - Math.floor(Math.random()*50);
+    yaw.value = String(y);
+    pitch.value = String(p);
+    zoom.value = (0.9 + Math.random()*0.3).toFixed(2);
+    updateCamFromSliders();
+    syncLabels();
+    setStatus("Neon snap angle applied. Ooooh fancy.");
+  });
+
+  // ------------------------------------------------------------
+  // Render helpers
+  // ------------------------------------------------------------
+  function paintSpace(){
+    // Hard fill background so no white flash on mobile
+    ctx.fillStyle = "#05060e";
+    ctx.fillRect(0,0,innerWidth,innerHeight);
+
+    // Subtle nebula bloom
+    const g1 = ctx.createRadialGradient(innerWidth*0.2, innerHeight*0.15, 0, innerWidth*0.2, innerHeight*0.15, innerWidth*0.9);
+    g1.addColorStop(0, "rgba(80,120,255,0.10)");
+    g1.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = g1;
+    ctx.fillRect(0,0,innerWidth,innerHeight);
+
+    const g2 = ctx.createRadialGradient(innerWidth*0.85, innerHeight*0.35, 0, innerWidth*0.85, innerHeight*0.35, innerWidth*0.8);
+    g2.addColorStop(0, "rgba(180,80,255,0.08)");
+    g2.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = g2;
+    ctx.fillRect(0,0,innerWidth,innerHeight);
+
+    // Stars deterministic-ish
+    ctx.globalAlpha = 0.18;
+    for(let i=0;i<140;i++){
+      const x = (i*97 + 13) % innerWidth;
+      const y = (i*53 + 7) % innerHeight;
+      ctx.fillStyle = "#d9e7ff";
+      ctx.fillRect(x, y, 1, 1);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function drawTrack(){
+    ctx.save();
+    ctx.lineCap="round";
+    ctx.lineJoin="round";
+
+    // Glow pass
+    ctx.beginPath();
+    for(let i=0;i<track.length;i++){
+      const pr = project(track[i]);
+      if(i===0) ctx.moveTo(pr.x, pr.y);
+      else ctx.lineTo(pr.x, pr.y);
+    }
+    ctx.strokeStyle="rgba(120,180,255,0.20)";
+    ctx.lineWidth=22;
+    ctx.shadowBlur=26;
+    ctx.shadowColor="rgba(120,180,255,0.35)";
+    ctx.stroke();
+
+    // Core pass
+    ctx.beginPath();
+    for(let i=0;i<track.length;i++){
+      const pr = project(track[i]);
+      if(i===0) ctx.moveTo(pr.x, pr.y);
+      else ctx.lineTo(pr.x, pr.y);
+    }
+    ctx.shadowBlur=0;
+    ctx.strokeStyle="rgba(220,235,255,0.38)";
+    ctx.lineWidth=9;
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  function drawSupports(){
+    // Simple pillars to help the eye read depth
+    const idxs=[12, 48, 86, 130, 170, 210, 250];
+    for(const i of idxs){
+      const p = track[Math.min(track.length-1, i)];
+      const base = { x:p.x, y:-80, z:p.z };
+
+      const a = project(base);
+      const b = project(p);
+
+      ctx.save();
+      ctx.globalAlpha=0.16;
+      ctx.strokeStyle="rgba(220,200,160,0.6)";
+      ctx.lineWidth=7;
+      ctx.beginPath();
+      ctx.moveTo(a.x,a.y);
+      ctx.lineTo(b.x,b.y);
+      ctx.stroke();
+
+      ctx.globalAlpha=0.22;
+      ctx.fillStyle="rgba(240,220,180,0.25)";
+      ctx.beginPath();
+      ctx.ellipse(b.x,b.y, 12, 5, 0, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  function drawMarble(m){
+    const pos = sampleTrack(m.s);
+    const pr = project(pos);
+
+    const sizeMul = +size.value;
+    const radius = m.r * sizeMul * (0.9 + pr.s*0.35);
+
+    const glow = `hsla(${m.hue}, 90%, 65%, 0.35)`;
+    const core = `hsla(${m.hue}, 85%, 70%, 0.95)`;
+
+    ctx.save();
+
+    // Glow ring
+    ctx.beginPath();
+    ctx.fillStyle = glow;
+    ctx.shadowBlur = 18;
+    ctx.shadowColor = glow;
+    ctx.arc(pr.x, pr.y, radius*1.6, 0, Math.PI*2);
+    ctx.fill();
+
+    // Core sphere
+    const grad = ctx.createRadialGradient(pr.x - radius*0.35, pr.y - radius*0.35, radius*0.2, pr.x, pr.y, radius);
+    grad.addColorStop(0, "rgba(255,255,255,0.95)");
+    grad.addColorStop(0.28, core);
+    grad.addColorStop(1, "rgba(0,0,0,0.28)");
+
+    ctx.shadowBlur=0;
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(pr.x, pr.y, radius, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.restore();
+    return pr.z; // for depth sort hint if needed
+  }
+
+  // ------------------------------------------------------------
+  // Simulation
+  // ------------------------------------------------------------
+  let last = performance.now();
+
+  function frame(now){
+    const dtRaw = Math.min(0.033, (now-last)/1000);
+    last = now;
+
+    const tScale = +speed.value;
+    const dt = dtRaw * tScale;
+
+    // Auto orbit like Solar V9.2
+    if(cam.auto && !dragging){
+      cam.yaw += dt * 0.18 * tScale;
+      const degYaw = (cam.yaw*180/Math.PI);
+      yaw.value = String(Math.round((degYaw%360 + 360)%360));
+      yawVal.textContent = `${Math.round(+yaw.value)}°`;
+    }
+
+    const g = +grav.value;
+    const f = +fric.value;
+
+    if(marbles.length===0) spawnMarble();
+
+    for(const m of marbles){
+      const s = sampleTrack(m.s);
+      const tan = tangentAt(s.i0);
+
+      // Downhill factor
+      const slope = -tan.y; // + if descending
+      const a = g * slope * 1.7 - f * m.v;
+
+      m.v += a * dt;
+      if(m.v < 0) m.v = 0;
+
+      m.s += m.v * dt * 11;
+    }
+
+    // Render
+    paintSpace();
+    drawSupports();
+    drawTrack();
+
+    // Depth sort marbles (approx) by projected z
+    const drawn = marbles.map(m => {
+      const pos = sampleTrack(m.s);
+      const pr = project(pos);
+      return { m, z: pr.z };
+    }).sort((a,b)=> b.z - a.z);
+
+    for(const item of drawn){
+      drawMarble(item.m);
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  // ------------------------------------------------------------
+  // Boot
+  // ------------------------------------------------------------
+  updateCamFromSliders();
+  resetRun();
+  requestAnimationFrame(frame);
+
+})();
+</script>
+</body>
+</html>

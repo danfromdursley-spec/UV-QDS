@@ -1,0 +1,1 @@
+/data/data/com.termux/files/home/OMEGA_EMPIRE/UV_QDS/www/run_www_quiet_v1.sh

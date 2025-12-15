@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UV-QDS — All Pages Index</title>
+  <style>
+    :root{
+      --bg:#070b12;
+      --panel:#0c1220;
+      --panel2:#0a0f1b;
+      --text:#eef2ff;
+      --muted:#a7b0c5;
+      --accent:#9d7bff;
+      --accent2:#4be3ff;
+      --border:rgba(255,255,255,.06);
+    }
+    *{box-sizing:border-box;}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif;
+      background:
+        radial-gradient(1200px 600px at 20% -10%,rgba(157,123,255,.25),transparent),
+        radial-gradient(1000px 700px at 90% 110%,rgba(75,227,255,.22),transparent),
+        var(--bg);
+      color:var(--text);
+    }
+    header{
+      padding:28px 18px 10px;
+    }
+    h1{
+      margin:6px 0 4px;
+      font-size:28px;
+      letter-spacing:.03em;
+    }
+    p{
+      margin:0 0 16px;
+      color:var(--muted);
+      font-size:14px;
+    }
+    main{
+      max-width:980px;
+      margin:0 auto;
+      padding:0 18px 30px;
+    }
+    .pill{
+      display:inline-block;
+      font-size:11px;
+      padding:4px 10px;
+      border-radius:999px;
+      background:linear-gradient(90deg,rgba(157,123,255,.25),rgba(75,227,255,.25));
+      border:1px solid var(--border);
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.16em;
+    }
+    .controls{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      background:linear-gradient(180deg,rgba(255,255,255,.04),transparent);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:10px 12px;
+      margin-bottom:14px;
+    }
+    .controls input,
+    .controls select,
+    .controls button{
+      font-size:14px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:var(--panel);
+      color:var(--text);
+      padding:8px 10px;
+      outline:none;
+    }
+    .controls input{
+      flex:1 1 220px;
+      min-width:180px;
+    }
+    .controls button{
+      cursor:pointer;
+    }
+    .controls small{
+      font-size:11px;
+      color:var(--muted);
+      opacity:.9;
+    }
+    .grid{
+      margin-top:12px;
+      display:grid;
+      gap:10px;
+      grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    }
+    .card{
+      text-decoration:none;
+      color:inherit;
+      background:linear-gradient(180deg,rgba(255,255,255,.03),transparent);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px 14px 12px;
+      transition:transform .12s ease,border-color .12s ease,background .12s ease;
+    }
+    .card:hover{
+      transform:translateY(-1px);
+      border-color:rgba(157,123,255,.35);
+      background:linear-gradient(180deg,rgba(157,123,255,.08),transparent);
+    }
+    .name{
+      font-weight:650;
+      font-size:16px;
+      margin:0 0 4px;
+    }
+    .path{
+      font-size:11px;
+      color:var(--muted);
+      opacity:.9;
+      word-break:break-all;
+    }
+    .tag{
+      display:inline-block;
+      margin-top:8px;
+      padding:3px 7px;
+      font-size:10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      color:var(--muted);
+    }
+    footer{
+      max-width:980px;
+      margin:0 auto;
+      padding:10px 18px 26px;
+      color:var(--muted);
+      font-size:11px;
+    }
+    .group-header{
+      grid-column:1 / -1;
+      margin-top:16px;
+      font-size:12px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      color:var(--muted);
+      opacity:.9;
+    }
+    .highlight{
+      background:rgba(75,227,255,.22);
+      border-radius:4px;
+      padding:0 1px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="pill">UV-QDS — Map</span>
+    <h1>All Pages Index</h1>
+    <p>A single hub linking every HTML tool/page in this release.</p>
+  </header>
+
+  <main>
+    <div class="controls">
+      <input id="q" placeholder="Filter pages… (battery, universe, solar, growthhub, indus, etc.)" />
+      <select id="group">
+        <option value="none">No grouping</option>
+        <option value="category">Group by category</option>
+      </select>
+      <button id="reset">Reset</button>
+      <small id="stats"></small>
+    </div>
+
+    <div id="list" class="grid"></div>
+  </main>
+
+  <footer>
+    Tip: keep this file committed so your repo always has a one-click “everything” launcher.
+  </footer>
+
+  <script>
+    // --- data: add/extend this list as needed --------------------
+    const PAGES = [
+      // core hubs (examples – keep / extend with your full list)
+      { title: "index", href: "index.html", path: "index.html" },
+      { title: "all pages (mini)", href: "all_pages_min.html", path: "all_pages_min.html" },
+      { title: "QDS Battery Lab", href: "qds_battery_lab.html", path: "qds_battery_lab.html" },
+      { title: "QDS Universe v12b mobile", href: "qds_universe_v12b_mobile.html", path: "qds_universe_v12b_mobile.html" },
+      { title: "Solar system v9 mobile 3D showcase", href: "solar_system_v9_2_mobile_3d_showcase.html", path: "solar_system_v9_2_mobile_3d_showcase.html" },
+      { title: "Stinchcombe map", href: "stinchcombe_map.html", path: "stinchcombe_map.html" },
+
+      // NEW: H-Code demo
+      { title: "H-Code Warning Nodes · PC / Battery / Beacon mesh",
+        href: "h_code_warning_nodes_demo.html",
+        path: "h_code_warning_nodes_demo.html"
+      },
+
+      // ------------------------------------------------------------
+      // ⬆️ You can paste your big auto-generated list here from a
+      // backup all_pages_index*.html – just keep it inside the
+      // PAGES array and before this closing bracket.
+      // ------------------------------------------------------------
+    ];
+    // ------------------------------------------------------------
+
+    const categorize = (name) => {
+      const n = name.toLowerCase();
+      if (n.includes("battery")) return "Battery";
+      if (n.includes("universe")) return "Universe";
+      if (n.includes("solar")) return "Solar";
+      if (n.includes("omega")) return "Ω / OS";
+      if (n.includes("index")) return "Indexes";
+      if (n.includes("pillar") || n.includes("wedge")) return "Pillars / Wedges";
+      if (n.includes("cannon") || n.includes("catapult") || n.includes("pyramid")) return "Play / Demos";
+      if (n.includes("indus")) return "Language / Indus";
+      if (n.includes("stinchcombe") || n.includes("her")) return "Maps / Local";
+      if (n.includes("growthhub") || n.includes("offer")) return "GrowthHub / Business";
+      if (n.includes("test")) return "Tests / Repro";
+      if (n.includes("h-code") || n.includes("warning")) return "H-Code / Diagnostics";
+      return "Misc";
+    };
+
+    // enrich with category + sorted copy
+    const ENRICHED = PAGES.map(p => ({
+      ...p,
+      category: p.category || categorize(p.title || p.path || "")
+    })).sort((a, b) =>
+      (a.title || "").toLowerCase().localeCompare((b.title || "").toLowerCase())
+    );
+
+    const elList  = document.getElementById("list");
+    const elQ     = document.getElementById("q");
+    const elGroup = document.getElementById("group");
+    const elReset = document.getElementById("reset");
+    const elStats = document.getElementById("stats");
+
+    const highlight = (text, q) => {
+      if (!q) return text;
+      const re = new RegExp("(" + q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")", "ig");
+      return text.replace(re, "<span class=\"highlight\">$1</span>");
+    };
+
+    const renderFlat = (items, q) => {
+      elList.innerHTML = "";
+      for (const p of items) {
+        const a = document.createElement("a");
+        a.className = "card";
+        a.href = p.href;
+        const safeTitle = highlight(p.title, q);
+        const safePath  = highlight(p.path, q);
+        a.innerHTML = `
+          <div class="name">${safeTitle}</div>
+          <div class="path">${safePath}</div>
+          <span class="tag">${p.category}</span>
+        `;
+        elList.appendChild(a);
+      }
+    };
+
+    const renderGrouped = (items, q) => {
+      elList.innerHTML = "";
+      const groups = {};
+      for (const p of items) {
+        (groups[p.category] ||= []).push(p);
+      }
+      const cats = Object.keys(groups).sort();
+      for (const c of cats) {
+        const header = document.createElement("div");
+        header.className = "group-header";
+        header.textContent = c;
+        elList.appendChild(header);
+
+        for (const p of groups[c]) {
+          const a = document.createElement("a");
+          a.className = "card";
+          a.href = p.href;
+          const safeTitle = highlight(p.title, q);
+          const safePath  = highlight(p.path, q);
+          a.innerHTML = `
+            <div class="name">${safeTitle}</div>
+            <div class="path">${safePath}</div>
+            <span class="tag">${p.category}</span>
+          `;
+          elList.appendChild(a);
+        }
+      }
+    };
+
+    const apply = () => {
+      const q = (elQ.value || "").toLowerCase().trim();
+      const mode = elGroup.value;
+      let items = ENRICHED.filter(p =>
+        !q ||
+        (p.title || "").toLowerCase().includes(q) ||
+        (p.path || "").toLowerCase().includes(q) ||
+        (p.category || "").toLowerCase().includes(q)
+      );
+
+      // stats
+      elStats.textContent = `${items.length} of ${ENRICHED.length} pages`;
+
+      if (mode === "category") renderGrouped(items, q);
+      else renderFlat(items, q);
+
+      // persist
+      try {
+        localStorage.setItem("all_pages_index_q", elQ.value);
+        localStorage.setItem("all_pages_index_group", mode);
+      } catch (e) {}
+    };
+
+    // events
+    elQ.addEventListener("input", apply);
+    elGroup.addEventListener("change", apply);
+    elReset.addEventListener("click", () => {
+      elQ.value = "";
+      elGroup.value = "none";
+      apply();
+    });
+
+    // shortcut: "/" focuses search
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "/" && document.activeElement !== elQ) {
+        e.preventDefault();
+        elQ.focus();
+        elQ.select();
+      }
+    });
+
+    // restore last filter if present
+    try {
+      const savedQ = localStorage.getItem("all_pages_index_q");
+      const savedG = localStorage.getItem("all_pages_index_group");
+      if (savedQ !== null) elQ.value = savedQ;
+      if (savedG === "category" || savedG === "none") elGroup.value = savedG;
+    } catch (e) {}
+
+    // init
+    apply();
+  </script>
+</body>
+</html>

@@ -1,0 +1,825 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Ω-QDS Lab Suite · Shed Edition</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #050811;
+      --bg-elevated: #0c101f;
+      --bg-elevated-soft: #111526;
+      --fg: #f5f7ff;
+      --subtle: #9ca3c9;
+      --accent: #22d3ee;
+      --accent-soft: rgba(34, 211, 238, 0.12);
+      --pill-stable: #22c55e;
+      --pill-exp: #e879f9;
+      --pill-support: #60a5fa;
+      --pill-public: #facc15;
+      --radius-lg: 18px;
+      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.55);
+      --font-main: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Roboto", "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-main);
+      background: radial-gradient(circle at top, #111827 0, #020617 40%, #000 100%);
+      color: var(--fg);
+      line-height: 1.6;
+      padding-bottom: 64px;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page-wrap {
+      max-width: 1024px;
+      margin: 0 auto;
+      padding: 16px 14px 72px;
+    }
+
+    /* Top header */
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 10px 10px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(17, 24, 39, 0.98));
+      box-shadow: var(--shadow-soft);
+      position: sticky;
+      top: 8px;
+      z-index: 50;
+      backdrop-filter: blur(16px);
+    }
+
+    .brand-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .brand-logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 25% 20%, #f97316, #ec4899 45%, #1d4ed8 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.9),
+        0 0 18px rgba(236, 72, 153, 0.8);
+      font-size: 20px;
+    }
+
+    .brand-logo span {
+      transform: translateY(-1px);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .brand-title {
+      font-weight: 650;
+      font-size: 0.98rem;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+
+    .brand-sub {
+      font-size: 0.72rem;
+      color: var(--subtle);
+    }
+
+    .nav-chips {
+      display: none;
+    }
+
+    @media (min-width: 640px) {
+      .nav-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: flex-end;
+      }
+    }
+
+    .nav-chip {
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      background: rgba(15, 23, 42, 0.8);
+      color: var(--subtle);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+      white-space: nowrap;
+    }
+
+    .nav-chip:hover {
+      border-color: var(--accent);
+      color: var(--fg);
+      box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.3);
+    }
+
+    /* Hero */
+
+    .hero {
+      margin-top: 16px;
+      margin-bottom: 22px;
+      padding: 18px 18px 20px;
+      border-radius: 24px;
+      background: radial-gradient(circle at top left, #0f172a, #020617 55%, #020617 100%);
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+    }
+
+    .hero-kicker {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--subtle);
+      margin-bottom: 6px;
+    }
+
+    .hero-title {
+      font-size: 1.55rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .hero-sub {
+      font-size: 0.9rem;
+      color: var(--subtle);
+      margin-bottom: 16px;
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .metric-pill {
+      font-size: 0.75rem;
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.8);
+      color: var(--subtle);
+    }
+
+    .metric-pill strong {
+      color: var(--fg);
+    }
+
+    /* Sections / cards */
+
+    section.lab-section {
+      margin-bottom: 22px;
+    }
+
+    .section-header {
+      margin-bottom: 10px;
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .section-title {
+      font-size: 1.02rem;
+      font-weight: 650;
+    }
+
+    .section-pill {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.85);
+      color: var(--subtle);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      white-space: nowrap;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 12px;
+    }
+
+    @media (min-width: 720px) {
+      .card-grid {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      }
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, #111827, #020617 70%);
+      border-radius: var(--radius-lg);
+      padding: 14px 13px 13px;
+      border: 1px solid rgba(30, 64, 175, 0.72);
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .card-title {
+      font-weight: 620;
+      font-size: 0.96rem;
+    }
+
+    .pill {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      white-space: nowrap;
+    }
+
+    .pill-stable {
+      background: rgba(22, 163, 74, 0.18);
+      border-color: rgba(22, 163, 74, 0.85);
+      color: #bbf7d0;
+    }
+
+    .pill-exp {
+      background: rgba(236, 72, 153, 0.18);
+      border-color: rgba(236, 72, 153, 0.85);
+      color: #f9a8d4;
+    }
+
+    .pill-support {
+      background: rgba(59, 130, 246, 0.18);
+      border-color: rgba(59, 130, 246, 0.85);
+      color: #bfdbfe;
+    }
+
+    .pill-public {
+      background: rgba(250, 204, 21, 0.18);
+      border-color: rgba(250, 204, 21, 0.9);
+      color: #fef9c3;
+    }
+
+    .card-body {
+      font-size: 0.83rem;
+      color: var(--subtle);
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+      margin-bottom: 3px;
+    }
+
+    .tag {
+      font-size: 0.7rem;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--subtle);
+      border: 1px solid rgba(51, 65, 85, 0.9);
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      border: 1px solid rgba(56, 189, 248, 0.9);
+      background: radial-gradient(circle at top, var(--accent-soft), #020617);
+      color: var(--accent);
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+      white-space: nowrap;
+    }
+
+    .btn.secondary {
+      border-color: rgba(148, 163, 184, 0.7);
+      color: var(--subtle);
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .btn:hover {
+      box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.7),
+        0 0 20px rgba(34, 211, 238, 0.4);
+      transform: translateY(-0.5px);
+      color: #e0f2fe;
+    }
+
+    .run-line {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo,
+        Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.74rem;
+      padding: 6px 8px;
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(30, 64, 175, 0.8);
+      color: #e5e7eb;
+      margin-top: 4px;
+      white-space: nowrap;
+      overflow-x: auto;
+    }
+
+    .helper-note {
+      font-size: 0.76rem;
+      color: var(--subtle);
+      margin-top: 4px;
+    }
+
+    .howto-list {
+      font-size: 0.82rem;
+      color: var(--subtle);
+      list-style: disc;
+      margin-left: 18px;
+    }
+
+    footer {
+      margin-top: 26px;
+      font-size: 0.7rem;
+      color: #64748b;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrap">
+    <header class="top-bar">
+      <div class="brand-left">
+        <div class="brand-logo"><span>🎩</span></div>
+        <div class="brand-text">
+          <div class="brand-title">Ω-QDS Lab Suite</div>
+          <div class="brand-sub">Shed Edition · One phone · One universe</div>
+        </div>
+      </div>
+      <nav class="nav-chips">
+        <a href="#howto" class="nav-chip">How to use</a>
+        <a href="#core-os" class="nav-chip">Core OS</a>
+        <a href="#physics" class="nav-chip">Physics labs</a>
+        <a href="#compression" class="nav-chip">Compression</a>
+        <a href="#language" class="nav-chip">Language</a>
+        <a href="#field" class="nav-chip">Field &amp; maps</a>
+        <a href="#shed" class="nav-chip">Shed / experimental</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="hero-kicker">Local reality lab · Termux / Android</div>
+      <h1 class="hero-title">One phone. One shed. ~1,700+ engines.</h1>
+      <p class="hero-sub">
+        This page is your human-readable map over the Ω-Empire: cosmology,
+        compression, language, field-survey and QDS control engines. Tap a
+        button to launch an HTML toy, or copy the <code>python</code> command
+        into Termux.
+      </p>
+      <div class="hero-badges">
+        <span class="metric-pill"><strong>Mode:</strong> Shed Edition</span>
+        <span class="metric-pill"><strong>Core domains:</strong> Physics · Compression · Language · Field · OS</span>
+        <span class="metric-pill"><strong>Kernel:</strong> QDS finite-correlation · LifeFirst on top 🎩</span>
+      </div>
+    </section>
+
+    <!-- How to use -->
+    <section id="howto" class="lab-section">
+      <div class="section-header">
+        <h2 class="section-title">How to use this page</h2>
+        <span class="section-pill">Quick guide</span>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <ul class="howto-list">
+            <li>Open this page with <code>qlab</code> in Termux.</li>
+            <li>Tap any button to launch a local HTML lab or toy in the browser.</li>
+            <li>
+              For Python engines, copy the <code>Run:</code> line into Termux
+              and hit Enter.
+            </li>
+            <li>
+              To add new toys, just drop the <code>.html</code> file into
+              <code>~/OMEGA_EMPIRE/UV_QDS</code> and add a new card with
+              <code>href="your_file.html"</code>.
+            </li>
+          </ul>
+          <p class="helper-note">
+            Tip: if a link doesn’t work, check the file name in
+            <code>ls ~/OMEGA_EMPIRE/UV_QDS</code> and update the
+            <code>href</code> to match exactly.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Core OS & launchers -->
+    <section id="core-os" class="lab-section">
+      <div class="section-header">
+        <h2 class="section-title">Core OS &amp; launchers</h2>
+        <span class="section-pill">Boot &amp; control</span>
+      </div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">OMEGA_OS_V5 · Bootloader</h3>
+            <span class="pill pill-stable">stable · daily driver</span>
+          </div>
+          <div class="card-body">
+            Text-mode launcher that scans engines, groups them into families,
+            and exposes favourites (Apex, Realm, Indus, Doctor, Lazy Hub).
+            Primary entry-point into Ω-OS.
+            <div class="tag-row">
+              <span class="tag">Python CLI</span>
+              <span class="tag">Engine grouping</span>
+              <span class="tag">Favourites hot-keys</span>
+            </div>
+            <div class="run-line">Run: python OMEGA_OS_V5.py</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">OMEGA_APEX_ALL_IN_ONE_v3</h3>
+            <span class="pill pill-stable">stable · work hub</span>
+          </div>
+          <div class="card-body">
+            High-level control engine: pulls in the big family stacks
+            (V60 / V120 / V5000 / V50000 / V100000) so you can drive long chains
+            from one place.
+            <div class="tag-row">
+              <span class="tag">Chained workflows</span>
+              <span class="tag">QDS / Indus / Field</span>
+            </div>
+            <div class="run-line">Run: python OMEGA_APEX_ALL_IN_ONE_v3.py</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">OMEGA_REALM_V3 · Reality analytics</h3>
+            <span class="pill pill-stable">stable · analysis</span>
+          </div>
+          <div class="card-body">
+            Reads shared inbox / logs, scores engines and helps you see which
+            tools are actually pulling their weight in the Empire.
+            <div class="tag-row">
+              <span class="tag">Scoring &amp; metrics</span>
+              <span class="tag">QDS-aware</span>
+            </div>
+            <div class="run-line">Run: python OMEGA_REALM_V3.py</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">OMEGA_DOCTOR_V1 · Housekeeping</h3>
+            <span class="pill pill-support">stable · support</span>
+          </div>
+          <div class="card-body">
+            Health-check &amp; cleanup helper. Scans for junk, duplicates and
+            odd filenames so the Shed doesn’t collapse into a black hole.
+            <div class="tag-row">
+              <span class="tag">Maintenance</span>
+              <span class="tag">Safe to run</span>
+            </div>
+            <div class="run-line">Run: python OMEGA_DOCTOR_V1.py</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Physics & universe labs -->
+    <section id="physics" class="lab-section">
+      <div class="section-header">
+        <h2 class="section-title">Physics &amp; universe labs</h2>
+        <span class="section-pill">QDS playgrounds</span>
+      </div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">UV-QDS Playground</h3>
+            <span class="pill pill-public">public demo</span>
+          </div>
+          <div class="card-body">
+            Web lab for the main QDS fits: cosmic variance
+            <code>σ(H)/H</code>, galaxy rotation curves and a quick
+            noise/compression sandbox.
+            <div class="tag-row">
+              <span class="tag">HTML / JS</span>
+              <span class="tag">σ(H)/H vs R</span>
+              <span class="tag">Rotation curves</span>
+            </div>
+            <div class="btn-row">
+              <a href="uv_qds_playground.html" class="btn">Open playground</a>
+            </div>
+            <p class="helper-note">
+              Make sure <code>uv_qds_playground.html</code> lives next to this
+              file.
+            </p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Solar System V8 · Offline</h3>
+            <span class="pill pill-exp">toy · visual</span>
+          </div>
+          <div class="card-body">
+            Lightweight solar system toy for quick “kernel intuition” demos.
+            <div class="tag-row">
+              <span class="tag">HTML</span>
+              <span class="tag">Orbit toy</span>
+            </div>
+            <div class="btn-row">
+              <a href="solar_system_v8_offline.html" class="btn">Launch solar V8</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Universe favourites -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">QDS Universe · Neon grid set</h3>
+            <span class="pill pill-exp">toy · ride-along</span>
+          </div>
+          <div class="card-body">
+            Hand-picked favourites from the QDS Universe series. All fully
+            offline, tuned for “feel” demos on the phone.
+            <div class="tag-row">
+              <span class="tag">HTML canvas</span>
+              <span class="tag">Neon warp-grid</span>
+              <span class="tag">Camera toys</span>
+            </div>
+            <div class="btn-row">
+              <a href="qds_universe_v9_2_neon_clear_planets.html" class="btn">
+                V9.2 · Neon clear planets
+              </a>
+              <a href="qds_universe_v9_6_turbo_pan.html" class="btn">
+                V9.6 · Turbo pan camera
+              </a>
+              <a href="qds_universe_v12b_mobile.html" class="btn">
+                V12b · Mobile warpgrid
+              </a>
+            </div>
+            <p class="helper-note">
+              If these buttons 404, copy the matching
+              <code>.html</code> files into this folder and make sure the names
+              match.
+            </p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">QDS Universe V10 / Vmax (optional)</h3>
+            <span class="pill pill-exp">experimental stack</span>
+          </div>
+          <div class="card-body">
+            Extra-spicy variants (V10 / V11 / Vmax). Wire them in once you’ve
+            decided on favourites.
+            <div class="tag-row">
+              <span class="tag">Chaos sliders</span>
+              <span class="tag">High-energy</span>
+            </div>
+            <div class="btn-row">
+              <a href="qds_universe_v10_1_neon.html" class="btn secondary">
+                V10.1 · Neon (if present)
+              </a>
+              <a href="qds_universe_vmax.html" class="btn secondary">
+                Vmax · MAX chaos
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Compression & noise -->
+    <section id="compression" class="lab-section">
+      <div class="section-header">
+        <h2 class="section-title">Compression &amp; noise tools</h2>
+        <span class="section-pill">QDSX engines</span>
+      </div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">QDSX Market Edition · CLI</h3>
+            <span class="pill pill-stable">stable · published</span>
+          </div>
+          <div class="card-body">
+            Single-file, Android-safe compression engine. Tries multiple codecs
+            and writes <code>.qdsx</code> bundles with hashes.
+            <div class="tag-row">
+              <span class="tag">Python</span>
+              <span class="tag">Multi-codec</span>
+              <span class="tag">Market release</span>
+            </div>
+            <div class="run-line">Run: python qdsx_market.py</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">QDSZ HTML compressor</h3>
+            <span class="pill pill-exp">experimental · fun</span>
+          </div>
+          <div class="card-body">
+            Browser-only “script inside the script” demo. LZW-style dictionary
+            compressor embedded in a tiny HTML page.
+            <div class="tag-row">
+              <span class="tag">LZW-style</span>
+              <span class="tag">Base64 output</span>
+              <span class="tag">Browser-only</span>
+            </div>
+            <div class="btn-row">
+              <a href="qdsz_html_lab.html" class="btn">Open QDSZ lab</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Language & Indus lab -->
+    <section id="language" class="lab-section">
+      <div class="section-header">
+        <h2 class="section-title">Language &amp; Indus lab</h2>
+      <span class="section-pill">QDS language kernel</span>
+      </div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">INDUS ATLAS · QDS Language Lab V1.0</h3>
+            <span class="pill pill-stable">stable · offline</span>
+          </div>
+          <div class="card-body">
+            Browser-safe Indus HUD with glyph tiles, roles, route / vessel /
+            deity markers, frequencies and a live kernel status bar.
+            <div class="tag-row">
+              <span class="tag">HTML / JS</span>
+              <span class="tag">Glyph explorer</span>
+              <span class="tag">Filters &amp; search</span>
+            </div>
+            <div class="btn-row">
+              <a href="indus_atlas_v1_qds_language_lab.html" class="btn">
+                Open Indus Atlas
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">mega_language_v93_ticker</h3>
+            <span class="pill pill-exp">experimental</span>
+          </div>
+          <div class="card-body">
+            Engine-side language ticker for multi-corpus passes: cycles text,
+            logs coherence metrics and feeds the language stats.
+            <div class="tag-row">
+              <span class="tag">Python</span>
+              <span class="tag">Ticker / logger</span>
+            </div>
+            <div class="run-line">Run: python mega_language_v93_ticker.py</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Field & map dashboards -->
+    <section id="field" class="lab-section">
+      <div class="section-header">
+        <h2 class="section-title">Field &amp; map dashboards</h2>
+        <span class="section-pill">Stinchcombe hub</span>
+      </div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Ω-DASHBOARD · Stinchcombe field hub</h3>
+            <span class="pill pill-stable">stable · local</span>
+          </div>
+          <div class="card-body">
+            Flask / HTML dashboard at <code>127.0.0.1:5000</code>:
+            Stinchcombe &amp; Taits Hill bubbles, HER summary and links to the
+            OSM map + compression lab.
+            <div class="tag-row">
+              <span class="tag">Flask</span>
+              <span class="tag">HER summary</span>
+              <span class="tag">Map overlays</span>
+            </div>
+            <div class="btn-row">
+              <a href="#" class="btn secondary">Open dashboard (browser)</a>
+            </div>
+            <div class="run-line">Run: python field_hub.py</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">HER map · Stinchcombe &amp; Taits Hill</h3>
+            <span class="pill pill-stable">stable</span>
+          </div>
+          <div class="card-body">
+            Leaflet / OSM overlay with hillfort bubble centres, radius rings and
+            HER record counts by period.
+            <div class="tag-row">
+              <span class="tag">Leaflet / OSM</span>
+              <span class="tag">Radius bubbles</span>
+            </div>
+            <div class="btn-row">
+              <a href="her_map_stinchcombe.html" class="btn">
+                Open map view
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Shed engines & toys -->
+    <section id="shed" class="lab-section">
+      <div class="section-header">
+        <h2 class="section-title">Shed engines &amp; experimental toys</h2>
+        <span class="section-pill">Handle with style</span>
+      </div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">V30000 / V50000 / V100000 engines</h3>
+            <span class="pill pill-exp">experimental stack</span>
+          </div>
+          <div class="card-body">
+            Heavyweight experiment families
+            <code>V30000_OMEGA_SINGULARITY</code>,
+            <code>V50000_OMEGA_PRIME</code>,
+            <code>V100000_OMEGA_APEX_CORE</code> and friends.
+            <div class="tag-row">
+              <span class="tag">Stress-tests</span>
+              <span class="tag">Automation chains</span>
+              <span class="tag">“what if?” nights</span>
+            </div>
+            <p class="helper-note">
+              Rule of thumb: do not ship to normals. Launch via Ω-OS when you
+              actually mean it.
+            </p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">OMEGA_SHEDBOT &amp; CLEANER</h3>
+            <span class="pill pill-support">support</span>
+          </div>
+          <div class="card-body">
+            Helper engines for the Shed: scan, rename, archive and clean out the
+            tangled branches so your core lab stays fast.
+            <div class="tag-row">
+              <span class="tag">Maintenance</span>
+              <span class="tag">Use with backups</span>
+            </div>
+            <div class="run-line">Run: python OMEGA_SHEDBOT_CLEANER.py</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      Built in the Shed · QDS kernel underneath · LifeFirst directive on top.
+      Tweak, fork and scribble over this page as the lab grows. 🎩
+    </footer>
+  </div>
+</body>
+</html>

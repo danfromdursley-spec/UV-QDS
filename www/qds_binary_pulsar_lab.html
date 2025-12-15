@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>QDS Binary Pulsar Constraint Lab</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #050b18;
+      --card: #0b1628;
+      --card-soft: #101b30;
+      --accent1: #00f5a0;
+      --accent2: #00d5ff;
+      --text-main: #e4f0ff;
+      --text-soft: #9cb3d8;
+      --danger: #ff4b81;
+      --ok: #6dff9c;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+                   Roboto, sans-serif;
+      background: radial-gradient(circle at top, #0b1730 0, #050b18 55%);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 16px;
+    }
+    .shell {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 1.4rem;
+      margin-bottom: 0.25rem;
+    }
+    h2 {
+      font-size: 1.05rem;
+      margin: 1.25rem 0 0.35rem;
+    }
+    p {
+      font-size: 0.9rem;
+      color: var(--text-soft);
+      line-height: 1.4;
+      margin-bottom: 0.4rem;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: rgba(0, 245, 160, 0.08);
+      border: 1px solid rgba(0, 245, 160, 0.16);
+      color: var(--accent1);
+      margin-bottom: 0.45rem;
+    }
+    .card {
+      background: radial-gradient(circle at top left,
+                   rgba(0, 245, 160, 0.06),
+                   transparent 55%),
+                  var(--card);
+      border-radius: 18px;
+      padding: 16px 14px 14px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(0, 213, 255, 0.18);
+    }
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .btn, .btn-ghost {
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      transition: transform 0.08s ease, box-shadow 0.08s ease,
+                  background 0.12s ease, opacity 0.12s ease;
+      white-space: nowrap;
+    }
+    .btn {
+      background: linear-gradient(90deg, var(--accent1), var(--accent2));
+      color: #001224;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0, 245, 160, 0.3);
+    }
+    .btn-ghost {
+      background: rgba(13, 24, 48, 0.9);
+      color: var(--text-soft);
+      border: 1px solid rgba(156, 179, 216, 0.35);
+    }
+    .btn:active,
+    .btn-ghost:active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: none;
+      opacity: 0.9;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      gap: 12px;
+      margin-top: 10px;
+    }
+    @media (max-width: 640px) {
+      .grid { grid-template-columns: minmax(0,1fr); }
+    }
+    .panel {
+      background: var(--card-soft);
+      border-radius: 14px;
+      padding: 10px 10px 9px;
+      border: 1px solid rgba(156, 179, 216, 0.25);
+    }
+    label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-soft);
+      margin-bottom: 2px;
+    }
+    input {
+      width: 100%;
+      background: #050b18;
+      border-radius: 999px;
+      border: 1px solid rgba(156, 179, 216, 0.6);
+      color: var(--text-main);
+      padding: 6px 10px;
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+      outline: none;
+    }
+    input:focus {
+      border-color: var(--accent2);
+      box-shadow: 0 0 0 1px rgba(0, 213, 255, 0.5);
+    }
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      margin-bottom: 3px;
+      color: var(--text-soft);
+    }
+    .stat-row span:last-child {
+      color: var(--text-main);
+      font-weight: 500;
+    }
+    .status-pill {
+      margin-top: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .status-ok {
+      background: rgba(109, 255, 156, 0.12);
+      border: 1px solid rgba(109, 255, 156, 0.5);
+      color: var(--ok);
+    }
+    .status-bad {
+      background: rgba(255, 75, 129, 0.12);
+      border: 1px solid rgba(255, 75, 129, 0.5);
+      color: var(--danger);
+    }
+    .note {
+      font-size: 0.78rem;
+      color: var(--text-soft);
+      margin-top: 6px;
+    }
+    .tagline {
+      font-size: 0.8rem;
+      color: var(--text-soft);
+      margin-top: 4px;
+    }
+    .footer {
+      margin-top: 12px;
+      font-size: 0.75rem;
+      color: var(--text-soft);
+      text-align: right;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="btn-row">
+      <a href="qds_test_platformV3.html" class="btn-ghost">← Back to QDS Labs</a>
+      <a href="qds_binary_pulsar_notes.html" class="btn-ghost">View method / notes</a>
+    </div>
+
+    <div class="card">
+      <div class="pill">GR Precision · Binary Pulsars</div>
+      <h1>Binary Pulsar Constraint Lab</h1>
+      <p class="tagline">
+        Quick reality-check: given a binary separation and a QDS Yukawa term
+        <code>a<sub>eff</sub> = α · e<sup>-r/λc</sup></code>, estimate whether the extra
+        acceleration would already be ruled out by high-precision pulsar timing.
+      </p>
+      <p>
+        This is a <strong>sanity-filter</strong>, not a full data fit. It checks whether
+        <code>|α · e<sup>-r/λc</sup>|</code> stays below an allowed fractional deviation
+        band (typically ~0.2–0.3%) at the orbital separation.
+      </p>
+
+      <div class="grid">
+        <!-- Inputs -->
+        <div class="panel">
+          <h2>1. System &amp; QDS parameters</h2>
+
+          <label for="name">System label</label>
+          <input id="name" type="text" value="PSR B1913+16 (example)" />
+
+          <label for="sep">Binary separation r (units)</label>
+          <input id="sep" type="number" value="1.0" step="0.01" />
+
+          <label for="alpha">QDS strength α (dimensionless)</label>
+          <input id="alpha" type="number" value="0.01" step="0.001" />
+
+          <label for="lambda">Coherence length λc (same units as r)</label>
+          <input id="lambda" type="number" value="10.0" step="0.1" />
+
+          <label for="eps">
+            Allowed fractional deviation band |Δa/a|<sub>max</sub>
+            (e.g. 0.002 = 0.2%)
+          </label>
+          <input id="eps" type="number" value="0.002" step="0.0001" />
+
+          <button class="btn" onclick="runCheck()">Evaluate constraint</button>
+        </div>
+
+        <!-- Output -->
+        <div class="panel">
+          <h2>2. Result at orbital separation</h2>
+
+          <div class="stat-row">
+            <span>System</span>
+            <span id="out-name">–</span>
+          </div>
+          <div class="stat-row">
+            <span>Separation r</span>
+            <span id="out-r">–</span>
+          </div>
+          <div class="stat-row">
+            <span>Kernel factor e<sup>-r/λc</sup></span>
+            <span id="out-factor">–</span>
+          </div>
+          <div class="stat-row">
+            <span>|α · e<sup>-r/λc</sup>|</span>
+            <span id="out-aeff">–</span>
+          </div>
+          <div class="stat-row">
+            <span>Allowed |Δa/a|<sub>max</sub></span>
+            <span id="out-eps">–</span>
+          </div>
+
+          <div id="status-pill" class="status-pill" style="display:none;"></div>
+
+          <p class="note">
+            Interpretation: if <code>|α · e<sup>-r/λc</sup>|</code> is larger than the
+            allowed band, then this QDS parameter choice would likely be
+            <strong>ruled out</strong> by existing binary-pulsar timing limits at this
+            scale (assuming the modification behaves like a Yukawa correction to
+            Newtonian gravity).
+          </p>
+        </div>
+      </div>
+
+      <div class="footer">
+        Ω-Phone QDS Lab · Binary Pulsar quick-constraint ·
+        Demo only — not a full data analysis.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function runCheck() {
+      const name = document.getElementById('name').value.trim() || 'Unnamed system';
+      const r = parseFloat(document.getElementById('sep').value);
+      const alpha = parseFloat(document.getElementById('alpha').value);
+      const lambda = parseFloat(document.getElementById('lambda').value);
+      const eps = parseFloat(document.getElementById('eps').value);
+
+      if (!isFinite(r) || !isFinite(alpha) || !isFinite(lambda) || !isFinite(eps) ||
+          lambda <= 0 || r < 0 || eps <= 0) {
+        alert('Please enter sensible numeric values (λc > 0, r ≥ 0, eps > 0).');
+        return;
+      }
+
+      const factor = Math.exp(-r / lambda);
+      const aEff = Math.abs(alpha * factor);
+
+      document.getElementById('out-name').textContent = name;
+      document.getElementById('out-r').textContent = r.toFixed(3);
+      document.getElementById('out-factor').textContent = factor.toExponential(3);
+      document.getElementById('out-aeff').textContent = aEff.toExponential(3);
+      document.getElementById('out-eps').textContent = eps.toExponential(3);
+
+      const pill = document.getElementById('status-pill');
+      pill.style.display = 'inline-flex';
+
+      if (aEff <= eps) {
+        pill.className = 'status-pill status-ok';
+        pill.textContent = 'OK: this (α, λc) is inside pulsar timing band at this scale.';
+      } else {
+        pill.className = 'status-pill status-bad';
+        pill.textContent = 'Ruled out: this (α, λc) overshoots pulsar timing limits.';
+      }
+    }
+  </script>
+</body>
+</html>

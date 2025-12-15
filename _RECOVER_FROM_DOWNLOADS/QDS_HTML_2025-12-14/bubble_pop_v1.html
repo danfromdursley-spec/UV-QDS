@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Bubble Pop v1 — Phone Safe</title>
+<style>
+  :root{
+    --bg1:#070b14;
+    --bg2:#0a0f1f;
+    --hud:#e8f0ff;
+    --accent:#7cf6ff;
+    --accent2:#b388ff;
+    --danger:#ff6b9a;
+    --glass: rgba(255,255,255,0.06);
+    --glass2: rgba(255,255,255,0.12);
+    --shadow: 0 8px 30px rgba(0,0,0,0.35);
+    --radius: 16px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  html, body{
+    margin:0; height:100%; background: radial-gradient(1200px 800px at 20% 10%, #111a33 0%, var(--bg1) 40%, #04060c 100%);
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    color: var(--hud);
+    overflow:hidden;
+  }
+  #wrap{
+    position:fixed; inset:0;
+  }
+  canvas{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    touch-action: none;
+  }
+
+  /* HUD */
+  #hud{
+    position:absolute; top: env(safe-area-inset-top, 0); left:0; right:0;
+    padding: 10px 12px 0 12px;
+    display:flex; gap:10px; align-items:stretch; justify-content:space-between;
+    pointer-events:none;
+  }
+  .panel{
+    pointer-events:auto;
+    background: linear-gradient(135deg, var(--glass), rgba(255,255,255,0.02));
+    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 10px 12px;
+    min-width: 120px;
+  }
+  .panel.small{min-width:unset;}
+  .row{display:flex; align-items:center; justify-content:space-between; gap:8px;}
+  .title{
+    font-weight:700; letter-spacing:0.4px; font-size: 12px; opacity:0.85;
+  }
+  .big{
+    font-weight:800; font-size: 22px; line-height:1.1;
+    text-shadow: 0 0 12px rgba(124,246,255,0.15);
+  }
+  .sub{
+    font-size: 11px; opacity:0.75;
+  }
+
+  button{
+    appearance:none; border:none; cursor:pointer;
+    color: #0b1220;
+    font-weight:700; font-size: 12px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent), #b7fbff);
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08), 0 10px 20px rgba(0,0,0,0.25);
+    transition: transform .08s ease, filter .12s ease, opacity .12s ease;
+  }
+  button:active{transform: translateY(1px) scale(0.99);}
+  button.secondary{
+    background: linear-gradient(135deg, var(--accent2), #e2ccff);
+  }
+  button.ghost{
+    background: linear-gradient(135deg, var(--glass2), rgba(255,255,255,0.04));
+    color: var(--hud);
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+
+  input[type="range"]{
+    width: 120px;
+  }
+
+  #bottomBar{
+    position:absolute; left:0; right:0; bottom: env(safe-area-inset-bottom, 0);
+    padding: 0 12px 10px 12px;
+    display:flex; gap:10px; align-items:center; justify-content:center;
+    pointer-events:none;
+  }
+  #bottomBar .panel{pointer-events:auto;}
+
+  #centerOverlay{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    pointer-events:none;
+  }
+  #card{
+    pointer-events:auto;
+    width:min(92vw, 420px);
+    background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+    border: 1px solid rgba(255,255,255,0.12);
+    backdrop-filter: blur(14px);
+    border-radius: 22px;
+    box-shadow: var(--shadow);
+    padding: 20px 18px;
+    text-align:center;
+  }
+  #card h1{
+    margin: 6px 0 6px 0;
+    font-size: 26px;
+    letter-spacing: 0.6px;
+  }
+  #card p{
+    margin: 6px 0 14px 0;
+    font-size: 12.5px; opacity:0.8;
+  }
+  .pill{
+    display:inline-flex; gap:8px; align-items:center;
+    padding: 6px 10px; border-radius: 999px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    font-size: 10.5px; opacity:0.9;
+  }
+
+  /* tiny legend dot */
+  .dot{
+    width:8px; height:8px; border-radius:50%;
+    display:inline-block;
+    background: var(--accent);
+    box-shadow: 0 0 10px rgba(124,246,255,0.6);
+  }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="game"></canvas>
+
+  <div id="hud">
+    <div class="panel">
+      <div class="title">SCORE</div>
+      <div class="big" id="score">0</div>
+      <div class="sub">Best: <span id="best">0</span></div>
+    </div>
+
+    <div class="panel">
+      <div class="row">
+        <div>
+          <div class="title">TIME</div>
+          <div class="big"><span id="time">60.0</span>s</div>
+          <div class="sub">Streak: <span id="streak">0</span> · Combo: <span id="combo">x1</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel small">
+      <div class="title">MODE</div>
+      <div class="row" style="gap:6px; margin-top:6px;">
+        <button id="startBtn">START</button>
+        <button id="pauseBtn" class="ghost">PAUSE</button>
+      </div>
+      <div class="row" style="margin-top:8px;">
+        <span class="sub">Difficulty</span>
+      </div>
+      <input id="diff" type="range" min="1" max="10" value="5" />
+      <div class="sub" id="diffLabel">Normal</div>
+    </div>
+  </div>
+
+  <div id="bottomBar">
+    <div class="panel">
+      <div class="row">
+        <span class="sub">Spawn</span>
+        <input id="spawnRate" type="range" min="0.6" max="2.2" step="0.1" value="1.2" />
+        <span class="sub" id="spawnLabel">1.2x</span>
+      </div>
+      <div class="row" style="margin-top:6px;">
+        <span class="sub">Bubble Size</span>
+        <input id="sizeRate" type="range" min="0.7" max="1.4" step="0.05" value="1.0" />
+        <span class="sub" id="sizeLabel">1.0x</span>
+      </div>
+    </div>
+
+    <div class="panel small">
+      <div class="row">
+        <button id="resetBtn" class="secondary">RESET RUN</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="centerOverlay">
+    <div id="card">
+      <span class="pill"><span class="dot"></span> Bubble Pop v1 — fast, simple, phone-safe</span>
+      <h1>Pop the Bubbles</h1>
+      <p>
+        Tap bubbles to score. Keep a streak for bigger combos.
+        Difficulty increases speed and smaller targets.
+      </p>
+      <div class="row" style="justify-content:center;">
+        <button id="playNowBtn">PLAY NOW</button>
+        <button id="chillBtn" class="ghost">CHILL MODE</button>
+      </div>
+      <p class="sub" style="margin-top:12px;">
+        Tip: use two thumbs. This is a pure reflex snack. 🎩
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  // ---------- Canvas setup ----------
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d', { alpha: true });
+
+  function resize(){
+    const dpr = Math.max(1, Math.min(2.5, window.devicePixelRatio || 1));
+    canvas._dpr = dpr;
+    canvas.width = Math.floor(innerWidth * dpr);
+    canvas.height = Math.floor(innerHeight * dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  window.addEventListener('resize', resize, { passive:true });
+  resize();
+
+  // ---------- UI elements ----------
+  const scoreEl = document.getElementById('score');
+  const bestEl = document.getElementById('best');
+  const timeEl = document.getElementById('time');
+  const streakEl = document.getElementById('streak');
+  const comboEl = document.getElementById('combo');
+
+  const startBtn = document.getElementById('startBtn');
+  const pauseBtn = document.getElementById('pauseBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const playNowBtn = document.getElementById('playNowBtn');
+  const chillBtn = document.getElementById('chillBtn');
+
+  const diff = document.getElementById('diff');
+  const diffLabel = document.getElementById('diffLabel');
+  const spawnRate = document.getElementById('spawnRate');
+  const spawnLabel = document.getElementById('spawnLabel');
+  const sizeRate = document.getElementById('sizeRate');
+  const sizeLabel = document.getElementById('sizeLabel');
+
+  const overlay = document.getElementById('centerOverlay');
+
+  // ---------- Game state ----------
+  const storageKey = "BUBBLE_POP_V1_BEST";
+  let best = Number(localStorage.getItem(storageKey) || 0);
+  bestEl.textContent = String(best);
+
+  let running = false;
+  let paused = false;
+
+  let score = 0;
+  let streak = 0;
+  let combo = 1;
+
+  let timeLeft = 60.0; // seconds
+  let lastPopTime = 0;
+
+  // Tuning
+  function diffName(v){
+    if(v <= 2) return "Chill";
+    if(v <= 4) return "Easy";
+    if(v <= 6) return "Normal";
+    if(v <= 8) return "Hard";
+    return "Chaos";
+  }
+  function updateLabels(){
+    diffLabel.textContent = diffName(Number(diff.value));
+    spawnLabel.textContent = `${Number(spawnRate.value).toFixed(1)}x`;
+    sizeLabel.textContent = `${Number(sizeRate.value).toFixed(2)}x`;
+  }
+  diff.addEventListener('input', updateLabels);
+  spawnRate.addEventListener('input', updateLabels);
+  sizeRate.addEventListener('input', updateLabels);
+  updateLabels();
+
+  // ---------- Bubble + FX ----------
+  const bubbles = [];
+  const pops = [];
+
+  function rand(min,max){ return Math.random()*(max-min)+min; }
+
+  function spawnBubble(){
+    const d = Number(diff.value);
+    const spawnMul = Number(spawnRate.value);
+    const sizeMul = Number(sizeRate.value);
+
+    const baseR = rand(18, 52) * sizeMul * (1.05 - d*0.03);
+    const r = Math.max(12, baseR);
+
+    const x = rand(r+10, innerWidth - r - 10);
+    const y = innerHeight + r + rand(0, 60);
+
+    // Speed scales with difficulty
+    const vy = rand(40, 90) * (0.7 + d*0.09) * spawnMul;
+    const vx = rand(-18, 18) * (0.6 + d*0.06);
+
+    // Hue palette: neon-cool
+    const hue = rand(175, 290);
+    const sat = rand(70, 95);
+    const light = rand(55, 70);
+    const alpha = rand(0.65, 0.9);
+
+    bubbles.push({
+      x,y,r,vx,vy,
+      hue,sat,light,alpha,
+      wob: rand(0, Math.PI*2),
+      wobSpd: rand(0.8, 1.8),
+      life: 0,
+      valueBase: Math.round(8 + (52 - r) * 0.6 + d*1.5)
+    });
+  }
+
+  function addPopFX(x,y,r,hue){
+    pops.push({
+      x,y,r,
+      hue,
+      t: 0,
+      dur: 0.22
+    });
+  }
+
+  // Spawn cadence
+  let spawnAcc = 0;
+
+  function spawnPerSecond(){
+    const d = Number(diff.value);
+    const base = 1.0 + d * 0.22;
+    const mul = Number(spawnRate.value);
+    return base * mul;
+  }
+
+  // ---------- Scoring ----------
+  function updateCombo(now){
+    // if too long since last pop, drop streak
+    const gap = (now - lastPopTime);
+    if(lastPopTime && gap > 1400){
+      streak = 0;
+      combo = 1;
+    }
+    combo = 1 + Math.floor(streak / 5);
+    combo = Math.min(combo, 8);
+  }
+
+  function popBubble(b, now){
+    streak++;
+    lastPopTime = now;
+    updateCombo(now);
+
+    const bonus = Math.round(b.valueBase * combo);
+    score += bonus;
+
+    addPopFX(b.x, b.y, b.r, b.hue);
+
+    if(score > best){
+      best = score;
+      localStorage.setItem(storageKey, String(best));
+      bestEl.textContent = String(best);
+    }
+  }
+
+  // ---------- Input ----------
+  function getPos(e){
+    if(e.touches && e.touches.length){
+      return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+    return { x: e.clientX, y: e.clientY };
+  }
+
+  function handlePress(e){
+    if(!running || paused) return;
+    e.preventDefault?.();
+
+    const p = getPos(e);
+    const now = performance.now();
+
+    // hit test top-most (last) first
+    for(let i = bubbles.length - 1; i >= 0; i--){
+      const b = bubbles[i];
+      const dx = p.x - b.x;
+      const dy = p.y - b.y;
+      if(dx*dx + dy*dy <= b.r*b.r){
+        popBubble(b, now);
+        bubbles.splice(i,1);
+        break;
+      }
+    }
+  }
+
+  canvas.addEventListener('pointerdown', handlePress);
+  canvas.addEventListener('touchstart', handlePress, { passive:false });
+
+  // ---------- Game control ----------
+  function resetRun(){
+    score = 0; streak = 0; combo = 1;
+    timeLeft = 60.0;
+    lastPopTime = 0;
+    bubbles.length = 0;
+    pops.length = 0;
+    spawnAcc = 0;
+    updateHUD();
+  }
+
+  function startGame(){
+    overlay.style.display = "none";
+    running = true;
+    paused = false;
+    resetRun();
+  }
+
+  function pauseGame(){
+    if(!running) return;
+    paused = !paused;
+    pauseBtn.textContent = paused ? "RESUME" : "PAUSE";
+  }
+
+  function endGame(){
+    running = false;
+    paused = false;
+    pauseBtn.textContent = "PAUSE";
+    overlay.style.display = "flex";
+    // update overlay text minimally by modifying card content
+    const h = overlay.querySelector("h1");
+    const p = overlay.querySelector("p");
+    if(h && p){
+      h.textContent = "Run Complete";
+      p.innerHTML = `Score: <b>${score}</b> · Best: <b>${best}</b><br/>Tap Play Now for another round.`;
+    }
+  }
+
+  startBtn.addEventListener('click', startGame);
+  playNowBtn.addEventListener('click', startGame);
+
+  chillBtn.addEventListener('click', () => {
+    diff.value = 2;
+    spawnRate.value = 0.9;
+    sizeRate.value = 1.15;
+    updateLabels();
+    startGame();
+  });
+
+  pauseBtn.addEventListener('click', pauseGame);
+  resetBtn.addEventListener('click', () => {
+    if(!running){
+      startGame();
+    } else {
+      resetRun();
+    }
+  });
+
+  // ---------- Render ----------
+  function drawBackground(){
+    // star speckle
+    ctx.save();
+    ctx.globalAlpha = 0.08;
+    for(let i=0;i<40;i++){
+      const x = (i*97 + (performance.now()*0.02)) % innerWidth;
+      const y = (i*193) % innerHeight;
+      ctx.fillStyle = "#bcd7ff";
+      ctx.fillRect(x, y, 1.2, 1.2);
+    }
+    ctx.restore();
+  }
+
+  function drawBubble(b){
+    const grd = ctx.createRadialGradient(b.x - b.r*0.35, b.y - b.r*0.35, b.r*0.2, b.x, b.y, b.r);
+    grd.addColorStop(0, `hsla(${b.hue}, ${b.sat}%, ${Math.min(90, b.light+18)}%, ${b.alpha})`);
+    grd.addColorStop(1, `hsla(${b.hue}, ${b.sat}%, ${b.light}%, ${b.alpha*0.55})`);
+
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
+    ctx.fillStyle = grd;
+    ctx.fill();
+
+    // rim highlight
+    ctx.lineWidth = Math.max(1.2, b.r*0.04);
+    ctx.strokeStyle = `hsla(${b.hue}, 90%, 80%, 0.28)`;
+    ctx.stroke();
+
+    // specular shine
+    ctx.beginPath();
+    ctx.ellipse(b.x - b.r*0.25, b.y - b.r*0.25, b.r*0.22, b.r*0.14, -0.6, 0, Math.PI*2);
+    ctx.fillStyle = "rgba(255,255,255,0.12)";
+    ctx.fill();
+  }
+
+  function drawPopFX(p){
+    const k = p.t / p.dur;
+    const rr = p.r * (0.9 + k*0.9);
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, 0.6 * (1 - k));
+    ctx.lineWidth = Math.max(1.5, p.r*0.08);
+    ctx.strokeStyle = `hsla(${p.hue}, 90%, 70%, 1)`;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, rr, 0, Math.PI*2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function updateHUD(){
+    scoreEl.textContent = String(score);
+    streakEl.textContent = String(streak);
+    comboEl.textContent = `x${combo}`;
+    timeEl.textContent = timeLeft.toFixed(1);
+  }
+
+  // ---------- Update loop ----------
+  let last = performance.now();
+
+  function tick(now){
+    const dt = Math.min(0.033, (now - last) / 1000);
+    last = now;
+
+    ctx.clearRect(0,0,innerWidth,innerHeight);
+    drawBackground();
+
+    if(running && !paused){
+      // time
+      timeLeft -= dt;
+      if(timeLeft <= 0){
+        timeLeft = 0;
+        updateHUD();
+        endGame();
+      }
+
+      // spawn
+      spawnAcc += dt * spawnPerSecond();
+      while(spawnAcc >= 1){
+        spawnBubble();
+        spawnAcc -= 1;
+      }
+
+      // update bubbles
+      for(let i = bubbles.length - 1; i >= 0; i--){
+        const b = bubbles[i];
+        b.life += dt;
+        b.wob += dt * b.wobSpd;
+
+        const wobble = Math.sin(b.wob) * 10;
+        b.x += (b.vx + wobble*0.12) * dt;
+        b.y -= b.vy * dt;
+
+        // bounce off sides softly
+        if(b.x < b.r + 6){ b.x = b.r + 6; b.vx *= -0.7; }
+        if(b.x > innerWidth - b.r - 6){ b.x = innerWidth - b.r - 6; b.vx *= -0.7; }
+
+        // despawn if off top
+        if(b.y < -b.r - 50){
+          bubbles.splice(i,1);
+          // miss penalty: resets streak gently
+          streak = Math.max(0, streak - 1);
+          updateCombo(now);
+        }
+      }
+
+      // update pop fx
+      for(let i = pops.length - 1; i >= 0; i--){
+        const p = pops[i];
+        p.t += dt;
+        if(p.t >= p.dur) pops.splice(i,1);
+      }
+
+      updateCombo(now);
+    }
+
+    // draw bubbles + fx regardless for nice pause view
+    for(const b of bubbles) drawBubble(b);
+    for(const p of pops) drawPopFX(p);
+
+    // paused overlay hint
+    if(running && paused){
+      ctx.save();
+      ctx.globalAlpha = 0.18;
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "700 28px system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("PAUSED", innerWidth/2, innerHeight/2);
+      ctx.restore();
+    }
+
+    updateHUD();
+    requestAnimationFrame(tick);
+  }
+
+  updateHUD();
+  requestAnimationFrame(tick);
+
+})();
+</script>
+</body>
+</html>

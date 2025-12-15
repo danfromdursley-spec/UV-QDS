@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Revenue Floor + Capacity Truth (v2)</title>
+<style>
+  :root{
+    --bg:#070c14;
+    --panel:#0c1422;
+    --panel-2:#0b111c;
+    --muted:#9aa7bd;
+    --text:#e9f1ff;
+    --accent:#7fb3ff;
+    --accent-2:#7fffd4;
+    --danger:#ff7f9d;
+    --border:rgba(255,255,255,0.06);
+    --glow:0 0 0 1px rgba(127,179,255,0.08), 0 10px 30px rgba(0,0,0,0.35);
+    --radius:18px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, sans-serif;
+    background:
+      radial-gradient(900px 500px at 10% 0%, rgba(127,179,255,0.08), transparent 55%),
+      radial-gradient(900px 600px at 90% 10%, rgba(127,255,212,0.06), transparent 60%),
+      var(--bg);
+    color:var(--text);
+  }
+  .wrap{
+    max-width: 980px;
+    margin: 18px auto 60px;
+    padding: 0 14px;
+  }
+  .hero{
+    background: linear-gradient(145deg, rgba(127,179,255,0.08), rgba(127,255,212,0.04), transparent 60%);
+    border:1px solid var(--border);
+    box-shadow: var(--glow);
+    border-radius: var(--radius);
+    padding: 18px 18px 8px;
+  }
+  .badge{
+    display:inline-flex;
+    gap:8px;
+    align-items:center;
+    padding:6px 10px;
+    font-size:11px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+    border:1px solid var(--border);
+    border-radius:999px;
+    background: rgba(255,255,255,0.02);
+  }
+  h1{
+    margin: 10px 0 6px;
+    font-size: 28px;
+    line-height:1.15;
+  }
+  .sub{
+    color:var(--muted);
+    margin:0 0 14px;
+    font-size: 14px;
+  }
+  .actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin: 10px 0 12px;
+  }
+  button{
+    border:1px solid var(--border);
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+    color:var(--text);
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 12.5px;
+    letter-spacing:0.01em;
+  }
+  button:hover{filter:brightness(1.06)}
+  button.secondary{
+    color: var(--muted);
+    font-weight: 600;
+  }
+  button.accent{
+    border-color: rgba(127,179,255,0.35);
+    box-shadow: 0 0 0 1px rgba(127,179,255,0.12) inset;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 14px;
+    margin-top: 14px;
+  }
+  @media (max-width: 860px){
+    .grid{grid-template-columns: 1fr;}
+  }
+
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent 30%), var(--panel);
+    border:1px solid var(--border);
+    box-shadow: var(--glow);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .card h3{
+    margin: 0 0 10px;
+    font-size: 14px;
+    letter-spacing:0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .section{
+    background: var(--panel-2);
+    border:1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+  .section h4{
+    margin: 0 0 10px;
+    font-size: 12px;
+    letter-spacing:0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .row{
+    display:grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 10px;
+    align-items:center;
+    margin: 8px 0;
+  }
+  .row small{color:var(--muted)}
+  input, select, textarea{
+    width:100%;
+    border:1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+    color: var(--text);
+    padding: 10px 11px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    outline: none;
+  }
+  textarea{min-height: 36px; resize: vertical;}
+  .muted{color:var(--muted)}
+  .hint{
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  .kpi{
+    display:grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .kpiBox{
+    border:1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 12px 10px;
+    background: linear-gradient(145deg, rgba(127,179,255,0.06), transparent 40%);
+  }
+  .kpiLabel{
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing:0.14em;
+    text-transform: uppercase;
+  }
+  .kpiValue{
+    font-size: 28px;
+    font-weight: 800;
+    margin: 5px 0 2px;
+  }
+  .kpiSub{
+    color: var(--muted);
+    font-size: 11.5px;
+  }
+
+  .split{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  @media (max-width: 520px){
+    .split{grid-template-columns: 1fr;}
+  }
+
+  table{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  th, td{
+    border-bottom: 1px solid var(--border);
+    padding: 8px 6px;
+    vertical-align: top;
+  }
+  th{
+    color: var(--muted);
+    font-weight: 600;
+    text-align: left;
+    font-size: 10px;
+    letter-spacing:0.12em;
+    text-transform: uppercase;
+  }
+
+  .pill{
+    display:inline-flex;
+    padding: 4px 8px;
+    border-radius: 999px;
+    border:1px solid var(--border);
+    font-size: 10px;
+    color: var(--muted);
+  }
+  .status{
+    float:right;
+  }
+
+  .onepager .inputsCard,
+  .onepager .auditCard,
+  .onepager .sensitivityCard{
+    display:none !important;
+  }
+  .onepager .grid{
+    grid-template-columns: 1fr;
+  }
+
+  .footerNote{
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <span class="badge">QDS • GrowthHub</span>
+    <h1>Revenue Floor + Capacity Truth <span class="muted">(v2)</span></h1>
+    <p class="sub">Single-file business system: demand → conversion → capacity caps → MRR accumulation → assumption audit. Built for honest planning, not hype.</p>
+    <div class="actions">
+      <button class="accent" id="toggleViewBtn">Toggle One-Pager View</button>
+      <button id="printBtn">Print One-Pager</button>
+      <button id="copySummaryBtn">Copy Board Summary</button>
+      <button class="secondary" id="resetBtn">Reset to Base Pack</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- INPUTS -->
+    <div class="card inputsCard">
+      <h3>Inputs</h3>
+
+      <div class="section">
+        <h4>Mode</h4>
+        <div class="row">
+          <div>
+            <div>Preset</div>
+            <small class="muted">Sets sane starting assumptions.</small>
+          </div>
+          <select id="preset">
+            <option value="conservative">Conservative</option>
+            <option value="base" selected>Base</option>
+            <option value="optimistic">Optimistic (still sane)</option>
+          </select>
+        </div>
+        <div class="row">
+          <div>
+            <div>Currency label (display)</div>
+            <small class="muted">Symbol only, e.g., £ $ €</small>
+          </div>
+          <input id="currency" value="£" />
+        </div>
+        <div class="row">
+          <div>
+            <div>Months to project</div>
+            <small class="muted">MRR accumulation horizon.</small>
+          </div>
+          <input id="months" type="number" min="1" max="60" value="12" />
+        </div>
+      </div>
+
+      <div class="section">
+        <h4>Demand</h4>
+        <div class="row"><div>Leads / month (L)</div><input id="L" type="number" min="0" step="1" value="12" /></div>
+        <div class="row"><div>Qualified rate (q, 0–1)</div><input id="q" type="number" min="0" max="1" step="0.01" value="0.5" /></div>
+        <div class="row"><div>Sprint close of qualified (s, 0–1)</div><input id="s" type="number" min="0" max="1" step="0.01" value="0.35" /></div>
+        <div class="row"><div>Pilot-from-sprint (p, 0–1)</div><input id="p" type="number" min="0" max="1" step="0.01" value="0.4" /></div>
+        <div class="row"><div>Retainer-from-pilot (r, 0–1)</div><input id="r" type="number" min="0" max="1" step="0.01" value="0.3" /></div>
+        <div class="hint">Tip: keep rates in 0–1 format. This model auto-caps sprints/pilots using your capacity values.</div>
+      </div>
+
+      <div class="section">
+        <h4>Pricing</h4>
+        <div class="row"><div>Sprint price</div><input id="Sprice" type="number" min="0" step="50" value="2500" /></div>
+        <div class="row"><div>Pilot price</div><input id="Pprice" type="number" min="0" step="100" value="6000" /></div>
+        <div class="row"><div>Retainer / month</div><input id="Rprice" type="number" min="0" step="50" value="2000" /></div>
+      </div>
+
+      <div class="section">
+        <h4>Capacity</h4>
+        <div class="row"><div>Max sprints / month (Smax)</div><input id="Smax" type="number" min="0" step="1" value="6" /></div>
+        <div class="row"><div>Max pilots / month (Pmax)</div><input id="Pmax" type="number" min="0" step="1" value="3" /></div>
+        <div class="row">
+          <div>Notes (optional)</div>
+          <input id="capNotes" placeholder="e.g., 1-person team, 60% delivery time" />
+        </div>
+      </div>
+
+      <div class="section">
+        <h4>MRR</h4>
+        <div class="row"><div>Starting MRR (M0)</div><input id="M0" type="number" min="0" step="50" value="0" /></div>
+        <div class="row"><div>Monthly churn % (c)</div><input id="churn" type="number" min="0" max="50" step="0.1" value="3" /></div>
+        <div class="row"><div>Cost base / month (optional)</div><input id="cost" type="number" min="0" step="50" value="200" /></div>
+      </div>
+    </div>
+
+    <!-- OUTPUTS -->
+    <div class="card">
+      <h3>Live Outputs <span class="pill status" id="statusPill">Auto</span></h3>
+
+      <div class="kpi">
+        <div class="kpiBox">
+          <div class="kpiLabel">Revenue / Month</div>
+          <div class="kpiValue" id="revMonth">£0</div>
+          <div class="kpiSub">Sprints + Pilots + New MRR</div>
+        </div>
+        <div class="kpiBox">
+          <div class="kpiLabel">Revenue / Year (Run-Rate)</div>
+          <div class="kpiValue" id="revYear">£0</div>
+          <div class="kpiSub">Conservative if capacity-capped</div>
+        </div>
+
+        <div class="split">
+          <div class="kpiBox">
+            <div class="kpiLabel">New MRR / Month</div>
+            <div class="kpiValue" id="newMrr">£0</div>
+            <div class="kpiSub">Based on new retainers</div>
+          </div>
+          <div class="kpiBox">
+            <div class="kpiLabel">Projected MRR @ Horizon</div>
+            <div class="kpiValue" id="mrrEnd">£0</div>
+            <div class="kpiSub" id="mrrEndSub">After churn</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section" style="margin-top:12px;">
+        <h4>Expected volumes / month</h4>
+        <div class="muted" id="volumesBox">
+          Qualified: 0<br/>Sprints: 0<br/>Pilots: 0<br/>New retainers: 0
+        </div>
+      </div>
+
+      <div class="section">
+        <h4>MRR accumulation</h4>
+        <div class="muted" id="mrrBox">
+          Starting: 0<br/>MRR @ 3 months: 0<br/>MRR @ 6 months: 0<br/>MRR @ 12 months: 0
+        </div>
+      </div>
+
+      <div class="section">
+        <h4>Board summary (auto)</h4>
+        <textarea id="boardSummary" readonly></textarea>
+        <div class="footerNote">This line is designed to be copy-safe for meetings.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- ASSUMPTION AUDIT -->
+    <div class="card auditCard">
+      <h3>Assumption Audit</h3>
+      <div class="section">
+        <table>
+          <thead>
+            <tr>
+              <th>Assumption</th>
+              <th>Value</th>
+              <th>Confidence</th>
+              <th>Evidence note</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Qualified rate (q)</td>
+              <td id="qValCell">0</td>
+              <td>
+                <select id="qConf">
+                  <option>Low</option>
+                  <option selected>Med</option>
+                  <option>High</option>
+                </select>
+              </td>
+              <td><input id="qNote" placeholder="e.g., last 10 calls" /></td>
+            </tr>
+            <tr>
+              <td>Sprint close (s)</td>
+              <td id="sValCell">0</td>
+              <td>
+                <select id="sConf">
+                  <option>Low</option>
+                  <option selected>Med</option>
+                  <option>High</option>
+                </select>
+              </td>
+              <td><input id="sNote" placeholder="e.g., 3 recent wins" /></td>
+            </tr>
+            <tr>
+              <td>Pilot-from-sprint (p)</td>
+              <td id="pValCell">0</td>
+              <td>
+                <select id="pConf">
+                  <option>Low</option>
+                  <option selected>Med</option>
+                  <option>High</option>
+                </select>
+              </td>
+              <td><input id="pNote" placeholder="e.g., sector avg" /></td>
+            </tr>
+            <tr>
+              <td>Retainer-from-pilot (r)</td>
+              <td id="rValCell">0</td>
+              <td>
+                <select id="rConf">
+                  <option>Low</option>
+                  <option selected>Med</option>
+                  <option>High</option>
+                </select>
+              </td>
+              <td><input id="rNote" placeholder="e.g., 2 pilot-to-retainer conversions" /></td>
+            </tr>
+            <tr>
+              <td>Churn (c)</td>
+              <td id="cValCell">0</td>
+              <td>
+                <select id="cConf">
+                  <option>Low</option>
+                  <option selected>Med</option>
+                  <option>High</option>
+                </select>
+              </td>
+              <td><input id="cNote" placeholder="e.g., comparable SaaS/retainer benchmark" /></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="hint">Confidence is narrative fuel for the board: it turns a calculator into a calibrated system.</div>
+      </div>
+    </div>
+
+    <!-- SENSITIVITY -->
+    <div class="card sensitivityCard">
+      <h3>What Moves the Needle (Sensitivity)</h3>
+      <div class="section">
+        <table>
+          <thead>
+            <tr>
+              <th>Change</th>
+              <th>Effect on yearly run-rate</th>
+            </tr>
+          </thead>
+          <tbody id="sensBody"></tbody>
+        </table>
+        <div class="hint">Simple local deltas. Good enough for decision chat; not pretending to be a full Monte Carlo.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- Helpers ---------- */
+const $ = (id)=>document.getElementById(id);
+
+function num(id, def=0){
+  const el = $(id);
+  if(!el) return def;
+  const v = parseFloat(String(el.value ?? "").trim());
+  return Number.isFinite(v) ? v : def;
+}
+function clamp(x, a, b){
+  if(!Number.isFinite(x)) return a;
+  return Math.min(b, Math.max(a, x));
+}
+function fmtMoney(x){
+  const cur = String($("currency").value || "£").trim() || "£";
+  const n = Number.isFinite(x) ? x : 0;
+  const rounded = Math.round(n);
+  return cur + rounded.toLocaleString();
+}
+
+/* ---------- Core model ---------- */
+function computeModel(){
+  const L = Math.max(0, num("L"));
+  const q = clamp(num("q"), 0, 1);
+  const s = clamp(num("s"), 0, 1);
+  const p = clamp(num("p"), 0, 1);
+  const r = clamp(num("r"), 0, 1);
+
+  const Sprice = Math.max(0, num("Sprice"));
+  const Pprice = Math.max(0, num("Pprice"));
+  const Rprice = Math.max(0, num("Rprice"));
+
+  const Smax = Math.max(0, num("Smax"));
+  const Pmax = Math.max(0, num("Pmax"));
+
+  const M0 = Math.max(0, num("M0"));
+  const churnPct = clamp(num("churn"), 0, 50);
+  const churn = churnPct / 100;
+
+  const months = clamp(Math.round(num("months", 12)), 1, 60);
+
+  const qualified = L * q;
+  const sprintsRaw = qualified * s;
+  const sprints = Math.min(sprintsRaw, Smax);
+
+  const pilotsRaw = sprints * p;
+  const pilots = Math.min(pilotsRaw, Pmax);
+
+  const newRetainers = pilots * r;
+
+  const newMrr = newRetainers * Rprice;
+
+  const revMonth = (sprints * Sprice) + (pilots * Pprice) + newMrr;
+  const revYear = revMonth * 12;
+
+  // MRR accumulation over horizon
+  let mrr = M0;
+  const mrrTimeline = [mrr];
+  for(let i=1;i<=months;i++){
+    mrr = (mrr + newMrr) * (1 - churn);
+    mrrTimeline.push(mrr);
+  }
+
+  const at = (n)=>{
+    const idx = clamp(n, 0, months);
+    return mrrTimeline[idx];
+  };
+
+  return {
+    L,q,s,p,r,Sprice,Pprice,Rprice,Smax,Pmax,M0,churnPct,churn,months,
+    qualified,sprintsRaw,sprints,pilotsRaw,pilots,newRetainers,newMrr,
+    revMonth,revYear,mrrTimeline,
+    mrr3: at(3), mrr6: at(6), mrr12: at(12), mrrEnd: at(months)
+  };
+}
+
+/* ---------- Presets ---------- */
+const PRESETS = {
+  conservative: {
+    L:6, q:0.40, s:0.30, p:0.30, r:0.25,
+    Sprice:2000, Pprice:5000, Rprice:1500,
+    Smax:4, Pmax:2, M0:0, churn:4
+  },
+  base: {
+    L:12, q:0.50, s:0.35, p:0.40, r:0.30,
+    Sprice:2500, Pprice:6000, Rprice:2000,
+    Smax:6, Pmax:3, M0:0, churn:3
+  },
+  optimistic: {
+    L:20, q:0.60, s:0.45, p:0.45, r:0.40,
+    Sprice:3000, Pprice:8000, Rprice:2500,
+    Smax:8, Pmax:4, M0:0, churn:2
+  }
+};
+
+function applyPreset(){
+  const key = $("preset")?.value || "base";
+  const p = PRESETS[key] || PRESETS.base;
+
+  $("L").value = p.L;
+  $("q").value = p.q;
+  $("s").value = p.s;
+  $("p").value = p.p;
+  $("r").value = p.r;
+
+  $("Sprice").value = p.Sprice;
+  $("Pprice").value = p.Pprice;
+  $("Rprice").value = p.Rprice;
+
+  $("Smax").value = p.Smax;
+  $("Pmax").value = p.Pmax;
+
+  $("M0").value = p.M0;
+  $("churn").value = p.churn;
+}
+
+/* ---------- Sensitivity ---------- */
+function buildSensitivity(base){
+  const rows = [];
+
+  function calcWith(patch){
+    // temporarily apply patch values, compute, then restore
+    const ids = Object.keys(patch);
+    const old = {};
+    ids.forEach(id=>{
+      old[id] = $(id).value;
+      $(id).value = patch[id];
+    });
+    const m = computeModel();
+    ids.forEach(id=>$(id).value = old[id]);
+    return m.revYear;
+  }
+
+  const baseYear = base.revYear;
+
+  // +1 lead
+  rows.push({
+    label: "+1 lead / month",
+    delta: calcWith({L: num("L")+1}) - baseYear
+  });
+
+  // +0.10 sprint close
+  rows.push({
+    label: "+0.10 sprint close rate",
+    delta: calcWith({s: clamp(num("s")+0.10, 0, 1)}) - baseYear
+  });
+
+  // +1 sprint capacity
+  rows.push({
+    label: "+1 sprint capacity",
+    delta: calcWith({Smax: num("Smax")+1}) - baseYear
+  });
+
+  // +0.05 pilot-from-sprint
+  rows.push({
+    label: "+0.05 pilot-from-sprint",
+    delta: calcWith({p: clamp(num("p")+0.05, 0, 1)}) - baseYear
+  });
+
+  // +0.05 retainer-from-pilot
+  rows.push({
+    label: "+0.05 retainer-from-pilot",
+    delta: calcWith({r: clamp(num("r")+0.05, 0, 1)}) - baseYear
+  });
+
+  const body = $("sensBody");
+  body.innerHTML = "";
+  rows.forEach(r=>{
+    const tr = document.createElement("tr");
+    const td1 = document.createElement("td");
+    const td2 = document.createElement("td");
+    td1.textContent = r.label;
+    td2.textContent = fmtMoney(r.delta);
+    tr.appendChild(td1); tr.appendChild(td2);
+    body.appendChild(tr);
+  });
+}
+
+/* ---------- Board summary ---------- */
+function buildBoardSummary(m){
+  const capNote = String($("capNotes").value || "").trim();
+  const cost = Math.max(0, num("cost"));
+
+  const conf = {
+    q: $("qConf")?.value || "Med",
+    s: $("sConf")?.value || "Med",
+    p: $("pConf")?.value || "Med",
+    r: $("rConf")?.value || "Med",
+    c: $("cConf")?.value || "Med",
+  };
+
+  const notes = {
+    q: String($("qNote")?.value || "").trim(),
+    s: String($("sNote")?.value || "").trim(),
+    p: String($("pNote")?.value || "").trim(),
+    r: String($("rNote")?.value || "").trim(),
+    c: String($("cNote")?.value || "").trim(),
+  };
+
+  const parts = [];
+  parts.push(
+    `Revenue floor model (capacity-truthed): ` +
+    `${m.L} leads/mo → q ${m.q.toFixed(2)} → s ${m.s.toFixed(2)} → p ${m.p.toFixed(2)} → r ${m.r.toFixed(2)}.`
+  );
+  parts.push(
+    `Pricing: Sprint ${fmtMoney(m.Sprice)}, Pilot ${fmtMoney(m.Pprice)}, Retainer ${fmtMoney(m.Rprice)}/mo.`
+  );
+  parts.push(
+    `Capacity: Smax ${m.Smax}, Pmax ${m.Pmax}` + (capNote ? ` (${capNote})` : "") + `.`
+  );
+  parts.push(
+    `Expected/month: ${m.sprints.toFixed(2)} sprints, ${m.pilots.toFixed(2)} pilots, ${m.newRetainers.toFixed(2)} new retainers.`
+  );
+  parts.push(
+    `Run-rate: ${fmtMoney(m.revMonth)}/mo (${fmtMoney(m.revYear)}/yr).`
+  );
+  parts.push(
+    `MRR: M0 ${fmtMoney(m.M0)}, churn ${m.churnPct.toFixed(1)}%. New MRR ${fmtMoney(m.newMrr)}/mo → projected MRR @ ${m.months} months ${fmtMoney(m.mrrEnd)}.`
+  );
+  if(cost>0){
+    parts.push(`Cost base noted: ${fmtMoney(cost)}/mo (for margin context, not enforced in calc).`);
+  }
+
+  const confLine =
+    `Assumption confidence: q ${conf.q}, s ${conf.s}, p ${conf.p}, r ${conf.r}, churn ${conf.c}.`;
+  parts.push(confLine);
+
+  const ev = [];
+  if(notes.q) ev.push(`q: ${notes.q}`);
+  if(notes.s) ev.push(`s: ${notes.s}`);
+  if(notes.p) ev.push(`p: ${notes.p}`);
+  if(notes.r) ev.push(`r: ${notes.r}`);
+  if(notes.c) ev.push(`c: ${notes.c}`);
+  if(ev.length) parts.push(`Evidence: ${ev.join(" | ")}`);
+
+  parts.push(`This model is deliberately conservative: upside comes from more leads, better close rates, and capacity expansion — not inflated assumptions.`);
+
+  return parts.join(" ");
+}
+
+/* ---------- Render ---------- */
+function render(){
+  const m = computeModel();
+
+  // update audit value cells
+  $("qValCell").textContent = m.q.toFixed(2);
+  $("sValCell").textContent = m.s.toFixed(2);
+  $("pValCell").textContent = m.p.toFixed(2);
+  $("rValCell").textContent = m.r.toFixed(2);
+  $("cValCell").textContent = m.churnPct.toFixed(1) + "%";
+
+  // KPIs
+  $("revMonth").textContent = fmtMoney(m.revMonth);
+  $("revYear").textContent = fmtMoney(m.revYear);
+  $("newMrr").textContent = fmtMoney(m.newMrr);
+  $("mrrEnd").textContent = fmtMoney(m.mrrEnd);
+  $("mrrEndSub").textContent = `MRR after churn @ ${m.months} months`;
+
+  // volumes
+  $("volumesBox").innerHTML =
+    `Qualified: ${m.qualified.toFixed(2)}<br/>` +
+    `Sprints: ${m.sprints.toFixed(2)} (raw ${m.sprintsRaw.toFixed(2)})<br/>` +
+    `Pilots: ${m.pilots.toFixed(2)} (raw ${m.pilotsRaw.toFixed(2)})<br/>` +
+    `New retainers: ${m.newRetainers.toFixed(2)}`;
+
+  // MRR accumulation snapshot
+  $("mrrBox").innerHTML =
+    `Starting: ${fmtMoney(m.M0)}<br/>` +
+    `MRR @ 3 months: ${fmtMoney(m.mrr3)}<br/>` +
+    `MRR @ 6 months: ${fmtMoney(m.mrr6)}<br/>` +
+    `MRR @ 12 months: ${fmtMoney(m.mrr12)}`;
+
+  // sensitivity
+  buildSensitivity(m);
+
+  // board summary
+  const summary = buildBoardSummary(m);
+  $("boardSummary").value = summary;
+
+  // status pill
+  $("statusPill").textContent = "Live";
+}
+
+/* ---------- One-pager + Print ---------- */
+function toggleView(){
+  document.body.classList.toggle("onepager");
+}
+function printOnePager(){
+  // ensure onepager layout for print, but restore after
+  const was = document.body.classList.contains("onepager");
+  if(!was) document.body.classList.add("onepager");
+  window.print();
+  if(!was) document.body.classList.remove("onepager");
+}
+
+/* ---------- Copy summary ---------- */
+async function copySummary(){
+  const text = $("boardSummary").value || "";
+  try{
+    await navigator.clipboard.writeText(text);
+    $("statusPill").textContent = "Copied";
+    setTimeout(()=>$("statusPill").textContent = "Live", 800);
+  }catch(e){
+    // fallback
+    $("boardSummary").select();
+    document.execCommand("copy");
+    $("statusPill").textContent = "Copied";
+    setTimeout(()=>$("statusPill").textContent = "Live", 800);
+  }
+}
+
+/* ---------- Reset ---------- */
+function resetBase(){
+  $("preset").value = "base";
+  applyPreset();
+  $("currency").value = "£";
+  $("months").value = 12;
+  $("Smax").value = 6;
+  $("Pmax").value = 3;
+  $("M0").value = 0;
+  $("churn").value = 3;
+  $("cost").value = 200;
+  $("capNotes").value = "";
+
+  // audit defaults
+  ["qConf","sConf","pConf","rConf","cConf"].forEach(id=>{ if($(id)) $(id).value="Med"; });
+  ["qNote","sNote","pNote","rNote","cNote"].forEach(id=>{ if($(id)) $(id).value=""; });
+
+  render();
+}
+
+/* ---------- Bulletproof wiring ---------- */
+function attachListeners(){
+  document.querySelectorAll("input, select, textarea").forEach(el=>{
+    const handler = ()=>{
+      if(el.id === "preset"){ applyPreset(); }
+      render();
+    };
+    el.addEventListener("input", handler);
+    el.addEventListener("change", handler);
+  });
+
+  $("toggleViewBtn").addEventListener("click", toggleView);
+  $("printBtn").addEventListener("click", printOnePager);
+  $("copySummaryBtn").addEventListener("click", copySummary);
+  $("resetBtn").addEventListener("click", resetBase);
+}
+
+applyPreset();
+attachListeners();
+render();
+</script>
+
+<!-- QDS_SENS_ENGINE_v2 : compute real Δ yearly run-rate from inputs (not UI leftovers) -->
+<script>
+(function(){
+  function parseNum(x){
+    if(x==null) return NaN;
+    const s = String(x).replace(/,/g,'').replace(/[^\d.\-]/g,'').trim();
+    return s ? Number(s) : NaN;
+  }
+  function clamp01(x){ return Math.max(0, Math.min(1, x)); }
+  function moneySym(){
+    // try to infer symbol from any visible money figure
+    const t = document.body.innerText.match(/[£$€]/);
+    return t ? t[0] : "£";
+  }
+  function fmtMoney(x, sym){
+    if(!isFinite(x)) return "—";
+    const sign = x >= 0 ? "+" : "−";
+    const v = Math.abs(x);
+    return sign + (sym||"£") + v.toLocaleString(undefined,{maximumFractionDigits:0});
+  }
+
+  // Find an input/select by nearby label text (works even if IDs differ)
+  function getFieldByLabel(re){
+    const nodes = Array.from(document.querySelectorAll("label,div,span,p,strong,h4,h3,h2,th,td"));
+    const lab = nodes.find(n => re.test((n.textContent||"").trim()));
+    if(!lab) return null;
+
+    // search nearby for input/select
+    const scope = lab.closest("div,section,article,td,th") || lab.parentElement || document;
+    const cand = scope.querySelector("input,select,textarea");
+    if(cand) return cand;
+
+    // fallback: next siblings
+    let cur = lab;
+    for(let i=0;i<12;i++){
+      cur = cur.nextElementSibling || cur.parentElement?.nextElementSibling;
+      if(!cur) break;
+      const f = cur.querySelector?.("input,select,textarea") || (cur.matches?.("input,select,textarea") ? cur : null);
+      if(f) return f;
+    }
+    return null;
+  }
+
+  function readInputs(){
+    const L    = parseNum(getFieldByLabel(/Leads\s*\/\s*month/i)?.value);
+    const q    = parseNum(getFieldByLabel(/Qualified\s*rate/i)?.value);
+    const s    = parseNum(getFieldByLabel(/Sprint\s*close/i)?.value);
+    const p    = parseNum(getFieldByLabel(/Pilot-from-sprint/i)?.value);
+    const r    = parseNum(getFieldByLabel(/Retainer-from-pilot/i)?.value);
+
+    const sprintPrice   = parseNum(getFieldByLabel(/Sprint\s*price/i)?.value);
+    const pilotPrice    = parseNum(getFieldByLabel(/Pilot\s*price/i)?.value);
+    const retainerMonth = parseNum(getFieldByLabel(/Retainer\s*\/\s*month/i)?.value);
+
+    const Smax = parseNum(getFieldByLabel(/Max\s*sprints\s*\/\s*month/i)?.value);
+    const Pmax = parseNum(getFieldByLabel(/Max\s*pilots\s*\/\s*month/i)?.value);
+
+    return {
+      L, q:clamp01(q), s:clamp01(s), p:clamp01(p), r:clamp01(r),
+      sprintPrice, pilotPrice, retainerMonth,
+      Smax, Pmax
+    };
+  }
+
+  function model(inp){
+    // demand funnel + caps
+    const qualified = inp.L * inp.q;
+    const sprintsRaw = qualified * inp.s;
+    const sprints = isFinite(inp.Smax) ? Math.min(sprintsRaw, inp.Smax) : sprintsRaw;
+
+    const pilotsRaw = sprints * inp.p;
+    const pilots = isFinite(inp.Pmax) ? Math.min(pilotsRaw, inp.Pmax) : pilotsRaw;
+
+    const newRetainers = pilots * inp.r;
+
+    const revMonth =
+      sprints * inp.sprintPrice +
+      pilots * inp.pilotPrice +
+      newRetainers * inp.retainerMonth;
+
+    const runRateYear = revMonth * 12;
+
+    return {qualified, sprintsRaw, sprints, pilotsRaw, pilots, newRetainers, revMonth, runRateYear};
+  }
+
+  function ensureSensTable(){
+    // locate the "What Moves the Needle (Sensitivity)" block
+    const heads = Array.from(document.querySelectorAll("*"))
+      .filter(el => /What Moves the Needle/i.test((el.textContent||"").trim()));
+    if(!heads.length) return null;
+
+    const root = heads[0].closest("section") || heads[0].parentElement || document;
+
+    // find a table inside it
+    let table = root.querySelector("table");
+    if(!table){
+      // sometimes it’s not a <table>; just bail politely
+      return null;
+    }
+    return table;
+  }
+
+  function setRow(table, labelRe, valueText){
+    const rows = Array.from(table.querySelectorAll("tr"));
+    for(const tr of rows){
+      const tds = tr.querySelectorAll("td,th");
+      if(tds.length < 2) continue;
+      const left = (tds[0].textContent||"").trim();
+      if(labelRe.test(left)){
+        tds[tds.length-1].textContent = valueText;
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function fix(){
+    const inp = readInputs();
+    const sym = moneySym();
+    if(!isFinite(inp.L) || !isFinite(inp.sprintPrice) || !isFinite(inp.pilotPrice) || !isFinite(inp.retainerMonth)) return;
+
+    const base = model(inp);
+
+    // sensitivity scenarios
+    const sc = [];
+    sc.push({re:/\+1\s*lead/i,     inp:{...inp, L: inp.L + 1}});
+    sc.push({re:/\+0\.10\s*sprint\s*close/i, inp:{...inp, s: clamp01(inp.s + 0.10)}});
+    sc.push({re:/\+1\s*sprint\s*capacity/i,  inp:{...inp, Smax: isFinite(inp.Smax) ? inp.Smax + 1 : inp.Smax}});
+    sc.push({re:/\+0\.05\s*pilot-from-sprint/i, inp:{...inp, p: clamp01(inp.p + 0.05)}});
+    sc.push({re:/\+0\.05\s*retainer-from-pilot/i, inp:{...inp, r: clamp01(inp.r + 0.05)}});
+
+    const table = ensureSensTable();
+    if(!table) return;
+
+    // header rename (if present)
+    Array.from(table.querySelectorAll("th")).forEach(th=>{
+      if(/Effect on yearly run-rate/i.test(th.textContent||"")) th.textContent = "Δ yearly run-rate";
+    });
+
+    for(const item of sc){
+      const m = model(item.inp);
+      const delta = m.runRateYear - base.runRateYear;
+      setRow(table, item.re, fmtMoney(delta, sym));
+    }
+  }
+
+  // run now + whenever user tweaks sliders/inputs
+  fix();
+  const obs = new MutationObserver(()=>fix());
+  obs.observe(document.body, {subtree:true, childList:true, characterData:true});
+  document.addEventListener("input", fix, true);
+  document.addEventListener("change", fix, true);
+})();
+</script>
+</body>
+</html>

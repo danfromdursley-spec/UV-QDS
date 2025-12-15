@@ -1,0 +1,956 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>QDS RC Lab — Ultra</title>
+<style>
+  :root{
+    --bg0:#070A12; --bg1:#0A1020; --bg2:#0E1630;
+    --card: rgba(255,255,255,.05);
+    --line: rgba(255,255,255,.10);
+    --txt:#EAF0FF; --mut:#AAB6D6;
+    --good:#29f29a; --bad:#ff4d6d; --warn:#ffcc66; --info:#6aa6ff;
+    --shadow: 0 20px 70px rgba(0,0,0,.55);
+    --r: 16px;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+    --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family: var(--sans); color:var(--txt);
+    background:
+      radial-gradient(1200px 700px at 20% 15%, rgba(106,166,255,.18), transparent 55%),
+      radial-gradient(900px 600px at 75% 20%, rgba(41,242,154,.12), transparent 60%),
+      radial-gradient(1100px 700px at 50% 110%, rgba(255,77,109,.10), transparent 60%),
+      linear-gradient(180deg, var(--bg0), var(--bg1) 40%, var(--bg2));
+    min-height:100vh;
+  }
+  header{
+    position:sticky; top:0; z-index:20;
+    background: linear-gradient(180deg, rgba(7,10,18,.92), rgba(7,10,18,.72));
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .wrap{max-width:1200px; margin:0 auto; padding:18px 16px;}
+  .top{
+    display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  }
+  .brand{
+    display:flex; align-items:center; gap:12px;
+  }
+  .logo{
+    width:44px; height:44px; border-radius:14px;
+    background:
+      radial-gradient(circle at 30% 25%, rgba(106,166,255,.9), transparent 55%),
+      radial-gradient(circle at 70% 70%, rgba(41,242,154,.8), transparent 58%),
+      linear-gradient(135deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
+    border:1px solid rgba(255,255,255,.12);
+    box-shadow: 0 10px 35px rgba(0,0,0,.55);
+  }
+  h1{font-size:18px; margin:0; letter-spacing:.2px}
+  .sub{margin:2px 0 0 0; color:var(--mut); font-size:12px}
+  .pillbar{display:flex; gap:8px; flex-wrap:wrap}
+  .pill{
+    font-family:var(--mono);
+    font-size:12px; padding:7px 10px;
+    border-radius:999px; border:1px solid var(--line);
+    background: rgba(255,255,255,.04);
+    color: var(--mut);
+  }
+  .pill b{color:var(--txt); font-weight:700}
+  main .grid{
+    display:grid;
+    grid-template-columns: 440px 1fr;
+    gap:14px;
+    padding:14px 16px 22px;
+    max-width:1200px;
+    margin:0 auto;
+  }
+  @media (max-width: 980px){
+    main .grid{grid-template-columns:1fr}
+  }
+  .card{
+    background: var(--card);
+    border:1px solid var(--line);
+    border-radius: var(--r);
+    box-shadow: var(--shadow);
+    overflow:hidden;
+  }
+  .card .hd{
+    padding:14px 14px 12px;
+    border-bottom:1px solid var(--line);
+    display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+  }
+  .card .hd h2{
+    margin:0; font-size:13px; letter-spacing:.3px; text-transform:uppercase;
+    color:#CFE0FF;
+  }
+  .card .bd{padding:12px 14px 14px}
+  .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+  .btn{
+    cursor:pointer; user-select:none;
+    font-family:var(--mono);
+    font-size:12px;
+    padding:10px 12px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,.14);
+    background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.03));
+    color: var(--txt);
+    box-shadow: 0 10px 25px rgba(0,0,0,.25);
+  }
+  .btn:active{transform: translateY(1px)}
+  .btn.secondary{
+    background: rgba(255,255,255,.03);
+    color: var(--mut);
+  }
+  input[type="file"]{display:none}
+  .hint{color:var(--mut); font-size:12px; line-height:1.35}
+  .mono{font-family:var(--mono)}
+  .kvs{
+    display:grid; grid-template-columns: 1fr 1fr;
+    gap:10px;
+  }
+  @media (max-width: 980px){
+    .kvs{grid-template-columns:1fr}
+  }
+  .kv{
+    padding:10px 12px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.03);
+  }
+  .kv .k{color:var(--mut); font-size:11px; text-transform:uppercase; letter-spacing:.25px}
+  .kv .v{margin-top:4px; font-family:var(--mono); font-size:14px}
+  .tag{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:6px 9px; border-radius:999px; border:1px solid rgba(255,255,255,.14);
+    background: rgba(0,0,0,.18);
+    font-family: var(--mono); font-size:12px;
+    color: var(--mut);
+  }
+  .dot{width:8px; height:8px; border-radius:50%}
+  .dot.good{background:var(--good)}
+  .dot.bad{background:var(--bad)}
+  .dot.warn{background:var(--warn)}
+  .dot.info{background:var(--info)}
+  .split{display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap}
+  .search{
+    width:100%;
+    padding:10px 12px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.12);
+    background: rgba(0,0,0,.18);
+    color:var(--txt);
+    font-family:var(--mono);
+    outline:none;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-family: var(--mono);
+    font-size:12px;
+  }
+  th, td{
+    padding:9px 8px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    vertical-align:top;
+    white-space:nowrap;
+  }
+  th{color:#CFE0FF; text-align:left; font-weight:700}
+  tr:hover{background: rgba(255,255,255,.03)}
+  .click{cursor:pointer}
+  .small{font-size:11px; color:var(--mut)}
+  .right{ text-align:right }
+  .center{ text-align:center }
+  .pos{color: var(--good)}
+  .neg{color: var(--bad)}
+  .warnTxt{color: var(--warn)}
+  .mut{color: var(--mut)}
+  .plotWrap{padding:10px 12px 14px}
+  canvas{
+    width:100%;
+    height:360px;
+    background: rgba(0,0,0,.16);
+    border:1px solid rgba(255,255,255,.10);
+    border-radius: 16px;
+    display:block;
+  }
+  .legend{
+    display:flex; gap:10px; flex-wrap:wrap;
+    margin:10px 0 0;
+  }
+  .legend .tag{background: rgba(255,255,255,.03)}
+  .foot{
+    padding:10px 14px 14px;
+    border-top:1px solid rgba(255,255,255,.08);
+    color:var(--mut);
+    font-size:12px;
+    line-height:1.35;
+  }
+  .hr{height:1px; background:rgba(255,255,255,.10); margin:12px 0}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>QDS RC Lab — Ultra</h1>
+          <p class="sub">Client-side SPARC summary analysis + per-galaxy curve viewer. No libraries. Offline friendly.</p>
+        </div>
+      </div>
+      <div class="pillbar">
+        <div class="pill">SUMMARY: <b id="sumStatus">not loaded</b></div>
+        <div class="pill">Bestfit CSVs: <b id="bfCount">0</b></div>
+        <div class="pill">AICc/BIC: <b>live</b></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="grid">
+
+    <!-- LEFT: Controls + Stats + Table -->
+    <section class="card">
+      <div class="hd">
+        <h2>Data</h2>
+        <span class="tag"><span class="dot info"></span><span class="mono">Drag & Drop supported</span></span>
+      </div>
+      <div class="bd">
+        <div class="row">
+          <label class="btn" for="fileSummary">Load SUMMARY_qds_fit.csv</label>
+          <input id="fileSummary" type="file" accept=".csv,text/csv" />
+          <label class="btn secondary" for="fileBestfits">Load *_QDS_bestfit.csv (many)</label>
+          <input id="fileBestfits" type="file" accept=".csv,text/csv" multiple />
+          <button class="btn secondary" id="btnDemo">Demo mode</button>
+        </div>
+        <p class="hint">
+          <b>SUMMARY expected columns (by index):</b>
+          <span class="mono">npts, chi2_bary, redchi2_bary, chi2_qds, redchi2_qds, improve_pct, v0, lam</span>.
+          If your header names differ, this page still tries to map them.
+        </p>
+
+        <div class="hr"></div>
+
+        <div class="kvs">
+          <div class="kv">
+            <div class="k">N galaxies</div>
+            <div class="v" id="kN">—</div>
+          </div>
+          <div class="kv">
+            <div class="k">χ² wins (QDS better)</div>
+            <div class="v" id="kChiWins">—</div>
+          </div>
+          <div class="kv">
+            <div class="k">Mean χ² improvement (clipped at 0)</div>
+            <div class="v" id="kMeanImp">—</div>
+          </div>
+          <div class="kv">
+            <div class="k">AICc wins (penalty +2 params)</div>
+            <div class="v" id="kAicWins">—</div>
+          </div>
+          <div class="kv">
+            <div class="k">BIC wins (penalty +2 params)</div>
+            <div class="v" id="kBicWins">—</div>
+          </div>
+          <div class="kv">
+            <div class="k">Boundary hits</div>
+            <div class="v" id="kBounds">—</div>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="split">
+          <div style="flex:1; min-width:240px">
+            <input class="search" id="search" placeholder="search galaxy… (e.g. NGC4013)"/>
+          </div>
+          <div class="row">
+            <span class="tag" title="QDS chi2 < bary chi2"><span class="dot good"></span>χ² win</span>
+            <span class="tag" title="AICc prefers QDS"><span class="dot info"></span>AICc</span>
+            <span class="tag" title="Potential boundary fit"><span class="dot warn"></span>boundary</span>
+          </div>
+        </div>
+
+        <div style="margin-top:10px; overflow:auto; border-radius:14px; border:1px solid rgba(255,255,255,.10)">
+          <table id="tbl">
+            <thead>
+              <tr>
+                <th>galaxy</th>
+                <th class="right">n</th>
+                <th class="right">χ²b</th>
+                <th class="right">χ²q</th>
+                <th class="right">imp%</th>
+                <th class="right">AICc Δ</th>
+                <th class="right">BIC Δ</th>
+                <th class="right">v0</th>
+                <th class="right">lam</th>
+                <th class="center">flags</th>
+              </tr>
+            </thead>
+            <tbody id="tb"></tbody>
+          </table>
+        </div>
+
+        <div class="foot">
+          <b>Notes (scientific hygiene):</b><br/>
+          • χ² improvement uses raw χ² (not reduced) to avoid dof artifacts.<br/>
+          • AICc/BIC assume QDS has +2 free params vs bary baseline (k_b=0, k_q=2). Adjust inside code if needed.<br/>
+          • Boundary flags are heuristics (v0≈0, lam≈min/max). Interpret as “needs attention”, not “wrong”.
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: Plot + Details -->
+    <section class="card">
+      <div class="hd">
+        <h2>Galaxy viewer</h2>
+        <span class="tag"><span class="dot good"></span><span class="mono" id="selName">none selected</span></span>
+      </div>
+      <div class="bd">
+        <div class="kvs">
+          <div class="kv"><div class="k">χ²b → χ²q</div><div class="v" id="dChi">—</div></div>
+          <div class="kv"><div class="k">AICc / BIC</div><div class="v" id="dInfo">—</div></div>
+          <div class="kv"><div class="k">params</div><div class="v" id="dParams">—</div></div>
+          <div class="kv"><div class="k">flags</div><div class="v" id="dFlags">—</div></div>
+        </div>
+
+        <div class="plotWrap">
+          <canvas id="plot" width="1000" height="520"></canvas>
+          <div class="legend">
+            <span class="tag"><span class="dot info"></span>Vobs</span>
+            <span class="tag"><span class="dot good"></span>Vqds</span>
+            <span class="tag"><span class="dot warn"></span>Vbary</span>
+          </div>
+          <p class="hint" id="plotHint">
+            Load a per-galaxy <span class="mono">*_QDS_bestfit.csv</span> to see curves. If not present, you’ll still get full stats.
+          </p>
+        </div>
+
+        <div class="foot">
+          <b>Per-galaxy bestfit CSV auto-detect:</b> it tries to find columns like
+          <span class="mono">r</span>, <span class="mono">v_obs</span>,
+          <span class="mono">v_bary</span> (or gas/disk/bulge) and <span class="mono">v_qds</span>/<span class="mono">v_model</span>.
+          If your headings differ, tell me the header line and I’ll patch the mapper.
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<script>
+/* ===========================
+   QDS RC Lab — Ultra (no libs)
+   =========================== */
+
+const $ = sel => document.querySelector(sel);
+
+const state = {
+  summaryRows: [],
+  bestfits: new Map(), // galaxy -> {rows:[...], cols:{...}}
+  sel: null,
+  // heuristics (tune here)
+  v0_zero_eps: 1e-6,
+  lam_min_eps: 1e-9,
+  lam_max_guess: null,   // inferred from data if possible
+  lam_min_guess: null
+};
+
+function num(x){
+  const v = Number(x);
+  return Number.isFinite(v) ? v : NaN;
+}
+
+function fmt(x, d=3){
+  if(!Number.isFinite(x)) return "—";
+  const abs = Math.abs(x);
+  if(abs >= 1000) return x.toFixed(0);
+  if(abs >= 100) return x.toFixed(1);
+  if(abs >= 10) return x.toFixed(2);
+  return x.toFixed(d);
+}
+
+function parseCSV(text){
+  // simple robust CSV (handles quotes)
+  const rows = [];
+  let i=0, field="", row=[], inQ=false;
+  while(i < text.length){
+    const c = text[i];
+    if(inQ){
+      if(c === '"'){
+        if(text[i+1] === '"'){ field+='"'; i+=2; continue; }
+        inQ=false; i++; continue;
+      }
+      field += c; i++; continue;
+    } else {
+      if(c === '"'){ inQ=true; i++; continue; }
+      if(c === ','){ row.push(field); field=""; i++; continue; }
+      if(c === '\r'){ i++; continue; }
+      if(c === '\n'){ row.push(field); rows.push(row); row=[]; field=""; i++; continue; }
+      field += c; i++; continue;
+    }
+  }
+  // flush
+  if(field.length || row.length){ row.push(field); rows.push(row); }
+  return rows;
+}
+
+function headerMap(hdr){
+  const idx = {};
+  const H = hdr.map(s => (s||"").trim().toLowerCase());
+  function findAny(names){
+    for(const n of names){
+      const j = H.indexOf(n);
+      if(j>=0) return j;
+    }
+    return -1;
+  }
+  idx.galaxy = findAny(["galaxy","name"]);
+  idx.n      = findAny(["n","npts","n_points","npoints"]);
+  idx.chi2_b = findAny(["chi2_bary","chi2_b","chi2_baryon","chi2_baryons","chi2_baryonic","chi2b"]);
+  idx.red_b  = findAny(["redchi2_bary","redchi2_b","redchi2b","red_bary"]);
+  idx.chi2_q = findAny(["chi2_qds","chi2_q","chi2q","chi2_model"]);
+  idx.red_q  = findAny(["redchi2_qds","redchi2_q","redchi2q","red_qds"]);
+  idx.impPct = findAny(["improve_pct","improve","improvement_pct","imp_pct"]);
+  idx.v0     = findAny(["v0","v_0"]);
+  idx.lam    = findAny(["lam","lambda","lambda_c","lambda_c_kpc","lambda_kpc"]);
+  // fallback to your known layout if headers unknown
+  return idx;
+}
+
+function readFileAsText(file){
+  return new Promise((resolve,reject)=>{
+    const fr = new FileReader();
+    fr.onload = () => resolve(String(fr.result||""));
+    fr.onerror = () => reject(fr.error||new Error("read error"));
+    fr.readAsText(file);
+  });
+}
+
+function inferLamBounds(rows){
+  let lamMin = Infinity, lamMax = -Infinity;
+  for(const r of rows){
+    if(Number.isFinite(r.lam)){
+      lamMin = Math.min(lamMin, r.lam);
+      lamMax = Math.max(lamMax, r.lam);
+    }
+  }
+  if(lamMin !== Infinity) state.lam_min_guess = lamMin;
+  if(lamMax !== -Infinity) state.lam_max_guess = lamMax;
+}
+
+function computeRowDerived(r){
+  // chi2 improvement (clipped at 0)
+  const cb = r.chi2_b;
+  const cq = r.chi2_q;
+  let imp = (Number.isFinite(cb) && cb>0 && Number.isFinite(cq)) ? (100*(cb - cq)/cb) : NaN;
+  if(Number.isFinite(imp) && imp < 0) imp = 0;
+
+  // AICc + BIC
+  // assume bary k=0, QDS k=2 (penalty for 2 params)
+  const n = r.n;
+  const kb = 0, kq = 2;
+  let aicb = cb + 2*kb;
+  let aicq = cq + 2*kq;
+  let aiccb = aicb, aiccq = aicq;
+  if(Number.isFinite(n) && n > (kb+1)) aiccb = aicb + (2*kb*(kb+1))/(n-kb-1);
+  if(Number.isFinite(n) && n > (kq+1)) aiccq = aicq + (2*kq*(kq+1))/(n-kq-1);
+
+  const bicb = cb + kb*Math.log(Math.max(n,2));
+  const bicq = cq + kq*Math.log(Math.max(n,2));
+
+  // deltas: negative favours QDS
+  const dAICc = aiccq - aiccb;
+  const dBIC  = bicq - bicb;
+
+  // flags
+  const flags = [];
+  const v0 = r.v0;
+  const lam = r.lam;
+  const lamMin = state.lam_min_guess;
+  const lamMax = state.lam_max_guess;
+
+  if(Number.isFinite(v0) && Math.abs(v0) <= state.v0_zero_eps) flags.push("v0≈0");
+  if(Number.isFinite(lamMin) && Number.isFinite(lam) && Math.abs(lam-lamMin) <= 1e-12) flags.push("lam=min");
+  if(Number.isFinite(lamMax) && Number.isFinite(lam) && Math.abs(lam-lamMax) <= 1e-12) flags.push("lam=max");
+
+  const chiWin = Number.isFinite(cb) && Number.isFinite(cq) ? (cq < cb) : false;
+  const aicWin = Number.isFinite(dAICc) ? (dAICc < 0) : false;
+  const bicWin = Number.isFinite(dBIC) ? (dBIC < 0) : false;
+
+  return {imp, dAICc, dBIC, flags, chiWin, aicWin, bicWin};
+}
+
+function loadSummaryFromText(text, label){
+  const raw = parseCSV(text);
+  if(raw.length < 2) throw new Error("SUMMARY looks empty");
+
+  const hdr = raw[0];
+  const map = headerMap(hdr);
+
+  // If header mapping fails, fallback to known indices (your pipeline):
+  // galaxy(0), npts(1), chi2_b(2), red_b(3), chi2_q(4), red_q(5), improve_pct(6), v0(7), lam(8)
+  const fallback = (map.galaxy<0 || map.n<0 || map.chi2_b<0 || map.chi2_q<0 || map.v0<0 || map.lam<0);
+
+  const rows = [];
+  for(let i=1;i<raw.length;i++){
+    const line = raw[i];
+    if(!line || !line.length) continue;
+    const get = (j)=> (j>=0 && j<line.length) ? line[j] : "";
+    const r = {};
+    if(!fallback){
+      r.galaxy = String(get(map.galaxy)).trim();
+      r.n      = num(get(map.n));
+      r.chi2_b = num(get(map.chi2_b));
+      r.red_b  = num(get(map.red_b));
+      r.chi2_q = num(get(map.chi2_q));
+      r.red_q  = num(get(map.red_q));
+      r.impPct_file = num(get(map.impPct));
+      r.v0     = num(get(map.v0));
+      r.lam    = num(get(map.lam));
+    } else {
+      r.galaxy = String(get(0)).trim();
+      r.n      = num(get(1));
+      r.chi2_b = num(get(2));
+      r.red_b  = num(get(3));
+      r.chi2_q = num(get(4));
+      r.red_q  = num(get(5));
+      r.impPct_file = num(get(6));
+      r.v0     = num(get(7));
+      r.lam    = num(get(8));
+    }
+    if(!r.galaxy) continue;
+    rows.push(r);
+  }
+
+  state.summaryRows = rows;
+  inferLamBounds(rows);
+
+  $("#sumStatus").textContent = `${rows.length} rows`;
+  renderAll();
+}
+
+function galaxyNameFromBestfitFile(fileName){
+  // common: NGC4013_QDS_bestfit.csv
+  let base = fileName.replace(/\.csv$/i,"");
+  base = base.replace(/_QDS_bestfit$/i,"");
+  base = base.replace(/_bestfit$/i,"");
+  return base;
+}
+
+function mapBestfitColumns(hdr){
+  const H = hdr.map(s => (s||"").trim().toLowerCase());
+  const idx = {};
+  function findAny(names){
+    for(const n of names){
+      const j = H.indexOf(n);
+      if(j>=0) return j;
+    }
+    return -1;
+  }
+  idx.r     = findAny(["r","radius","rad","r_kpc","r_k"]);
+  idx.vobs  = findAny(["v_obs","vobs","v_observed","v"]);
+  idx.vbary = findAny(["v_bary","vbary","v_bar","v_b"]);
+  idx.vqds  = findAny(["v_qds","vqds","v_model","vfit","v_q"]);
+  idx.vgas  = findAny(["v_gas","vgas"]);
+  idx.vdisk = findAny(["v_disk","vdisk"]);
+  idx.vbul  = findAny(["v_bulge","vbul","vbulge"]);
+  idx.err   = findAny(["dv","v_err","verr","sigma","err"]);
+  return idx;
+}
+
+function loadBestfitFromText(text, fileName){
+  const raw = parseCSV(text);
+  if(raw.length < 2) return;
+  const hdr = raw[0];
+  const col = mapBestfitColumns(hdr);
+  const galaxy = galaxyNameFromBestfitFile(fileName);
+
+  const rows = [];
+  for(let i=1;i<raw.length;i++){
+    const line = raw[i]; if(!line || !line.length) continue;
+    const get = (j)=> (j>=0 && j<line.length) ? line[j] : "";
+    const r = {};
+    r.r    = num(get(col.r));
+    r.vobs = num(get(col.vobs));
+    r.vqds = num(get(col.vqds));
+    // bary: either explicit vbary or from components
+    const vb = num(get(col.vbary));
+    const vg = num(get(col.vgas));
+    const vd = num(get(col.vdisk));
+    const vbu= num(get(col.vbul));
+    r.vbary = Number.isFinite(vb) ? vb :
+              (Number.isFinite(vg)||Number.isFinite(vd)||Number.isFinite(vbu))
+                ? Math.sqrt((vg||0)**2 + (vd||0)**2 + (vbu||0)**2)
+                : NaN;
+    r.err  = num(get(col.err));
+    if(Number.isFinite(r.r)) rows.push(r);
+  }
+
+  if(rows.length){
+    state.bestfits.set(galaxy.toUpperCase(), {galaxy, rows});
+    $("#bfCount").textContent = String(state.bestfits.size);
+  }
+}
+
+function renderAll(){
+  const rows = state.summaryRows.slice();
+  if(!rows.length){
+    $("#kN").textContent = "—";
+    $("#tb").innerHTML = "";
+    drawEmptyPlot();
+    return;
+  }
+
+  // derive + sort (default: best AICc then χ² imp)
+  const enriched = rows.map(r=>{
+    const d = computeRowDerived(r);
+    return {...r, ...d};
+  });
+
+  // stats
+  const N = enriched.length;
+  let chiWins=0, aicWins=0, bicWins=0, sumImp=0, posImp=0;
+  let b_v0=0, b_lmin=0, b_lmax=0;
+
+  for(const r of enriched){
+    if(r.chiWin) chiWins++;
+    if(r.aicWin) aicWins++;
+    if(r.bicWin) bicWins++;
+    if(Number.isFinite(r.imp)){ sumImp += r.imp; posImp++; }
+    if(r.flags.includes("v0≈0")) b_v0++;
+    if(r.flags.includes("lam=min")) b_lmin++;
+    if(r.flags.includes("lam=max")) b_lmax++;
+  }
+
+  $("#kN").textContent = `${N}`;
+  $("#kChiWins").textContent = `${chiWins} / ${N} (${fmt(100*chiWins/N,2)}%)`;
+  $("#kMeanImp").textContent = `${fmt((posImp?sumImp/N:0),3)}%`;
+  $("#kAicWins").textContent = `${aicWins} / ${N} (${fmt(100*aicWins/N,2)}%)`;
+  $("#kBicWins").textContent = `${bicWins} / ${N} (${fmt(100*bicWins/N,2)}%)`;
+  $("#kBounds").textContent = `v0≈0: ${b_v0}  •  lam=min: ${b_lmin}  •  lam=max: ${b_lmax}`;
+
+  // apply search
+  const q = ($("#search").value || "").trim().toUpperCase();
+  let view = enriched;
+  if(q){
+    view = enriched.filter(r => r.galaxy.toUpperCase().includes(q));
+  }
+
+  // sort: AICc delta ascending, then chi2 improvement descending
+  view.sort((a,b)=>{
+    const da = Number.isFinite(a.dAICc) ? a.dAICc : 1e99;
+    const db = Number.isFinite(b.dAICc) ? b.dAICc : 1e99;
+    if(da !== db) return da - db;
+    const ia = Number.isFinite(a.imp) ? a.imp : -1;
+    const ib = Number.isFinite(b.imp) ? b.imp : -1;
+    return ib - ia;
+  });
+
+  // table
+  const tb = $("#tb");
+  tb.innerHTML = "";
+  for(const r of view){
+    const tr = document.createElement("tr");
+    tr.className = "click";
+    tr.addEventListener("click", ()=> selectGalaxy(r.galaxy));
+    const impCls = (Number.isFinite(r.imp) && r.imp>0) ? "pos" : "mut";
+    const dA = Number.isFinite(r.dAICc) ? r.dAICc : NaN;
+    const dB = Number.isFinite(r.dBIC)  ? r.dBIC  : NaN;
+
+    const flags = [];
+    if(r.chiWin) flags.push("χ²");
+    if(r.aicWin) flags.push("AICc");
+    if(r.bicWin) flags.push("BIC");
+    if(r.flags.length) flags.push("bound");
+
+    tr.innerHTML = `
+      <td><b>${esc(r.galaxy)}</b><div class="small">${state.bestfits.has(r.galaxy.toUpperCase()) ? "bestfit: loaded" : "bestfit: —"}</div></td>
+      <td class="right">${fmt(r.n,0)}</td>
+      <td class="right">${fmt(r.chi2_b,3)}</td>
+      <td class="right">${fmt(r.chi2_q,3)}</td>
+      <td class="right ${impCls}">${Number.isFinite(r.imp)?fmt(r.imp,3):"—"}</td>
+      <td class="right ${Number.isFinite(dA) ? (dA<0?"pos":"neg") : "mut"}">${Number.isFinite(dA)?fmt(dA,3):"—"}</td>
+      <td class="right ${Number.isFinite(dB) ? (dB<0?"pos":"neg") : "mut"}">${Number.isFinite(dB)?fmt(dB,3):"—"}</td>
+      <td class="right">${fmt(r.v0,3)}</td>
+      <td class="right">${fmt(r.lam,6)}</td>
+      <td class="center"><span class="${r.flags.length?'warnTxt':'mut'}">${esc(flags.join(" "))}</span></td>
+    `;
+    tb.appendChild(tr);
+  }
+
+  // keep selection alive
+  if(state.sel){
+    const exists = state.summaryRows.some(x => x.galaxy.toUpperCase() === state.sel.toUpperCase());
+    if(!exists) clearSelection();
+  }
+
+  if(!state.sel) drawEmptyPlot();
+}
+
+function esc(s){ return String(s).replace(/[&<>"']/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m])); }
+
+function selectGalaxy(name){
+  state.sel = name;
+  $("#selName").textContent = name;
+
+  const r0 = state.summaryRows.find(x => x.galaxy.toUpperCase() === name.toUpperCase());
+  if(!r0){ clearSelection(); return; }
+  const r = {...r0, ...computeRowDerived(r0)};
+
+  $("#dChi").textContent = `${fmt(r.chi2_b,3)} → ${fmt(r.chi2_q,3)}   |   imp(clipped)= ${Number.isFinite(r.imp)?fmt(r.imp,3)+"%":"—"}`;
+  $("#dInfo").textContent = `ΔAICc=${Number.isFinite(r.dAICc)?fmt(r.dAICc,3):"—"}   •   ΔBIC=${Number.isFinite(r.dBIC)?fmt(r.dBIC,3):"—"}`;
+  $("#dParams").textContent = `v0=${fmt(r.v0,3)}   lam=${fmt(r.lam,6)}   n=${fmt(r.n,0)}`;
+  $("#dFlags").textContent = r.flags.length ? r.flags.join("  •  ") : "—";
+
+  // plot if bestfit loaded
+  const bf = state.bestfits.get(name.toUpperCase());
+  if(bf && bf.rows && bf.rows.length){
+    $("#plotHint").textContent = `Plotting bestfit CSV for ${name}.`;
+    drawPlot(bf.rows, name);
+  } else {
+    $("#plotHint").textContent = `No bestfit CSV loaded for ${name}. Load *_QDS_bestfit.csv to plot curves.`;
+    drawEmptyPlot(name);
+  }
+}
+
+function clearSelection(){
+  state.sel = null;
+  $("#selName").textContent = "none selected";
+  $("#dChi").textContent = "—";
+  $("#dInfo").textContent = "—";
+  $("#dParams").textContent = "—";
+  $("#dFlags").textContent = "—";
+  drawEmptyPlot();
+}
+
+function drawEmptyPlot(title){
+  const c = $("#plot");
+  const g = c.getContext("2d");
+  g.clearRect(0,0,c.width,c.height);
+  g.fillStyle = "rgba(255,255,255,.06)";
+  g.fillRect(0,0,c.width,c.height);
+
+  g.strokeStyle = "rgba(255,255,255,.10)";
+  g.lineWidth = 1;
+  const pad=50;
+  g.strokeRect(pad, pad, c.width-2*pad, c.height-2*pad);
+
+  g.fillStyle = "rgba(234,240,255,.75)";
+  g.font = "16px " + getComputedStyle(document.documentElement).getPropertyValue('--sans');
+  g.fillText("Load a SUMMARY + bestfit CSVs to view curves", pad, pad-16);
+
+  g.fillStyle = "rgba(170,182,214,.85)";
+  g.font = "12px " + getComputedStyle(document.documentElement).getPropertyValue('--mono');
+  g.fillText(title ? `Selected: ${title}` : "Selected: none", pad, pad+22);
+  g.fillText("Expected bestfit cols: r, v_obs, v_bary (or v_gas/v_disk/v_bulge), v_qds/v_model", pad, pad+42);
+}
+
+function drawPlot(rows, name){
+  const c = $("#plot");
+  const g = c.getContext("2d");
+  g.clearRect(0,0,c.width,c.height);
+
+  const padL=70, padR=20, padT=35, padB=55;
+  const W = c.width, H = c.height;
+  const x0 = padL, x1 = W-padR, y0=padT, y1=H-padB;
+
+  // ranges
+  let rMin=Infinity, rMax=-Infinity, vMin=Infinity, vMax=-Infinity;
+  for(const p of rows){
+    if(Number.isFinite(p.r)){
+      rMin = Math.min(rMin, p.r);
+      rMax = Math.max(rMax, p.r);
+    }
+    for(const k of ["vobs","vbary","vqds"]){
+      const v = p[k];
+      if(Number.isFinite(v)){
+        vMin = Math.min(vMin, v);
+        vMax = Math.max(vMax, v);
+      }
+    }
+  }
+  if(!Number.isFinite(rMin) || !Number.isFinite(vMin)){ drawEmptyPlot(name); return; }
+  // padding
+  const vr = (vMax - vMin) || 1;
+  vMin -= 0.08*vr;
+  vMax += 0.10*vr;
+
+  const xr = (rMax - rMin) || 1;
+  function X(r){ return x0 + ((r - rMin)/xr) * (x1-x0); }
+  function Y(v){ return y1 - ((v - vMin)/(vMax-vMin)) * (y1-y0); }
+
+  // background
+  g.fillStyle = "rgba(0,0,0,.14)";
+  g.fillRect(0,0,W,H);
+
+  // grid
+  g.strokeStyle = "rgba(255,255,255,.10)";
+  g.lineWidth = 1;
+  for(let i=0;i<=5;i++){
+    const yy = y0 + (i/5)*(y1-y0);
+    g.beginPath(); g.moveTo(x0,yy); g.lineTo(x1,yy); g.stroke();
+  }
+  for(let i=0;i<=6;i++){
+    const xx = x0 + (i/6)*(x1-x0);
+    g.beginPath(); g.moveTo(xx,y0); g.lineTo(xx,y1); g.stroke();
+  }
+
+  // axes box
+  g.strokeStyle = "rgba(255,255,255,.20)";
+  g.lineWidth = 1;
+  g.strokeRect(x0,y0,x1-x0,y1-y0);
+
+  // labels
+  g.fillStyle = "rgba(234,240,255,.85)";
+  g.font = "16px " + getComputedStyle(document.documentElement).getPropertyValue('--sans');
+  g.fillText(`${name}`, x0, 22);
+
+  g.fillStyle = "rgba(170,182,214,.90)";
+  g.font = "12px " + getComputedStyle(document.documentElement).getPropertyValue('--mono');
+  g.fillText(`r: ${fmt(rMin,3)} → ${fmt(rMax,3)}   |   V: ${fmt(vMin,1)} → ${fmt(vMax,1)} (km/s)`, x0, y0-10);
+
+  // ticks
+  g.fillStyle = "rgba(170,182,214,.85)";
+  for(let i=0;i<=5;i++){
+    const vv = vMax - (i/5)*(vMax-vMin);
+    const yy = y0 + (i/5)*(y1-y0);
+    g.fillText(fmt(vv,1), 10, yy+4);
+  }
+  for(let i=0;i<=6;i++){
+    const rr = rMin + (i/6)*(rMax-rMin);
+    const xx = x0 + (i/6)*(x1-x0);
+    g.fillText(fmt(rr,2), xx-12, H-22);
+  }
+  g.fillText("r (kpc)", (x0+x1)/2 - 22, H-6);
+  g.save();
+  g.translate(16, (y0+y1)/2 + 30);
+  g.rotate(-Math.PI/2);
+  g.fillText("V (km/s)", 0, 0);
+  g.restore();
+
+  // color helpers (no libs, but crisp)
+  function strokeSeries(key, color){
+    // if you want *strictly* no fixed colours, you can remove these. But pro UI needs stable legend.
+    g.strokeStyle = color;
+    g.lineWidth = 2.2;
+    g.beginPath();
+    let started=false;
+    for(const p of rows){
+      const v = p[key];
+      if(!Number.isFinite(p.r) || !Number.isFinite(v)) continue;
+      const xx = X(p.r), yy=Y(v);
+      if(!started){ g.moveTo(xx,yy); started=true; }
+      else g.lineTo(xx,yy);
+    }
+    g.stroke();
+  }
+  function dotSeries(key, color){
+    g.fillStyle = color;
+    for(const p of rows){
+      const v = p[key];
+      if(!Number.isFinite(p.r) || !Number.isFinite(v)) continue;
+      const xx=X(p.r), yy=Y(v);
+      g.beginPath(); g.arc(xx,yy,3,0,Math.PI*2); g.fill();
+    }
+  }
+
+  // series
+  // vobs points
+  dotSeries("vobs", "rgba(106,166,255,.95)");
+  // vbary curve
+  strokeSeries("vbary", "rgba(255,204,102,.95)");
+  // vqds curve
+  strokeSeries("vqds", "rgba(41,242,154,.95)");
+}
+
+function demoMode(){
+  // tiny built-in demo summary (not physics, just UI sanity)
+  const txt = [
+    "galaxy,npts,chi2_bary,redchi2_bary,chi2_qds,redchi2_qds,improve_pct,v0,lam",
+    "NGC4013,36,2146.48,59.6246,639.82,17.7728,70.19,250.16,40",
+    "UGC02885,19,913.98,48.1042,27.75,1.4607,96.96,278.451,40",
+    "NGC3521,41,1205.63,29.4057,1222.29,29.8118,-1.38,301.845,40",
+    "CamB,21,198.94,9.47336,255.78,12.18,-28.57,0,0.2"
+  ].join("\n");
+  loadSummaryFromText(txt, "demo");
+  // demo curve for NGC4013
+  const bf = [
+    "r,v_obs,v_bary,v_qds",
+    "0.5,40,25,38",
+    "1.0,70,45,68",
+    "2.0,115,75,112",
+    "3.5,145,98,143",
+    "5.0,165,112,162",
+    "7.0,175,120,173",
+    "9.0,178,122,176"
+  ].join("\n");
+  loadBestfitFromText(bf, "NGC4013_QDS_bestfit.csv");
+  $("#bfCount").textContent = String(state.bestfits.size);
+  renderAll();
+  selectGalaxy("NGC4013");
+}
+
+function setupDnD(){
+  const area = document.body;
+  area.addEventListener("dragover", (e)=>{ e.preventDefault(); });
+  area.addEventListener("drop", async (e)=>{
+    e.preventDefault();
+    const files = Array.from(e.dataTransfer.files || []);
+    if(!files.length) return;
+    // auto route
+    let gotSummary=false;
+    for(const f of files){
+      const name = f.name.toLowerCase();
+      const txt = await readFileAsText(f);
+      if(name.includes("summary") && name.endsWith(".csv") && !gotSummary){
+        loadSummaryFromText(txt, f.name);
+        gotSummary = true;
+      } else if(name.endsWith(".csv")){
+        loadBestfitFromText(txt, f.name);
+      }
+    }
+    $("#bfCount").textContent = String(state.bestfits.size);
+    renderAll();
+  });
+}
+
+$("#fileSummary").addEventListener("change", async (e)=>{
+  const f = e.target.files && e.target.files[0];
+  if(!f) return;
+  try{
+    const txt = await readFileAsText(f);
+    loadSummaryFromText(txt, f.name);
+  }catch(err){
+    alert("Failed to load SUMMARY: " + err.message);
+  }
+});
+
+$("#fileBestfits").addEventListener("change", async (e)=>{
+  const files = Array.from(e.target.files || []);
+  if(!files.length) return;
+  for(const f of files){
+    try{
+      const txt = await readFileAsText(f);
+      loadBestfitFromText(txt, f.name);
+    }catch(_){}
+  }
+  $("#bfCount").textContent = String(state.bestfits.size);
+  renderAll();
+});
+
+$("#search").addEventListener("input", ()=> renderAll());
+$("#btnDemo").addEventListener("click", ()=> demoMode());
+
+setupDnD();
+drawEmptyPlot();
+</script>
+
+</body>
+</html>

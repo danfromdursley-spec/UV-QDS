@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Ω Marble Run 3D — Cuboro Grid v1</title>
+<style>
+  :root{
+    --bg1:#050816;
+    --bg2:#0a102a;
+    --panel:#0b1226cc;
+    --panel-border:#2a355ecc;
+    --accent:#7dd3fc;
+    --accent2:#c4b5fd;
+    --text:#e8ecff;
+    --muted:#a9b3d6;
+  }
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: radial-gradient(1200px 800px at 30% 20%, #0b143a 0%, var(--bg1) 35%, #03040b 100%);
+    color: var(--text);
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, sans-serif;
+    overflow: hidden;
+  }
+  #app {
+    position: fixed; inset: 0;
+  }
+  canvas { display:block; width:100%; height:100%; }
+
+  /* HUD container */
+  #hud {
+    position: fixed;
+    left: 10px; right: 10px; top: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    z-index: 5;
+    pointer-events: none; /* panels re-enable */
+  }
+  .panel {
+    pointer-events: auto;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 16px;
+    padding: 12px 12px 10px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 8px 24px #00000055;
+  }
+  .title {
+    font-weight: 700;
+    letter-spacing: .4px;
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .big {
+    font-size: 22px; font-weight: 800;
+  }
+  .row {
+    display:flex; align-items:center; justify-content: space-between;
+    gap: 10px;
+    margin: 6px 0;
+  }
+  .btn {
+    appearance: none; border: 1px solid #2b3a6a;
+    background: linear-gradient(135deg, #0e1a3e, #111b4a);
+    color: var(--text);
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-weight: 650;
+    font-size: 12px;
+    letter-spacing: .3px;
+    box-shadow: inset 0 0 0 1px #ffffff08, 0 6px 14px #00000044;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn-accent {
+    border-color: #4b7bd3;
+    background: linear-gradient(135deg, #103a6a, #1b2c88);
+  }
+
+  input[type="range"]{
+    width: 100%;
+  }
+  .tiny {
+    font-size: 11px; color: var(--muted);
+  }
+
+  /* Always-available HUD toggle */
+  #hudToggle {
+    position: fixed;
+    right: 12px; top: 12px;
+    z-index: 6;
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 1px solid #6aa7ff66;
+    background: linear-gradient(135deg, #9be7ff, #c9b8ff);
+    color: #0a0f1d;
+    font-weight: 800;
+    letter-spacing: .6px;
+    box-shadow: 0 10px 24px #00000055;
+  }
+
+  /* Bottom caption */
+  #caption {
+    position: fixed;
+    left: 50%; bottom: 10px;
+    transform: translateX(-50%);
+    z-index: 4;
+    background: rgba(8,12,28,0.65);
+    border: 1px solid rgba(80,100,160,0.4);
+    padding: 10px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    color: var(--muted);
+    backdrop-filter: blur(8px);
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<button id="hudToggle">HUD: ON</button>
+
+<div id="hud">
+  <div class="panel">
+    <div class="title">Ω MARBLE RUN — CUBORO GRID</div>
+    <div class="row">
+      <div class="big">3D v1</div>
+      <div class="tiny">single-file • phone-safe • true 3D</div>
+    </div>
+    <div class="row">
+      <button class="btn btn-accent" id="resetBtn">RESET SCENE</button>
+      <button class="btn" id="addMarbleBtn">ADD MARBLE</button>
+    </div>
+    <div class="row">
+      <button class="btn" id="toggleGridBtn">GRID: ON</button>
+      <button class="btn" id="toggleTracksBtn">TRACKS: ON</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="title">CAMERA + MOTION</div>
+
+    <div class="row"><span class="tiny">Marble Speed</span><span id="speedOut" class="tiny">1.00x</span></div>
+    <input id="speedSlider" type="range" min="0.2" max="3.0" step="0.05" value="1.0" />
+
+    <div class="row"><span class="tiny">Friction</span><span id="fricOut" class="tiny">0.020</span></div>
+    <input id="fricSlider" type="range" min="0.000" max="0.080" step="0.001" value="0.020" />
+
+    <div class="row"><span class="tiny">Gravity Feel</span><span id="gravOut" class="tiny">1.00</span></div>
+    <input id="gravSlider" type="range" min="0.2" max="2.0" step="0.05" value="1.0" />
+
+    <div class="row">
+      <button class="btn" id="camHomeBtn">CAM HOME</button>
+      <button class="btn" id="chaosBtn">MAX CHAOS</button>
+    </div>
+  </div>
+</div>
+
+<div id="caption">Drag to orbit • two-finger to zoom • Cuboro-ish block grid in true 3D. 🎩</div>
+
+<!-- Three.js (CDN). Works best with internet on first load. -->
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+<script src="https://unpkg.com/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+
+<script>
+(() => {
+  // ===============================
+  // Core scene
+  // ===============================
+  const app = document.getElementById("app");
+  const scene = new THREE.Scene();
+
+  const camera = new THREE.PerspectiveCamera(
+    55,
+    window.innerWidth / window.innerHeight,
+    0.01,
+    200
+  );
+  camera.position.set(4.2, 3.2, 5.4);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  app.appendChild(renderer.domElement);
+
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.06;
+  controls.rotateSpeed = 0.7;
+  controls.zoomSpeed = 0.9;
+  controls.panSpeed = 0.5;
+  controls.target.set(1.5, 0.8, 1.2);
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+  const key = new THREE.DirectionalLight(0xffffff, 0.9);
+  key.position.set(6, 8, 4);
+  scene.add(key);
+
+  const rim = new THREE.DirectionalLight(0x99bbff, 0.35);
+  rim.position.set(-6, 3, -6);
+  scene.add(rim);
+
+  // ===============================
+  // Materials (soft wood + neon)
+  // ===============================
+  const woodMat = new THREE.MeshStandardMaterial({
+    color: 0xcdbb9b,
+    roughness: 0.7,
+    metalness: 0.0
+  });
+  const woodDark = new THREE.MeshStandardMaterial({
+    color: 0xb59f7b,
+    roughness: 0.8,
+    metalness: 0.0
+  });
+  const trackMat = new THREE.MeshStandardMaterial({
+    color: 0x9fb2ff,
+    roughness: 0.35,
+    metalness: 0.15,
+    transparent: true,
+    opacity: 0.55
+  });
+
+  // ===============================
+  // Grid frame helper
+  // ===============================
+  const gridGroup = new THREE.Group();
+  scene.add(gridGroup);
+
+  const grid = new THREE.GridHelper(10, 20, 0x4150aa, 0x202a66);
+  grid.position.y = 0;
+  grid.material.transparent = true;
+  grid.material.opacity = 0.35;
+  gridGroup.add(grid);
+
+  // A subtle bounding "frame" box
+  const frameGeom = new THREE.BoxGeometry(3.2, 2.2, 3.2);
+  const edges = new THREE.EdgesGeometry(frameGeom);
+  const frameLines = new THREE.LineSegments(
+    edges,
+    new THREE.LineBasicMaterial({ color: 0x6aa7ff, transparent:true, opacity:0.35 })
+  );
+  frameLines.position.set(1.5, 1.05, 1.5);
+  gridGroup.add(frameLines);
+
+  // ===============================
+  // Cuboro-ish block layout
+  // ===============================
+  const blocksGroup = new THREE.Group();
+  scene.add(blocksGroup);
+
+  const BLOCK = 1; // size unit
+
+  function addBlock(x, y, z, variant = 0) {
+    const g = new THREE.BoxGeometry(BLOCK, BLOCK, BLOCK);
+    const m = (variant % 2 === 0) ? woodMat : woodDark;
+    const mesh = new THREE.Mesh(g, m);
+    mesh.position.set(x + 0.5, y + 0.5, z + 0.5);
+
+    // Soft bevel illusion using edges
+    const e = new THREE.EdgesGeometry(g);
+    const line = new THREE.LineSegments(
+      e,
+      new THREE.LineBasicMaterial({ color: 0x2a2f55, transparent:true, opacity:0.25 })
+    );
+    mesh.add(line);
+
+    blocksGroup.add(mesh);
+    return mesh;
+  }
+
+  function buildCuboroInspiredStack() {
+    blocksGroup.clear();
+
+    // Base platform (roughly 3x3)
+    const baseCoords = [
+      [0,0,0],[1,0,0],[2,0,0],
+      [0,0,1],[1,0,1],[2,0,1],
+      [0,0,2],[1,0,2],[2,0,2],
+    ];
+    baseCoords.forEach((c,i)=>addBlock(c[0],c[1],c[2], i));
+
+    // Left tower
+    addBlock(0,1,0,1);
+    addBlock(0,2,0,0);
+
+    // Mid supports
+    addBlock(1,1,1,1);
+    addBlock(1,1,2,0);
+
+    // Right wall-ish
+    addBlock(2,1,1,1);
+    addBlock(2,2,1,0);
+
+    // Bridge blocks (top run)
+    addBlock(1,2,0,1);
+    addBlock(2,2,0,0);
+
+    // Small "house" bump feel
+    addBlock(2,0,3,1);
+  }
+
+  // ===============================
+  // Track curves + visible tubes
+  // ===============================
+  const tracksGroup = new THREE.Group();
+  scene.add(tracksGroup);
+
+  let trackCurves = [];
+
+  function makeCurve(points) {
+    return new THREE.CatmullRomCurve3(points, false, "catmullrom", 0.5);
+  }
+
+  function addTubeForCurve(curve) {
+    const tube = new THREE.TubeGeometry(curve, 140, 0.06, 10, false);
+    const mesh = new THREE.Mesh(tube, trackMat);
+    tracksGroup.add(mesh);
+
+    // faint outline
+    const edges = new THREE.EdgesGeometry(tube);
+    const line = new THREE.LineSegments(
+      edges,
+      new THREE.LineBasicMaterial({ color: 0xb7c6ff, transparent:true, opacity:0.18 })
+    );
+    tracksGroup.add(line);
+
+    return mesh;
+  }
+
+  function buildTracks() {
+    tracksGroup.clear();
+    trackCurves = [];
+
+    // A main top-to-middle “channel” path (inspired by the photo)
+    const p1 = [
+      new THREE.Vector3(0.2, 2.9, 0.2),
+      new THREE.Vector3(0.8, 2.85, 0.2),
+      new THREE.Vector3(1.4, 2.78, 0.35),
+      new THREE.Vector3(2.1, 2.72, 0.55),
+      new THREE.Vector3(2.7, 2.70, 0.9),
+      new THREE.Vector3(2.9, 2.65, 1.4),
+      new THREE.Vector3(2.7, 2.55, 1.9),
+      new THREE.Vector3(2.2, 2.4, 2.2),
+      new THREE.Vector3(1.8, 2.25, 2.55),
+      new THREE.Vector3(1.4, 2.1, 2.8),
+    ];
+    const c1 = makeCurve(p1);
+    trackCurves.push(c1); addTubeForCurve(c1);
+
+    // A descending run to the lower bowl
+    const p2 = [
+      new THREE.Vector3(1.4, 2.1, 2.8),
+      new THREE.Vector3(1.1, 1.8, 2.6),
+      new THREE.Vector3(0.8, 1.5, 2.3),
+      new THREE.Vector3(0.6, 1.15, 1.9),
+      new THREE.Vector3(0.6, 0.9, 1.4),
+      new THREE.Vector3(0.8, 0.75, 1.0),
+      new THREE.Vector3(1.1, 0.65, 0.7),
+      new THREE.Vector3(1.5, 0.6, 0.55),
+      new THREE.Vector3(1.9, 0.55, 0.7),
+      new THREE.Vector3(2.2, 0.5, 1.05),
+    ];
+    const c2 = makeCurve(p2);
+    trackCurves.push(c2); addTubeForCurve(c2);
+
+    // A little lower “exit” lane
+    const p3 = [
+      new THREE.Vector3(2.2, 0.5, 1.05),
+      new THREE.Vector3(2.45, 0.48, 1.35),
+      new THREE.Vector3(2.7, 0.46, 1.75),
+      new THREE.Vector3(2.9, 0.45, 2.15),
+    ];
+    const c3 = makeCurve(p3);
+    trackCurves.push(c3); addTubeForCurve(c3);
+  }
+
+  // ===============================
+  // Marbles
+  // ===============================
+  const marblesGroup = new THREE.Group();
+  scene.add(marblesGroup);
+
+  const marbleMats = [
+    new THREE.MeshStandardMaterial({ color: 0xff7ad9, roughness: 0.25, metalness: 0.25, emissive: 0x200010 }),
+    new THREE.MeshStandardMaterial({ color: 0x7dfcff, roughness: 0.25, metalness: 0.25, emissive: 0x001022 }),
+    new THREE.MeshStandardMaterial({ color: 0xa78bfa, roughness: 0.25, metalness: 0.25, emissive: 0x12001f }),
+    new THREE.MeshStandardMaterial({ color: 0x6ee7b7, roughness: 0.25, metalness: 0.22, emissive: 0x001a0f }),
+  ];
+
+  function makeMarble(radius=0.12) {
+    const g = new THREE.SphereGeometry(radius, 28, 28);
+    const m = marbleMats[Math.floor(Math.random()*marbleMats.length)];
+    const mesh = new THREE.Mesh(g, m);
+
+    // aura
+    const glow = new THREE.Mesh(
+      new THREE.SphereGeometry(radius*1.5, 18, 18),
+      new THREE.MeshBasicMaterial({ color: m.color, transparent:true, opacity:0.12 })
+    );
+    mesh.add(glow);
+
+    return mesh;
+  }
+
+  const marbles = []; // {mesh, curveIndex, t, v}
+
+  let speedMult = 1.0;
+  let friction = 0.020;
+  let gravFeel = 1.0;
+
+  function addMarble() {
+    if (!trackCurves.length) return;
+    const mesh = makeMarble();
+    const curveIndex = 0; // start on main
+    const t = Math.random()*0.08; // near start
+    const v = 0.006 + Math.random()*0.003;
+
+    marblesGroup.add(mesh);
+    marbles.push({ mesh, curveIndex, t, v });
+  }
+
+  function resetMarbles() {
+    marblesGroup.clear();
+    marbles.length = 0;
+    addMarble(); addMarble(); addMarble();
+  }
+
+  function advanceMarble(m) {
+    const curve = trackCurves[m.curveIndex];
+    if (!curve) return;
+
+    // tangent slope -> pseudo gravity boost
+    const tClamped = Math.max(0, Math.min(1, m.t));
+    const tangent = curve.getTangent(tClamped);
+    const slopeBoost = Math.max(0, -tangent.y); // only speed up when heading downward
+    const accel = 0.00018 * gravFeel * (0.2 + slopeBoost * 2.2);
+
+    // friction resist
+    m.v *= (1 - Math.min(0.06, friction * 0.5));
+
+    // integrate
+    m.v += accel;
+    m.t += m.v * speedMult;
+
+    if (m.t >= 1) {
+      // move to next curve if exists
+      if (m.curveIndex + 1 < trackCurves.length) {
+        m.curveIndex++;
+        m.t = 0.001;
+        m.v *= 0.85;
+      } else {
+        // loop politely
+        m.curveIndex = 0;
+        m.t = 0.001;
+        m.v = 0.006 + Math.random()*0.003;
+      }
+    }
+
+    const pos = curve.getPoint(Math.max(0, Math.min(1, m.t)));
+    m.mesh.position.copy(pos);
+
+    // rotate marble for nice feel
+    m.mesh.rotation.x += m.v * 18;
+    m.mesh.rotation.z += m.v * 14;
+  }
+
+  // ===============================
+  // Build / Reset scene
+  // ===============================
+  function buildAll() {
+    buildCuboroInspiredStack();
+    buildTracks();
+    resetMarbles();
+  }
+
+  // ===============================
+  // UI
+  // ===============================
+  const hud = document.getElementById("hud");
+  const hudToggle = document.getElementById("hudToggle");
+
+  let hudOn = true;
+  function setHud(on) {
+    hudOn = on;
+    hud.style.display = on ? "grid" : "none";
+    hudToggle.textContent = on ? "HUD: ON" : "HUD: OFF";
+  }
+  hudToggle.addEventListener("click", () => setHud(!hudOn));
+
+  document.getElementById("resetBtn").addEventListener("click", buildAll);
+  document.getElementById("addMarbleBtn").addEventListener("click", addMarble);
+
+  const toggleGridBtn = document.getElementById("toggleGridBtn");
+  let gridOn = true;
+  toggleGridBtn.addEventListener("click", () => {
+    gridOn = !gridOn;
+    gridGroup.visible = gridOn;
+    toggleGridBtn.textContent = gridOn ? "GRID: ON" : "GRID: OFF";
+  });
+
+  const toggleTracksBtn = document.getElementById("toggleTracksBtn");
+  let tracksOn = true;
+  toggleTracksBtn.addEventListener("click", () => {
+    tracksOn = !tracksOn;
+    tracksGroup.visible = tracksOn;
+    toggleTracksBtn.textContent = tracksOn ? "TRACKS: ON" : "TRACKS: OFF";
+  });
+
+  const speedSlider = document.getElementById("speedSlider");
+  const speedOut = document.getElementById("speedOut");
+  speedSlider.addEventListener("input", () => {
+    speedMult = parseFloat(speedSlider.value);
+    speedOut.textContent = speedMult.toFixed(2) + "x";
+  });
+
+  const fricSlider = document.getElementById("fricSlider");
+  const fricOut = document.getElementById("fricOut");
+  fricSlider.addEventListener("input", () => {
+    friction = parseFloat(fricSlider.value);
+    fricOut.textContent = friction.toFixed(3);
+  });
+
+  const gravSlider = document.getElementById("gravSlider");
+  const gravOut = document.getElementById("gravOut");
+  gravSlider.addEventListener("input", () => {
+    gravFeel = parseFloat(gravSlider.value);
+    gravOut.textContent = gravFeel.toFixed(2);
+  });
+
+  document.getElementById("camHomeBtn").addEventListener("click", () => {
+    camera.position.set(4.2, 3.2, 5.4);
+    controls.target.set(1.5, 0.8, 1.2);
+    controls.update();
+  });
+
+  document.getElementById("chaosBtn").addEventListener("click", () => {
+    // Add a handful of marbles plus a bit of speed spice
+    for (let i=0;i<8;i++) addMarble();
+    speedMult = Math.min(3, speedMult + 0.5);
+    speedSlider.value = speedMult.toFixed(2);
+    speedOut.textContent = speedMult.toFixed(2) + "x";
+  });
+
+  // start UI values
+  setHud(true);
+  speedOut.textContent = speedMult.toFixed(2) + "x";
+  fricOut.textContent = friction.toFixed(3);
+  gravOut.textContent = gravFeel.toFixed(2);
+
+  // ===============================
+  // Resize
+  // ===============================
+  function onResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+  window.addEventListener("resize", onResize);
+
+  // ===============================
+  // Animate
+  // ===============================
+  let last = performance.now();
+  function tick(now) {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+
+    // Rand wobble micro-glow vibe
+    tracksGroup.rotation.y = Math.sin(now * 0.00015) * 0.02;
+
+    // Step marbles
+    for (const m of marbles) {
+      // dt not used directly to keep feel stable across phones
+      advanceMarble(m);
+    }
+
+    controls.update();
+    renderer.render(scene, camera);
+    requestAnimationFrame(tick);
+  }
+
+  // Build scene!
+  buildAll();
+  requestAnimationFrame(tick);
+
+})();
+</script>
+</body>
+</html>

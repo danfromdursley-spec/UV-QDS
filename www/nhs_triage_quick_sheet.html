@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Triage Quick Sheet</title>
+  <style>
+    :root{
+      --bg:#f7f9fc; --card:#ffffff; --ink:#0b1320; --mut:#51607a;
+      --line:#d7e1f2; --brand:#005eb8; /* NHS-ish blue, but not branding */
+      --red:#d5281b; --amber:#ffb81c; --green:#007f3b; --purple:#6f2c91;
+      --shadow: 0 10px 30px rgba(11,19,32,0.08);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.35 system-ui,Segoe UI,Roboto,Arial}
+    header{
+      background:linear-gradient(90deg, var(--brand), #1a79d6);
+      color:#fff; padding:14px 16px; position:sticky; top:0; z-index:5;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+    header .top{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    h1{margin:0;font-size:16px;letter-spacing:0.2px}
+    .sub{opacity:0.9;font-size:12px}
+    main{max-width:1100px;margin:0 auto;padding:12px;display:grid;grid-template-columns: 1.1fr 0.9fr;gap:12px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+    .card h2{margin:0;font-size:14px;padding:12px 12px;border-bottom:1px solid var(--line);background:#fbfcff}
+    .pad{padding:12px}
+    .grid{display:grid;grid-template-columns: 1fr 1fr;gap:10px}
+    .grid3{display:grid;grid-template-columns: 1fr 1fr 1fr;gap:10px}
+    .field{display:flex;flex-direction:column;gap:6px}
+    label{font-size:12px;color:var(--mut)}
+    input, textarea, select{
+      font:14px system-ui; padding:10px 10px; border-radius:12px; border:1px solid var(--line);
+      background:#fff; outline:none;
+    }
+    textarea{min-height:84px;resize:vertical}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .btn{
+      border:1px solid var(--line); background:#fff; color:var(--ink);
+      padding:10px 12px; border-radius:12px; cursor:pointer; font-weight:600;
+    }
+    .btnPrimary{background:var(--brand);border-color:var(--brand);color:#fff}
+    .btnDanger{background:var(--red);border-color:var(--red);color:#fff}
+    .btnGhost{background:#fbfcff}
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      border:1px solid var(--line); background:#fff; padding:8px 10px; border-radius:999px;
+      font-size:12px; color:var(--mut)
+    }
+    .badge{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:8px 10px; border-radius:12px; font-weight:800; letter-spacing:0.5px;
+      border:1px solid transparent; min-width:92px;
+    }
+    .bRed{background:rgba(213,40,27,0.12); color:var(--red); border-color:rgba(213,40,27,0.35)}
+    .bAmber{background:rgba(255,184,28,0.18); color:#7a5200; border-color:rgba(255,184,28,0.55)}
+    .bGreen{background:rgba(0,127,59,0.12); color:var(--green); border-color:rgba(0,127,59,0.35)}
+    .bPurple{background:rgba(111,44,145,0.12); color:var(--purple); border-color:rgba(111,44,145,0.35)}
+    .divider{height:1px;background:var(--line);margin:12px 0}
+    .mini{font-size:12px;color:var(--mut)}
+    .kpi{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .kpi .box{border:1px solid var(--line);border-radius:14px;padding:10px;background:#fff}
+    .kpi .box b{display:block;font-size:12px;color:var(--mut);margin-bottom:4px}
+    .kpi .box .v{font-size:18px;font-weight:900}
+    .sliderRow{display:grid;grid-template-columns: 1fr 120px;gap:10px;align-items:center}
+    input[type="range"]{width:100%}
+    .footerNote{padding:10px 12px;border-top:1px solid var(--line);background:#fbfcff;color:var(--mut);font-size:12px}
+
+    @media (max-width: 900px){
+      main{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <div>
+      <h1>Triage Quick Sheet</h1>
+      <div class="sub">Fast snapshot + SBAR handover + export (offline-friendly)</div>
+    </div>
+    <div class="row">
+      <span class="pill">Auto time: <span id="now"></span></span>
+      <span class="pill">Status: <span id="statusText">Ready</span></span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- LEFT: Entry + Observations -->
+  <section class="card">
+    <h2>Patient & Presentation</h2>
+    <div class="pad">
+      <div class="grid">
+        <div class="field">
+          <label>Patient ID / NHS No. (or local ref)</label>
+          <input id="pid" placeholder="e.g., ED-12345 / NHS No. / Ward ref" />
+        </div>
+        <div class="field">
+          <label>Name (optional)</label>
+          <input id="pname" placeholder="Optional" />
+        </div>
+        <div class="field">
+          <label>DOB / Age</label>
+          <input id="dob" placeholder="e.g., 1983-04-12 or 42" />
+        </div>
+        <div class="field">
+          <label>Location</label>
+          <input id="loc" placeholder="e.g., ED, Ward 3B, Bay 2" />
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="field">
+        <label>Presenting problem</label>
+        <textarea id="presenting" placeholder="One-liner. What brought them in?"></textarea>
+      </div>
+
+      <div class="grid">
+        <div class="field">
+          <label>Allergies</label>
+          <input id="allergies" placeholder="NKDA / details" />
+        </div>
+        <div class="field">
+          <label>Key risks (tick all that apply)</label>
+          <select id="risks" multiple>
+            <option>Falls risk</option>
+            <option>Sepsis concern</option>
+            <option>Chest pain</option>
+            <option>Stroke concern</option>
+            <option>Bleeding risk / anticoag</option>
+            <option>Confusion / delirium</option>
+            <option>Self-harm risk</option>
+            <option>Violence / aggression risk</option>
+            <option>Safeguarding concern</option>
+          </select>
+          <div class="mini">Tip: tap and hold / multi-select depends on browser. If annoying, just write it in notes.</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="row" style="justify-content:space-between;align-items:flex-start">
+        <div>
+          <div class="mini" style="font-weight:800;color:var(--ink);margin-bottom:6px">Triage category</div>
+          <div class="row">
+            <span id="triageBadge" class="badge bGreen">GREEN</span>
+            <span class="pill">Score: <b id="scoreOut">0</b>/10</span>
+            <span class="pill">Prompt: <b id="promptOut">Routine</b></span>
+          </div>
+          <div class="mini" id="triageHint" style="margin-top:6px">Adjust vitals / risk sliders; category updates live.</div>
+        </div>
+        <div class="row">
+          <button class="btn btnPrimary" id="saveBtn">Save snapshot</button>
+          <button class="btn btnGhost" id="copyBtn">Copy SBAR</button>
+          <button class="btn" id="exportBtn">Export JSON</button>
+          <button class="btn btnDanger" id="clearBtn">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <h2>Observations</h2>
+    <div class="pad">
+      <div class="grid3">
+        <div class="field"><label>HR (bpm)</label><input id="hr" type="number" inputmode="numeric" placeholder="e.g., 78"></div>
+        <div class="field"><label>RR (/min)</label><input id="rr" type="number" inputmode="numeric" placeholder="e.g., 16"></div>
+        <div class="field"><label>SpO₂ (%)</label><input id="spo2" type="number" inputmode="numeric" placeholder="e.g., 98"></div>
+        <div class="field"><label>Temp (°C)</label><input id="temp" type="number" step="0.1" inputmode="decimal" placeholder="e.g., 36.8"></div>
+        <div class="field"><label>SBP (mmHg)</label><input id="sbp" type="number" inputmode="numeric" placeholder="e.g., 122"></div>
+        <div class="field"><label>GCS / AVPU</label><input id="neuro" placeholder="e.g., GCS 15 / Alert"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="grid">
+        <div class="field">
+          <label>Pain (0–10)</label>
+          <div class="sliderRow">
+            <input id="pain" type="range" min="0" max="10" step="1" value="0">
+            <span class="pill"><b id="painOut">0</b>/10</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Concern level (clinician gut check)</label>
+          <div class="sliderRow">
+            <input id="concern" type="range" min="0" max="10" step="1" value="2">
+            <span class="pill"><b id="concernOut">2</b>/10</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="field">
+        <label>Immediate actions / pending</label>
+        <textarea id="actions" placeholder="e.g., ECG ordered, bloods sent, fluids started, awaiting CT, etc."></textarea>
+      </div>
+    </div>
+  </section>
+
+  <!-- RIGHT: SBAR + optional psychosocial vector -->
+  <aside class="card">
+    <h2>SBAR Handover (auto-built)</h2>
+    <div class="pad">
+      <div class="field">
+        <label>Situation</label>
+        <textarea id="s_s" placeholder="Optional override. If blank, auto-generated."></textarea>
+      </div>
+      <div class="field">
+        <label>Background</label>
+        <textarea id="s_b" placeholder="Optional override."></textarea>
+      </div>
+      <div class="field">
+        <label>Assessment</label>
+        <textarea id="s_a" placeholder="Optional override."></textarea>
+      </div>
+      <div class="field">
+        <label>Recommendation</label>
+        <textarea id="s_r" placeholder="Optional override."></textarea>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="kpi">
+        <div class="box"><b>Triage</b><div id="kTriage" class="v">GREEN</div><div class="mini" id="kPrompt">Routine</div></div>
+        <div class="box"><b>Score</b><div id="kScore" class="v">0</div><div class="mini">simple heuristic</div></div>
+      </div>
+    </div>
+
+    <h2>Optional: Psychosocial Stability Vector</h2>
+    <div class="pad">
+      <div class="mini">Use if relevant (MH, safeguarding, aggression risk). Values 0–1.</div>
+
+      <div class="field">
+        <label>Agency (A)</label>
+        <div class="sliderRow">
+          <input id="A" type="range" min="0" max="1" step="0.01" value="0.55">
+          <span class="pill"><b id="Aout">0.55</b></span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Coherence (K)</label>
+        <div class="sliderRow">
+          <input id="K" type="range" min="0" max="1" step="0.01" value="0.55">
+          <span class="pill"><b id="Kout">0.55</b></span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Dependency (D)</label>
+        <div class="sliderRow">
+          <input id="D" type="range" min="0" max="1" step="0.01" value="0.40">
+          <span class="pill"><b id="Dout">0.40</b></span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Noise/Stress (N)</label>
+        <div class="sliderRow">
+          <input id="N" type="range" min="0" max="1" step="0.01" value="0.45">
+          <span class="pill"><b id="Nout">0.45</b></span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="mini">
+        This page is a **workflow aid**, not a diagnostic device. Use local clinical policy.
+      </div>
+    </div>
+
+    <div class="footerNote">
+      Pro tip: “Copy SBAR” → paste into message / notes. “Save snapshot” keeps last state in localStorage.
+    </div>
+  </aside>
+</main>
+
+<script>
+  const $ = (id)=>document.getElementById(id);
+  const clamp=(x,min,max)=>Math.max(min,Math.min(max,x));
+  const nowEl = $("now");
+
+  function setNow(){
+    const d = new Date();
+    nowEl.textContent = d.toLocaleString();
+  }
+  setNow(); setInterval(setNow, 10000);
+
+  function num(id){
+    const v = parseFloat($(id).value);
+    return Number.isFinite(v) ? v : null;
+  }
+
+  // Very simple triage heuristic (transparent, tweakable)
+  function computeScore(){
+    let score = 0;
+
+    const hr=num("hr"), rr=num("rr"), spo2=num("spo2"), temp=num("temp"), sbp=num("sbp");
+    const pain = parseInt($("pain").value,10);
+    const concern = parseInt($("concern").value,10);
+
+    // Vitals flags (deliberately conservative + simple)
+    if (hr !== null && (hr < 50 || hr > 120)) score += 2;
+    if (rr !== null && (rr < 10 || rr > 24)) score += 2;
+    if (spo2 !== null && (spo2 < 92)) score += 3;
+    if (temp !== null && (temp < 35.0 || temp >= 38.5)) score += 1;
+    if (sbp !== null && (sbp < 90 || sbp > 180)) score += 2;
+
+    // Pain + clinician concern
+    if (pain >= 7) score += 2;
+    if (concern >= 7) score += 3;
+    else if (concern >= 4) score += 1;
+
+    // Optional psychosocial (N high + K low => add risk)
+    const A=parseFloat($("A").value), K=parseFloat($("K").value), D=parseFloat($("D").value), N=parseFloat($("N").value);
+    if (N > 0.75 && K < 0.35) score += 2;
+    if (D > 0.75 && A < 0.35) score += 1;
+
+    return clamp(score, 0, 10);
+  }
+
+  function triageFromScore(score){
+    // Simple buckets
+    if (score >= 7) return {cat:"RED",   prompt:"Immediate senior review / urgent action"};
+    if (score >= 4) return {cat:"AMBER", prompt:"Time-critical assessment; monitor closely"};
+    return {cat:"GREEN", prompt:"Routine assessment; standard observation frequency"};
+  }
+
+  function badgeClass(cat){
+    if (cat==="RED") return "badge bRed";
+    if (cat==="AMBER") return "badge bAmber";
+    if (cat==="PURPLE") return "badge bPurple";
+    return "badge bGreen";
+  }
+
+  function buildAutoSBAR(meta){
+    const name = $("pname").value.trim();
+    const pid = $("pid").value.trim();
+    const loc = $("loc").value.trim();
+    const presenting = $("presenting").value.trim();
+    const actions = $("actions").value.trim();
+
+    const hr=num("hr"), rr=num("rr"), spo2=num("spo2"), temp=num("temp"), sbp=num("sbp");
+    const neuro = $("neuro").value.trim();
+    const pain = $("pain").value;
+    const concern = $("concern").value;
+
+    const header = [name||"Patient", pid?`(${pid})`:"", loc?`@ ${loc}`:""].filter(Boolean).join(" ");
+
+    const situation = `${header}. Triage ${meta.cat} (score ${meta.score}/10). Presenting: ${presenting||"—"}`;
+    const background = `Allergies: ${$("allergies").value.trim()||"—"}. Risks: ${[...$("risks").selectedOptions].map(o=>o.value).join(", ")||"—"}.`;
+    const assessment =
+      `Obs: HR ${hr??"—"}, RR ${rr??"—"}, SpO₂ ${spo2??"—"}%, Temp ${temp??"—"}°C, SBP ${sbp??"—"}, Neuro ${neuro||"—"}. `+
+      `Pain ${pain}/10, Concern ${concern}/10. `+
+      `Psychosocial A/K/D/N: ${$("A").value}/${$("K").value}/${$("D").value}/${$("N").value}.`;
+    const recommendation = `${meta.prompt}. Actions/pending: ${actions||"—"}`;
+
+    return {s:situation, b:background, a:assessment, r:recommendation};
+  }
+
+  function refresh(){
+    $("painOut").textContent = $("pain").value;
+    $("concernOut").textContent = $("concern").value;
+
+    ["A","K","D","N"].forEach(k=> $(k+"out").textContent = parseFloat($(k).value).toFixed(2));
+
+    const score = computeScore();
+    const t = triageFromScore(score);
+
+    $("scoreOut").textContent = score;
+    $("promptOut").textContent = t.prompt;
+
+    $("triageBadge").textContent = t.cat;
+    $("triageBadge").className = badgeClass(t.cat);
+
+    $("kTriage").textContent = t.cat;
+    $("kPrompt").textContent = t.prompt;
+    $("kScore").textContent = score;
+
+    const meta = {cat:t.cat, prompt:t.prompt, score};
+
+    // Only auto-fill SBAR fields if they’re blank (so nurses can override)
+    const auto = buildAutoSBAR(meta);
+    if (!$("s_s").value.trim()) $("s_s").value = auto.s;
+    if (!$("s_b").value.trim()) $("s_b").value = auto.b;
+    if (!$("s_a").value.trim()) $("s_a").value = auto.a;
+    if (!$("s_r").value.trim()) $("s_r").value = auto.r;
+  }
+
+  function getState(){
+    return {
+      ts: new Date().toISOString(),
+      pid: $("pid").value, pname:$("pname").value, dob:$("dob").value, loc:$("loc").value,
+      presenting:$("presenting").value, allergies:$("allergies").value,
+      risks:[...$("risks").selectedOptions].map(o=>o.value),
+      obs:{hr:$("hr").value, rr:$("rr").value, spo2:$("spo2").value, temp:$("temp").value, sbp:$("sbp").value, neuro:$("neuro").value},
+      pain:$("pain").value, concern:$("concern").value,
+      actions:$("actions").value,
+      sbar:{s:$("s_s").value, b:$("s_b").value, a:$("s_a").value, r:$("s_r").value},
+      psycho:{A:$("A").value, K:$("K").value, D:$("D").value, N:$("N").value},
+      triage:{score:computeScore(), ...triageFromScore(computeScore())}
+    };
+  }
+
+  async function copySBAR(){
+    const txt =
+`SBAR HANDOVER
+S: ${$("s_s").value.trim()}
+B: ${$("s_b").value.trim()}
+A: ${$("s_a").value.trim()}
+R: ${$("s_r").value.trim()}
+
+Triage: ${$("triageBadge").textContent} | Score: ${$("scoreOut").textContent}/10 | ${$("promptOut").textContent}
+Time: ${new Date().toLocaleString()}`;
+    try{
+      await navigator.clipboard.writeText(txt);
+      $("statusText").textContent = "Copied";
+    }catch(e){
+      // fallback
+      const ta = document.createElement("textarea");
+      ta.value = txt;
+      document.body.appendChild(ta);
+      ta.select(); document.execCommand("copy");
+      document.body.removeChild(ta);
+      $("statusText").textContent = "Copied (fallback)";
+    }
+    setTimeout(()=> $("statusText").textContent="Ready", 1200);
+  }
+
+  function saveSnapshot(){
+    const st = getState();
+    localStorage.setItem("triage_quick_sheet:last", JSON.stringify(st));
+    $("statusText").textContent = "Saved";
+    setTimeout(()=> $("statusText").textContent="Ready", 1200);
+  }
+
+  function exportJSON(){
+    const st = getState();
+    const blob = new Blob([JSON.stringify(st,null,2)], {type:"application/json"});
+    const a = document.createElement("a");
+    const pid = ($("pid").value.trim() || "triage").replace(/[^a-z0-9_-]/gi,"_");
+    a.href = URL.createObjectURL(blob);
+    a.download = `${pid}_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function clearAll(){
+    if (!confirm("Clear the form?")) return;
+    document.querySelectorAll("input, textarea").forEach(x=>{
+      if (x.type==="range") return;
+      x.value="";
+    });
+    $("risks").selectedIndex = -1;
+    $("pain").value = 0; $("concern").value = 2;
+    $("A").value=0.55; $("K").value=0.55; $("D").value=0.40; $("N").value=0.45;
+    $("s_s").value=""; $("s_b").value=""; $("s_a").value=""; $("s_r").value="";
+    refresh();
+  }
+
+  function loadLast(){
+    const raw = localStorage.getItem("triage_quick_sheet:last");
+    if (!raw) return;
+    try{
+      const st = JSON.parse(raw);
+      $("pid").value=st.pid||""; $("pname").value=st.pname||""; $("dob").value=st.dob||""; $("loc").value=st.loc||"";
+      $("presenting").value=st.presenting||""; $("allergies").value=st.allergies||"";
+      // risks
+      const set = new Set(st.risks||[]);
+      [...$("risks").options].forEach(o=> o.selected = set.has(o.value));
+      // obs
+      $("hr").value=st.obs?.hr||""; $("rr").value=st.obs?.rr||""; $("spo2").value=st.obs?.spo2||"";
+      $("temp").value=st.obs?.temp||""; $("sbp").value=st.obs?.sbp||""; $("neuro").value=st.obs?.neuro||"";
+      $("pain").value=st.pain ?? 0; $("concern").value=st.concern ?? 2;
+      $("actions").value=st.actions||"";
+      $("A").value=st.psycho?.A ?? 0.55; $("K").value=st.psycho?.K ?? 0.55; $("D").value=st.psycho?.D ?? 0.40; $("N").value=st.psycho?.N ?? 0.45;
+      // keep SBAR overrides if user had them
+      $("s_s").value=st.sbar?.s||""; $("s_b").value=st.sbar?.b||""; $("s_a").value=st.sbar?.a||""; $("s_r").value=st.sbar?.r||"";
+    }catch(e){}
+  }
+
+  // Wire up events
+  ["pid","pname","dob","loc","presenting","allergies","hr","rr","spo2","temp","sbp","neuro","actions","pain","concern","A","K","D","N","risks"]
+    .forEach(id=>{
+      const node = $(id);
+      if (!node) return;
+      node.addEventListener("input", refresh);
+      node.addEventListener("change", refresh);
+    });
+
+  $("copyBtn").addEventListener("click", copySBAR);
+  $("saveBtn").addEventListener("click", saveSnapshot);
+  $("exportBtn").addEventListener("click", exportJSON);
+  $("clearBtn").addEventListener("click", clearAll);
+
+  // Init
+  loadLast();
+  refresh();
+</script>
+</body>
+</html>

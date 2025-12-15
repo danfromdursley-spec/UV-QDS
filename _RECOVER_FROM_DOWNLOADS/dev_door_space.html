@@ -1,0 +1,370 @@
+<link rel="icon" type="image/png" sizes="192x192" href="devdoor_icon_192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="devdoor_icon_512.png">
+<link rel="apple-touch-icon" href="devdoor_icon_192.png">
+<link rel="manifest" href="devdoor.webmanifest">
+<meta name="theme-color" content="#050814"><!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DEV DOOR — Space Index</title>
+  <meta name="theme-color" content="#05070b" />
+  <style>
+    :root{
+      --bg:#05070b;
+      --bg2:#0b0f16;
+      --panel:#0c111a;
+      --text:#e8f1ff;
+      --muted:#9aa8bf;
+      --accent1:#00e5ff;
+      --accent2:#00ff88;
+      --warn:#ffd36a;
+      --shadow: 0 10px 30px rgba(0,0,0,.45);
+      --r: 18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 10% -10%, rgba(0,229,255,.12), transparent 50%),
+        radial-gradient(1200px 700px at 90% 10%, rgba(0,255,136,.12), transparent 50%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+    }
+    header{
+      position: sticky; top:0; z-index:50;
+      backdrop-filter: blur(10px);
+      background: rgba(5,7,11,.75);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .wrap{max-width: 1050px; margin:0 auto; padding: 18px 16px 40px}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between}
+    .brand{display:flex; gap:12px; align-items:center}
+    .logo{
+      width:38px; height:38px; border-radius:12px;
+      background: linear-gradient(135deg, rgba(0,229,255,.22), rgba(0,255,136,.22));
+      border: 1px solid rgba(255,255,255,.08);
+      display:grid; place-items:center;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.03);
+    }
+    .logo-dot{
+      width:18px; height:18px; border-radius:6px;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      filter: drop-shadow(0 0 10px rgba(0,229,255,.35));
+    }
+    h1{font-size: 1.2rem; margin:0}
+    .sub{font-size:.85rem; color:var(--muted)}
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 6px 10px; border-radius: 999px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.06);
+      font-size:.78rem; color:var(--muted)
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: var(--r);
+      padding: 16px 16px 14px;
+      box-shadow: var(--shadow);
+    }
+    .grid{display:grid; gap:12px; grid-template-columns: 1fr;}
+    @media (min-width: 900px){
+      .grid-2{grid-template-columns: 1fr 1fr}
+    }
+    .controls{
+      display:flex; gap:8px; flex-wrap:wrap;
+    }
+    input, select{
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      color: var(--text);
+      padding: 10px 10px;
+      border-radius: 12px;
+      outline: none;
+      min-width: 160px;
+    }
+    input::placeholder{color: rgba(200,210,230,.55)}
+    .btn{
+      appearance:none; border:0; cursor:pointer;
+      padding: 9px 12px; border-radius: 12px;
+      font-weight: 650; letter-spacing:.2px;
+      background: linear-gradient(135deg, rgba(0,229,255,.18), rgba(0,255,136,.18));
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: var(--shadow);
+      text-decoration:none;
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .btn-quiet{
+      background: rgba(255,255,255,.04);
+      font-weight: 550;
+    }
+    .tag{
+      display:inline-block; padding: 3px 8px; border-radius: 999px;
+      font-size:.7rem; margin-right:6px;
+      background: rgba(0,229,255,.08);
+      border: 1px solid rgba(0,229,255,.18);
+      color: #cfefff;
+    }
+    .tag.warn{
+      background: rgba(255,211,106,.08);
+      border-color: rgba(255,211,106,.2);
+      color: #fff0c9;
+    }
+    .section-title{
+      display:flex; align-items:center; justify-content:space-between;
+      gap: 10px;
+    }
+    h2{font-size: 1.0rem; margin:0 0 8px 0}
+    .muted{color: var(--muted)}
+    .list{
+      display:grid; gap:8px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 900px){
+      .list{grid-template-columns: 1fr 1fr;}
+    }
+    .item{
+      border: 1px solid rgba(255,255,255,.06);
+      background: rgba(255,255,255,.02);
+      border-radius: 14px;
+      padding: 12px 12px 10px;
+      display:flex; gap:10px; align-items:center; justify-content:space-between;
+    }
+    .item-title{
+      font-size:.92rem; font-weight: 650;
+    }
+    .item-path{
+      font-size:.72rem; color: var(--muted);
+      opacity:.9;
+    }
+    .left{
+      min-width: 0;
+    }
+    .right{
+      display:flex; gap:6px; flex-wrap:wrap;
+    }
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;}
+    .divider{
+      height:1px; background: rgba(255,255,255,.06); margin: 12px 0;
+    }
+    .tiny{font-size:.75rem}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="row">
+      <div class="brand">
+        <div class="logo"><div class="logo-dot"></div></div>
+        <div>
+          <h1>DEV DOOR — Space Index</h1>
+          <div class="sub">Standalone lab gateway • Clean list • Working buttons</div>
+        </div>
+      </div>
+      <div class="row">
+        <span class="pill">Internal Use • Not a pitch page</span>
+        <a class="btn btn-quiet" href="frontdoor_show.html">Back to Front Door</a>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:10px;">
+      <div class="controls">
+        <input id="q" placeholder="Search titles or filenames…" />
+        <select id="cat">
+          <option value="ALL">All categories</option>
+        </select>
+        <button class="btn btn-quiet" id="latestBtn">Show latest 20</button>
+        <button class="btn btn-quiet" id="allBtn">Show all</button>
+      </div>
+      <div class="tiny muted" style="margin-top:8px;">
+        This page is auto-generated from your local <span class="mono">www</span> directory.
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="grid grid-2">
+    <div class="card">
+      <div class="section-title">
+        <h2>Quick Gates</h2>
+        <span class="tag warn">Fast Jump</span>
+      </div>
+      <div class="right">
+        <a class="btn" href="all_pages_index.html">All Pages Index</a>
+        <a class="btn" href="all_pages_min.html">All Pages Min</a>
+        <a class="btn" href="dev_hub.html">Legacy Dev Hub</a>
+        <a class="btn" href="qds_showcase_index_v1_1.html">Showcase Index</a>
+      </div>
+      <div class="divider"></div>
+      <div class="muted tiny">
+        These are fixed “known good” anchors in case you want a stable breadcrumb trail.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">
+        <h2>Status</h2>
+      </div>
+      <div class="muted tiny">
+        Total detected HTML files (filtered): <span id="count">0</span>
+      </div>
+      <div class="divider"></div>
+      <div class="muted tiny">
+        Generator: <span class="mono">make_dev_door_space.sh</span><br>
+        Output: <span class="mono">dev_door_space.html</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" style="margin-top:12px;">
+    <div class="section-title">
+      <h2 id="listTitle">Files</h2>
+      <span class="muted tiny">Tap open = loads locally via your server</span>
+    </div>
+    <div class="list" id="list"></div>
+  </section>
+
+  <footer class="muted tiny" style="margin-top:20px;">
+    DEV DOOR — Space Index • standalone utility page • safe to keep separate from GrowthHub.
+  </footer>
+</main>
+
+<script>
+  const ITEMS = [
+    {"file":"QDS-5-WEDGE-PORTFOLIO/index.html","title":"index","cat":"Business/Offers"},{"file":"QDS_Battery_Lab/index.html","title":"index","cat":"Battery"},{"file":"all_pages.html","title":"all pages","cat":"Other"},{"file":"all_pages_compact.html","title":"all pages compact","cat":"Other"},{"file":"all_pages_index.html","title":"all pages index","cat":"Other"},{"file":"all_pages_min.html","title":"all pages min","cat":"Other"},{"file":"cannon_side_2d_v1.html","title":"cannon side 2d v1","cat":"Games/Toys"},{"file":"cannon_wall_breaker_v1.html","title":"cannon wall breaker v1","cat":"Games/Toys"},{"file":"cannon_wall_breaker_v1_1.html","title":"cannon wall breaker v1 1","cat":"Games/Toys"},{"file":"catapult_balloon_pop_v1.html","title":"catapult balloon pop v1","cat":"Games/Toys"},{"file":"ddmelts_microsite_v1.html","title":"ddmelts microsite v1","cat":"Other"},{"file":"ddmelts_microsite_v1_1.html","title":"ddmelts microsite v1 1","cat":"Other"},{"file":"ddmelts_microsite_v1_2_live_links.html","title":"ddmelts microsite v1 2 live links","cat":"Other"},{"file":"ddmelts_microsite_v1_2_pink_hearts.html","title":"ddmelts microsite v1 2 pink hearts","cat":"Other"},{"file":"dev_door_space.html","title":"dev door space","cat":"Dev/Index"},{"file":"dev_hub.html","title":"dev hub","cat":"Dev/Index"},{"file":"f/index.html","title":"index","cat":"Other"},{"file":"frontdoor.html","title":"frontdoor","cat":"Front Doors"},{"file":"frontdoor_show.html","title":"frontdoor show","cat":"Front Doors"},{"file":"growthhub.html","title":"growthhub","cat":"GrowthHub"},{"file":"growthhub_allinone_v1.html","title":"growthhub allinone v1","cat":"GrowthHub"},{"file":"growthhub_allinone_v1_1.html","title":"growthhub allinone v1 1","cat":"GrowthHub"},{"file":"growthhub_demo_front_20251207_170108.html","title":"growthhub demo front 20251207 170108","cat":"GrowthHub"},{"file":"growthhub_demo_front_20251207_172220.html","title":"growthhub demo front 20251207 172220","cat":"GrowthHub"},{"file":"growthhub_jargon_v1.html","title":"growthhub jargon v1","cat":"GrowthHub"},{"file":"growthhub_linked_20251207_162635.html","title":"growthhub linked 20251207 162635","cat":"GrowthHub"},{"file":"growthhub_linked_20251207_162917.html","title":"growthhub linked 20251207 162917","cat":"GrowthHub"},{"file":"growthhub_linked_20251207_163105.html","title":"growthhub linked 20251207 163105","cat":"GrowthHub"},{"file":"growthhub_linked_20251207_163119.html","title":"growthhub linked 20251207 163119","cat":"GrowthHub"},{"file":"growthhub_linked_20251207_163619.html","title":"growthhub linked 20251207 163619","cat":"GrowthHub"},{"file":"growthhub_linked_20251207_163635.html","title":"growthhub linked 20251207 163635","cat":"GrowthHub"},{"file":"growthhub_linked_20251207_165546.html","title":"growthhub linked 20251207 165546","cat":"GrowthHub"},{"file":"growthhub_linked_20251207_165600.html","title":"growthhub linked 20251207 165600","cat":"GrowthHub"},{"file":"growthhub_linked_20251207_165721.html","title":"growthhub linked 20251207 165721","cat":"GrowthHub"},{"file":"growthhub_meeting_script_v1.html","title":"growthhub meeting script v1","cat":"GrowthHub"},{"file":"growthhub_multi_area_stack_v1.html","title":"growthhub multi area stack v1","cat":"GrowthHub"},{"file":"growthhub_official_top5.html","title":"growthhub official top5","cat":"GrowthHub"},{"file":"growthhub_official_top5_demo_front_20251207_170108.html","title":"growthhub official top5 demo front 20251207 170108","cat":"GrowthHub"},{"file":"growthhub_official_top5_demo_front_20251207_172220.html","title":"growthhub official top5 demo front 20251207 172220","cat":"GrowthHub"},{"file":"growthhub_official_top5_with_offer_20251207_165318.html","title":"growthhub official top5 with offer 20251207 165318","cat":"GrowthHub"},{"file":"growthhub_official_top5_with_offer_20251207_165325.html","title":"growthhub official top5 with offer 20251207 165325","cat":"GrowthHub"},{"file":"growthhub_official_top5_with_offer_20251207_165411.html","title":"growthhub official top5 with offer 20251207 165411","cat":"GrowthHub"},{"file":"growthhub_official_top5_with_offer_20251207_165424.html","title":"growthhub official top5 with offer 20251207 165424","cat":"GrowthHub"},{"file":"growthhub_official_top5_with_offer_20251207_165431.html","title":"growthhub official top5 with offer 20251207 165431","cat":"GrowthHub"},{"file":"growthhub_official_top5_with_offer_20251207_165545.html","title":"growthhub official top5 with offer 20251207 165545","cat":"GrowthHub"},{"file":"growthhub_official_top5_with_offer_20251207_165559.html","title":"growthhub official top5 with offer 20251207 165559","cat":"GrowthHub"},{"file":"growthhub_official_top5_with_offer_20251207_165720.html","title":"growthhub official top5 with offer 20251207 165720","cat":"GrowthHub"},{"file":"growthhub_stroud_demo.html","title":"growthhub stroud demo","cat":"GrowthHub"},{"file":"growthhub_with_offer_20251207_165318.html","title":"growthhub with offer 20251207 165318","cat":"GrowthHub"},{"file":"growthhub_with_offer_20251207_165325.html","title":"growthhub with offer 20251207 165325","cat":"GrowthHub"},{"file":"growthhub_with_offer_20251207_165411.html","title":"growthhub with offer 20251207 165411","cat":"GrowthHub"},{"file":"growthhub_with_offer_20251207_165424.html","title":"growthhub with offer 20251207 165424","cat":"GrowthHub"},{"file":"growthhub_with_offer_20251207_165431.html","title":"growthhub with offer 20251207 165431","cat":"GrowthHub"},{"file":"growthhub_with_offer_20251207_165545.html","title":"growthhub with offer 20251207 165545","cat":"GrowthHub"},{"file":"growthhub_with_offer_20251207_165559.html","title":"growthhub with offer 20251207 165559","cat":"GrowthHub"},{"file":"growthhub_with_offer_20251207_165720.html","title":"growthhub with offer 20251207 165720","cat":"GrowthHub"},{"file":"index.html","title":"index","cat":"Other"},{"file":"index_demo_front_20251207_170108.html","title":"index demo front 20251207 170108","cat":"Other"},{"file":"index_demo_front_20251207_172220.html","title":"index demo front 20251207 172220","cat":"Other"},{"file":"index_with_offer_20251207_165318.html","title":"index with offer 20251207 165318","cat":"Business/Offers"},{"file":"index_with_offer_20251207_165325.html","title":"index with offer 20251207 165325","cat":"Business/Offers"},{"file":"index_with_offer_20251207_165411.html","title":"index with offer 20251207 165411","cat":"Business/Offers"},{"file":"index_with_offer_20251207_165424.html","title":"index with offer 20251207 165424","cat":"Business/Offers"},{"file":"index_with_offer_20251207_165431.html","title":"index with offer 20251207 165431","cat":"Business/Offers"},{"file":"index_with_offer_20251207_165545.html","title":"index with offer 20251207 165545","cat":"Business/Offers"},{"file":"index_with_offer_20251207_165559.html","title":"index with offer 20251207 165559","cat":"Business/Offers"},{"file":"index_with_offer_20251207_165720.html","title":"index with offer 20251207 165720","cat":"Business/Offers"},{"file":"indus_atlas_v1_qds_language_lab.html","title":"indus atlas v1 qds language lab","cat":"Language/Heritage"},{"file":"last5days_index.html","title":"last5days index","cat":"Other"},{"file":"legacy_hub_v1.html","title":"legacy hub v1","cat":"Other"},{"file":"offer_demo_suite_v1.html","title":"offer demo suite v1","cat":"Business/Offers"},{"file":"offer_index_v1.html","title":"offer index v1","cat":"Business/Offers"},{"file":"offer_microsite_v1.html","title":"offer microsite v1","cat":"Business/Offers"},{"file":"offer_showcase_hub_v1.html","title":"offer showcase hub v1","cat":"Business/Offers"},{"file":"omega_os_index_v1.html","title":"omega os index v1","cat":"Other"},{"file":"omega_os_index_v2.html","title":"omega os index v2","cat":"Other"},{"file":"omega_qds_lab.html","title":"omega qds lab","cat":"Other"},{"file":"portfolio.html","title":"portfolio","cat":"Business/Offers"},{"file":"portfolio_market_allinone_v1.html","title":"portfolio market allinone v1","cat":"Business/Offers"},{"file":"portfolio_offer_v2.html","title":"portfolio offer v2","cat":"Business/Offers"},{"file":"portfolio_offer_v2_20251206_134821.html","title":"portfolio offer v2 20251206 134821","cat":"Business/Offers"},{"file":"portfolio_ultimate_allinone_v1.html","title":"portfolio ultimate allinone v1","cat":"Business/Offers"},{"file":"portfolio_v1.html","title":"portfolio v1","cat":"Business/Offers"},{"file":"proof_of_ship_v1.html","title":"proof of ship v1","cat":"Other"},{"file":"pyramid_pinball_v1.html","title":"pyramid pinball v1","cat":"Games/Toys"},{"file":"q.html","title":"q","cat":"Other"},{"file":"qds_5_pillars_hub.html","title":"qds 5 pillars hub","cat":"Other"},{"file":"qds_5_pillars_hub_v1.html","title":"qds 5 pillars hub v1","cat":"Other"},{"file":"qds_battery_coach_v3.html","title":"qds battery coach v3","cat":"Battery"},{"file":"qds_battery_design_v1.html","title":"qds battery design v1","cat":"Battery"},{"file":"qds_battery_habitat_demo.html","title":"qds battery habitat demo","cat":"Battery"},{"file":"qds_battery_habitat_v1_1_build_001.html","title":"qds battery habitat v1 1 build 001","cat":"Battery"},{"file":"qds_battery_habitat_v1_2_build002.html","title":"qds battery habitat v1 2 build002","cat":"Battery"},{"file":"qds_battery_hub_v9_1_purple_neon.html","title":"qds battery hub v9 1 purple neon","cat":"Battery"},{"file":"qds_battery_hub_v9_2_purple_neon.html","title":"qds battery hub v9 2 purple neon","cat":"Battery"},{"file":"qds_battery_hub_v9_3_science_neon.html","title":"qds battery hub v9 3 science neon","cat":"Battery"},{"file":"qds_battery_hub_v9_4_science_neon_plus.html","title":"qds battery hub v9 4 science neon plus","cat":"Battery"},{"file":"qds_battery_hub_v9_5_1_science_neon.html","title":"qds battery hub v9 5 1 science neon","cat":"Battery"},{"file":"qds_battery_hub_v9_5_science_neon.html","title":"qds battery hub v9 5 science neon","cat":"Battery"},{"file":"qds_battery_hub_v9_6_science_neon.html","title":"qds battery hub v9 6 science neon","cat":"Battery"},{"file":"qds_battery_hub_v9_7_science_neon_lab.html","title":"qds battery hub v9 7 science neon lab","cat":"Battery"},{"file":"qds_battery_index_v1_neon_os.html","title":"qds battery index v1 neon os","cat":"Battery"},{"file":"qds_battery_lab.html","title":"qds battery lab","cat":"Battery"},{"file":"qds_battery_lab_showcase_stress_bias_v1.html","title":"qds battery lab showcase stress bias v1","cat":"Battery"},{"file":"qds_battery_lab_showcase_stress_bias_v2.html","title":"qds battery lab showcase stress bias v2","cat":"Battery"},{"file":"qds_battery_lab_showcase_v1.html","title":"qds battery lab showcase v1","cat":"Battery"},{"file":"qds_battery_noise_toy_v1.html","title":"qds battery noise toy v1","cat":"Battery"},{"file":"qds_battery_os_index_v1.html","title":"qds battery os index v1","cat":"Battery"},{"file":"qds_battery_suite_v4_showcase.html","title":"qds battery suite v4 showcase","cat":"Battery"},{"file":"qds_battery_suite_v5_boss_polish.html","title":"qds battery suite v5 boss polish","cat":"Battery"},{"file":"qds_battery_suite_v6_realworld.html","title":"qds battery suite v6 realworld","cat":"Battery"},{"file":"qds_battery_suite_v8_1_fairpath.html","title":"qds battery suite v8 1 fairpath","cat":"Battery"},{"file":"qds_battery_suite_v8_2_poster_tamed.html","title":"qds battery suite v8 2 poster tamed","cat":"Battery"},{"file":"qds_battery_suite_v8_3_neon_shell.html","title":"qds battery suite v8 3 neon shell","cat":"Battery"},{"file":"qds_battery_suite_v8_nextlevel.html","title":"qds battery suite v8 nextlevel","cat":"Battery"},{"file":"qds_battery_whisperer_v2.html","title":"qds battery whisperer v2","cat":"Battery"},{"file":"qds_business_projection_posh_v1.html","title":"qds business projection posh v1","cat":"Business/Offers"},{"file":"qds_chips_noise_v1.html","title":"qds chips noise v1","cat":"Other"},{"file":"qds_compression_lab_v1.html","title":"qds compression lab v1","cat":"Compression"},{"file":"qds_domain_map.html","title":"qds domain map","cat":"Maps/Local"},{"file":"qds_domain_map_animated_v1.html","title":"qds domain map animated v1","cat":"Maps/Local"},{"file":"qds_micro_lab.html","title":"qds micro lab","cat":"Other"},{"file":"qds_offer_bundle_v1_20251207_165042.html","title":"qds offer bundle v1 20251207 165042","cat":"Business/Offers"},{"file":"qds_offer_bundle_v1_20251207_165051.html","title":"qds offer bundle v1 20251207 165051","cat":"Business/Offers"},{"file":"qds_production_dashboard_v1.html","title":"qds production dashboard v1","cat":"Other"},{"file":"qds_revenue_floor_BASE.html","title":"qds revenue floor BASE","cat":"Business/Offers"},{"file":"qds_revenue_floor_STRETCH.html","title":"qds revenue floor STRETCH","cat":"Business/Offers"},{"file":"qds_revenue_floor_v2.html","title":"qds revenue floor v2","cat":"Business/Offers"},{"file":"qds_revenue_onepager.html","title":"qds revenue onepager","cat":"Business/Offers"},{"file":"qds_revenue_predictor_v1.html","title":"qds revenue predictor v1","cat":"Business/Offers"},{"file":"qds_rotation_lab.html","title":"qds rotation lab","cat":"Other"},{"file":"qds_sensors_metrology_v1.html","title":"qds sensors metrology v1","cat":"Other"},{"file":"qds_shed_index_v1.html","title":"qds shed index v1","cat":"Other"},{"file":"qds_showcase_index_v1.html","title":"qds showcase index v1","cat":"Other"},{"file":"qds_showcase_index_v1_1.html","title":"qds showcase index v1 1","cat":"Other"},{"file":"qds_solar_v6_textures.html","title":"qds solar v6 textures","cat":"Universe/Demos"},{"file":"qds_test_platform.html","title":"qds test platform","cat":"Other"},{"file":"qds_test_task_pack_v1.html","title":"qds test task pack v1","cat":"Other"},{"file":"qds_test_task_pack_v1_1_pro.html","title":"qds test task pack v1 1 pro","cat":"Other"},{"file":"qds_universe_v12b_mobile.html","title":"qds universe v12b mobile","cat":"Universe/Demos"},{"file":"qds_universe_v9_10_neon_planet_colours.html","title":"qds universe v9 10 neon planet colours","cat":"Universe/Demos"},{"file":"qds_universe_v9_2_neon_clear_planets.html","title":"qds universe v9 2 neon clear planets","cat":"Universe/Demos"},{"file":"qds_universe_v9_6_turbo_pan.html","title":"qds universe v9 6 turbo pan","cat":"Universe/Demos"},{"file":"qds_variance_lab.html","title":"qds variance lab","cat":"Other"},{"file":"solar_system_v8_offline.html","title":"solar system v8 offline","cat":"Universe/Demos"},{"file":"solar_system_v9_2_mobile_3d_showcase.html","title":"solar system v9 2 mobile 3d showcase","cat":"Universe/Demos"},{"file":"start_here_90s_v1.html","title":"start here 90s v1","cat":"Other"},{"file":"stinchcombe_map.html","title":"stinchcombe map","cat":"Maps/Local"}
+  ];
+
+  // Tiny helper to sort newest-ish by filename fallback
+  // (We avoid fs calls since this is a static page).
+  function scoreName(s){
+    // prefer timestamp-like chunks
+    const m = s.match(/(20\d{6})_(\d{6})|(20\d{2})(\d{2})(\d{2})/);
+    if (!m) return 0;
+    return 1;
+  }
+
+  const q = document.getElementById("q");
+  const cat = document.getElementById("cat");
+  const list = document.getElementById("list");
+  const count = document.getElementById("count");
+  const latestBtn = document.getElementById("latestBtn");
+  const allBtn = document.getElementById("allBtn");
+  const listTitle = document.getElementById("listTitle");
+
+  // Populate categories
+  const cats = Array.from(new Set(ITEMS.map(i => i.cat))).sort();
+  for (const c of cats){
+    const opt = document.createElement("option");
+    opt.value = c;
+    opt.textContent = c;
+    cat.appendChild(opt);
+  }
+
+  let mode = "ALL";
+
+  function render(){
+    const term = (q.value || "").toLowerCase().trim();
+    const csel = cat.value;
+
+    let data = ITEMS.slice();
+
+    if (csel !== "ALL"){
+      data = data.filter(i => i.cat === csel);
+    }
+
+    if (term){
+      data = data.filter(i =>
+        i.title.toLowerCase().includes(term) ||
+        i.file.toLowerCase().includes(term)
+      );
+    }
+
+    if (mode === "LATEST"){
+      // crude "latest-ish": prioritize names with timestamps and longer versions
+      data = data
+        .sort((a,b) => (scoreName(b.file) - scoreName(a.file)) || (b.file.localeCompare(a.file)))
+        .slice(0,20);
+      listTitle.textContent = "Latest 20 (name-ranked)";
+    } else {
+      listTitle.textContent = "Files";
+    }
+
+    list.innerHTML = "";
+    count.textContent = ITEMS.length;
+
+    for (const i of data){
+      const row = document.createElement("div");
+      row.className = "item";
+
+      const left = document.createElement("div");
+      left.className = "left";
+
+      const t = document.createElement("div");
+      t.className = "item-title";
+      t.textContent = i.title;
+
+      const p = document.createElement("div");
+      p.className = "item-path mono";
+      p.textContent = i.file;
+
+      const tag = document.createElement("span");
+      tag.className = "tag";
+      tag.textContent = i.cat;
+
+      left.appendChild(tag);
+      left.appendChild(t);
+      left.appendChild(p);
+
+      const right = document.createElement("div");
+      right.className = "right";
+
+      const open = document.createElement("a");
+      open.className = "btn";
+      open.href = i.file;
+      open.textContent = "Open";
+
+      const copy = document.createElement("button");
+      copy.className = "btn btn-quiet";
+      copy.textContent = "Copy path";
+      copy.addEventListener("click", async () => {
+        try{
+          await navigator.clipboard.writeText(i.file);
+          copy.textContent = "Copied";
+          setTimeout(()=>copy.textContent="Copy path", 800);
+        }catch(e){
+          copy.textContent = "No clipboard";
+          setTimeout(()=>copy.textContent="Copy path", 900);
+        }
+      });
+
+      right.appendChild(open);
+      right.appendChild(copy);
+
+      row.appendChild(left);
+      row.appendChild(right);
+      list.appendChild(row);
+    }
+
+    if (!data.length){
+      const empty = document.createElement("div");
+      empty.className = "muted tiny";
+      empty.textContent = "No matches. Try clearing filters.";
+      list.appendChild(empty);
+    }
+  }
+
+  q.addEventListener("input", render);
+  cat.addEventListener("change", render);
+
+  latestBtn.addEventListener("click", () => { mode="LATEST"; render(); });
+  allBtn.addEventListener("click", () => { mode="ALL"; render(); });
+
+  render();
+</script>
+</body>
+</html>

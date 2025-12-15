@@ -1,0 +1,10 @@
+PHONE TRANSFER REPORT
+Generated: Mon Dec 15 20:25:14 GMT 2025
+Root: /data/data/com.termux/files/home/OMEGA_EMPIRE/_OFFLOAD_PENDING
+
+== Totals ==
+Files: 0
+
+== Biggest folders (top 20) ==
+
+== Biggest files (top 30) ==

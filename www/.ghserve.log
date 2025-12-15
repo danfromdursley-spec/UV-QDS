@@ -1,0 +1,10 @@
+127.0.0.1 - - [15/Dec/2025 11:40:15] "GET /frontdoor_show.html HTTP/1.1" 200 -
+127.0.0.1 - - [15/Dec/2025 11:40:18] "GET /qds_revenue_floor_v2.html HTTP/1.1" 304 -
+127.0.0.1 - - [15/Dec/2025 12:02:17] "GET /qds_cheatsheet_space.html?x=1765800135 HTTP/1.1" 200 -
+127.0.0.1 - - [15/Dec/2025 12:02:17] "GET /favicon.ico HTTP/1.1" 200 -
+127.0.0.1 - - [15/Dec/2025 15:18:52] "GET /frontdoor_show.html HTTP/1.1" 200 -
+127.0.0.1 - - [15/Dec/2025 15:18:54] "GET /growthhub_stroud_demo.html HTTP/1.1" 304 -
+127.0.0.1 - - [15/Dec/2025 15:18:58] "GET /qds_compression_lab_v1.html HTTP/1.1" 304 -
+127.0.0.1 - - [15/Dec/2025 15:19:00] "GET /qds_battery_habitat_v1_2_build002.html HTTP/1.1" 304 -
+127.0.0.1 - - [15/Dec/2025 16:01:55] "GET /frontdoor_show.html HTTP/1.1" 304 -
+127.0.0.1 - - [15/Dec/2025 16:05:34] "GET /qds_revenue_floor_v2.html HTTP/1.1" 304 -

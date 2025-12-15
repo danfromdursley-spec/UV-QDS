@@ -1,0 +1,213 @@
+::ffff:127.0.0.1 - - [07/Dec/2025 17:22:34] "GET /growthhub_multi_area_stack_v1.html HTTP/1.1" 304 -
+::ffff:127.0.0.1 - - [07/Dec/2025 17:24:06] code 404, message File not found
+::ffff:127.0.0.1 - - [07/Dec/2025 17:24:06] "GET / HTTP/1.1" 304 -
+::ffff:127.0.0.1 - - [07/Dec/2025 17:24:06] "GET /growthhub_multi_area_stack_v1.htmlhttp://127.0.0.1:8011/all_pages_compact.htmlhttp://127.0.0.1:8011/index.htmlhttp://127.0.0.1:8011/growthhub.html HTTP/1.1" 404 -
+----------------------------------------
+Exception occurred during processing of request from ('::ffff:127.0.0.1', 48958, 0, 0)
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 731, in send_head
+    f = open(path, 'rb')
+        ^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/data/data/com.termux/files/home/OMEGA_EMPIRE/UV_QDS/www/growthhub_multi_area_stack_v1.htmlhttp:/127.0.0.1:8011/all_pages_compact.htmlhttp:/127.0.0.1:8011/index.htmlhttp:/127.0.0.1:8011/growthhub.html'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 1307, in finish_request
+    self.RequestHandlerClass(request, client_address, self,
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 672, in __init__
+    super().__init__(*args, **kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.12/socketserver.py", line 766, in __init__
+    self.handle()
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 676, in do_GET
+    f = self.send_head()
+        ^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 733, in send_head
+    self.send_error(HTTPStatus.NOT_FOUND, "File not found")
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 491, in send_error
+    self.wfile.write(body)
+  File "/data/data/com.termux/files/usr/lib/python3.12/socketserver.py", line 845, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+::ffff:127.0.0.1 - - [07/Dec/2025 17:24:40] "GET / HTTP/1.1" 304 -
+::ffff:127.0.0.1 - - [07/Dec/2025 17:26:26] "GET /index_demo_front_20251207_170108.html HTTP/1.1" 304 -
+::ffff:127.0.0.1 - - [07/Dec/2025 17:26:47] "GET /growthhub_multi_area_stack_v1.html?x=1 HTTP/1.1" 200 -
+::ffff:127.0.0.1 - - [07/Dec/2025 17:27:05] "GET /frontdoor.html HTTP/1.1" 200 -
+::ffff:127.0.0.1 - - [07/Dec/2025 17:27:14] "GET /growthhub.html HTTP/1.1" 304 -
+::ffff:127.0.0.1 - - [07/Dec/2025 17:27:18] "GET /growthhub_official_top5.html HTTP/1.1" 304 -
+::ffff:127.0.0.1 - - [07/Dec/2025 17:27:21] "GET /growthhub_multi_area_stack_v1.html HTTP/1.1" 304 -
+::ffff:127.0.0.1 - - [07/Dec/2025 17:30:09] "GET /qds_battery_habitat_demo.html HTTP/1.1" 200 -
+::ffff:127.0.0.1 - - [07/Dec/2025 17:30:09] "GET /qds_battery_design_v1.html HTTP/1.1" 304 -
+::ffff:127.0.0.1 - - [07/Dec/2025 17:30:09] "GET /all_pages.html HTTP/1.1" 200 -
+----------------------------------------
+Exception occurred during processing of request from ('::ffff:127.0.0.1', 49038, 0, 0)
+----------------------------------------
+Exception occurred during processing of request from ('::ffff:127.0.0.1', 49042, 0, 0)
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 1307, in finish_request
+    self.RequestHandlerClass(request, client_address, self,
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 672, in __init__
+    super().__init__(*args, **kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.12/socketserver.py", line 766, in __init__
+    self.handle()
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 679, in do_GET
+    self.copyfile(f, self.wfile)
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 878, in copyfile
+    shutil.copyfileobj(source, outputfile)
+  File "/data/data/com.termux/files/usr/lib/python3.12/shutil.py", line 204, in copyfileobj
+    fdst_write(buf)
+  File "/data/data/com.termux/files/usr/lib/python3.12/socketserver.py", line 845, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+  File "/data/data/com.termux/files/usr/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 1307, in finish_request
+    self.RequestHandlerClass(request, client_address, self,
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 672, in __init__
+    super().__init__(*args, **kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.12/socketserver.py", line 766, in __init__
+    self.handle()
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 679, in do_GET
+    self.copyfile(f, self.wfile)
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 878, in copyfile
+    shutil.copyfileobj(source, outputfile)
+  File "/data/data/com.termux/files/usr/lib/python3.12/shutil.py", line 204, in copyfileobj
+    fdst_write(buf)
+  File "/data/data/com.termux/files/usr/lib/python3.12/socketserver.py", line 845, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+::ffff:127.0.0.1 - - [07/Dec/2025 17:30:09] "GET /all_pages.html HTTP/1.1" 200 -
+----------------------------------------
+Exception occurred during processing of request from ('::ffff:127.0.0.1', 49044, 0, 0)
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 1307, in finish_request
+    self.RequestHandlerClass(request, client_address, self,
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 672, in __init__
+    super().__init__(*args, **kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.12/socketserver.py", line 766, in __init__
+    self.handle()
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 679, in do_GET
+    self.copyfile(f, self.wfile)
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 878, in copyfile
+    shutil.copyfileobj(source, outputfile)
+  File "/data/data/com.termux/files/usr/lib/python3.12/shutil.py", line 204, in copyfileobj
+    fdst_write(buf)
+  File "/data/data/com.termux/files/usr/lib/python3.12/socketserver.py", line 845, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+::ffff:127.0.0.1 - - [07/Dec/2025 17:30:28] "GET /index.html HTTP/1.1" 200 -
+::ffff:127.0.0.1 - - [07/Dec/2025 17:36:13] "GET /frontdoor.html HTTP/1.1" 200 -
+::ffff:127.0.0.1 - - [07/Dec/2025 17:36:14] "GET /growthhub_multi_area_stack_v1.html HTTP/1.1" 304 -
+::ffff:127.0.0.1 - - [07/Dec/2025 17:36:21] "GET /frontdoor.html HTTP/1.1" 304 -
+::ffff:127.0.0.1 - - [07/Dec/2025 17:36:25] "GET /growthhub_official_top5_demo_front_20251207_172220.html HTTP/1.1" 200 -
+::ffff:127.0.0.1 - - [07/Dec/2025 17:41:47] "GET /qds_battery_design_v1.html HTTP/1.1" 200 -
+----------------------------------------
+Exception occurred during processing of request from ('::ffff:127.0.0.1', 49142, 0, 0)
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 1307, in finish_request
+    self.RequestHandlerClass(request, client_address, self,
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 672, in __init__
+    super().__init__(*args, **kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.12/socketserver.py", line 766, in __init__
+    self.handle()
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 679, in do_GET
+    self.copyfile(f, self.wfile)
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 878, in copyfile
+    shutil.copyfileobj(source, outputfile)
+  File "/data/data/com.termux/files/usr/lib/python3.12/shutil.py", line 204, in copyfileobj
+    fdst_write(buf)
+  File "/data/data/com.termux/files/usr/lib/python3.12/socketserver.py", line 845, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+::ffff:127.0.0.1 - - [07/Dec/2025 17:53:04] "GET /frontdoor.html HTTP/1.1" 200 -
+::ffff:127.0.0.1 - - [07/Dec/2025 17:53:10] "GET /growthhub_official_top5_demo_front_20251207_172220.html HTTP/1.1" 304 -
+::ffff:127.0.0.1 - - [07/Dec/2025 17:53:14] "GET /qds_universe_v9_2_neon_clear_planets.html HTTP/1.1" 200 -
+::ffff:127.0.0.1 - - [07/Dec/2025 17:53:24] "GET /qds_universe_v12b_mobile.html HTTP/1.1" 200 -
+::ffff:127.0.0.1 - - [07/Dec/2025 17:57:57] "GET /qds_battery_hub_v9_6_science_neon.html HTTP/1.1" 200 -
+::ffff:127.0.0.1 - - [07/Dec/2025 17:57:57] "GET /index_demo_front_20251207_170108.html HTTP/1.1" 200 -
+::ffff:127.0.0.1 - - [07/Dec/2025 17:57:57] "GET /growthhub_demo_front_20251207_170108.html HTTP/1.1" 304 -
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('::ffff:127.0.0.1', 49206, 0, 0)
+Exception occurred during processing of request from ('::ffff:127.0.0.1', 49200, 0, 0)
+Traceback (most recent call last):
+::ffff:127.0.0.1 - - [07/Dec/2025 17:57:57] "GET /frontdoor.html HTTP/1.1" 304 -
+  File "/data/data/com.termux/files/usr/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 1307, in finish_request
+    self.RequestHandlerClass(request, client_address, self,
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 672, in __init__
+    super().__init__(*args, **kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.12/socketserver.py", line 766, in __init__
+    self.handle()
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 679, in do_GET
+    self.copyfile(f, self.wfile)
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 878, in copyfile
+    shutil.copyfileobj(source, outputfile)
+  File "/data/data/com.termux/files/usr/lib/python3.12/shutil.py", line 204, in copyfileobj
+    fdst_write(buf)
+  File "/data/data/com.termux/files/usr/lib/python3.12/socketserver.py", line 845, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 1307, in finish_request
+    self.RequestHandlerClass(request, client_address, self,
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 672, in __init__
+    super().__init__(*args, **kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.12/socketserver.py", line 766, in __init__
+    self.handle()
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 679, in do_GET
+    self.copyfile(f, self.wfile)
+  File "/data/data/com.termux/files/usr/lib/python3.12/http/server.py", line 878, in copyfile
+    shutil.copyfileobj(source, outputfile)
+  File "/data/data/com.termux/files/usr/lib/python3.12/shutil.py", line 204, in copyfileobj
+    fdst_write(buf)
+  File "/data/data/com.termux/files/usr/lib/python3.12/socketserver.py", line 845, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------

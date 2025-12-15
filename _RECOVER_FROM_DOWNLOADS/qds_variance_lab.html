@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>QDS Variance Quick Tester</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      background: #05060a;
+      color: #e5f2ff;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 4px;
+    }
+    h2 {
+      font-size: 1.1rem;
+      margin-top: 16px;
+      margin-bottom: 4px;
+    }
+    .sub {
+      font-size: 0.9rem;
+      color: #9fb3cc;
+      margin-bottom: 16px;
+    }
+    .panel {
+      border-radius: 12px;
+      background: radial-gradient(circle at top left, #15253a, #05060a);
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      border: 1px solid #28374d;
+    }
+    label {
+      font-size: 0.85rem;
+      color: #c4d7f2;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: flex-end;
+      margin-bottom: 8px;
+    }
+    .field {
+      flex: 1 1 110px;
+      min-width: 100px;
+    }
+    input[type="number"],
+    input[type="text"] {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid #394a63;
+      background: #040712;
+      color: #e5f2ff;
+      font-size: 0.9rem;
+    }
+    input[type="number"]:focus,
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #4fd1c5;
+      box-shadow: 0 0 0 1px #4fd1c5;
+    }
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      background: linear-gradient(135deg, #38bdf8, #22c55e);
+      color: #020617;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    button.secondary {
+      background: #0f172a;
+      color: #cbd5f5;
+      border: 1px solid #334155;
+    }
+    button:active {
+      transform: translateY(1px);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 0.83rem;
+    }
+    th, td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #1f2937;
+      text-align: right;
+      white-space: nowrap;
+    }
+    th {
+      background: #020617;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    td:first-child, th:first-child {
+      text-align: left;
+    }
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .pill-pass {
+      background: #022c22;
+      color: #bbf7d0;
+      border: 1px solid #16a34a;
+    }
+    .pill-fail {
+      background: #450a0a;
+      color: #fecaca;
+      border: 1px solid #dc2626;
+    }
+    .summary {
+      font-size: 0.85rem;
+      color: #9fb3cc;
+      margin-top: 6px;
+    }
+    canvas {
+      width: 100%;
+      max-width: 100%;
+      background: #020617;
+      border-radius: 12px;
+      border: 1px solid #1e293b;
+      margin-top: 6px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      font-size: 0.75rem;
+      margin-left: 4px;
+      color: #cbd5f5;
+    }
+    @media (max-width: 640px) {
+      .row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      button {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>QDS Variance Quick Tester</h1>
+    <div class="sub">
+      Plug in radii and observed fractional scatter <code>σ(H)/H</code> to compare
+      against the QDS law <code>σ(H)/H = A · R<sup>−p</sup></code>.
+      Defaults: <strong>A = 0.017</strong>, <strong>p = 0.35</strong>.
+    </div>
+
+    <!-- Kernel controls -->
+    <div class="panel">
+      <h2>1. Kernel parameters</h2>
+      <div class="row">
+        <div class="field">
+          <label for="A">A (amplitude, σ(H)/H at R=1 Mpc)</label>
+          <input type="number" id="A" step="0.0001" value="0.017">
+        </div>
+        <div class="field">
+          <label for="p">p (slope)</label>
+          <input type="number" id="p" step="0.01" value="0.35">
+        </div>
+        <div class="field">
+          <label for="tol">Tolerance (% difference allowed)</label>
+          <input type="number" id="tol" step="1" value="20">
+        </div>
+        <div class="field" style="flex:0 0 auto;">
+          <button id="recalcBtn" type="button">Recalculate all</button>
+        </div>
+      </div>
+      <div class="summary">
+        Tip: enter σ(H)/H in <strong>percent</strong> below (e.g. 3.4 for 3.4%).
+      </div>
+    </div>
+
+    <!-- Data entry -->
+    <div class="panel">
+      <h2>2. Add data point <span class="badge">R in Mpc, scatter in %</span></h2>
+      <div class="row">
+        <div class="field">
+          <label for="R_in">Radius R (Mpc)</label>
+          <input type="number" id="R_in" step="1" min="1" placeholder="e.g. 30">
+        </div>
+        <div class="field">
+          <label for="obs_in">Observed σ(H)/H (%)</label>
+          <input type="number" id="obs_in" step="0.01" placeholder="e.g. 4.2">
+        </div>
+        <div class="field" style="flex:0 0 auto;">
+          <button id="addBtn" type="button">Add point</button>
+        </div>
+        <div class="field" style="flex:0 0 auto;">
+          <button id="clearBtn" type="button" class="secondary">Clear all</button>
+        </div>
+      </div>
+
+      <div style="max-height: 220px; overflow-y: auto; margin-top: 6px;">
+        <table id="dataTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>R (Mpc)</th>
+              <th>Obs σ(H)/H (%)</th>
+              <th>QDS pred (%)</th>
+              <th>Δ (%)</th>
+              <th>|Δ| vs tol</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="summary" id="summaryText">
+        No points yet. Add a few radii and observed scatters to see how QDS behaves.
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="panel">
+      <h2>3. Visual check</h2>
+      <div class="summary">
+        Line = QDS prediction. Points = your observed σ(H)/H. X-axis is radius (Mpc), Y-axis is percent.
+      </div>
+      <canvas id="chart" width="800" height="340"></canvas>
+    </div>
+  </div>
+
+  <script>
+    // Simple QDS variance tester
+    const AInput   = document.getElementById('A');
+    const pInput   = document.getElementById('p');
+    const tolInput = document.getElementById('tol');
+
+    const RInput   = document.getElementById('R_in');
+    const obsInput = document.getElementById('obs_in');
+
+    const addBtn    = document.getElementById('addBtn');
+    const clearBtn  = document.getElementById('clearBtn');
+    const recalcBtn = document.getElementById('recalcBtn');
+
+    const tableBody = document.querySelector('#dataTable tbody');
+    const summaryEl = document.getElementById('summaryText');
+
+    const canvas = document.getElementById('chart');
+    const ctx    = canvas.getContext('2d');
+
+    let points = []; // {R, obs, pred, diff, rel}
+
+    function computePred(R, A, p) {
+      // σ(H)/H = A * R^(-p), convert to percent for display
+      return 100 * A * Math.pow(R, -p);
+    }
+
+    function recalcAll() {
+      const A   = parseFloat(AInput.value)   || 0;
+      const p   = parseFloat(pInput.value)   || 0;
+      const tol = parseFloat(tolInput.value) || 0;
+
+      points = points.map(pt => {
+        const pred = computePred(pt.R, A, p);
+        const diff = pt.obs - pred;
+        const rel  = pred !== 0 ? (diff / pred) * 100 : 0;
+        return { ...pt, pred, diff, rel, tol };
+      });
+
+      renderTable();
+      renderSummary();
+      drawChart();
+    }
+
+    function addPoint() {
+      const Rval   = parseFloat(RInput.value);
+      const obsVal = parseFloat(obsInput.value);
+      if (!isFinite(Rval) || !isFinite(obsVal) || Rval <= 0) {
+        alert('Please enter a valid radius (R > 0) and observed % value.');
+        return;
+      }
+
+      const A   = parseFloat(AInput.value)   || 0;
+      const p   = parseFloat(pInput.value)   || 0;
+      const tol = parseFloat(tolInput.value) || 0;
+
+      const pred = computePred(Rval, A, p);
+      const diff = obsVal - pred;
+      const rel  = pred !== 0 ? (diff / pred) * 100 : 0;
+
+      points.push({ R: Rval, obs: obsVal, pred, diff, rel, tol });
+      RInput.value = '';
+      obsInput.value = '';
+
+      renderTable();
+      renderSummary();
+      drawChart();
+    }
+
+    function clearAll() {
+      if (!confirm('Clear all data points?')) return;
+      points = [];
+      renderTable();
+      renderSummary();
+      drawChart();
+    }
+
+    function renderTable() {
+      tableBody.innerHTML = '';
+      const tol = parseFloat(tolInput.value) || 0;
+
+      points.forEach((pt, idx) => {
+        const tr = document.createElement('tr');
+
+        const pass = Math.abs(pt.rel) <= tol;
+        const pill = document.createElement('span');
+        pill.className = 'pill ' + (pass ? 'pill-pass' : 'pill-fail');
+        pill.textContent = pass ? 'PASS' : 'FAIL';
+
+        tr.innerHTML = `
+          <td>${idx + 1}</td>
+          <td>${pt.R.toFixed(1)}</td>
+          <td>${pt.obs.toFixed(3)}</td>
+          <td>${pt.pred.toFixed(3)}</td>
+          <td>${pt.rel.toFixed(1)}</td>
+          <td></td>
+        `;
+        tr.lastElementChild.appendChild(pill);
+        tableBody.appendChild(tr);
+      });
+    }
+
+    function renderSummary() {
+      if (points.length === 0) {
+        summaryEl.textContent = 'No points yet. Add a few radii and observed scatters to see how QDS behaves.';
+        return;
+      }
+      const tol  = parseFloat(tolInput.value) || 0;
+      const n    = points.length;
+      const pass = points.filter(pt => Math.abs(pt.rel) <= tol).length;
+      const frac = (pass / n) * 100;
+
+      const minR = Math.min(...points.map(p => p.R));
+      const maxR = Math.max(...points.map(p => p.R));
+      summaryEl.textContent =
+        `Points: ${n} | Within tolerance: ${pass} (${frac.toFixed(1)}%) | ` +
+        `R range: ${minR.toFixed(1)} – ${maxR.toFixed(1)} Mpc | ` +
+        `Tolerance: ±${tol.toFixed(0)}% of QDS prediction.`;
+    }
+
+    function drawChart() {
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      // Background
+      ctx.fillStyle = '#020617';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.save();
+      ctx.translate(48, 16);
+      const plotW = w - 64;
+      const plotH = h - 48;
+
+      // No points: draw frame only
+      let minR = 1, maxR = 100;
+      let minY = 0, maxY = 10;
+
+      if (points.length > 0) {
+        minR = Math.min(...points.map(p => p.R));
+        maxR = Math.max(...points.map(p => p.R));
+        const ys = points.map(p => p.obs).concat(points.map(p => p.pred));
+        minY = Math.min(...ys);
+        maxY = Math.max(...ys);
+      }
+
+      if (minR === maxR) { maxR = minR + 1; }
+      if (minY === maxY) { maxY = minY + 1; }
+
+      // Pad a bit
+      const padR = 0.1 * (maxR - minR);
+      const padY = 0.2 * (maxY - minY);
+      minR -= padR; maxR += padR;
+      minY = Math.max(0, minY - padY);
+      maxY += padY;
+
+      function xScale(R) {
+        return ((R - minR) / (maxR - minR)) * plotW;
+      }
+      function yScale(y) {
+        return plotH - ((y - minY) / (maxY - minY)) * plotH;
+      }
+
+      // Axes
+      ctx.strokeStyle = '#1f2937';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, yScale(0));
+      ctx.lineTo(plotW, yScale(0));
+      ctx.moveTo(0, 0);
+      ctx.lineTo(0, plotH);
+      ctx.stroke();
+
+      ctx.fillStyle = '#64748b';
+      ctx.font = '10px system-ui';
+
+      // Simple ticks
+      const tickCount = 4;
+      for (let i = 0; i <= tickCount; i++) {
+        const tY = minY + (i / tickCount) * (maxY - minY);
+        const y = yScale(tY);
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(plotW, y);
+        ctx.strokeStyle = 'rgba(100,116,139,0.25)';
+        ctx.stroke();
+        ctx.fillText(tY.toFixed(1) + '%', -40, y + 3);
+      }
+
+      ctx.fillText('R (Mpc)', plotW - 40, plotH + 14);
+      ctx.fillText('σ(H)/H (%)', -4, -6);
+
+      // Draw QDS predicted curve if we have at least one point
+      const A   = parseFloat(AInput.value) || 0;
+      const p   = parseFloat(pInput.value) || 0;
+
+      if (points.length > 0 && A > 0) {
+        ctx.beginPath();
+        for (let i = 0; i <= 80; i++) {
+          const t = i / 80;
+          const R = minR + t * (maxR - minR);
+          if (R <= 0) continue;
+          const y = computePred(R, A, p);
+          const xPix = xScale(R);
+          const yPix = yScale(y);
+          if (i === 0) ctx.moveTo(xPix, yPix);
+          else ctx.lineTo(xPix, yPix);
+        }
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      // Draw observed points
+      points.forEach(pt => {
+        const x = xScale(pt.R);
+        const y = yScale(pt.obs);
+        const pass = Math.abs(pt.rel) <= (parseFloat(tolInput.value) || 0);
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = pass ? '#22c55e' : '#f97316';
+        ctx.fill();
+      });
+
+      ctx.restore();
+    }
+
+    // Wire up events
+    addBtn.addEventListener('click', addPoint);
+    clearBtn.addEventListener('click', clearAll);
+    recalcBtn.addEventListener('click', recalcAll);
+
+    AInput.addEventListener('change', recalcAll);
+    pInput.addEventListener('change', recalcAll);
+    tolInput.addEventListener('change', recalcAll);
+
+    // Initial draw
+    drawChart();
+  </script>
+</body>
+</html>

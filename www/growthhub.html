@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QDS Growth Hub — Operator Dashboard</title>
+  <style>
+    :root{
+      --bg:#070b14; --panel:#0c1323; --panel2:#0a1020;
+      --text:#e6ecff; --muted:#9aa7c7; --accent:#78a6ff;
+      --ok:#6dffb2; --warn:#ffd479; --line:rgba(255,255,255,.06);
+      --glow:0 0 24px rgba(120,166,255,.12);
+      --radius:16px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:var(--sans); color:var(--text);
+      background:
+        radial-gradient(900px 600px at 10% -10%, rgba(120,166,255,.10), transparent 60%),
+        radial-gradient(900px 600px at 90% 10%, rgba(109,255,178,.08), transparent 60%),
+        linear-gradient(180deg, #050812, var(--bg) 40%, #050812 100%);
+    }
+    .wrap{max-width:1100px; margin:0 auto; padding:28px 18px 80px}
+    .top{
+      display:flex; gap:14px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+      padding:14px 16px; border:1px solid var(--line); border-radius:var(--radius);
+      background:linear-gradient(135deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+      box-shadow:var(--glow);
+    }
+    .badge{
+      display:inline-flex; gap:8px; align-items:center;
+      padding:6px 10px; border:1px solid var(--line); border-radius:999px;
+      background:rgba(255,255,255,.03); font-size:12px; color:var(--muted);
+    }
+    .badge .dot{width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow:0 0 8px rgba(120,166,255,.6)}
+    h1{margin:18px 0 6px; font-size: clamp(26px, 3.5vw, 38px); letter-spacing:.2px}
+    .sub{color:var(--muted); max-width:70ch}
+    .grid{display:grid; gap:14px}
+    .g2{grid-template-columns: repeat(2, minmax(0,1fr))}
+    .g3{grid-template-columns: repeat(3, minmax(0,1fr))}
+    @media (max-width:900px){ .g3{grid-template-columns:1fr 1fr} }
+    @media (max-width:650px){ .g2,.g3{grid-template-columns:1fr} }
+    .card{
+      border:1px solid var(--line); border-radius:var(--radius);
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+      padding:16px 16px 14px; box-shadow:var(--glow);
+    }
+    .card.alt{background:linear-gradient(180deg, rgba(255,255,255,.015), rgba(255,255,255,.005));}
+    .kicker{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted)}
+    .big{
+      font-size: clamp(22px, 2.8vw, 30px); font-weight:700; margin:6px 0 2px;
+    }
+    .mono{font-family:var(--mono)}
+    .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+    .pill{
+      padding:6px 10px; border-radius:10px; border:1px solid var(--line);
+      background:rgba(255,255,255,.03); font-size:12px; color:var(--muted)
+    }
+    .pill.ok{color:#0b1a12; background:linear-gradient(90deg, rgba(109,255,178,.20), rgba(109,255,178,.08)); border-color:rgba(109,255,178,.25)}
+    .pill.warn{color:#1a1406; background:linear-gradient(90deg, rgba(255,212,121,.20), rgba(255,212,121,.08)); border-color:rgba(255,212,121,.25)}
+    .split{
+      display:grid; grid-template-columns: 1.2fr .8fr; gap:14px;
+    }
+    @media (max-width:900px){ .split{grid-template-columns:1fr} }
+    .list{margin:10px 0 0; padding:0; list-style:none}
+    .list li{
+      padding:8px 0; border-top:1px dashed rgba(255,255,255,.06);
+      color:var(--muted)
+    }
+    .list li strong{color:var(--text)}
+    .check{
+      display:flex; gap:10px; align-items:flex-start;
+      padding:10px 0; border-top:1px dashed rgba(255,255,255,.06)
+    }
+    .check .c{
+      width:18px; height:18px; border-radius:5px; border:1px solid var(--line);
+      display:inline-flex; align-items:center; justify-content:center; font-size:12px;
+      background:rgba(255,255,255,.03); color:var(--muted)
+    }
+    .check.done .c{background:rgba(109,255,178,.16); border-color:rgba(109,255,178,.35); color:var(--ok)}
+    .check.now  .c{background:rgba(120,166,255,.16); border-color:rgba(120,166,255,.35); color:var(--accent)}
+    .check.next .c{background:rgba(255,212,121,.14); border-color:rgba(255,212,121,.35); color:var(--warn)}
+    .hr{height:1px; background:linear-gradient(90deg, transparent, var(--line), transparent); margin:18px 0}
+    .cta{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    }
+    .btn{
+      appearance:none; border:1px solid var(--line); border-radius:12px; padding:10px 14px;
+      background:linear-gradient(135deg, rgba(120,166,255,.18), rgba(120,166,255,.06));
+      color:var(--text); font-weight:600; cursor:pointer;
+      box-shadow:var(--glow);
+    }
+    .btn.secondary{
+      background:rgba(255,255,255,.03);
+      color:var(--muted);
+    }
+    .tiny{font-size:11px; color:var(--muted)}
+    .metric{
+      display:flex; justify-content:space-between; gap:10px; align-items:center;
+      padding:10px 0; border-top:1px dashed rgba(255,255,255,.06);
+    }
+    .bar{
+      height:6px; border-radius:999px; background:rgba(255,255,255,.06); overflow:hidden; flex:1;
+    }
+    .bar > i{
+      display:block; height:100%; width:0%;
+      background:linear-gradient(90deg, rgba(120,166,255,.7), rgba(109,255,178,.7));
+    }
+    .foot{
+      margin-top:26px; padding-top:14px; border-top:1px solid var(--line);
+      color:var(--muted); font-size:12px;
+    }
+    .tagline{font-weight:600; color:var(--text)}
+  </style>
+<meta name="theme-color" content="#0f172a">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+
+</head>
+<body>
+  <div class="wrap">
+
+    <!-- TOP STRIP -->
+    <div class="top">
+      <div class="row">
+        <span class="badge"><span class="dot"></span> Operator Build</span>
+        <span class="badge">Battery Habitat v1.2 → v1.6 lineage</span>
+        <span class="badge">Forecast + Mod Stack + Compression</span>
+      </div>
+      <div class="row">
+        <span class="pill ok">Proof-first</span>
+        <span class="pill warn">Claims capped</span>
+        <span class="pill">No chemistry changes</span>
+      </div>
+    </div>
+
+    <!-- HERO -->
+    <h1>QDS Fleet & Storage Reliability — Founder Operator Dashboard</h1>
+    <p class="sub">
+      This is a working product stream, not a slide fantasy.
+      We start with software forecasting, then layer modular thermal/mechanical upgrades
+      only after the baseline wins are measured.
+    </p>
+
+    <div class="grid g3">
+      <div class="card">
+        <div class="kicker">Core Promise</div>
+        <div class="big">Reduce stress events → extend effective life</div>
+        <div class="tiny">Focus: predictability, thermal uniformity, safer modular isolation.</div>
+      </div>
+      <div class="card">
+        <div class="kicker">Target Customers</div>
+        <div class="big">Fleets • Microgrids • Remote assets</div>
+        <div class="tiny">Pick one for the Growth Hub call; expand after first pilot.</div>
+      </div>
+      <div class="card">
+        <div class="kicker">Credibility Mode</div>
+        <div class="big mono">“Demo → Pilot → Claim”</div>
+        <div class="tiny">We show the mechanism, then the measurement, then the number.</div>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <!-- PROOF OF WORK -->
+    <div class="split">
+      <div class="card alt">
+        <div class="kicker">Proof of Work (what already exists)</div>
+
+        <ul class="list">
+          <li><strong>Battery Habitat UI</strong> — architecture toggles, assumption audit, ASCII pack concept.</li>
+          <li><strong>Battery Forecast App</strong> — degradation/“fall-off” prediction framing for fleets.</li>
+          <li><strong>QDS Compression Concepts</strong> — SAVE-style portfolio path for multi-domain data systems.</li>
+          <li><strong>Termux-first dev</strong> — mobile build cadence, local server demos, rapid iteration.</li>
+        </ul>
+
+        <div class="row" style="margin-top:10px">
+          <span class="pill ok">Shippable demo</span>
+          <span class="pill">Screenshot-ready</span>
+          <span class="pill">Investor-safe language</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="kicker">The Moat Story</div>
+        <div class="big">Three products that lock together</div>
+        <ul class="list">
+          <li><strong>Forecast</strong> identifies where life is lost.</li>
+          <li><strong>AI rules</strong> reduce stress events.</li>
+          <li><strong>Mod stack</strong> flattens hotspots & vibration load.</li>
+          <li><strong>Compression</strong> makes fleet telemetry cheaper to retain and learn from.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <!-- ROADMAP -->
+    <div class="grid g2">
+      <div class="card">
+        <div class="kicker">Roadmap (commitment signal)</div>
+
+        <div class="check done">
+          <span class="c">✓</span>
+          <div>
+            <strong>Prototype UI suite</strong><br/>
+            <span class="tiny">Battery Habitat estimator + architecture toggles.</span>
+          </div>
+        </div>
+        <div class="check done">
+          <span class="c">✓</span>
+          <div>
+            <strong>Forecast framing</strong><br/>
+            <span class="tiny">Fleet-ready language + “capped for credibility”.</span>
+          </div>
+        </div>
+        <div class="check now">
+          <span class="c">●</span>
+          <div>
+            <strong>Pilot pack</strong><br/>
+            <span class="tiny">Baseline → intervention → delta measurement template.</span>
+          </div>
+        </div>
+        <div class="check next">
+          <span class="c">→</span>
+          <div>
+            <strong>Paid Pilot 1</strong><br/>
+            <span class="tiny">Software-only first, hardware after baseline ROI is proven.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="kicker">Pilot Metrics (your “not messing about” list)</div>
+        <div class="metric">
+          <span>Thermal spread across pack</span>
+          <span class="tiny mono">ΔT ↓</span>
+        </div>
+        <div class="metric">
+          <span>Stress-event frequency</span>
+          <span class="tiny mono">events/100 cycles ↓</span>
+        </div>
+        <div class="metric">
+          <span>Degradation slope vs baseline</span>
+          <span class="tiny mono">k ↓</span>
+        </div>
+        <div class="metric">
+          <span>Downtime / maintenance delta</span>
+          <span class="tiny mono">£/vehicle/month ↓</span>
+        </div>
+        <div class="metric">
+          <span>Telemetry retention cost</span>
+          <span class="tiny mono">GB/£ ↓</span>
+        </div>
+
+        <div class="tiny" style="margin-top:10px">
+          This turns your page into a *measurement contract*, not a hype poster.
+        </div>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <!-- IMPACT BAND -->
+    <div class="card alt">
+      <div class="row" style="justify-content:space-between">
+        <div>
+          <div class="kicker">Expected Impact (guardrailed)</div>
+          <div class="big">Effective life uplift (pilot band)</div>
+          <div class="tiny">You can set your demo numbers here without overselling.</div>
+        </div>
+        <div class="row">
+          <span class="pill warn">Demo estimator</span>
+          <span class="pill">Claims capped</span>
+        </div>
+      </div>
+
+      <div class="metric">
+        <span class="mono">Software-only (Forecast + Rules)</span>
+        <div class="bar"><i style="width:35%"></i></div>
+        <span class="tiny mono">Low-risk baseline win</span>
+      </div>
+      <div class="metric">
+        <span class="mono">Mod Stack (Case + Honeycomb + Airflow)</span>
+        <div class="bar"><i style="width:60%"></i></div>
+        <span class="tiny mono">Pilot-dependent</span>
+      </div>
+      <div class="metric">
+        <span class="mono">Full System (Data + AI + Mods + Compression)</span>
+        <div class="bar"><i style="width:78%"></i></div>
+        <span class="tiny mono">Scale story</span>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <!-- CTA -->
+    <div class="card">
+      <div class="kicker">Growth Hub Ask (easy yes)</div>
+      <div class="big">Support a paid pilot + commercialization path</div>
+      <p class="sub">
+        We’re not asking you to believe a headline.
+        We’re asking you to help structure the first pilot so we can earn the headline.
+      </p>
+
+      <div class="cta">
+        <button class="btn" onclick="alert('Add your pilot PDF / one-pager link here')">
+          Pilot Lite — software baseline
+        </button>
+        <button class="btn" onclick="alert('Add your hardware module scope here')">
+          Pilot Plus — add modular stack
+        </button>
+        <button class="btn secondary" onclick="alert('Add your data/compression brief here')">
+          Fleet Data Efficiency — retention + learning
+        </button>
+      </div>
+
+      <div class="tiny" style="margin-top:10px">
+        Replace these alerts with real links when you’re ready.
+      </div>
+    </div>
+
+    <div class="foot">
+      <div class="tagline">Tone goal:</div>
+      Calm, measured, builder-first confidence.  
+      The page should feel like a control room where outcomes are inevitable because process is tight.
+    </div>
+
+  </div>
+</body>
+</html>
+
+<!-- GrowthHub Showcase: QDS Business Projection -->
+<div class="card">
+  <div class="tag">GrowthHub • Finance</div>
+  <h3>Business Projections (3 Pillars)</h3>
+  <p>5-year, editable, investor-friendly model: Batteries · QDS-SAVE · Forecasting.</p>
+  <a class="btn" href="./qds_business_projection_posh_v1.html">Open projection</a>
+</div>
+<!-- /GrowthHub Showcase: QDS Business Projection -->

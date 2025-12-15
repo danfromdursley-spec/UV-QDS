@@ -1,0 +1,1 @@
+/data/data/com.termux/files/home/OMEGA_EMPIRE/UV_QDS/public_rips/rip_dft_ev_charge_stats.sh

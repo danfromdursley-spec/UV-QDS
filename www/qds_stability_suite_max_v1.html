@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>QDS Stability Suite MAX v1 — Batteries + Fusion (Toy) 🔋🔥🎩</title>
+<style>
+  :root{
+    --bg:#0b0f14; --panel:#0f1621; --panel2:#0c131c;
+    --text:#e8eef6; --muted:#9fb0c2; --accent:#6ee7ff; --accent2:#a78bfa;
+    --good:#7CFF9B; --warn:#FFD479; --bad:#FF7C9B;
+    --line:#1e2a3a;
+    --r:14px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:linear-gradient(160deg,#070b10 0%, #0b111a 40%, #070c12 100%);
+    color:var(--text); font:14px/1.35 system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  }
+  header{
+    padding:16px 14px 6px 14px;
+  }
+  .title{
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  .badge{
+    font-size:11px; padding:3px 8px; border:1px solid var(--line);
+    border-radius:999px; color:var(--muted); background:rgba(255,255,255,0.02);
+  }
+  h1{
+    font-size:20px; margin:0 0 4px 0; letter-spacing:0.2px;
+  }
+  .subtitle{color:var(--muted); font-size:12px}
+  .tabs{
+    display:flex; gap:6px; padding:8px 10px 0 10px; flex-wrap:wrap;
+  }
+  .tab{
+    padding:8px 10px; border:1px solid var(--line); border-radius:10px;
+    background:rgba(255,255,255,0.02); color:var(--muted); cursor:pointer;
+    user-select:none;
+  }
+  .tab.active{
+    color:var(--text); border-color:rgba(110,231,255,0.35);
+    box-shadow:0 0 0 1px rgba(110,231,255,0.12) inset;
+  }
+  main{padding:10px}
+  .grid{
+    display:grid; grid-template-columns:1fr; gap:10px;
+  }
+  @media(min-width:980px){
+    .grid.two{grid-template-columns:1.1fr 0.9fr}
+  }
+  .card{
+    background:linear-gradient(180deg,var(--panel) 0%, var(--panel2) 100%);
+    border:1px solid var(--line); border-radius:var(--r); padding:12px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.25);
+  }
+  .card h3{margin:0 0 8px 0; font-size:14px}
+  .muted{color:var(--muted)}
+  .row{display:flex; gap:10px; flex-wrap:wrap}
+  .pill{
+    padding:4px 8px; border-radius:999px; border:1px solid var(--line);
+    font-size:11px; color:var(--muted);
+  }
+  label{display:block; font-size:11px; color:var(--muted); margin-bottom:4px}
+  input[type=range]{width:220px; max-width:100%}
+  input[type=number]{width:90px; background:#08101a; border:1px solid var(--line);
+    color:var(--text); border-radius:8px; padding:4px 6px}
+  select{
+    background:#08101a; border:1px solid var(--line); color:var(--text);
+    border-radius:8px; padding:4px 6px
+  }
+  .kv{
+    display:grid; grid-template-columns:1fr auto; gap:6px 10px;
+    align-items:center;
+  }
+  .btn{
+    background:linear-gradient(90deg, rgba(110,231,255,0.12), rgba(167,139,250,0.12));
+    border:1px solid rgba(110,231,255,0.25); color:var(--text);
+    padding:8px 10px; border-radius:10px; cursor:pointer;
+  }
+  .btn.secondary{
+    border-color:var(--line); background:rgba(255,255,255,0.03); color:var(--muted);
+  }
+  .btn.small{padding:6px 8px; font-size:11px}
+  .switch{
+    display:flex; align-items:center; gap:8px; margin:4px 0;
+  }
+  .switch input{transform:scale(1.1)}
+  .big{
+    font-size:22px; font-weight:700; letter-spacing:0.2px;
+  }
+  .statgrid{
+    display:grid; grid-template-columns:repeat(2,minmax(120px,1fr)); gap:8px;
+  }
+  @media(min-width:520px){
+    .statgrid{grid-template-columns:repeat(4,minmax(120px,1fr))}
+  }
+  .stat{
+    padding:10px; border:1px solid var(--line); border-radius:12px;
+    background:rgba(255,255,255,0.02);
+  }
+  .stat .label{font-size:10px; color:var(--muted)}
+  .stat .value{font-size:18px; font-weight:700}
+  .hr{height:1px; background:var(--line); margin:10px 0}
+  canvas{
+    width:100%; height:180px; background:rgba(255,255,255,0.02);
+    border:1px solid var(--line); border-radius:12px;
+  }
+  textarea{
+    width:100%; min-height:140px; background:#08101a; color:var(--text);
+    border:1px solid var(--line); border-radius:10px; padding:8px;
+    font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size:11px;
+  }
+  .hidden{display:none}
+  .tag-good{color:var(--good)}
+  .tag-warn{color:var(--warn)}
+  .tag-bad{color:var(--bad)}
+</style>
+</head>
+<body>
+<header>
+  <div class="title">
+    <h1>QDS Stability Suite MAX v1 — Batteries + Fusion (Toy)</h1>
+    <span class="badge">single-file</span>
+    <span class="badge">no libs</span>
+    <span class="badge">mobile-safe</span>
+    <span class="badge">Paired Fair + No Regen</span>
+    <span class="badge">Poster Mode</span>
+    <span class="badge">Real-World Advice</span>
+  </div>
+  <div class="subtitle">
+    A fairness-first correlated-noise test harness. Batteries are the primary showcase.
+    Fusion tab is a harmless toy reskin of the same engine — no real-world fusion claims.
+  </div>
+  <div class="tabs" id="tabs"></div>
+</header>
+
+<main>
+  <!-- ========== LAB / BATTERY ========== -->
+  <section id="view-lab" class="view">
+    <div class="grid two">
+      <div class="card">
+        <h3>Core Controls (shared engine)</h3>
+        <div class="kv">
+          <div>
+            <label>Mode</label>
+            <select id="modeSelect">
+              <option value="battery">Battery 🔋</option>
+              <option value="fusion">Fusion (Toy) 🔥</option>
+            </select>
+          </div>
+          <div class="pill" id="modeHint">Battery wear + longevity toy model.</div>
+
+          <div>
+            <label id="lblBase">Base drain per cycle (%)</label>
+            <input id="baseRange" type="range" min="0.1" max="10" step="0.1"/>
+          </div>
+          <input id="baseNum" type="number" min="0.1" max="10" step="0.1"/>
+
+          <div>
+            <label id="lblAmp">Noise amplitude (%)</label>
+            <input id="ampRange" type="range" min="0" max="20" step="0.1"/>
+          </div>
+          <input id="ampNum" type="number" min="0" max="20" step="0.1"/>
+
+          <div>
+            <label>Correlation p (AR(1) memory)</label>
+            <input id="pRange" type="range" min="0" max="0.99" step="0.01"/>
+          </div>
+          <input id="pNum" type="number" min="0" max="0.99" step="0.01"/>
+
+          <div>
+            <label>Cells / runs (n)</label>
+            <input id="nRange" type="range" min="200" max="5000" step="100"/>
+          </div>
+          <input id="nNum" type="number" min="50" max="20000" step="50"/>
+
+          <div>
+            <label>Max cycles simulated</label>
+            <input id="maxRange" type="range" min="200" max="12000" step="100"/>
+          </div>
+          <input id="maxNum" type="number" min="50" max="50000" step="50"/>
+
+          <div>
+            <label id="lblThr">Failure threshold (%)</label>
+            <input id="thrRange" type="range" min="1" max="99" step="1"/>
+          </div>
+          <input id="thrNum" type="number" min="1" max="99" step="1"/>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="row">
+          <div class="card" style="padding:10px; min-width:240px">
+            <h3>Presets</h3>
+            <div class="row">
+              <button class="btn small secondary" id="presetPhone">Realistic phone</button>
+              <button class="btn small secondary" id="presetClean">Clean baseline</button>
+              <button class="btn small secondary" id="presetStress">Controlled stress</button>
+              <button class="btn small secondary" id="presetChaos">Chaos (demo)</button>
+              <button class="btn small secondary" id="presetFusionBase">Tokamak toy</button>
+              <button class="btn small secondary" id="presetFusionEdge">Edge-chaos toy</button>
+            </div>
+          </div>
+
+          <div class="card" style="padding:10px; min-width:240px">
+            <h3>Stress Hammers</h3>
+            <div class="switch"><input id="nonlinChk" type="checkbox"/><label>Nonlinear wear / instability ramp</label></div>
+            <div class="switch"><input id="heatChk" type="checkbox"/><label>Heat epochs / harsh phases</label></div>
+            <div class="switch"><input id="outChk" type="checkbox"/><label>Rare outliers / burst events</label></div>
+            <div class="switch"><input id="pathoChk" type="checkbox"/><label>Hammer: Pathological regime</label></div>
+          </div>
+
+          <div class="card" style="padding:10px; min-width:240px">
+            <h3>Bias Integrity</h3>
+            <div class="switch"><input id="pairedChk" type="checkbox"/><label>Paired Fair Mode (same ε stream)</label></div>
+            <div class="switch"><input id="noRegenChk" type="checkbox"/><label>No Regen (drain cannot go negative)</label></div>
+            <div class="switch"><input id="blindChk" type="checkbox"/><label>Blind labels (display swap)</label></div>
+            <div class="switch"><input id="hardNullChk" type="checkbox"/><label>Hard null (forces p=0)</label></div>
+            <div class="pill muted">Sweeps force blind OFF for interpretability.</div>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="row">
+          <button class="btn" id="runBtn">Run simulation</button>
+          <button class="btn secondary" id="posterBtn">Poster Mode (4-block)</button>
+          <button class="btn secondary" id="resetBtn">Reset defaults</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Results</h3>
+        <div class="row">
+          <span class="pill" id="sanityPill">Sanity flags: —</span>
+          <span class="pill" id="regimePill">Regime: —</span>
+          <span class="pill" id="learnPill">Learning confidence: —</span>
+        </div>
+
+        <div class="statgrid" style="margin-top:10px">
+          <div class="stat">
+            <div class="label" id="lblWhiteMean">White mean</div>
+            <div class="value" id="whiteMean">—</div>
+          </div>
+          <div class="stat">
+            <div class="label" id="lblWhiteSig">White σ</div>
+            <div class="value" id="whiteSig">—</div>
+          </div>
+          <div class="stat">
+            <div class="label" id="lblQdsMean">QDS mean</div>
+            <div class="value" id="qdsMean">—</div>
+          </div>
+          <div class="stat">
+            <div class="label" id="lblQdsSig">QDS σ</div>
+            <div class="value" id="qdsSig">—</div>
+          </div>
+        </div>
+
+        <div class="statgrid" style="margin-top:8px">
+          <div class="stat">
+            <div class="label">Δ (QDS vs White)</div>
+            <div class="value" id="deltaPct">—</div>
+          </div>
+          <div class="stat">
+            <div class="label">Mean Δ cycles (paired)</div>
+            <div class="value" id="deltaMean">—</div>
+          </div>
+          <div class="stat">
+            <div class="label">Sample paired profile</div>
+            <div class="value" id="samplePair">—</div>
+          </div>
+          <div class="stat">
+            <div class="label">Last timestamp</div>
+            <div class="value" id="lastTime">—</div>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+        <h3>Distribution</h3>
+        <canvas id="distCanvas"></canvas>
+
+        <div class="hr"></div>
+        <h3>Sample health / stability profile (paired example)</h3>
+        <canvas id="profileCanvas"></canvas>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:10px">
+      <h3>Local run history</h3>
+      <div class="row">
+        <button class="btn small secondary" id="clearHistoryBtn">Clear history</button>
+        <button class="btn small secondary" id="copyHistoryBtn">Copy history</button>
+      </div>
+      <textarea id="historyBox" readonly></textarea>
+    </div>
+  </section>
+
+  <!-- ========== COACH ========== -->
+  <section id="view-coach" class="view hidden">
+    <div class="grid two">
+      <div class="card">
+        <h3>Simulation Coach 🧠🔋 / 🧠🔥</h3>
+        <div class="muted">
+          Conservative advice from your current sim + last runs.
+          This is a toy coach for habit intuition, not a medical or engineering authority.
+        </div>
+        <div class="hr"></div>
+        <div class="statgrid">
+          <div class="stat">
+            <div class="label">Stress badge</div>
+            <div class="value" id="coachBadge">—</div>
+          </div>
+          <div class="stat">
+            <div class="label">Risk score</div>
+            <div class="value" id="coachRisk">—</div>
+          </div>
+          <div class="stat">
+            <div class="label">Suggested routine cap</div>
+            <div class="value" id="coachCap">—</div>
+          </div>
+          <div class="stat">
+            <div class="label">Learning (last 5)</div>
+            <div class="value" id="coachLearn">—</div>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div id="coachText" class="muted">Run a sim to generate coach output.</div>
+      </div>
+
+      <div class="card">
+        <h3>Routine Planner (lightweight)</h3>
+        <div class="kv">
+          <div>
+            <label>Tomorrow intent</label>
+            <select id="intentSel">
+              <option value="0">Normal day</option>
+              <option value="1">Long day</option>
+              <option value="2">Travel day</option>
+            </select>
+          </div>
+          <div class="pill muted">0=Normal • 1=Long • 2=Travel</div>
+
+          <div>
+            <label>Ambient heat risk</label>
+            <select id="heatRiskSel">
+              <option value="0">Normal</option>
+              <option value="1">Warm</option>
+              <option value="2">Hot</option>
+            </select>
+          </div>
+          <div class="pill muted">0=Normal • 1=Warm • 2=Hot</div>
+        </div>
+        <div class="hr"></div>
+        <button class="btn" id="planBtn">Generate plan</button>
+        <div class="hr"></div>
+        <div id="planOut" class="muted">—</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== REAL WORLD ========== -->
+  <section id="view-real" class="view hidden">
+    <div class="grid two">
+      <div class="card">
+        <h3>Real-World Mode (Advice Only)</h3>
+        <div class="muted">
+          This mode turns your habits + heat patterns into conservative guidance.
+          It does <b>not</b> claim physics-level extension.
+        </div>
+        <div class="hr"></div>
+
+        <div class="row">
+          <button class="btn small secondary" id="readBatteryBtn">Read device battery (if supported)</button>
+          <span class="pill" id="batteryReadPill">Device read: not attempted</span>
+        </div>
+
+        <div class="hr"></div>
+        <h3>Your habits (estimate)</h3>
+        <div class="kv">
+          <div>
+            <label>Typical daily max SoC %</label>
+            <input id="hMax" type="range" min="50" max="100" step="1"/>
+          </div>
+          <input id="hMaxNum" type="number" min="50" max="100" step="1"/>
+
+          <div>
+            <label>Typical daily min SoC %</label>
+            <input id="hMin" type="range" min="0" max="40" step="1"/>
+          </div>
+          <input id="hMinNum" type="number" min="0" max="40" step="1"/>
+
+          <div>
+            <label>Fast-charge days per week</label>
+            <input id="hFast" type="range" min="0" max="7" step="1"/>
+          </div>
+          <input id="hFastNum" type="number" min="0" max="7" step="1"/>
+
+          <div>
+            <label>Hot use hours per day</label>
+            <input id="hHot" type="range" min="0" max="6" step="0.5"/>
+          </div>
+          <input id="hHotNum" type="number" min="0" max="24" step="0.5"/>
+
+          <div>
+            <label>Overnight to 100% nights/week</label>
+            <input id="hOver" type="range" min="0" max="7" step="1"/>
+          </div>
+          <input id="hOverNum" type="number" min="0" max="7" step="1"/>
+        </div>
+
+        <div class="hr"></div>
+        <div class="row">
+          <button class="btn small secondary" id="saveHabitsBtn">Save habits</button>
+          <button class="btn small secondary" id="loadHabitsBtn">Load habits</button>
+          <button class="btn small secondary" id="resetHabitsBtn">Reset habits</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Real-World Scoring + Guidance</h3>
+        <div class="statgrid">
+          <div class="stat">
+            <div class="label">Habit Risk Index</div>
+            <div class="value" id="habitRisk">—</div>
+          </div>
+          <div class="stat">
+            <div class="label">Sim Risk (from settings)</div>
+            <div class="value" id="simRisk">—</div>
+          </div>
+          <div class="stat">
+            <div class="label">Combined Daily Risk</div>
+            <div class="value" id="comboRisk">—</div>
+          </div>
+          <div class="stat">
+            <div class="label">Suggested routine window</div>
+            <div class="value" id="rwWindow">—</div>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div id="rwText" class="muted">Adjust habits and run a sim for combined guidance.</div>
+        <div class="hr"></div>
+        <h3>Quick actions you can actually do</h3>
+        <div class="muted">
+          • Aim for a routine window like 25–85%.<br/>
+          • Avoid charging while hot.<br/>
+          • If you need 100%, finish closer to departure.<br/>
+          • Keep airflow during fast charge.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SWEEPS ========== -->
+  <section id="view-sweeps" class="view hidden">
+    <div class="card">
+      <h3>One-Tap Sweeps</h3>
+      <div class="muted">
+        Uses current base/amp/n/max/hammers/fair settings.
+        Sweeps force <b>blind OFF</b> for interpretability.
+      </div>
+      <div class="hr"></div>
+      <div class="row">
+        <div class="card" style="padding:10px">
+          <h3>p sweep</h3>
+          <button class="btn small" id="pQuickBtn">Quick p (0, .3, .6, .9)</button>
+          <button class="btn small secondary" id="pDenseBtn">Dense p (0 → 0.9 step 0.1)</button>
+        </div>
+        <div class="card" style="padding:10px">
+          <h3>threshold sweep</h3>
+          <button class="btn small" id="tQuickBtn">Thr (30, 50, 75)</button>
+          <button class="btn small secondary" id="tDenseBtn">Thr (20, 30, 50, 75, 80)</button>
+        </div>
+      </div>
+      <div class="hr"></div>
+      <canvas id="sweepCanvas"></canvas>
+      <div class="hr"></div>
+      <textarea id="sweepBox" readonly></textarea>
+    </div>
+  </section>
+
+  <!-- ========== NOISE TOY ========== -->
+  <section id="view-noise" class="view hidden">
+    <div class="grid two">
+      <div class="card">
+        <h3>Noise Toy — White vs QDS AR(1)</h3>
+        <div class="muted">Visual intuition for correlation streaks (no claims).</div>
+        <div class="hr"></div>
+        <div class="kv">
+          <div>
+            <label>Series length</label>
+            <input id="noiseLen" type="range" min="50" max="800" step="10"/>
+          </div>
+          <input id="noiseLenNum" type="number" min="10" max="5000" step="10"/>
+
+          <div>
+            <label>p (uses current p by default)</label>
+            <input id="noiseP" type="range" min="0" max="0.99" step="0.01"/>
+          </div>
+          <input id="noisePNum" type="number" min="0" max="0.99" step="0.01"/>
+        </div>
+        <div class="hr"></div>
+        <button class="btn" id="noiseGenBtn">Generate noise series</button>
+      </div>
+      <div class="card">
+        <h3>Noise plot</h3>
+        <canvas id="noiseCanvas"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== EXPORT ========== -->
+  <section id="view-export" class="view hidden">
+    <div class="card">
+      <h3>Export</h3>
+      <div class="muted">Copy your run history + sweep output for notes, emails, or logs.</div>
+      <div class="hr"></div>
+      <div class="row">
+        <button class="btn small secondary" id="copyAllBtn">Copy ALL logs</button>
+        <button class="btn small secondary" id="downloadTxtBtn">Download logs .txt</button>
+      </div>
+      <div class="hr"></div>
+      <textarea id="exportBox" readonly></textarea>
+    </div>
+  </section>
+</main>
+
+<script>
+/* ===========================================================
+   QDS Stability Suite MAX v1
+   - single-file, no deps
+   - batteries primary show
+   - fusion tab is a toy reskin of same engine
+   =========================================================== */
+
+const TABS = [
+  {id:"lab", label:"Lab Run"},
+  {id:"coach", label:"Coach"},
+  {id:"real", label:"Real-World"},
+  {id:"sweeps", label:"Sweeps"},
+  {id:"noise", label:"Noise Toy"},
+  {id:"export", label:"Export"},
+];
+
+const el = id => document.getElementById(id);
+
+const state = {
+  mode:"battery",
+  base:1.2, amp:1.8, p:0.25, n:1200, max:4000, thr:50,
+  nonlin:true, heat:true, out:true, patho:false,
+  paired:true, noRegen:true, blind:false, hardNull:false,
+  lastResult:null,
+};
+
+const HISTORY_KEY = "QDS_BATT_MAX_HISTORY_V1";
+const HABITS_KEY  = "QDS_BATT_MAX_HABITS_V1";
+const LEARN_KEY   = "QDS_BATT_MAX_LEARN_V1";
+const SWEEP_KEY   = "QDS_BATT_MAX_SWEEP_V1";
+
+/* ----------------- UI init ----------------- */
+function initTabs(){
+  const shell = el("tabs");
+  TABS.forEach(t=>{
+    const b = document.createElement("div");
+    b.className = "tab" + (t.id==="lab"?" active":"");
+    b.textContent = t.label;
+    b.onclick = ()=>showTab(t.id);
+    b.dataset.tab = t.id;
+    shell.appendChild(b);
+  });
+}
+function showTab(id){
+  document.querySelectorAll(".tab").forEach(t=>{
+    t.classList.toggle("active", t.dataset.tab===id);
+  });
+  document.querySelectorAll(".view").forEach(v=>v.classList.add("hidden"));
+  el("view-"+id).classList.remove("hidden");
+  if(id==="coach") renderCoach();
+  if(id==="real")  renderRealWorld();
+  if(id==="export") buildExportBox();
+}
+
+/* --------------- control binding --------------- */
+function bindRangeNum(rangeId, numId, key, clampMin=null, clampMax=null){
+  const r = el(rangeId), n = el(numId);
+  r.value = state[key]; n.value = state[key];
+  const sync = (val)=>{
+    let v = parseFloat(val);
+    if(clampMin!==null) v = Math.max(clampMin, v);
+    if(clampMax!==null) v = Math.min(clampMax, v);
+    state[key] = v;
+    r.value = v; n.value = v;
+    if(key==="p" && state.hardNull){
+      state.p = 0; r.value=0; n.value=0;
+    }
+    updateSanity();
+    updateModeLabels();
+  };
+  r.addEventListener("input", e=>sync(e.target.value));
+  n.addEventListener("input", e=>sync(e.target.value));
+}
+
+function bindCheck(id, key){
+  const c = el(id);
+  c.checked = !!state[key];
+  c.addEventListener("change", ()=>{
+    state[key] = c.checked;
+    if(key==="patho" && state.patho) applyPathological();
+    if(key==="hardNull" && state.hardNull){
+      state.p = 0;
+      el("pRange").value=0; el("pNum").value=0;
+    }
+    updateSanity();
+  });
+}
+
+/* --------------- mode labels --------------- */
+function updateModeLabels(){
+  const m = state.mode;
+  el("modeHint").textContent = (m==="battery")
+    ? "Battery wear + longevity toy model."
+    : "Fusion stability toy (same engine, new labels).";
+  el("lblBase").textContent = (m==="battery")
+    ? "Base drain per cycle (%)"
+    : "Baseline loss per phase (%)";
+  el("lblAmp").textContent  = (m==="battery")
+    ? "Noise amplitude (%)"
+    : "Fluctuation amplitude (%)";
+  el("lblThr").textContent  = (m==="battery")
+    ? "Failure threshold (%)"
+    : "Disruption boundary (%)";
+  el("lblWhiteMean").textContent = (m==="battery") ? "White mean lifetime" : "White mean stability";
+  el("lblQdsMean").textContent   = (m==="battery") ? "QDS mean lifetime"   : "QDS mean stability";
+}
+
+/* --------------- presets --------------- */
+function setPreset(obj){
+  Object.assign(state, obj);
+  // push to inputs
+  el("baseRange").value = el("baseNum").value = state.base;
+  el("ampRange").value  = el("ampNum").value  = state.amp;
+  el("pRange").value    = el("pNum").value    = state.p;
+  el("nRange").value    = el("nNum").value    = state.n;
+  el("maxRange").value  = el("maxNum").value  = state.max;
+  el("thrRange").value  = el("thrNum").value  = state.thr;
+
+  el("nonlinChk").checked = state.nonlin;
+  el("heatChk").checked   = state.heat;
+  el("outChk").checked    = state.out;
+  el("pathoChk").checked  = state.patho;
+
+  el("pairedChk").checked  = state.paired;
+  el("noRegenChk").checked = state.noRegen;
+  el("blindChk").checked   = state.blind;
+  el("hardNullChk").checked= state.hardNull;
+
+  updateSanity();
+  updateModeLabels();
+}
+
+function applyPathological(){
+  // push extreme demo settings without claiming realism
+  setPreset({
+    base:8.0, amp:14.0, p:0.99, n:5000, max:8000, thr:95,
+    nonlin:true, heat:true, out:true,
+    paired:true, noRegen:true, blind:false, hardNull:false,
+    patho:true
+  });
+}
+
+/* --------------- simulation core --------------- */
+function randn(){
+  // Box-Muller
+  let u=0, v=0;
+  while(u===0) u=Math.random();
+  while(v===0) v=Math.random();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+}
+
+function genEpsSeries(len, paired=false){
+  const w = new Array(len);
+  for(let i=0;i<len;i++) w[i]=randn();
+  return w;
+}
+
+function ar1Series(len, p, eps){
+  const x = new Array(len);
+  let prev = 0;
+  const s = Math.sqrt(Math.max(0,1 - p*p));
+  for(let i=0;i<len;i++){
+    const e = eps ? eps[i] : randn();
+    const v = p*prev + s*e;
+    x[i]=v; prev=v;
+  }
+  return x;
+}
+
+function simulateOneCell(base, amp, p, thr, maxCycles, hammers, epsStream, isQDS){
+  let health = 100;
+  let t=0;
+  let prev=0;
+  const s = Math.sqrt(Math.max(0,1 - p*p));
+  const heatPeriod = 30;
+  const outlierProb = 0.015;
+
+  while(t < maxCycles){
+    // noise
+    let e = epsStream ? epsStream[t] : randn();
+    let noise = isQDS ? (p*prev + s*e) : e;
+    prev = noise;
+
+    let drain = base + amp * noise;
+
+    // no-regen clamp
+    if(state.noRegen && drain < 0) drain = 0;
+
+    // hammers
+    if(hammers.nonlin){
+      const low = Math.max(0, (thr+10) - health);
+      if(low > 0) drain *= (1 + low/40);
+    }
+    if(hammers.heat){
+      if((t % heatPeriod) < 6) drain *= 1.35;
+    }
+    if(hammers.out){
+      if(Math.random() < outlierProb) drain *= 2.5;
+    }
+
+    health -= drain;
+    t++;
+
+    if(health <= thr) break;
+    // avoid infinite nonsensical loop
+    if(health <= -200) break;
+  }
+  return t;
+}
+
+function simulateBatch(){
+  const base = state.base;
+  const amp  = state.amp;
+  const p    = state.hardNull ? 0 : state.p;
+  const n    = Math.max(1, Math.floor(state.n));
+  const maxC = Math.max(10, Math.floor(state.max));
+  const thr  = state.thr;
+
+  const hammers = {nonlin:state.nonlin, heat:state.heat, out:state.out};
+
+  const white = new Array(n);
+  const qds   = new Array(n);
+  const pairedD = new Array(n);
+
+  for(let i=0;i<n;i++){
+    const len = maxC+5;
+    const eps = state.paired ? genEpsSeries(len) : null;
+    const w = simulateOneCell(base, amp, 0, thr, maxC, hammers, eps, false);
+    const q = simulateOneCell(base, amp, p, thr, maxC, hammers, eps, true);
+
+    white[i]=w; qds[i]=q;
+    pairedD[i]=q - w;
+  }
+
+  return {white, qds, pairedD, pUsed:p};
+}
+
+function mean(arr){
+  let s=0; for(const x of arr) s+=x; return s/arr.length;
+}
+function std(arr){
+  const m=mean(arr); let s=0;
+  for(const x of arr){ const d=x-m; s+=d*d; }
+  return Math.sqrt(s/Math.max(1, arr.length-1));
+}
+
+/* --------------- plotting --------------- */
+function drawHistogram(canvas, a, b){
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width = canvas.clientWidth * devicePixelRatio;
+  const H = canvas.height = canvas.clientHeight * devicePixelRatio;
+  ctx.clearRect(0,0,W,H);
+
+  const all = a.concat(b);
+  const min = Math.min(...all), max = Math.max(...all);
+  const bins = 24;
+  const bw = Math.max(1, Math.ceil((max-min+1)/bins));
+  const ha = new Array(bins).fill(0);
+  const hb = new Array(bins).fill(0);
+
+  function idx(x){
+    return Math.min(bins-1, Math.max(0, Math.floor((x-min)/bw)));
+  }
+  a.forEach(x=>ha[idx(x)]++);
+  b.forEach(x=>hb[idx(x)]++);
+
+  const maxCount = Math.max(...ha, ...hb, 1);
+  const pad=18*devicePixelRatio;
+  const plotW = W - pad*2, plotH = H - pad*2;
+
+  // axes
+  ctx.strokeStyle = "rgba(255,255,255,0.08)";
+  ctx.lineWidth = 1*devicePixelRatio;
+  ctx.strokeRect(pad, pad, plotW, plotH);
+
+  // bars
+  const barW = plotW/bins;
+  for(let i=0;i<bins;i++){
+    const x = pad + i*barW;
+    const h1 = (ha[i]/maxCount)*plotH;
+    const h2 = (hb[i]/maxCount)*plotH;
+
+    // white
+    ctx.fillStyle = "rgba(110,231,255,0.22)";
+    ctx.fillRect(x, pad + plotH - h1, barW*0.48, h1);
+
+    // qds
+    ctx.fillStyle = "rgba(167,139,250,0.22)";
+    ctx.fillRect(x+barW*0.52, pad + plotH - h2, barW*0.48, h2);
+  }
+}
+
+function drawProfile(canvas, wLen, qLen){
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width = canvas.clientWidth * devicePixelRatio;
+  const H = canvas.height = canvas.clientHeight * devicePixelRatio;
+  ctx.clearRect(0,0,W,H);
+
+  const pad=18*devicePixelRatio;
+  const plotW = W - pad*2, plotH = H - pad*2;
+
+  ctx.strokeStyle = "rgba(255,255,255,0.08)";
+  ctx.lineWidth = 1*devicePixelRatio;
+  ctx.strokeRect(pad, pad, plotW, plotH);
+
+  const maxLen = Math.max(5, wLen, qLen);
+  function line(len, color){
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2*devicePixelRatio;
+    ctx.beginPath();
+    for(let i=0;i<=len;i++){
+      const x = pad + (i/maxLen)*plotW;
+      // fake health line
+      const y = pad + (i/len)*plotH;
+      if(i===0) ctx.moveTo(x, pad);
+      ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+  line(wLen, "rgba(110,231,255,0.6)");
+  line(qLen, "rgba(167,139,250,0.6)");
+}
+
+function drawSweep(canvas, points, xLabel){
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width = canvas.clientWidth * devicePixelRatio;
+  const H = canvas.height = canvas.clientHeight * devicePixelRatio;
+  ctx.clearRect(0,0,W,H);
+
+  const pad=18*devicePixelRatio;
+  const plotW = W - pad*2, plotH = H - pad*2;
+
+  ctx.strokeStyle = "rgba(255,255,255,0.08)";
+  ctx.lineWidth = 1*devicePixelRatio;
+  ctx.strokeRect(pad, pad, plotW, plotH);
+
+  if(points.length===0) return;
+
+  const xs = points.map(p=>p.x), ys = points.map(p=>p.delta);
+  const xmin=Math.min(...xs), xmax=Math.max(...xs);
+  const ymin=Math.min(...ys), ymax=Math.max(...ys);
+  const spanX = Math.max(1e-9, xmax-xmin);
+  const spanY = Math.max(1e-9, ymax-ymin);
+
+  ctx.strokeStyle = "rgba(110,231,255,0.55)";
+  ctx.lineWidth = 2*devicePixelRatio;
+  ctx.beginPath();
+  points.forEach((p,i)=>{
+    const x = pad + ((p.x-xmin)/spanX)*plotW;
+    const y = pad + plotH - ((p.delta-ymin)/spanY)*plotH;
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  // dots
+  points.forEach(p=>{
+    const x = pad + ((p.x-xmin)/spanX)*plotW;
+    const y = pad + plotH - ((p.delta-ymin)/spanY)*plotH;
+    ctx.fillStyle = "rgba(167,139,250,0.7)";
+    ctx.beginPath(); ctx.arc(x,y,3.2*devicePixelRatio,0,Math.PI*2); ctx.fill();
+  });
+}
+
+function drawNoise(canvas, white, qds){
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width = canvas.clientWidth * devicePixelRatio;
+  const H = canvas.height = canvas.clientHeight * devicePixelRatio;
+  ctx.clearRect(0,0,W,H);
+
+  const pad=18*devicePixelRatio;
+  const plotW = W - pad*2, plotH = H - pad*2;
+  ctx.strokeStyle = "rgba(255,255,255,0.08)";
+  ctx.lineWidth = 1*devicePixelRatio;
+  ctx.strokeRect(pad, pad, plotW, plotH);
+
+  const all = white.concat(qds);
+  const ymin=Math.min(...all), ymax=Math.max(...all);
+  const spanY=Math.max(1e-9, ymax-ymin);
+  const n = Math.min(white.length, qds.length);
+
+  function plot(series, color){
+    ctx.strokeStyle = color; ctx.lineWidth = 1.8*devicePixelRatio;
+    ctx.beginPath();
+    for(let i=0;i<n;i++){
+      const x = pad + (i/(n-1))*plotW;
+      const y = pad + plotH - ((series[i]-ymin)/spanY)*plotH;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+  plot(white, "rgba(110,231,255,0.55)");
+  plot(qds,   "rgba(167,139,250,0.55)");
+}
+
+/* --------------- history + learning --------------- */
+function getHistory(){
+  return JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+}
+function setHistory(arr){
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(arr));
+}
+function pushHistory(line){
+  const h = getHistory();
+  h.unshift(line);
+  setHistory(h.slice(0, 120));
+  renderHistory();
+}
+function renderHistory(){
+  const h = getHistory();
+  el("historyBox").value = h.join("\n");
+}
+
+function getLearn(){
+  return JSON.parse(localStorage.getItem(LEARN_KEY) || "[]");
+}
+function pushLearn(deltaPct){
+  const a = getLearn();
+  a.unshift({t:Date.now(), delta:deltaPct, thr:state.thr, p:state.p, base:state.base, amp:state.amp});
+  localStorage.setItem(LEARN_KEY, JSON.stringify(a.slice(0, 40)));
+}
+function learningSummary(){
+  const a = getLearn().slice(0,5);
+  if(a.length===0) return {mean:0, n:0, conf:"low"};
+  const meanD = a.reduce((s,x)=>s+x.delta,0)/a.length;
+
+  // confidence guard: mixed extreme regimes
+  let conf="medium";
+  const wild = a.some(x=>x.thr>=90 || x.base>=5 || x.amp>=8 || x.p>=0.9);
+  const variedThr = new Set(a.map(x=>x.thr)).size >= 3;
+  if(wild || variedThr) conf="low";
+  return {mean:meanD, n:a.length, conf};
+}
+
+/* --------------- sanity + regime --------------- */
+function updateSanity(){
+  const flags = [];
+  if(state.paired) flags.push("Paired ON");
+  if(state.noRegen) flags.push("NoRegen ON");
+  if(state.blind) flags.push("Blind ON");
+  if(state.hardNull) flags.push("HardNull p=0");
+  if(state.thr >= 90) flags.push("High thr inflates %");
+  el("sanityPill").textContent = "Sanity flags: " + (flags.join(" • ") || "—");
+
+  // regime tag
+  const isPatho = (state.thr>=90 && (state.base>=5 || state.amp>=8 || state.p>=0.9))
+               || (state.base>=7) || (state.amp>=12);
+  const isStress = (state.nonlin||state.heat||state.out) && !isPatho;
+
+  let txt="Normal", cls="tag-good";
+  if(isPatho){ txt="Pathological (demo extremes)"; cls="tag-bad"; }
+  else if(isStress){ txt="Stress"; cls="tag-warn"; }
+  el("regimePill").textContent = "Regime: " + txt;
+  el("regimePill").className = "pill " + cls;
+
+  const ls = learningSummary();
+  el("learnPill").textContent = "Learning confidence: " + ls.conf;
+  el("learnPill").className = "pill " + (ls.conf==="low"?"tag-warn": "tag-good");
+}
+
+/* --------------- main run --------------- */
+function runSim(){
+  // enforce hard null
+  const pUsed = state.hardNull ? 0 : state.p;
+
+  const batch = simulateBatch();
+  const wm = mean(batch.white), ws = std(batch.white);
+  const qm = mean(batch.qds),   qs = std(batch.qds);
+  const meanD = mean(batch.pairedD);
+  const delta = (qm - wm) / Math.max(1e-9, wm) * 100;
+
+  // blind labels: swap display only
+  let dispWhite = {m:wm, s:ws};
+  let dispQds   = {m:qm, s:qs};
+  let dispDelta = delta;
+  let dispMeanD = meanD;
+
+  if(state.blind){
+    if(Math.random() < 0.5){
+      const tmp = dispWhite; dispWhite = dispQds; dispQds = tmp;
+      dispDelta = -dispDelta;
+      dispMeanD = -dispMeanD;
+    }
+  }
+
+  el("whiteMean").textContent = dispWhite.m.toFixed(1);
+  el("whiteSig").textContent  = dispWhite.s.toFixed(1);
+  el("qdsMean").textContent   = dispQds.m.toFixed(1);
+  el("qdsSig").textContent    = dispQds.s.toFixed(1);
+  el("deltaPct").textContent  = (dispDelta>=0?"+":"") + dispDelta.toFixed(1) + "%";
+  el("deltaMean").textContent = (dispMeanD>=0?"+":"") + dispMeanD.toFixed(2);
+  el("samplePair").textContent= "White ~" + Math.round(wm) + " / QDS ~" + Math.round(qm);
+  const ts = new Date();
+  el("lastTime").textContent = ts.toLocaleTimeString();
+
+  drawHistogram(el("distCanvas"), batch.white, batch.qds);
+  drawProfile(el("profileCanvas"), Math.round(wm), Math.round(qm));
+
+  state.lastResult = {wm,ws,qm,qs, delta, meanD, pUsed, ts:ts.toISOString()};
+  pushLearn(delta);
+
+  const line =
+    ts.toLocaleDateString() + ", " + ts.toLocaleTimeString() +
+    " · base=" + state.base.toFixed(1) + "% · amp=" + state.amp.toFixed(1) + "% · p=" + pUsed.toFixed(2) +
+    " · thr=" + state.thr + "% · n=" + state.n + " · max=" + state.max +
+    " · white μ=" + wm.toFixed(1) + " σ=" + ws.toFixed(1) +
+    " · QDS μ=" + qm.toFixed(1) + " σ=" + qs.toFixed(1) +
+    " · Δ=" + delta.toFixed(1) + "% · meanΔ=" + meanD.toFixed(2) +
+    " · stress: nonlin=" + state.nonlin + " heat=" + state.heat + " out=" + state.out +
+    " · bias: paired=" + state.paired + " noRegen=" + state.noRegen + " blind=" + state.blind;
+
+  pushHistory(line);
+  renderCoach();
+  renderRealWorld();
+  updateSanity();
+  buildExportBox();
+}
+
+/* --------------- poster mode --------------- */
+function posterMode(){
+  // 4-block evidence ladder:
+  // A) current
+  // B) blind ON
+  // C) hard null p=0
+  // D) restore current
+  const save = JSON.parse(JSON.stringify(state));
+
+  // A
+  runSim();
+
+  // B
+  state.blind = true; el("blindChk").checked = true;
+  runSim();
+
+  // C
+  state.hardNull = true; el("hardNullChk").checked = true;
+  state.p = 0; el("pRange").value=0; el("pNum").value=0;
+  runSim();
+
+  // D restore (no auto)
+  Object.assign(state, save);
+  setPreset(save);
+}
+
+/* --------------- coach --------------- */
+function simRiskScore(){
+  // simple conservative heuristic
+  let r = 0;
+  r += Math.min(40, state.base*6);
+  r += Math.min(35, state.amp*2.2);
+  r += Math.min(25, state.p*30);
+  if(state.nonlin) r += 8;
+  if(state.heat)   r += 10;
+  if(state.out)    r += 8;
+  r += Math.max(0, (state.thr-50)/2);
+  return Math.max(0, Math.min(100, Math.round(r)));
+}
+function stressBadge(){
+  const rs = simRiskScore();
+  if(rs >= 80) return "HIGH STRESS";
+  if(rs >= 45) return "MEDIUM STRESS";
+  return "LOW STRESS";
+}
+function suggestedCap(){
+  const rs = simRiskScore();
+  if(rs >= 80) return 80;
+  if(rs >= 50) return 85;
+  return 90;
+}
+function renderCoach(){
+  const rs = simRiskScore();
+  el("coachBadge").textContent = stressBadge();
+  el("coachRisk").textContent  = rs + "/100";
+  el("coachCap").textContent   = suggestedCap() + "%";
+
+  const ls = learningSummary();
+  el("coachLearn").textContent = (ls.n? (ls.mean>=0?"+":"") + ls.mean.toFixed(1) + "%":"—");
+
+  if(!state.lastResult){
+    el("coachText").innerHTML = "Run a sim to generate coach output.";
+    return;
+  }
+  const cap = suggestedCap();
+  const winLow = Math.max(10, cap-55);
+  const txt = [];
+  txt.push("<b>Risk score ≈ "+rs+"/100.</b> Suggested routine cap: <b>"+cap+"%</b>.");
+  txt.push("• Routine window: aim for <b>"+winLow+"–"+cap+"%</b> on normal days.");
+  txt.push("• Travel day: top to 100% closer to departure.");
+  if(state.heat) txt.push("• Thermal discipline: Heat phases ON — avoid charging hot; cool first.");
+  if(state.out)  txt.push("• Shock control: Outliers ON — spikes are the enemy.");
+  if(state.p >= 0.6) txt.push("• Correlation read: strong memory — avoid clustering heat + high SoC + spikes.");
+  txt.push("• Latest sim footprint: Δ " + state.lastResult.delta.toFixed(1) + "% with fairness controls.");
+  el("coachText").innerHTML = txt.join("<br/>");
+}
+
+/* --------------- planner --------------- */
+function genPlan(){
+  const intent = parseInt(el("intentSel").value,10);
+  const heatR  = parseInt(el("heatRiskSel").value,10);
+  const cap = suggestedCap();
+
+  let plan = [];
+  plan.push("Plan:");
+  if(intent===0) plan.push("• Normal day: target "+(cap-55)+"–"+cap+"% window.");
+  if(intent===1) plan.push("• Long day: allow "+(cap-45)+"–"+Math.min(95,cap+5)+"% window.");
+  if(intent===2) plan.push("• Travel: charge to 100% nearer departure; minimize time at 100%.");
+
+  if(heatR===0) plan.push("• Ambient heat: normal. Standard cooling discipline.");
+  if(heatR===1) plan.push("• Ambient heat: warm. Remove thick case while charging.");
+  if(heatR===2) plan.push("• Ambient heat: hot. Prefer slow charge + airflow; avoid fast charge if possible.");
+
+  el("planOut").innerHTML = plan.join("<br/>");
+}
+
+/* --------------- real-world habits --------------- */
+function bindHabit(rangeId, numId){
+  const r = el(rangeId), n = el(numId);
+  const sync = ()=>{
+    n.value = r.value;
+    renderRealWorld();
+  };
+  r.addEventListener("input", sync);
+  n.addEventListener("input", ()=>{
+    r.value = n.value; renderRealWorld();
+  });
+}
+
+function saveHabits(){
+  const h = readHabitsFromUI();
+  localStorage.setItem(HABITS_KEY, JSON.stringify(h));
+  renderRealWorld();
+}
+function loadHabits(){
+  const h = JSON.parse(localStorage.getItem(HABITS_KEY) || "null");
+  if(!h) return;
+  writeHabitsToUI(h);
+  renderRealWorld();
+}
+function resetHabits(){
+  writeHabitsToUI({max:90,min:20,fast:2,hot:0,over:1});
+  renderRealWorld();
+}
+
+function readHabitsFromUI(){
+  return {
+    max: parseFloat(el("hMax").value),
+    min: parseFloat(el("hMin").value),
+    fast: parseFloat(el("hFast").value),
+    hot: parseFloat(el("hHot").value),
+    over: parseFloat(el("hOver").value)
+  };
+}
+function writeHabitsToUI(h){
+  el("hMax").value = el("hMaxNum").value = h.max;
+  el("hMin").value = el("hMinNum").value = h.min;
+  el("hFast").value= el("hFastNum").value= h.fast;
+  el("hHot").value = el("hHotNum").value = h.hot;
+  el("hOver").value= el("hOverNum").value= h.over;
+}
+
+function habitRiskScore(h){
+  let r=0;
+  r += Math.max(0, (h.max-85))*1.2;
+  r += Math.max(0, (20-h.min))*1.1;
+  r += h.fast*3.5;
+  r += h.hot*6.0;
+  r += h.over*3.0;
+  return Math.max(0, Math.min(100, Math.round(r)));
+}
+
+function renderRealWorld(){
+  const h = readHabitsFromUI();
+  const hr = habitRiskScore(h);
+  const sr = simRiskScore();
+  const combo = Math.round(0.55*hr + 0.45*sr);
+
+  el("habitRisk").textContent = hr + "/100";
+  el("simRisk").textContent   = sr + "/100";
+  el("comboRisk").textContent = combo + "/100";
+
+  const cap = suggestedCap();
+  el("rwWindow").textContent = Math.max(10,cap-65) + "–" + cap + "%";
+
+  const notes = [];
+  notes.push("Combined daily risk ≈ <b>"+combo+"/100</b>.");
+  if(sr>=80) notes.push("Sim settings currently in <b>high/chaos stress</b> — combined score likely inflated.");
+  notes.push("Suggested routine cap: <b>"+cap+"%</b>.");
+  notes.push("High daily max SoC: consider an 85–90% cap for normal days.");
+  notes.push("Fast-charge often: do it when cool; prefer slower top-ups when possible.");
+  notes.push("Overnight-to-100: reduce frequency or top-up closer to morning.");
+  if(state.lastResult){
+    notes.push("Latest sim footprint: Δ "+state.lastResult.delta.toFixed(1)+"% with fairness controls.");
+  }
+  el("rwText").innerHTML = notes.join("<br/>");
+}
+
+/* --------------- battery API (optional) --------------- */
+async function readDeviceBattery(){
+  if(!navigator.getBattery){
+    el("batteryReadPill").textContent = "Device read: not supported here";
+    return;
+  }
+  const b = await navigator.getBattery();
+  const pct = Math.round(b.level*100);
+  el("batteryReadPill").textContent = "Device reports ~"+pct+"% and " + (b.charging?"charging":"not charging") + ".";
+}
+
+/* --------------- sweeps --------------- */
+function runSweepPs(ps){
+  const saveBlind = state.blind;
+  state.blind = false; el("blindChk").checked = false;
+
+  const out = [];
+  const pts = [];
+  ps.forEach(pv=>{
+    state.p = pv; el("pRange").value=pv; el("pNum").value=pv;
+    state.hardNull = false; el("hardNullChk").checked=false;
+    const batch = simulateBatch();
+    const wm = mean(batch.white), qm = mean(batch.qds);
+    const delta = (qm-wm)/Math.max(1e-9, wm)*100;
+    const md = mean(batch.pairedD);
+    out.push("p="+pv.toFixed(2)+"  white μ="+wm.toFixed(1)+"  QDS μ="+qm.toFixed(1)+"  Δ="+delta.toFixed(1)+"%  meanΔ="+md.toFixed(2));
+    pts.push({x:pv, delta});
+  });
+
+  el("sweepBox").value = out.join("\n");
+  localStorage.setItem(SWEEP_KEY, el("sweepBox").value);
+  drawSweep(el("sweepCanvas"), pts, "p");
+
+  state.blind = saveBlind; el("blindChk").checked = saveBlind;
+  updateSanity();
+  buildExportBox();
+}
+
+function runSweepThrs(thrs){
+  const saveBlind = state.blind;
+  state.blind = false; el("blindChk").checked = false;
+
+  const out = [];
+  const pts = [];
+  thrs.forEach(tv=>{
+    state.thr = tv; el("thrRange").value=tv; el("thrNum").value=tv;
+    const batch = simulateBatch();
+    const wm = mean(batch.white), qm = mean(batch.qds);
+    const delta = (qm-wm)/Math.max(1e-9, wm)*100;
+    const md = mean(batch.pairedD);
+    out.push("thr="+tv+"%  white μ="+wm.toFixed(1)+"  QDS μ="+qm.toFixed(1)+"  Δ="+delta.toFixed(1)+"%  meanΔ="+md.toFixed(2));
+    pts.push({x:tv, delta});
+  });
+
+  el("sweepBox").value = out.join("\n");
+  localStorage.setItem(SWEEP_KEY, el("sweepBox").value);
+  drawSweep(el("sweepCanvas"), pts, "thr");
+
+  state.blind = saveBlind; el("blindChk").checked = saveBlind;
+  updateSanity();
+  buildExportBox();
+}
+
+/* --------------- noise toy --------------- */
+function genNoise(){
+  const len = Math.floor(parseFloat(el("noiseLen").value));
+  let p = parseFloat(el("noiseP").value);
+  const eps = genEpsSeries(len);
+  const white = eps.slice();
+  const qds = ar1Series(len, p, eps);
+  drawNoise(el("noiseCanvas"), white, qds);
+}
+
+/* --------------- export --------------- */
+function buildExportBox(){
+  const h = getHistory();
+  const s = localStorage.getItem(SWEEP_KEY) || "";
+  const head =
+    "QDS Stability Suite MAX v1 export\n" +
+    "Mode=" + state.mode + "\n" +
+    "Settings: base="+state.base+" amp="+state.amp+" p="+state.p+" thr="+state.thr+" n="+state.n+" max="+state.max+"\n" +
+    "Hammers: nonlin="+state.nonlin+" heat="+state.heat+" out="+state.out+"\n" +
+    "Bias: paired="+state.paired+" noRegen="+state.noRegen+" blind="+state.blind+" hardNull="+state.hardNull+"\n\n";
+  el("exportBox").value = head + "RUN HISTORY\n" + (h.join("\n")||"—") + "\n\nSWEEPS\n" + (s||"—");
+}
+
+function downloadLogs(){
+  buildExportBox();
+  const blob = new Blob([el("exportBox").value], {type:"text/plain"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "qds_stability_suite_max_logs.txt";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* --------------- copy helpers --------------- */
+async function copyText(txt){
+  try{
+    await navigator.clipboard.writeText(txt);
+  }catch(e){
+    // fallback
+    const ta = document.createElement("textarea");
+    ta.value = txt; document.body.appendChild(ta);
+    ta.select(); document.execCommand("copy");
+    document.body.removeChild(ta);
+  }
+}
+
+/* --------------- wire buttons --------------- */
+function wireUI(){
+  initTabs();
+
+  // mode selector
+  el("modeSelect").addEventListener("change", ()=>{
+    state.mode = el("modeSelect").value;
+    updateModeLabels();
+  });
+
+  bindRangeNum("baseRange","baseNum","base",0.1,10);
+  bindRangeNum("ampRange","ampNum","amp",0,20);
+  bindRangeNum("pRange","pNum","p",0,0.99);
+  bindRangeNum("nRange","nNum","n",50,20000);
+  bindRangeNum("maxRange","maxNum","max",50,50000);
+  bindRangeNum("thrRange","thrNum","thr",1,99);
+
+  bindCheck("nonlinChk","nonlin");
+  bindCheck("heatChk","heat");
+  bindCheck("outChk","out");
+  bindCheck("pathoChk","patho");
+  bindCheck("pairedChk","paired");
+  bindCheck("noRegenChk","noRegen");
+  bindCheck("blindChk","blind");
+  bindCheck("hardNullChk","hardNull");
+
+  el("presetPhone").onclick = ()=>setPreset({
+    mode:"battery",
+    base:1.2, amp:1.8, p:0.25, thr:50, n:1200, max:4000,
+    nonlin:true, heat:true, out:true,
+    paired:true, noRegen:true, blind:false, hardNull:false, patho:false
+  });
+
+  el("presetClean").onclick = ()=>setPreset({
+    mode:"battery",
+    base:1.2, amp:1.2, p:0.0, thr:50, n:1200, max:4000,
+    nonlin:false, heat:false, out:false,
+    paired:true, noRegen:true, blind:false, hardNull:false, patho:false
+  });
+
+  el("presetStress").onclick = ()=>setPreset({
+    mode:"battery",
+    base:3.0, amp:5.0, p:0.60, thr:50, n:2000, max:5000,
+    nonlin:true, heat:true, out:true,
+    paired:true, noRegen:true, blind:false, hardNull:false, patho:false
+  });
+
+  el("presetChaos").onclick = ()=>applyPathological();
+
+  el("presetFusionBase").onclick = ()=>setPreset({
+    mode:"fusion",
+    base:2.5, amp:4.0, p:0.45, thr:60, n:1800, max:5000,
+    nonlin:true, heat:true, out:true,
+    paired:true, noRegen:true, blind:false, hardNull:false, patho:false
+  });
+
+  el("presetFusionEdge").onclick = ()=>setPreset({
+    mode:"fusion",
+    base:5.0, amp:8.0, p:0.80, thr:85, n:2500, max:4000,
+    nonlin:true, heat:true, out:true,
+    paired:true, noRegen:true, blind:false, hardNull:false, patho:false
+  });
+
+  el("runBtn").onclick = runSim;
+  el("posterBtn").onclick = posterMode;
+
+  el("resetBtn").onclick = ()=>{
+    setPreset({
+      mode:"battery",
+      base:1.2, amp:1.8, p:0.25, thr:50, n:1200, max:4000,
+      nonlin:true, heat:true, out:true,
+      paired:true, noRegen:true, blind:false, hardNull:false, patho:false
+    });
+  };
+
+  el("clearHistoryBtn").onclick = ()=>{
+    setHistory([]);
+    renderHistory();
+    buildExportBox();
+  };
+  el("copyHistoryBtn").onclick = ()=>{
+    copyText(el("historyBox").value || "");
+  };
+
+  // sweeps
+  el("pQuickBtn").onclick = ()=>runSweepPs([0,0.3,0.6,0.9]);
+  el("pDenseBtn").onclick = ()=>{
+    const ps=[]; for(let p=0;p<=0.9+1e-9;p+=0.1) ps.push(+p.toFixed(2));
+    runSweepPs(ps);
+  };
+  el("tQuickBtn").onclick = ()=>runSweepThrs([30,50,75]);
+  el("tDenseBtn").onclick = ()=>runSweepThrs([20,30,50,75,80]);
+
+  // noise bindings
+  el("noiseLen").value = 200; el("noiseLenNum").value=200;
+  el("noiseP").value = state.p; el("noisePNum").value=state.p;
+  el("noiseLen").oninput = ()=>{ el("noiseLenNum").value=el("noiseLen").value; };
+  el("noiseLenNum").oninput = ()=>{ el("noiseLen").value=el("noiseLenNum").value; };
+  el("noiseP").oninput = ()=>{ el("noisePNum").value=el("noiseP").value; };
+  el("noisePNum").oninput = ()=>{ el("noiseP").value=el("noisePNum").value; };
+  el("noiseGenBtn").onclick = genNoise;
+
+  // planner
+  el("planBtn").onclick = genPlan;
+
+  // habits
+  bindHabit("hMax","hMaxNum");
+  bindHabit("hMin","hMinNum");
+  bindHabit("hFast","hFastNum");
+  bindHabit("hHot","hHotNum");
+  bindHabit("hOver","hOverNum");
+
+  el("saveHabitsBtn").onclick = saveHabits;
+  el("loadHabitsBtn").onclick = loadHabits;
+  el("resetHabitsBtn").onclick = resetHabits;
+
+  // battery read
+  el("readBatteryBtn").onclick = readDeviceBattery;
+
+  // export
+  el("copyAllBtn").onclick = ()=>{
+    buildExportBox(); copyText(el("exportBox").value);
+  };
+  el("downloadTxtBtn").onclick = downloadLogs;
+  el("downloadTxtBtn").classList.remove("hidden");
+  el("downloadTxtBtn").textContent = "Download logs .txt";
+
+  el("copyAllBtn").classList.remove("hidden");
+
+  // legacy ids used here
+  el("copyAllBtn").id = "copyAllBtn"; // no-op safety
+}
+
+/* --------------- boot --------------- */
+function boot(){
+  initTabs();
+
+  // default preset
+  setPreset({
+    mode:"battery",
+    base:1.2, amp:1.8, p:0.25, thr:50, n:1200, max:4000,
+    nonlin:true, heat:true, out:true,
+    paired:true, noRegen:true, blind:false, hardNull:false, patho:false
+  });
+
+  // attach tab clicks
+  // (rebuild tabs to ensure correct bindings)
+  el("tabs").innerHTML="";
+  initTabs();
+
+  wireUI();
+
+  // habits default
+  resetHabits();
+  loadHabits();
+
+  // history
+  renderHistory();
+
+  // sweep restore
+  const s = localStorage.getItem(SWEEP_KEY);
+  if(s) el("sweepBox").value = s;
+
+  updateModeLabels();
+  updateSanity();
+  buildExportBox();
+}
+
+boot();
+</script>
+</body>
+</html>

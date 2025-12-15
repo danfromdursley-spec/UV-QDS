@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Battery Habitat Skin v2+ · QDS Battery Lab</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #050814;
+      --bg-alt: #0c101f;
+      --bg-card: #080d1b;
+      --bg-chip: #091325;
+      --border-soft: #1c2640;
+      --text-main: #e6f1ff;
+      --text-soft: #9aa7c7;
+      --accent-blue: #32d0ff;
+      --accent-green: #36f7b0;
+      --accent-magenta: #ff4fa3;
+      --accent-amber: #ffc868;
+      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.7);
+      --radius-lg: 18px;
+      --radius-pill: 999px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #101632 0, var(--bg) 55%);
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+      padding: 16px 16px 80px;
+    }
+
+    .page {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .hero {
+      background: radial-gradient(circle at top left, #192b4f 0, #050814 55%);
+      border-radius: 28px;
+      padding: 22px 18px 24px;
+      border: 1px solid rgba(95, 195, 255, 0.25);
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      opacity: 0.35;
+      background:
+        radial-gradient(circle at 0 0, rgba(50, 208, 255, 0.16) 0, transparent 55%),
+        radial-gradient(circle at 100% 0, rgba(54, 247, 176, 0.14) 0, transparent 55%),
+        radial-gradient(circle at 50% 110%, rgba(255, 79, 163, 0.10) 0, transparent 70%);
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent-green);
+      background: rgba(18, 36, 54, 0.9);
+      border-radius: var(--radius-pill);
+      padding: 4px 10px 4px 6px;
+      border: 1px solid rgba(50, 208, 255, 0.25);
+    }
+
+    .eyebrow-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: radial-gradient(circle, #4cffb4 0, #008f5a 70%);
+      box-shadow: 0 0 12px rgba(54, 247, 176, 0.9);
+    }
+
+    h1 {
+      margin-top: 10px;
+      font-size: 26px;
+      line-height: 1.25;
+    }
+
+    h1 span.accent {
+      color: var(--accent-blue);
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      font-size: 14px;
+      color: var(--text-soft);
+      max-width: 640px;
+    }
+
+    .meta-row {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(72, 205, 255, 0.4);
+      background: linear-gradient(135deg, #081224, #050814);
+      color: var(--accent-blue);
+      white-space: nowrap;
+    }
+
+    .pill.green {
+      border-color: rgba(54, 247, 176, 0.45);
+      color: var(--accent-green);
+    }
+
+    .pill.magenta {
+      border-color: rgba(255, 79, 163, 0.5);
+      color: var(--accent-magenta);
+    }
+
+    .pill span.dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: currentColor;
+    }
+
+    .note {
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--text-soft);
+      opacity: 0.8;
+    }
+
+    main {
+      margin-top: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 780px) {
+      .grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .hero {
+        border-radius: 22px;
+      }
+    }
+
+    .card {
+      background: radial-gradient(circle at top, #151d34 0, #070b16 60%);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-soft);
+      padding: 16px 14px 14px;
+      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.75);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent-blue);
+    }
+
+    .card-tag {
+      font-size: 11px;
+      color: var(--text-soft);
+      opacity: 0.85;
+    }
+
+    h2 {
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    p {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text-soft);
+      margin-bottom: 8px;
+    }
+
+    ul {
+      list-style: none;
+      margin: 4px 0 2px;
+    }
+
+    ul li {
+      position: relative;
+      padding-left: 16px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text-soft);
+    }
+
+    ul li::before {
+      content: "•";
+      position: absolute;
+      left: 4px;
+      color: var(--accent-blue);
+      font-size: 12px;
+      top: 0;
+    }
+
+    .stack-legend {
+      margin-top: 10px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-soft);
+    }
+
+    .stack-diagram {
+      margin-top: 10px;
+      background: radial-gradient(circle at 50% 0, #1b2442 0, #050814 60%);
+      border-radius: 18px;
+      padding: 10px 10px 12px;
+      border: 1px solid rgba(72, 109, 189, 0.85);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stack-layer {
+      position: relative;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 11px;
+      margin-bottom: 7px;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #020407;
+      font-weight: 600;
+    }
+
+    .stack-layer.top {
+      background: linear-gradient(90deg, #4dffb5, #ffe382, #ff58b0);
+      box-shadow: 0 0 18px rgba(255, 88, 176, 0.6);
+    }
+
+    .stack-layer.mid {
+      background: linear-gradient(90deg, #7db7ff, #a395ff);
+      box-shadow: 0 0 14px rgba(125, 183, 255, 0.7);
+    }
+
+    .stack-layer.base {
+      background: linear-gradient(90deg, #151c34, #0b162f);
+      color: var(--accent-blue);
+      box-shadow: inset 0 0 0 1px rgba(85, 140, 255, 0.8);
+    }
+
+    .stack-caption {
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--text-soft);
+      text-align: center;
+    }
+
+    .stress-scale {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      font-size: 11px;
+    }
+
+    .stress-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #050814;
+      border: 1px solid rgba(140, 175, 255, 0.5);
+      color: var(--text-soft);
+    }
+
+    .stress-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--accent-green);
+      box-shadow: 0 0 8px rgba(54, 247, 176, 0.9);
+    }
+
+    .stress-dot.elevated {
+      background: var(--accent-amber);
+      box-shadow: 0 0 8px rgba(255, 200, 104, 0.9);
+    }
+
+    .stress-dot.over {
+      background: var(--accent-magenta);
+      box-shadow: 0 0 9px rgba(255, 79, 163, 0.95);
+    }
+
+    .chips-row {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .chip {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      background: var(--bg-chip);
+      border: 1px solid rgba(59, 102, 170, 0.7);
+      color: var(--accent-blue);
+      white-space: nowrap;
+    }
+
+    .chip.alt {
+      color: var(--accent-green);
+      border-color: rgba(54, 247, 176, 0.7);
+    }
+
+    .chip.soft {
+      color: var(--text-soft);
+      border-color: rgba(104, 125, 170, 0.7);
+    }
+
+    .equation-pill {
+      margin-top: 10px;
+      padding: 6px 10px;
+      border-radius: 12px;
+      background: #050814;
+      border: 1px solid rgba(71, 163, 255, 0.8);
+      font-size: 12px;
+      font-family: "SF Mono", ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      color: var(--accent-blue);
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .equation-pill span.label {
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 9px;
+      color: var(--text-soft);
+      margin-right: 10px;
+    }
+
+    .callout {
+      margin-top: 8px;
+      border-radius: 14px;
+      padding: 7px 10px;
+      background: linear-gradient(90deg, rgba(54, 247, 176, 0.08), rgba(50, 208, 255, 0.02));
+      border: 1px dashed rgba(54, 247, 176, 0.6);
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    .section-title {
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent-blue);
+      margin-bottom: 6px;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      font-size: 11px;
+      color: var(--text-soft);
+      text-align: center;
+      opacity: 0.75;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        QDS Battery Lab · Concept Design
+      </div>
+
+      <h1>Battery Habitat <span class="accent">Skin v2+</span></h1>
+
+      <p class="subtitle">
+        Transformable nano-skin for cells — mechanocromic stress map +
+        THIN-style sensing + QDS Habitat geometry. Designed as an ECG-for-cells:
+        it <strong>shows stress visually</strong>, <strong>senses local behaviour</strong>,
+        and <strong>shapes current &amp; heat flow</strong> to match the QDS kernel.
+      </p>
+
+      <div class="meta-row">
+        <span>Design note · v2.0+ · D. Williams · QDS / UV_QDS/www</span>
+        <span class="note">Concept only · chemistry &amp; stack thickness TBD</span>
+      </div>
+
+      <div class="meta-row" style="margin-top:10px;">
+        <span class="pill green"><span class="dot"></span>QDS Battery Lab</span>
+        <span class="pill"><span class="dot"></span>Nano-Skin · Mechanocromic</span>
+        <span class="pill magenta"><span class="dot"></span>Sensing · Habitat</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- LAYER STACK + DIAGRAM -->
+    <section class="grid">
+      <article class="card">
+        <div class="card-header">
+          <div class="card-title">Concept · Three-Layer Battery Skin</div>
+          <div class="card-tag">Layer stack</div>
+        </div>
+        <h2>1 ▸ Layer Stack</h2>
+        <p>
+          The Battery Habitat Skin v2+ wraps a cell or module in a thin,
+          intelligent “nano-skin” formed of three functional layers. Together,
+          they expose history-aware colour patterns, high-bandwidth ionic-electronic
+          sensing and a structural interface tuned to QDS Habitat geometries
+          (honeycomb, Severn-flow, QDS-Glass-Carbon).
+        </p>
+
+        <div class="stack-legend">Cross-section · Cell + Habitat Skin v2+</div>
+
+        <div class="stack-diagram">
+          <div class="stack-layer top">
+            Mechanocromic Stress Film · Colour Memory
+          </div>
+          <div class="stack-layer mid">
+            THIN-Style Ionic-Electronic Nano-Skin
+          </div>
+          <div class="stack-layer base">
+            QDS Habitat Interface · Honeycomb / Severn-Flow
+          </div>
+          <p class="stack-caption">
+            Outer surface → top · inner surface → bottom. Diagram conceptual –
+            chemistry &amp; thickness scaled for clarity.
+          </p>
+
+          <div class="stress-scale">
+            <div class="stress-chip">
+              <span class="stress-dot"></span> Nominal
+            </div>
+            <div class="stress-chip">
+              <span class="stress-dot elevated"></span> Elevated
+            </div>
+            <div class="stress-chip">
+              <span class="stress-dot over"></span> Over-stressed
+            </div>
+          </div>
+        </div>
+
+        <p style="margin-top:12px;">
+          Top layer encodes <strong>strain / pressure history</strong> as colour:
+          green → nominal, amber → elevated, magenta → over-stressed.
+          Middle layer converts local potential, impedance and micro-strain
+          into readable signals. Base layer manages <strong>heat, vibration and
+          current distribution</strong> while matching QDS Habitat geometries.
+        </p>
+
+        <div class="chips-row">
+          <span class="chip alt">ECG-for-cells</span>
+          <span class="chip">Abuse history indicator</span>
+          <span class="chip soft">Lifetime diagnostics</span>
+          <span class="chip soft">Habitat integration</span>
+        </div>
+
+        <div class="callout" style="margin-top:10px;">
+          <strong>Mode · Pack-as-patient.</strong>
+          Cells are treated as monitored “patients”: continuous stress history,
+          live ECG-style traces, and correlation-shaped cooling / current paths.
+        </div>
+      </article>
+
+      <!-- SIGNALS + KERNEL CARD -->
+      <article class="card">
+        <div class="card-header">
+          <div class="card-title">Signals &amp; Outputs</div>
+          <div class="card-tag">ECG for cells · Kernel-matched</div>
+        </div>
+
+        <h2>2 ▸ Signals &amp; Outputs</h2>
+        <p>
+          The skin exposes both <strong>analogue signals</strong>
+          (sense lines, OECT-style channels, local impedance) and
+          <strong>digital observables</strong> (colour pattern via camera).
+          Fusing these gives a 2D “health map” for each pack, ready to drop
+          straight into the QDS labs.
+        </p>
+
+        <ul>
+          <li>Sense lines from nano-skin to BMS / logger.</li>
+          <li>Optional fixed camera watching mechanocromic pattern.</li>
+          <li>Feeds real-time 2D stress map into QDS Battery Lab dashboards.</li>
+        </ul>
+
+        <div class="section-title" style="margin-top:10px;">QDS Kernel Role</div>
+        <p>
+          Skin parameters (colour thresholds, sensitivity, layout) are tuned so
+          observed stress &amp; signal correlations match the QDS kernel:
+        </p>
+
+        <div class="equation-pill">
+          <span class="label">Kernel</span>
+          K(t,r) = σ² exp(−|t| / τ_c) · exp(−|r|² / 2λ_c²)
+        </div>
+
+        <p style="margin-top:8px;">
+          This allows <strong>τ_c</strong>, <strong>λ_c</strong> and lifetime models
+          to be refined from real packs instead of theory alone, closing the loop
+          between substrate physics and engineering practice.
+        </p>
+
+        <div class="section-title" style="margin-top:12px;">Integration Hooks</div>
+        <ul>
+          <li>Streams directly into <strong>QDS Battery Lab</strong> (stress &amp; life).</li>
+          <li>Side-feeds to <strong>Variance / Rotation / Micro Labs</strong> for cross-checks.</li>
+          <li>Data-ready for machine-learning or physics-informed QDS models.</li>
+        </ul>
+
+        <div class="callout" style="margin-top:10px;">
+          <strong>Goal:</strong> packs that can report how they feel, show where
+          they hurt and teach the model how to age them more gently.
+        </div>
+      </article>
+    </section>
+
+    <!-- HABITAT + ENGINEERING SECTION -->
+    <section class="grid">
+      <article class="card">
+        <div class="card-header">
+          <div class="card-title">Integration · Habitat</div>
+          <div class="card-tag">Geometry &amp; assembly</div>
+        </div>
+
+        <h2>3 ▸ Habitat Interface</h2>
+        <p>
+          The skin is designed to laminate onto QDS Habitat geometries
+          (honeycomb, Severn-flow, QDS-Glass-Carbon) without blocking cooling,
+          access or serviceability.
+        </p>
+
+        <ul>
+          <li>Assembly in dry state; activation via controlled wetting / gel.</li>
+          <li>Compatible with cell-to-cell bridges and carbon-glass carrier frames.</li>
+          <li>Stress-skin tuned to work with 3D-printed “nano-Severn” pore layouts.</li>
+        </ul>
+
+        <div class="chips-row" style="margin-top:10px;">
+          <span class="chip alt">Honeycomb &amp; Severn-flow</span>
+          <span class="chip">QDS-Glass-Carbon</span>
+          <span class="chip soft">CNC / 3D-print friendly</span>
+        </div>
+
+        <div class="callout" style="margin-top:12px;">
+          <strong>Engineering note:</strong> geometry is chosen so mechanical
+          stiffness, heat paths and ionic routes all follow the same correlation
+          shapes – fewer hot-spots, fewer surprise failures.
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <div class="card-title">Deployment · Engines</div>
+          <div class="card-tag">From lab sketch to rig</div>
+        </div>
+
+        <h2>4 ▸ Implementation Path</h2>
+        <p>
+          This v2+ design is “VMAX-ready”: it pulls together the useful engines
+          you’ve already built into one clean concept sheet.
+        </p>
+
+        <ul>
+          <li><strong>Battery Habitat Lab</strong> → visual + numeric stress views.</li>
+          <li><strong>Auto-Bench &amp; Stability Suite</strong> → controlled load profiles.</li>
+          <li><strong>QDS Kernel Fits</strong> → τ_c, λ_c from real stress maps.</li>
+        </ul>
+
+        <p style="margin-top:6px;">
+          First prototypes can focus on <strong>partial stack demos</strong>:
+          even a simple mechano-colour film bonded to a dummy pack gives
+          immediate value for training, outreach and Growth Hub discussions.
+        </p>
+
+        <div class="callout" style="margin-top:10px;">
+          <strong>Talking point:</strong> “In four days we generated 180+ linked
+          HTML tools. This page is the skin that ties the QDS Battery Habitat
+          story together in one glance.”
+        </div>
+      </article>
+    </section>
+
+    <p class="footer-note">
+      QDS Battery Habitat Skin v2+ · Concept only · All parameters provisional ·
+      Designed for local lab build-out around Dursley / Berkeley / Cam.
+    </p>
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,881 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>QDS RotMod Extreme Lab</title>
+<style>
+  :root{
+    --bg:#070A12; --panel:#0B1224; --panel2:#0A1020;
+    --txt:#EAF2FF; --mut:#9FB3D9;
+    --a:#00E5FF; --b:#00FF85; --c:#FF3D81; --d:#FFC857;
+    --line:rgba(160,190,255,.18); --shadow:0 14px 40px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    color:var(--txt); background: radial-gradient(1200px 800px at 10% 0%, rgba(0,229,255,.15), transparent 60%),
+                                 radial-gradient(900px 700px at 95% 10%, rgba(0,255,133,.12), transparent 55%),
+                                 radial-gradient(1200px 900px at 50% 100%, rgba(255,61,129,.10), transparent 60%),
+                                 var(--bg);
+    min-height:100vh;
+  }
+  header{
+    padding:18px 16px 10px;
+    position:sticky; top:0; backdrop-filter: blur(10px);
+    background: linear-gradient(to bottom, rgba(7,10,18,.86), rgba(7,10,18,.55));
+    border-bottom:1px solid var(--line);
+    z-index:10;
+  }
+  .wrap{max-width:1200px;margin:0 auto}
+  h1{margin:0; font-size:18px; letter-spacing:.4px}
+  .sub{margin-top:6px; color:var(--mut); font-size:12px; line-height:1.35}
+  .grid{
+    display:grid; gap:12px; padding:12px 16px 24px;
+    grid-template-columns: 1.05fr .95fr;
+  }
+  @media (max-width: 980px){ .grid{grid-template-columns: 1fr} }
+  .card{
+    background: linear-gradient(180deg, rgba(11,18,36,.92), rgba(10,16,32,.78));
+    border:1px solid var(--line); border-radius:16px;
+    box-shadow: var(--shadow);
+    overflow:hidden;
+  }
+  .card .hd{
+    padding:12px 12px 10px;
+    border-bottom:1px solid var(--line);
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+  }
+  .card .hd .t{font-size:13px; letter-spacing:.35px; color:var(--txt)}
+  .card .bd{padding:12px}
+  .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+  .btn{
+    cursor:pointer; user-select:none;
+    padding:10px 12px; border-radius:12px;
+    background: linear-gradient(180deg, rgba(0,229,255,.14), rgba(0,229,255,.06));
+    border:1px solid rgba(0,229,255,.28);
+    color:var(--txt); font-weight:700; font-size:12px;
+  }
+  .btn:hover{filter:brightness(1.08)}
+  .btn.alt{
+    background: linear-gradient(180deg, rgba(0,255,133,.14), rgba(0,255,133,.06));
+    border:1px solid rgba(0,255,133,.28);
+  }
+  .btn.warn{
+    background: linear-gradient(180deg, rgba(255,200,87,.16), rgba(255,200,87,.06));
+    border:1px solid rgba(255,200,87,.30);
+  }
+  input[type="file"]{display:none}
+  .pill{
+    padding:6px 10px; border-radius:999px;
+    border:1px solid var(--line);
+    color:var(--mut); font-size:11px;
+    background: rgba(255,255,255,.03);
+  }
+  .kpis{
+    display:grid; gap:10px;
+    grid-template-columns: repeat(4, minmax(0,1fr));
+  }
+  @media (max-width: 980px){ .kpis{grid-template-columns: repeat(2, minmax(0,1fr));} }
+  .kpi{
+    border:1px solid var(--line); border-radius:14px;
+    padding:10px; background: rgba(255,255,255,.02);
+  }
+  .kpi .l{color:var(--mut); font-size:11px}
+  .kpi .v{font-size:18px; font-weight:900; margin-top:4px}
+  .kpi .s{color:var(--mut); font-size:11px; margin-top:4px}
+  .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
+  canvas{width:100%; height:260px; border-radius:14px; border:1px solid var(--line); background: rgba(255,255,255,.02)}
+  .smallcanvas{height:220px}
+  .split{
+    display:grid; gap:10px; grid-template-columns: 1fr 1fr;
+  }
+  @media (max-width: 980px){ .split{grid-template-columns:1fr} }
+  .controls{
+    display:grid; gap:10px; grid-template-columns: 1fr 1fr 1fr;
+  }
+  @media (max-width: 980px){ .controls{grid-template-columns:1fr} }
+  .field{
+    border:1px solid var(--line); border-radius:14px; padding:10px;
+    background: rgba(255,255,255,.02);
+  }
+  .field label{display:block; color:var(--mut); font-size:11px; margin-bottom:6px}
+  .field input, .field select{
+    width:100%; padding:10px 10px; border-radius:12px;
+    border:1px solid rgba(160,190,255,.20);
+    background: rgba(0,0,0,.25); color: var(--txt);
+    outline:none;
+  }
+  table{
+    width:100%; border-collapse: collapse; overflow:hidden;
+    border:1px solid var(--line); border-radius:14px;
+  }
+  th, td{
+    padding:8px 10px; border-bottom:1px solid rgba(160,190,255,.12);
+    font-size:12px;
+  }
+  th{color:var(--mut); text-align:left; background: rgba(255,255,255,.03)}
+  tr:hover td{background: rgba(0,229,255,.05)}
+  .note{color:var(--mut); font-size:12px; line-height:1.35}
+  .ok{color:var(--b)} .bad{color:var(--c)} .mid{color:var(--d)}
+  .hr{height:1px; background: var(--line); margin:12px 0}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>QDS RotMod Extreme Lab <span class="pill mono">offline · no deps · χ²-first</span></h1>
+    <div class="sub">
+      Load <span class="mono">SUMMARY_qds_fit.csv</span> and optionally galaxy <span class="mono">*_QDS_bestfit.csv</span> files.
+      This page avoids the reduced-χ² DOF artifact by using χ² and “χ²/n” for visual comparison.
+    </div>
+  </div>
+</header>
+
+<div class="wrap grid">
+
+  <!-- LEFT: Loader + KPIs + Plots -->
+  <section class="card">
+    <div class="hd">
+      <div class="t">Data Loader + Core Metrics</div>
+      <div class="row">
+        <label class="btn" for="fileSummary">Load SUMMARY CSV</label>
+        <input id="fileSummary" type="file" accept=".csv"/>
+        <label class="btn alt" for="fileBestfits">Add bestfit CSV(s)</label>
+        <input id="fileBestfits" type="file" accept=".csv" multiple/>
+        <button class="btn warn" id="btnExport">Export Augmented CSV</button>
+      </div>
+    </div>
+
+    <div class="bd">
+      <div class="row" id="statusRow">
+        <span class="pill mono" id="status">No SUMMARY loaded yet.</span>
+      </div>
+
+      <div class="kpis" style="margin-top:10px">
+        <div class="kpi"><div class="l">Rows</div><div class="v" id="kRows">—</div><div class="s mono" id="kCols">—</div></div>
+        <div class="kpi"><div class="l">QDS Wins (AICc)</div><div class="v" id="kWins">—</div><div class="s" id="kWinFrac">—</div></div>
+        <div class="kpi"><div class="l">Mean χ²-improvement</div><div class="v" id="kMeanImp">—</div><div class="s" id="kMedImp">—</div></div>
+        <div class="kpi"><div class="l">Boundary Hits</div><div class="v" id="kBound">—</div><div class="s" id="kBoundNote">—</div></div>
+      </div>
+
+      <div class="split" style="margin-top:12px">
+        <div>
+          <div class="note"><b>Histogram:</b> χ²-based improvement (negatives clipped to 0 for “effective gain”).</div>
+          <canvas id="cvHist" class="smallcanvas"></canvas>
+        </div>
+        <div>
+          <div class="note"><b>Scatter:</b> bary χ²/n vs QDS χ²/n (same denominator so v0=0 doesn’t fake-worsen).</div>
+          <canvas id="cvScatter" class="smallcanvas"></canvas>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="note">
+        <b>Stress checks:</b>
+        <span class="mono">v0=0</span> should yield <span class="mono">χ²_qds≈χ²_bary</span>.
+        If you see big deltas there, it’s either a bug, file mismatch, or model not truly reducing to bary.
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <span class="pill mono" id="checkV0">v0=0 check: —</span>
+        <span class="pill mono" id="checkLam">λ boundary check: —</span>
+        <span class="pill mono" id="checkOutliers">outliers: —</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- RIGHT: Filters + Table + Bestfit viewer -->
+  <section class="card">
+    <div class="hd">
+      <div class="t">Filter + Ranked Table + Curve Viewer</div>
+      <div class="row">
+        <span class="pill mono" id="bestfitCount">bestfits: 0</span>
+      </div>
+    </div>
+
+    <div class="bd">
+      <div class="controls">
+        <div class="field">
+          <label>Search galaxy</label>
+          <input id="qSearch" placeholder="e.g. NGC4013, UGC02885"/>
+        </div>
+        <div class="field">
+          <label>Sort by</label>
+          <select id="qSort">
+            <option value="imp_desc">χ²-improve (desc)</option>
+            <option value="imp_asc">χ²-improve (asc)</option>
+            <option value="aicc_best">AICc delta (best QDS first)</option>
+            <option value="rb_desc">bary χ²/n (desc)</option>
+            <option value="rb_asc">bary χ²/n (asc)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Show</label>
+          <select id="qShow">
+            <option value="all">All rows</option>
+            <option value="wins">AICc wins only</option>
+            <option value="losses">AICc losses only</option>
+            <option value="bound">Boundary hits only</option>
+            <option value="v0zero">v0=0 only</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top:10px; max-height: 320px; overflow:auto; border-radius:14px">
+        <table>
+          <thead>
+            <tr>
+              <th>galaxy</th>
+              <th>n</th>
+              <th>bary χ²/n</th>
+              <th>qds χ²/n</th>
+              <th>imp%</th>
+              <th>AICc Δ</th>
+              <th>v0</th>
+              <th>λ</th>
+              <th>flags</th>
+            </tr>
+          </thead>
+          <tbody id="tbl"></tbody>
+        </table>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="row" style="align-items:flex-end">
+        <div class="field" style="flex:1; min-width:220px">
+          <label>Curve viewer (needs *_QDS_bestfit.csv loaded)</label>
+          <select id="selCurve">
+            <option value="">— select galaxy bestfit —</option>
+          </select>
+        </div>
+        <button class="btn alt" id="btnAutoPick">Auto-pick top winner</button>
+      </div>
+      <div class="note" style="margin-top:8px">
+        Curve plot expects columns like <span class="mono">r</span>, <span class="mono">v_obs</span>/<span class="mono">v</span>,
+        and one or more model columns (e.g. <span class="mono">v_bary</span>, <span class="mono">v_qds</span>, <span class="mono">v_model</span>).
+        If your headers differ, it will try best-effort mapping.
+      </div>
+      <canvas id="cvCurve"></canvas>
+      <div class="row" style="margin-top:8px">
+        <span class="pill mono" id="curveInfo">curve: —</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(() => {
+  // ---------- Helpers ----------
+  const $ = (id) => document.getElementById(id);
+  const clamp = (x,a,b)=>Math.max(a,Math.min(b,x));
+  const fmt = (x, d=3) => (Number.isFinite(x)? x.toFixed(d) : "—");
+  const pct = (x, d=1) => (Number.isFinite(x)? x.toFixed(d)+"%" : "—");
+  const median = (arr) => {
+    const a = arr.slice().sort((x,y)=>x-y);
+    const n = a.length; if(!n) return NaN;
+    return (n%2? a[(n-1)/2] : 0.5*(a[n/2-1]+a[n/2]));
+  };
+  const mean = (arr) => arr.length? arr.reduce((s,x)=>s+x,0)/arr.length : NaN;
+  const quantile = (arr,q) => {
+    const a = arr.slice().sort((x,y)=>x-y);
+    if(!a.length) return NaN;
+    const pos = (a.length-1)*q;
+    const lo = Math.floor(pos), hi = Math.ceil(pos);
+    if(lo===hi) return a[lo];
+    return a[lo]*(hi-pos)+a[hi]*(pos-lo);
+  };
+  const parseCSV = (text) => {
+    // Simple CSV parser (handles quotes)
+    const rows = [];
+    let i=0, field="", row=[], inQ=false;
+    while(i<text.length){
+      const c = text[i];
+      if(inQ){
+        if(c === '"'){
+          if(text[i+1] === '"'){ field += '"'; i++; }
+          else inQ=false;
+        } else field += c;
+      } else {
+        if(c === '"') inQ=true;
+        else if(c === ','){ row.push(field); field=""; }
+        else if(c === '\n'){ row.push(field); rows.push(row); row=[]; field=""; }
+        else if(c === '\r'){ /* skip */ }
+        else field += c;
+      }
+      i++;
+    }
+    if(field.length || row.length){ row.push(field); rows.push(row); }
+    return rows;
+  };
+
+  function mapSummaryHeader(header){
+    // Accept either named headers or fallback positions:
+    // expected: galaxy,n,chi2_bary,redchi2_bary,chi2_qds,redchi2_qds,improve_pct,v0,lam
+    const H = header.map(h => (h||"").trim().toLowerCase());
+    const idx = (names) => {
+      for(const name of names){
+        const j = H.indexOf(name);
+        if(j>=0) return j;
+      }
+      return -1;
+    };
+
+    const m = {
+      galaxy: idx(["galaxy","name","id"]),
+      n: idx(["n","npts","points","num_points"]),
+      chi2_b: idx(["chi2_bary","chi2_b","chi2_baryon","chi2_baryonic","chi2_baryons","bary_chi2"]),
+      red_b: idx(["redchi2_bary","redchi2_b","red_bary","bary_redchi2"]),
+      chi2_q: idx(["chi2_qds","chi2_q","qds_chi2","chi2_model"]),
+      red_q: idx(["redchi2_qds","redchi2_q","qds_redchi2","red_model"]),
+      imp: idx(["improve_pct","improve","improve_percent","pct_improve"]),
+      v0: idx(["v0","v_0","v0_kms"]),
+      lam: idx(["lam","lambda","lambda_c","l","scale"])
+    };
+
+    // Fallback by position if missing
+    const fallback = ["galaxy","n","chi2_b","red_b","chi2_q","red_q","imp","v0","lam"];
+    fallback.forEach((k, pos) => { if(m[k] < 0) m[k] = pos; });
+    return m;
+  }
+
+  function aicc(chi2, n, k){
+    const base = chi2 + 2*k;
+    if(n > (k+1)) return base + (2*k*(k+1))/(n-k-1);
+    return base; // fallback if too small n
+  }
+
+  // ---------- State ----------
+  let summaryRaw = null;
+  let summary = [];       // normalized objects
+  let bestfits = new Map(); // galaxy -> {header, rows, colsMap}
+  let headerInfo = {cols:[], map:null};
+
+  // ---------- UI elements ----------
+  const status = $("status");
+  const kRows = $("kRows");
+  const kCols = $("kCols");
+  const kWins = $("kWins");
+  const kWinFrac = $("kWinFrac");
+  const kMeanImp = $("kMeanImp");
+  const kMedImp = $("kMedImp");
+  const kBound = $("kBound");
+  const kBoundNote = $("kBoundNote");
+  const checkV0 = $("checkV0");
+  const checkLam = $("checkLam");
+  const checkOutliers = $("checkOutliers");
+  const tbl = $("tbl");
+  const qSearch = $("qSearch");
+  const qSort = $("qSort");
+  const qShow = $("qShow");
+  const selCurve = $("selCurve");
+  const curveInfo = $("curveInfo");
+  const bestfitCount = $("bestfitCount");
+  const btnExport = $("btnExport");
+  const btnAutoPick = $("btnAutoPick");
+
+  // ---------- Plotters ----------
+  function clearCanvas(cv){
+    const ctx = cv.getContext("2d");
+    const dpr = window.devicePixelRatio || 1;
+    const w = cv.clientWidth, h = cv.clientHeight;
+    cv.width = Math.floor(w*dpr); cv.height = Math.floor(h*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,h);
+    return {ctx,w,h};
+  }
+
+  function drawAxes(ctx,w,h, pad=34){
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = "rgba(160,190,255,.22)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad, pad);
+    ctx.lineTo(pad, h-pad);
+    ctx.lineTo(w-pad, h-pad);
+    ctx.stroke();
+    return {pad};
+  }
+
+  function drawHist(cv, values){
+    const {ctx,w,h} = clearCanvas(cv);
+    const {pad} = drawAxes(ctx,w,h,34);
+    if(!values.length){
+      ctx.fillStyle="rgba(159,179,217,.9)";
+      ctx.fillText("Load SUMMARY to see histogram", pad, pad+12);
+      return;
+    }
+    // bins 0..100
+    const bins = 20;
+    const min=0, max=100;
+    const counts = new Array(bins).fill(0);
+    for(const v of values){
+      const x = clamp(v, min, max);
+      let b = Math.floor((x-min)/(max-min)*bins);
+      b = clamp(b,0,bins-1);
+      counts[b]++;
+    }
+    const maxC = Math.max(...counts,1);
+    const bw = (w-2*pad)/bins;
+    for(let i=0;i<bins;i++){
+      const x0 = pad + i*bw;
+      const barH = (h-2*pad) * (counts[i]/maxC);
+      const y0 = h-pad - barH;
+      ctx.fillStyle = "rgba(0,229,255,.22)";
+      ctx.fillRect(x0+2, y0, bw-4, barH);
+      ctx.strokeStyle = "rgba(0,229,255,.35)";
+      ctx.strokeRect(x0+2, y0, bw-4, barH);
+    }
+    ctx.fillStyle="rgba(159,179,217,.9)";
+    ctx.font="12px ui-monospace, Menlo, Consolas, monospace";
+    ctx.fillText("0", pad-10, h-pad+18);
+    ctx.fillText("100", w-pad-28, h-pad+18);
+    ctx.fillText("χ²-improve%", pad, pad-12);
+  }
+
+  function drawScatter(cv, pts){
+    const {ctx,w,h} = clearCanvas(cv);
+    const {pad} = drawAxes(ctx,w,h,34);
+    if(!pts.length){
+      ctx.fillStyle="rgba(159,179,217,.9)";
+      ctx.fillText("Load SUMMARY to see scatter", pad, pad+12);
+      return;
+    }
+    // Use quantile bounds to reduce crazy scaling
+    const xb = pts.map(p=>p.x), yb=pts.map(p=>p.y);
+    const x0 = Math.max(0, quantile(xb,0.02));
+    const x1 = quantile(xb,0.98);
+    const y0 = Math.max(0, quantile(yb,0.02));
+    const y1 = quantile(yb,0.98);
+    const sx = (x)=> pad + (w-2*pad) * ( (x-x0) / (x1-x0 || 1) );
+    const sy = (y)=> (h-pad) - (h-2*pad) * ( (y-y0) / (y1-y0 || 1) );
+
+    // diag line
+    ctx.strokeStyle = "rgba(0,255,133,.35)";
+    ctx.beginPath();
+    ctx.moveTo(sx(x0), sy(x0));
+    ctx.lineTo(sx(Math.min(x1,y1)), sy(Math.min(x1,y1)));
+    ctx.stroke();
+
+    for(const p of pts){
+      const x = sx(p.x), y = sy(p.y);
+      ctx.fillStyle = p.win ? "rgba(0,255,133,.42)" : "rgba(255,61,129,.40)";
+      ctx.beginPath(); ctx.arc(x,y,2.4,0,Math.PI*2); ctx.fill();
+    }
+
+    ctx.fillStyle="rgba(159,179,217,.9)";
+    ctx.font="12px ui-monospace, Menlo, Consolas, monospace";
+    ctx.fillText("bary χ²/n", pad, pad-12);
+    ctx.fillText("qds χ²/n", pad-30, pad+10);
+  }
+
+  function mapBestfitHeader(header){
+    const H = header.map(h => (h||"").trim().toLowerCase());
+    const pick = (keys) => {
+      for(const k of keys){ const i = H.indexOf(k); if(i>=0) return i; }
+      return -1;
+    };
+    const m = {
+      r: pick(["r","radius","rad"]),
+      vobs: pick(["v_obs","vobs","v","vrot","v_rot","vdata"]),
+      verr: pick(["e_v","err","v_err","sigma","dv","v_sigma"]),
+      vbary: pick(["v_bary","vbary","vbar","v_b"]),
+      vqds: pick(["v_qds","vqds","v_model","vmod","v_fit","v_total","v_q"])
+    };
+    return m;
+  }
+
+  function drawCurve(cv, bf){
+    const {ctx,w,h} = clearCanvas(cv);
+    const {pad} = drawAxes(ctx,w,h,40);
+
+    if(!bf){
+      ctx.fillStyle="rgba(159,179,217,.9)";
+      ctx.fillText("Load *_QDS_bestfit.csv then select one above.", pad, pad+12);
+      return;
+    }
+
+    const {rows, map, galaxy} = bf;
+    const ri = map.r, vo = map.vobs, ve = map.verr, vb = map.vbary, vq = map.vqds;
+
+    if(ri<0 || vo<0){
+      ctx.fillStyle="rgba(255,200,87,.95)";
+      ctx.fillText("Could not detect r and v_obs columns in this bestfit CSV.", pad, pad+12);
+      return;
+    }
+
+    const R = [], V=[], E=[], VB=[], VQ=[];
+    for(const row of rows){
+      const r = Number(row[ri]);
+      const v = Number(row[vo]);
+      if(!Number.isFinite(r) || !Number.isFinite(v)) continue;
+      R.push(r); V.push(v);
+      E.push(ve>=0 ? Number(row[ve]) : NaN);
+      VB.push(vb>=0 ? Number(row[vb]) : NaN);
+      VQ.push(vq>=0 ? Number(row[vq]) : NaN);
+    }
+    if(R.length < 3){
+      ctx.fillStyle="rgba(255,200,87,.95)";
+      ctx.fillText("Not enough numeric rows to plot.", pad, pad+12);
+      return;
+    }
+
+    const r0 = Math.min(...R), r1 = Math.max(...R);
+    const v0 = Math.min(...V.filter(Number.isFinite));
+    const v1 = Math.max(...V.filter(Number.isFinite));
+
+    const sx = (x)=> pad + (w-2*pad) * ((x-r0)/(r1-r0 || 1));
+    const sy = (y)=> (h-pad) - (h-2*pad) * ((y-v0)/(v1-v0 || 1));
+
+    // plot data points
+    for(let i=0;i<R.length;i++){
+      const x=sx(R[i]), y=sy(V[i]);
+      ctx.fillStyle="rgba(0,229,255,.65)";
+      ctx.beginPath(); ctx.arc(x,y,2.2,0,Math.PI*2); ctx.fill();
+
+      const e = E[i];
+      if(Number.isFinite(e) && e>0){
+        ctx.strokeStyle="rgba(0,229,255,.25)";
+        ctx.beginPath();
+        ctx.moveTo(x, sy(V[i]-e));
+        ctx.lineTo(x, sy(V[i]+e));
+        ctx.stroke();
+      }
+    }
+
+    // bary line (if present)
+    if(VB.some(Number.isFinite)){
+      ctx.strokeStyle="rgba(255,200,87,.55)";
+      ctx.beginPath();
+      let started=false;
+      for(let i=0;i<R.length;i++){
+        const yv=VB[i]; if(!Number.isFinite(yv)) continue;
+        const x=sx(R[i]), y=sy(yv);
+        if(!started){ ctx.moveTo(x,y); started=true; } else ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+    }
+
+    // qds line (if present)
+    if(VQ.some(Number.isFinite)){
+      ctx.strokeStyle="rgba(0,255,133,.60)";
+      ctx.beginPath();
+      let started=false;
+      for(let i=0;i<R.length;i++){
+        const yv=VQ[i]; if(!Number.isFinite(yv)) continue;
+        const x=sx(R[i]), y=sy(yv);
+        if(!started){ ctx.moveTo(x,y); started=true; } else ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+    }
+
+    ctx.fillStyle="rgba(159,179,217,.9)";
+    ctx.font="12px ui-monospace, Menlo, Consolas, monospace";
+    ctx.fillText(`${galaxy}  (points=${R.length})`, pad, pad-14);
+    ctx.fillText(`r:[${fmt(r0,2)}..${fmt(r1,2)}]  v:[${fmt(v0,1)}..${fmt(v1,1)}]`, pad, h-12);
+
+    curveInfo.textContent = `curve: ${galaxy} · rows=${R.length} · cols=${bf.header.length}`;
+  }
+
+  // ---------- Summary processing ----------
+  function normalizeSummary(rows){
+    const header = rows[0];
+    const map = mapSummaryHeader(header);
+    headerInfo = {cols: header, map};
+
+    const out = [];
+    for(let i=1;i<rows.length;i++){
+      const r = rows[i];
+      if(!r || !r.length) continue;
+
+      const galaxy = (r[map.galaxy] ?? "").trim();
+      if(!galaxy) continue;
+
+      const n = Number(r[map.n]);
+      const cb = Number(r[map.chi2_b]);
+      const cq = Number(r[map.chi2_q]);
+      const rb = Number(r[map.red_b]);
+      const rq = Number(r[map.red_q]);
+      const imp_in = Number(r[map.imp]);
+      const v0 = Number(r[map.v0]);
+      const lam = Number(r[map.lam]);
+
+      // χ²-based improvement (robust) + effective (clip negatives)
+      const imp_chi2 = (Number.isFinite(cb) && cb>0 && Number.isFinite(cq)) ? 100*(cb-cq)/cb : NaN;
+      const imp_eff = Number.isFinite(imp_chi2) ? Math.max(0, imp_chi2) : NaN;
+
+      // comparable reduced chi2 for visuals: χ²/n
+      const b_vis = (Number.isFinite(cb) && Number.isFinite(n) && n>0) ? cb/n : (Number.isFinite(rb)? rb : NaN);
+      const q_vis = (Number.isFinite(cq) && Number.isFinite(n) && n>0) ? cq/n : (Number.isFinite(rq)? rq : NaN);
+
+      // AICc
+      const aiccb = (Number.isFinite(cb) && Number.isFinite(n)) ? aicc(cb,n,0) : NaN;
+      const aiccq = (Number.isFinite(cq) && Number.isFinite(n)) ? aicc(cq,n,2) : NaN;
+      const daicc = (Number.isFinite(aiccb) && Number.isFinite(aiccq)) ? (aiccq - aiccb) : NaN; // negative => QDS better
+      const win = Number.isFinite(daicc) ? (daicc < 0) : false;
+
+      out.push({
+        galaxy, n,
+        chi2_b: cb, chi2_q: cq,
+        red_b: rb, red_q: rq,
+        imp_in, imp_chi2, imp_eff,
+        v0, lam,
+        b_vis, q_vis,
+        aiccb, aiccq, daicc, win
+      });
+    }
+    return out;
+  }
+
+  function computeBoundary(summary){
+    const v0s = summary.map(d=>d.v0).filter(Number.isFinite);
+    const lams = summary.map(d=>d.lam).filter(Number.isFinite);
+    const v0min = v0s.length? Math.min(...v0s) : NaN;
+    const v0max = v0s.length? Math.max(...v0s) : NaN;
+    const lammin = lams.length? Math.min(...lams) : NaN;
+    const lammax = lams.length? Math.max(...lams) : NaN;
+
+    for(const d of summary){
+      const flags = [];
+      if(Number.isFinite(d.v0) && Number.isFinite(v0min) && d.v0===v0min) flags.push("v0=min");
+      if(Number.isFinite(d.v0) && Number.isFinite(v0max) && d.v0===v0max) flags.push("v0=max");
+      if(Number.isFinite(d.lam) && Number.isFinite(lammin) && d.lam===lammin) flags.push("λ=min");
+      if(Number.isFinite(d.lam) && Number.isFinite(lammax) && d.lam===lammax) flags.push("λ=max");
+      d.flags = flags;
+      d.bound = flags.length>0;
+    }
+    return {v0min,v0max,lammin,lammax};
+  }
+
+  function refreshKPIs(){
+    if(!summary.length){
+      kRows.textContent="—"; kCols.textContent="—";
+      kWins.textContent="—"; kWinFrac.textContent="—";
+      kMeanImp.textContent="—"; kMedImp.textContent="—";
+      kBound.textContent="—"; kBoundNote.textContent="—";
+      checkV0.textContent="v0=0 check: —";
+      checkLam.textContent="λ boundary check: —";
+      checkOutliers.textContent="outliers: —";
+      return;
+    }
+    const n = summary.length;
+    const wins = summary.filter(d=>d.win).length;
+    const imp = summary.map(d=>d.imp_eff).filter(Number.isFinite);
+    const bound = summary.filter(d=>d.bound).length;
+
+    kRows.textContent = String(n);
+    kCols.textContent = `cols: ${headerInfo.cols.length} · header mapped`;
+    kWins.textContent = `${wins}/${n}`;
+    kWinFrac.textContent = `win_frac=${fmt(wins/n,3)}`;
+    kMeanImp.textContent = pct(mean(imp),1);
+    kMedImp.textContent = `median=${pct(median(imp),1)}`;
+    kBound.textContent = String(bound);
+    kBoundNote.textContent = `hits on v0/λ min/max`;
+
+    // v0=0 sanity: max |chi2_q-chi2_b| among v0=0 rows
+    const v0z = summary.filter(d=>Number.isFinite(d.v0) && d.v0===0 && Number.isFinite(d.chi2_b) && Number.isFinite(d.chi2_q));
+    if(v0z.length){
+      const deltas = v0z.map(d=>Math.abs(d.chi2_q - d.chi2_b));
+      const mx = Math.max(...deltas);
+      const ok = mx < 1e-6 ? "OK" : (mx < 1e-2 ? "tiny" : "WARN");
+      checkV0.textContent = `v0=0 check: rows=${v0z.length} max|Δχ²|=${fmt(mx,6)} (${ok})`;
+    } else checkV0.textContent = `v0=0 check: rows=0`;
+
+    // λ boundaries
+    const lamMinHits = summary.filter(d=>d.flags?.includes("λ=min")).length;
+    const lamMaxHits = summary.filter(d=>d.flags?.includes("λ=max")).length;
+    checkLam.textContent = `λ boundary check: λ=min hits=${lamMinHits} · λ=max hits=${lamMaxHits}`;
+
+    // outliers in χ²/n space using robust fences
+    const b = summary.map(d=>d.b_vis).filter(Number.isFinite);
+    const q = summary.map(d=>d.q_vis).filter(Number.isFinite);
+    const bq1=quantile(b,.25), bq3=quantile(b,.75), biqr=bq3-bq1;
+    const qq1=quantile(q,.25), qq3=quantile(q,.75), qiqr=qq3-qq1;
+    const bHi=bq3+3*biqr, qHi=qq3+3*qiqr;
+    const outc = summary.filter(d=>Number.isFinite(d.b_vis) && Number.isFinite(d.q_vis) && (d.b_vis>bHi || d.q_vis>qHi)).length;
+    checkOutliers.textContent = `outliers: ${outc} (3×IQR fence in χ²/n)`;
+  }
+
+  function applyFilters(){
+    if(!summary.length){ tbl.innerHTML=""; return; }
+
+    const s = (qSearch.value||"").trim().toLowerCase();
+    const mode = qShow.value;
+    const sort = qSort.value;
+
+    let rows = summary.slice();
+
+    if(s) rows = rows.filter(d => d.galaxy.toLowerCase().includes(s));
+
+    if(mode==="wins") rows = rows.filter(d=>d.win);
+    else if(mode==="losses") rows = rows.filter(d=>!d.win);
+    else if(mode==="bound") rows = rows.filter(d=>d.bound);
+    else if(mode==="v0zero") rows = rows.filter(d=>Number.isFinite(d.v0) && d.v0===0);
+
+    const keySorters = {
+      imp_desc: (a,b)=> (b.imp_eff||-1e9) - (a.imp_eff||-1e9),
+      imp_asc:  (a,b)=> (a.imp_eff||1e9) - (b.imp_eff||1e9),
+      aicc_best:(a,b)=> (a.daicc||1e9) - (b.daicc||1e9),
+      rb_desc:  (a,b)=> (b.b_vis||-1e9) - (a.b_vis||-1e9),
+      rb_asc:   (a,b)=> (a.b_vis||1e9) - (b.b_vis||1e9),
+    };
+    rows.sort(keySorters[sort] || keySorters.imp_desc);
+
+    // render table
+    const frag = document.createDocumentFragment();
+    for(const d of rows.slice(0, 220)){ // keep snappy
+      const tr = document.createElement("tr");
+      const flags = (d.flags||[]).join(" ");
+      const impClass = (d.imp_eff>=80) ? "ok" : (d.imp_eff>=20 ? "mid" : (d.imp_eff>0 ? "mid" : "bad"));
+      const aiccClass = d.win ? "ok" : "bad";
+      tr.innerHTML = `
+        <td class="mono">${d.galaxy}</td>
+        <td class="mono">${Number.isFinite(d.n)? d.n : "—"}</td>
+        <td class="mono">${fmt(d.b_vis,6)}</td>
+        <td class="mono">${fmt(d.q_vis,6)}</td>
+        <td class="${impClass} mono">${pct(d.imp_eff,1)}</td>
+        <td class="${aiccClass} mono">${Number.isFinite(d.daicc)? fmt(d.daicc,3) : "—"}</td>
+        <td class="mono">${Number.isFinite(d.v0)? fmt(d.v0,3) : "—"}</td>
+        <td class="mono">${Number.isFinite(d.lam)? fmt(d.lam,3) : "—"}</td>
+        <td class="mono">${flags || ""}</td>
+      `;
+      tr.addEventListener("click", ()=>{
+        // if bestfit exists, select it
+        if(bestfits.has(d.galaxy)){
+          selCurve.value = d.galaxy;
+          drawCurve($("cvCurve"), bestfits.get(d.galaxy));
+        }
+      });
+      frag.appendChild(tr);
+    }
+    tbl.innerHTML="";
+    tbl.appendChild(frag);
+
+    // plots from FULL summary (not filtered) for consistency
+    const impVals = summary.map(d=>d.imp_eff).filter(Number.isFinite);
+    drawHist($("cvHist"), impVals);
+
+    const pts = summary
+      .filter(d=>Number.isFinite(d.b_vis) && Number.isFinite(d.q_vis))
+      .map(d=>({x:d.b_vis, y:d.q_vis, win:d.win}));
+    drawScatter($("cvScatter"), pts);
+  }
+
+  // ---------- File loading ----------
+  $("fileSummary").addEventListener("change", async (ev)=>{
+    const f = ev.target.files[0];
+    if(!f) return;
+    const text = await f.text();
+    const rows = parseCSV(text);
+    if(rows.length < 2){
+      status.textContent = "SUMMARY parse failed (too few rows).";
+      return;
+    }
+    summaryRaw = rows;
+    summary = normalizeSummary(rows);
+    const bounds = computeBoundary(summary);
+
+    status.textContent = `Loaded SUMMARY: ${f.name} · rows=${summary.length} · λ[min,max]=[${fmt(bounds.lammin,3)}, ${fmt(bounds.lammax,3)}]`;
+    refreshKPIs();
+    applyFilters();
+  });
+
+  $("fileBestfits").addEventListener("change", async (ev)=>{
+    const files = Array.from(ev.target.files || []);
+    if(!files.length) return;
+
+    for(const f of files){
+      const text = await f.text();
+      const rows = parseCSV(text);
+      if(rows.length < 2) continue;
+
+      const header = rows[0];
+      const map = mapBestfitHeader(header);
+
+      // try to guess galaxy name from filename: GALAXY_QDS_bestfit.csv
+      let galaxy = f.name.replace(/_QDS_bestfit\.csv$/i,"").replace(/\.csv$/i,"");
+      // in case user renamed
+      if(!galaxy) galaxy = f.name;
+
+      bestfits.set(galaxy, {galaxy, header, rows: rows.slice(1), map});
+    }
+
+    // refresh dropdown
+    const keys = Array.from(bestfits.keys()).sort((a,b)=>a.localeCompare(b));
+    selCurve.innerHTML = `<option value="">— select galaxy bestfit —</option>` +
+      keys.map(k=>`<option value="${k}">${k}</option>`).join("");
+
+    bestfitCount.textContent = `bestfits: ${bestfits.size}`;
+  });
+
+  selCurve.addEventListener("change", ()=>{
+    const g = selCurve.value;
+    if(!g) { drawCurve($("cvCurve"), null); curveInfo.textContent="curve: —"; return; }
+    drawCurve($("cvCurve"), bestfits.get(g));
+  });
+
+  btnAutoPick.addEventListener("click", ()=>{
+    if(!summary.length) return;
+    // pick the best AICc (lowest daicc)
+    const cand = summary.filter(d=>Number.isFinite(d.daicc)).slice().sort((a,b)=>a.daicc-b.daicc)[0];
+    if(cand && bestfits.has(cand.galaxy)){
+      selCurve.value = cand.galaxy;
+      drawCurve($("cvCurve"), bestfits.get(cand.galaxy));
+    } else if(cand){
+      status.textContent = `Top AICc row: ${cand.galaxy} (no bestfit CSV loaded for it).`;
+    }
+  });
+
+  qSearch.addEventListener("input", applyFilters);
+  qSort.addEventListener("change", applyFilters);
+  qShow.addEventListener("change", applyFilters);
+
+  // ---------- Export augmented CSV ----------
+  btnExport.addEventListener("click", ()=>{
+    if(!summary.length){
+      status.textContent="Nothing to export (load SUMMARY first).";
+      return;
+    }
+    const header = [
+      "galaxy","n",
+      "chi2_bary","chi2_qds",
+      "chi2n_bary","chi2n_qds",
+      "imp_chi2_pct","imp_effective_pct",
+      "aicc_bary","aicc_qds","daicc","qds_wins",
+      "v0","lam","flags"
+    ];
+    const lines = [header.join(",")];
+    for(const d of summary){
+      const line = [
+        d.galaxy, d.n,
+        d.chi2_b, d.chi2_q,
+        d.b_vis, d.q_vis,
+        d.imp_chi2, d.imp_eff,
+        d.aiccb, d.aiccq, d.daicc, d.win?1:0,
+        d.v0, d.lam,
+        (d.flags||[]).join("|")
+      ].map(x => (x===null||x===undefined) ? "" : String(x));
+      lines.push(line.join(","));
+    }
+    const blob = new Blob([lines.join("\n")], {type:"text/csv"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `SUMMARY_augmented_${new Date().toISOString().replace(/[-:]/g,"").slice(0,15)}.csv`;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+  });
+
+  // initial blank plots
+  drawHist($("cvHist"), []);
+  drawScatter($("cvScatter"), []);
+  drawCurve($("cvCurve"), null);
+
+})();
+</script>
+</body>
+</html>

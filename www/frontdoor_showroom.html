@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#071224" />
+  <title>Quantum Dynamic Systems (Dursley UK ltd)</title>
+  <style>
+    :root{
+      /* Professional colour scheme (still has punch) */
+      --bg0:#050B14;
+      --bg1:#071224;
+      --card:#0A162A;
+      --card2:#081326;
+      --ink:#EAF2FF;
+      --muted:#A9B8D6;
+      --line:rgba(255,255,255,.10);
+
+      --teal:#2FE3D0;
+      --teal2:#18BFB0;
+      --gold:#F3C96A;
+      --good:#4CF59A;
+      --warn:#F7C85A;
+
+      --shadow: 0 12px 40px rgba(0,0,0,.45);
+      --radius: 22px;
+      --radius2: 16px;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(1100px 700px at 20% 10%, rgba(47,227,208,.10), transparent 55%),
+        radial-gradient(800px 520px at 85% 0%, rgba(243,201,106,.10), transparent 55%),
+        radial-gradient(900px 650px at 60% 85%, rgba(47,227,208,.07), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg0));
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    a{ color:inherit; text-decoration:none; }
+    .wrap{
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 18px 14px 28px;
+    }
+
+    .topbar{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      padding: 10px 6px 0;
+    }
+
+    .brand{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      min-width: 0;
+    }
+
+    .orb{
+      width:42px;height:42px;border-radius:999px;
+      background:
+        radial-gradient(circle at 30% 25%, rgba(255,255,255,.85), rgba(255,255,255,0) 40%),
+        radial-gradient(circle at 55% 60%, rgba(47,227,208,.55), rgba(47,227,208,0) 60%),
+        linear-gradient(180deg, #0F2C55, #071224);
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow: 0 10px 28px rgba(0,0,0,.35);
+      flex:0 0 auto;
+    }
+
+    .brand h1{
+      margin:0;
+      font-size: 15px;
+      line-height: 1.15;
+      letter-spacing: .3px;
+      font-weight: 740;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      max-width: 72vw;
+    }
+    .brand .sub{
+      margin-top:3px;
+      color:var(--muted);
+      font-size: 12px;
+      line-height: 1.25;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      max-width: 72vw;
+    }
+
+    .pills{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .pill{
+      border:1px solid rgba(47,227,208,.35);
+      background: rgba(10,22,42,.55);
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      color: rgba(234,242,255,.92);
+      letter-spacing: .6px;
+      text-transform: uppercase;
+      backdrop-filter: blur(8px);
+    }
+    .pill.gold{
+      border-color: rgba(243,201,106,.40);
+      color: rgba(255,246,228,.95);
+    }
+
+    .hero{
+      margin-top: 14px;
+      padding: 18px 16px;
+      border-radius: var(--radius);
+      background:
+        radial-gradient(900px 450px at 25% 0%, rgba(47,227,208,.12), transparent 55%),
+        radial-gradient(800px 420px at 90% 15%, rgba(243,201,106,.10), transparent 60%),
+        linear-gradient(180deg, rgba(10,22,42,.72), rgba(8,19,38,.62));
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow: var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .hero h2{
+      margin: 2px 0 10px;
+      font-size: 28px;
+      line-height: 1.05;
+      letter-spacing: -.3px;
+    }
+    .hero p{
+      margin:0;
+      color: rgba(169,184,214,.95);
+      font-size: 14px;
+      line-height: 1.45;
+      max-width: 70ch;
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    @media (min-width: 820px){
+      .row{ grid-template-columns: 1.35fr .65fr; }
+      .grid{ grid-template-columns: repeat(2, 1fr); }
+      .hero h2{ font-size: 34px; }
+    }
+
+    .card{
+      border-radius: var(--radius);
+      border:1px solid rgba(255,255,255,.11);
+      background: linear-gradient(180deg, rgba(10,22,42,.72), rgba(8,19,38,.62));
+      box-shadow: var(--shadow);
+      padding: 14px;
+      overflow:hidden;
+      position:relative;
+    }
+
+    .card h3{
+      margin: 0 0 8px;
+      font-size: 14px;
+      letter-spacing: .7px;
+      text-transform: uppercase;
+      color: rgba(234,242,255,.92);
+    }
+    .card .desc{
+      margin: 0 0 12px;
+      color: rgba(169,184,214,.96);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .btnrow{
+      display:flex;
+      flex-wrap:wrap;
+      gap: 10px;
+      align-items:center;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border:1px solid rgba(47,227,208,.35);
+      background: rgba(7,18,36,.35);
+      color: rgba(234,242,255,.95);
+      font-weight: 700;
+      letter-spacing: .2px;
+      box-shadow: 0 10px 26px rgba(0,0,0,.30);
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+      user-select:none;
+    }
+    .btn:active{ transform: scale(.98); }
+    .btn.primary{
+      background: linear-gradient(180deg, rgba(47,227,208,.20), rgba(7,18,36,.25));
+      border-color: rgba(47,227,208,.55);
+    }
+    .btn.gold{
+      background: linear-gradient(180deg, rgba(243,201,106,.18), rgba(7,18,36,.25));
+      border-color: rgba(243,201,106,.55);
+    }
+    .btn .tag{
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      color: rgba(234,242,255,.85);
+      padding: 5px 9px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+    }
+
+    .kv{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .stat{
+      border-radius: var(--radius2);
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(5,11,20,.35);
+      padding: 10px;
+    }
+    .stat .k{ color: rgba(169,184,214,.95); font-size: 12px; }
+    .stat .v{ margin-top:4px; font-weight: 800; font-size: 14px; }
+    .stat .v.good{ color: var(--good); }
+    .stat .v.warn{ color: var(--warn); }
+
+    .search{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      padding: 10px 12px;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(5,11,20,.35);
+    }
+    .search input{
+      width:100%;
+      border:0;
+      outline:0;
+      background: transparent;
+      color: var(--ink);
+      font-size: 14px;
+    }
+    .hint{
+      margin-top: 10px;
+      color: rgba(169,184,214,.88);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .list{
+      margin-top: 12px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .item{
+      border-radius: var(--radius2);
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(5,11,20,.32);
+      padding: 12px;
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      justify-content: space-between;
+    }
+    .item .left{ min-width:0; }
+    .item .name{
+      font-weight: 850;
+      font-size: 14px;
+      line-height: 1.15;
+      letter-spacing: .2px;
+    }
+    .item .meta{
+      margin-top: 6px;
+      color: rgba(169,184,214,.92);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+    .badge{
+      flex:0 0 auto;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      color: rgba(234,242,255,.88);
+    }
+    .badge.live{ border-color: rgba(76,245,154,.35); color: rgba(76,245,154,.95); }
+    .badge.off{ border-color: rgba(247,200,90,.35); color: rgba(247,200,90,.95); }
+
+    footer{
+      margin-top: 16px;
+      padding: 10px 4px 0;
+      color: rgba(169,184,214,.80);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .tiny{
+      color: rgba(169,184,214,.80);
+      font-size: 11px;
+      margin-top: 8px;
+    }
+    code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      color: rgba(234,242,255,.92);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <div class="topbar">
+      <div class="brand">
+        <div class="orb" aria-hidden="true"></div>
+        <div style="min-width:0">
+          <h1>Quantum Dynamic Systems (Dursley UK ltd)</h1>
+          <div class="sub">Showroom launchpad • Local-first • Offline-capable • Phone-first</div>
+        </div>
+      </div>
+
+      <div class="pills">
+        <div class="pill">Local HTML</div>
+        <div class="pill gold">Professional demo</div>
+        <div class="pill" id="netPill">Checking…</div>
+      </div>
+    </div>
+
+    <div class="hero">
+      <h2>Showroom Front Door</h2>
+      <p>
+        A clean launchpad for your QDS labs: batteries, microphysics sanity, cosmology variance checks,
+        rotation curves, pulsar proxy constraints, and your phys.org vault tooling.
+        <b>No external libraries.</b> Works from <code>file://</code> or <code>localhost</code>.
+      </p>
+      <div class="tiny">Tip: This is “boardroom-safe” styling (still colourful) — no NASA branding here.</div>
+    </div>
+
+    <div class="row">
+      <div class="card">
+        <h3>Quick Launch</h3>
+        <p class="desc">One-tap entry to your main hubs (use these in meetings).</p>
+
+        <div class="btnrow">
+          <a class="btn primary" href="qds_nasa_lab_suite.html">
+            <span>Dev Door (personal)</span>
+            <span class="tag">hub</span>
+          </a>
+          <a class="btn gold" href="qds_test_platformV3.html">
+            <span>Reality-Check Labs</span>
+            <span class="tag">tests</span>
+          </a>
+          <a class="btn primary" href="qds_megasuite_onebutton_MAX.html">
+            <span>Mega Suite • One-Button MAX</span>
+            <span class="tag">run</span>
+          </a>
+          <a class="btn" href="physorg_qds_triage.html">
+            <span>News Triage Vault</span>
+            <span class="tag">vault</span>
+          </a>
+        </div>
+
+        <div class="kv">
+          <div class="stat">
+            <div class="k">Mode</div>
+            <div class="v" id="modeV">Local</div>
+          </div>
+          <div class="stat">
+            <div class="k">Connectivity</div>
+            <div class="v" id="connV">—</div>
+          </div>
+          <div class="stat">
+            <div class="k">Session timestamp</div>
+            <div class="v" id="tsV">—</div>
+          </div>
+          <div class="stat">
+            <div class="k">Build note</div>
+            <div class="v good">Showroom-ready</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Find a Tool</h3>
+        <p class="desc">Search the showroom list. Works offline. Filters instantly.</p>
+        <div class="search">
+          <span aria-hidden="true">🔎</span>
+          <input id="q" placeholder="Search: battery, H0, pulsar, rotmod, news, bird..." autocomplete="off" />
+        </div>
+        <div class="hint">
+          This page links only to local files in <code>~/OMEGA_EMPIRE/UV_QDS/www</code>.
+          If something doesn’t open, it’s usually a filename mismatch or subfolder path.
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Core Labs</h3>
+        <p class="desc">The stuff that shows “real engineering and tests”, fast.</p>
+        <div class="list" id="coreList"></div>
+      </div>
+
+      <div class="card">
+        <h3>News / Vault / Intel</h3>
+        <p class="desc">Your local phys.org rip tooling and vault dashboards.</p>
+        <div class="list" id="newsList"></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px;">
+      <h3>Reference / Reports</h3>
+      <p class="desc">Supporting pages and condensed reports.</p>
+      <div class="list" id="refList"></div>
+    </div>
+
+    <footer>
+      <div>
+        <b>Quantum Dynamic Systems (Dursley UK ltd)</b> — local-first tooling suite.
+      </div>
+      <div class="tiny">
+        Built on-device (Ω-Phone workflow). Designed for clarity: show the tool, show the output, keep it honest.
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    // ===== Config: showroom links (edit anytime) =====
+    const LINKS = [
+      // Core labs
+      { group:"core", name:"Mega Suite • One-Button MAX", href:"qds_megasuite_onebutton_MAX.html", meta:"Sanity + integration runner (kernel, UV, H0, rotation, pulsar proxy, bird).", tag:"core" },
+      { group:"core", name:"Reality-Check Labs (Test Platform V3)", href:"qds_test_platformV3.html", meta:"Falsification-first launchpad for targeted QDS checks.", tag:"tests" },
+      { group:"core", name:"Battery Habitat RW Lab v1.3", href:"qds_battery_habitat_rw_v1_3.html", meta:"Random-walk battery stress + lifetime sketch tools.", tag:"battery" },
+      { group:"core", name:"Rotation Curve Lab Ultra", href:"qds_rc_lab_ultra.html", meta:"Rotation curve sanity testing and quick plots.", tag:"galaxy" },
+      { group:"core", name:"ROTMOD Extreme Lab", href:"qds_rotmod_extreme_lab.html", meta:"Extended rotation-curve workflows + checks.", tag:"rotmod" },
+      { group:"core", name:"Binary Pulsar Lab v2 (MAX)", href:"qds_binary_pulsar_lab_v2_max.html", meta:"Binary/pulsar constraint proxy tooling.", tag:"pulsar" },
+      { group:"core", name:"Pulsar Suite One-Button MAX", href:"qds_pulsar_suite_onebutton_MAX.html", meta:"Multi-system run + curves export (proxy).", tag:"suite" },
+      { group:"core", name:"Bird Migration Lab", href:"bird_migration_lab.html", meta:"Coherence & cohort comparison lab (local).", tag:"bio" },
+      { group:"core", name:"Alphabet Learning Lab (vMAX)", href:"qds_learning_alphabet_lab_vmax.html", meta:"Kid-friendly learning sandbox (local).", tag:"kids" },
+
+      // News / vault
+      { group:"news", name:"Phys.org News Dashboard", href:"physorg_news_dashboard.html", meta:"Local rip dashboard, browsing + quick sorting.", tag:"news" },
+      { group:"news", name:"QDS News Triage Vault", href:"physorg_qds_triage.html", meta:"Bucket + mode triage vault for local MASTER.json rips.", tag:"vault" },
+      { group:"news", name:"Phys.org Supervault (v4)", href:"physorg_supervault_v4.html", meta:"Deep vault mode / super index view.", tag:"super" },
+
+      // Reference / reports
+      { group:"ref", name:"NASA RW3 Condensed Report (local)", href:"nasa_rw3/NASA_RW3_report.html", meta:"RW3 summary + plots (local report page).", tag:"report" },
+
+      // Optional: personal dev door (kept separate but available)
+      { group:"ref", name:"Dev Door (personal) • QDS × NASA Lab Suite", href:"qds_nasa_lab_suite.html", meta:"Personal dev launchpad (not for formal showroom).", tag:"dev" },
+    ];
+
+    const el = (id)=>document.getElementById(id);
+
+    function badgeFor(tag){
+      // keep minimal, professional
+      const map = {
+        core:"CORE", tests:"TESTS", battery:"BATTERY", galaxy:"GALAXY",
+        rotmod:"ROTMOD", pulsar:"PULSAR", suite:"SUITE", bio:"BIO",
+        kids:"KIDS", news:"NEWS", vault:"VAULT", super:"VAULT",
+        report:"REPORT", dev:"DEV"
+      };
+      return map[tag] || "LINK";
+    }
+
+    function renderList(targetId, group){
+      const target = el(targetId);
+      target.innerHTML = "";
+
+      LINKS.filter(x => x.group === group).forEach(item => {
+        const row = document.createElement("a");
+        row.className = "item";
+        row.href = item.href;
+
+        const left = document.createElement("div");
+        left.className = "left";
+
+        const name = document.createElement("div");
+        name.className = "name";
+        name.textContent = item.name;
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        meta.textContent = item.meta + "  •  file: " + item.href;
+
+        left.appendChild(name);
+        left.appendChild(meta);
+
+        const badge = document.createElement("div");
+        badge.className = "badge";
+        badge.textContent = badgeFor(item.tag);
+
+        row.appendChild(left);
+        row.appendChild(badge);
+        target.appendChild(row);
+      });
+    }
+
+    function applySearch(q){
+      q = (q||"").trim().toLowerCase();
+      const allItems = document.querySelectorAll(".list .item");
+      allItems.forEach(a=>{
+        const txt = a.textContent.toLowerCase();
+        a.style.display = (!q || txt.includes(q)) ? "" : "none";
+      });
+    }
+
+    function updateStatus(){
+      const now = new Date();
+      el("tsV").textContent = now.toISOString().replace("T"," ").slice(0,19) + "Z";
+
+      const isFile = location.protocol === "file:";
+      el("modeV").textContent = isFile ? "File (offline-ready)" : "Localhost / local server";
+
+      const online = navigator.onLine;
+      el("connV").textContent = online ? "Online" : "Offline";
+      el("connV").className = "v " + (online ? "good" : "warn");
+
+      const netPill = el("netPill");
+      netPill.textContent = online ? "Online" : "Offline";
+      netPill.style.borderColor = online ? "rgba(76,245,154,.35)" : "rgba(247,200,90,.35)";
+    }
+
+    // Boot
+    renderList("coreList","core");
+    renderList("newsList","news");
+    renderList("refList","ref");
+
+    updateStatus();
+    window.addEventListener("online", updateStatus);
+    window.addEventListener("offline", updateStatus);
+
+    el("q").addEventListener("input", (e)=>applySearch(e.target.value));
+  </script>
+</body>
+</html>

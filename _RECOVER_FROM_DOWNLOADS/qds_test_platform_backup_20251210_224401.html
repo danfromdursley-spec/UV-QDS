@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>QDS Test Platform</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #050816;
+      --panel: #0b1020;
+      --border: #252b45;
+      --text: #f5f7ff;
+      --muted: #9aa3c7;
+      --accent1: #00d4ff;
+      --accent2: #00ff88;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    body {
+      background: radial-gradient(circle at top, #101530 0, #050816 55%, #02030a 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 16px;
+    }
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: linear-gradient(135deg, #0a0f1f, #050816);
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.7);
+      padding: 18px 18px 22px;
+    }
+    header {
+      margin-bottom: 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 10px;
+    }
+    .badge-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+    .pill {
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 255, 136, 0.25);
+      background: radial-gradient(circle at top left, rgba(0, 255, 136, 0.18), transparent);
+      color: var(--accent2);
+    }
+    h1 {
+      font-size: 22px;
+      margin-bottom: 4px;
+    }
+    .subtitle {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .grid {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+    }
+    .card {
+      background: radial-gradient(circle at top left, rgba(0, 212, 255, 0.14), rgba(5, 8, 22, 0.98));
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      padding: 14px 14px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 150px;
+    }
+    .card h2 {
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+    .card small {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+    .card p {
+      font-size: 13px;
+      color: var(--muted);
+      margin: 6px 0 12px;
+      line-height: 1.35;
+    }
+    .meta {
+      font-size: 11px;
+      color: #a7b3ff;
+      margin-bottom: 10px;
+    }
+    .btn-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .btn-main {
+      border: none;
+      border-radius: 999px;
+      padding: 7px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      color: #02030a;
+      background-image: linear-gradient(90deg, var(--accent1), var(--accent2));
+      box-shadow: 0 0 15px rgba(0, 255, 168, 0.3);
+      white-space: nowrap;
+    }
+    .btn-main:active {
+      transform: scale(0.97);
+    }
+    .btn-ghost {
+      font-size: 11px;
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px dotted rgba(154, 163, 199, 0.6);
+    }
+    footer {
+      margin-top: 16px;
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    footer span strong {
+      color: var(--accent1);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div class="badge-row">
+        <span class="pill">QDS Test Platform</span>
+        <span>Kernel: K(t,r) = σ² e<sup>-|t|/τc</sup> e<sup>-r²/(2λc²)</sup></span>
+      </div>
+      <h1>QDS Validation Labs</h1>
+      <p class="subtitle">
+        Quick launch pad for all working QDS tests on this device. Tap a lab to run live checks.
+      </p>
+    </header>
+
+    <section class="grid">
+      <!-- 1. Cosmological variance -->
+      <article class="card">
+        <div>
+          <small>COSMOLOGY • HUBBLE VARIANCE</small>
+          <h2>H₀ Variance Lab</h2>
+          <p>
+            Enter radii R (Mpc) and observed σ(H)/H, compare against the QDS variance law
+            σ/H = A·R<sup>-p</sup>, and see pass/fail vs tolerance.
+          </p>
+          <div class="meta">
+            Uses A = 0.017, p = 0.35 • Scale: 5–100 Mpc
+          </div>
+        </div>
+        <div class="btn-row">
+          <!-- adjust filename if yours is different -->
+          <a class="btn-main" href="qds_variance_lab.html">Open H₀ Variance Lab</a>
+          <a class="btn-ghost" href="qds_variance_lab.html">view table / chart</a>
+        </div>
+      </article>
+
+      <!-- 2. Rotation curves -->
+      <article class="card">
+        <div>
+          <small>GALAXIES • ROTATION CURVES</small>
+          <h2>Rotation Curve Tester</h2>
+          <p>
+            Input radii r (kpc), Newtonian speeds v<sub>N</sub> and observed v,
+            then compare against the QDS-modified law
+            v<sub>QDS</sub> = v<sub>N</sub> √(1 + α e<sup>-r/λc</sup>).
+          </p>
+          <div class="meta">
+            α and λc editable • Per-point % error and pass/fail readout
+          </div>
+        </div>
+        <div class="btn-row">
+          <!-- set to your actual rotation-curve file name -->
+          <a class="btn-main" href="qds_rotation_lab.html">Open Rotation Lab</a>
+          <a class="btn-ghost" href="qds_rotation_lab.html">view Newtonian vs QDS</a>
+        </div>
+      </article>
+
+      <!-- 3. Microphysics -->
+      <article class="card">
+        <div>
+          <small>MICROPHYSICS • KERNEL SHAPE</small>
+          <h2>Microphysics Lab</h2>
+          <p>
+            Explore the kernel directly: set σ², τc and λc, probe K(t,r), and
+            inspect temporal and spatial correlation curves.
+          </p>
+          <div class="meta">
+            Dimensionless units • Shows K/σ², temporal & spatial factors
+          </div>
+        </div>
+        <div class="btn-row">
+          <!-- if your file is q.html, this will work as-is -->
+          <a class="btn-main" href="q.html">Open Microphysics Lab</a>
+          <a class="btn-ghost" href="q.html">see correlation shapes</a>
+        </div>
+      </article>
+    </section>
+
+    <footer>
+      <span>Device: <strong>Ω-Phone QDS Lab</strong> • Localhost:8000</span>
+      <span>Built by Dan-Operator &amp; GPT-5.1 Thinking 🎩</span>
+    </footer>
+  </main>
+</body>
+</html>

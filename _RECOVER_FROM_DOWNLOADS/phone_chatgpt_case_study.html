@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Phone + ChatGPT Dev Lab Case Study</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Case study: a non-developer using ChatGPT + an Android phone to build a full mini dev lab (HTML, Python, Bash, tools and dashboards).">
+  <style>
+    :root {
+      --bg: #050711;
+      --bg-card: #0d1020;
+      --accent: #4ff2c8;
+      --accent-soft: rgba(79, 242, 200, 0.15);
+      --accent-blue: #42a5ff;
+      --text-main: #f7f8ff;
+      --text-soft: #c5c7e6;
+      --border-soft: #20233b;
+      --shadow-soft: 0 0 40px rgba(0, 0, 0, 0.7);
+      --radius-lg: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #101535 0, #050711 50%);
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+
+    header {
+      padding: 24px 18px 22px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, #0d152b, #070915);
+      border: 1px solid var(--border-soft);
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: radial-gradient(
+        circle at top right,
+        rgba(66, 165, 255, 0.26),
+        transparent 60%
+      );
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .hero-label {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(3, 7, 18, 0.7);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-label span.dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #4ade80;
+      box-shadow: 0 0 12px rgba(74, 222, 128, 0.9);
+    }
+
+    h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(24px, 4vw, 32px);
+      letter-spacing: 0.02em;
+      position: relative;
+      z-index: 1;
+    }
+
+    h1 span.accent {
+      color: var(--accent);
+    }
+
+    .hero-sub {
+      max-width: 620px;
+      margin: 0;
+      color: var(--text-soft);
+      font-size: 14px;
+      line-height: 1.5;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-grid {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .badge {
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(7, 11, 26, 0.8);
+      font-size: 11px;
+      color: var(--text-soft);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+    }
+
+    .badge span.key {
+      font-weight: 600;
+      color: var(--accent-blue);
+    }
+
+    main {
+      margin-top: 26px;
+      display: grid;
+      grid-template-columns: minmax(0, 2.3fr) minmax(0, 1.4fr);
+      gap: 18px;
+    }
+
+    @media (max-width: 800px) {
+      main {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: 18px 18px 16px;
+      border: 1px solid var(--border-soft);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .card + .card {
+      margin-top: 12px;
+    }
+
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 17px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--accent-soft);
+    }
+
+    .card h2 span {
+      color: var(--text-main);
+    }
+
+    p {
+      margin: 0 0 10px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-soft);
+    }
+
+    .pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .pill {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.7);
+      color: var(--text-soft);
+      white-space: nowrap;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .metric {
+      border-radius: 14px;
+      padding: 10px 10px 9px;
+      background: radial-gradient(circle at top left, var(--accent-soft), #050816);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    .metric-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-soft);
+    }
+
+    .metric-value {
+      margin-top: 4px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .callout {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(15, 118, 110, 0.15);
+      border: 1px solid rgba(45, 212, 191, 0.5);
+      font-size: 13px;
+      color: var(--text-soft);
+    }
+
+    ul {
+      margin: 6px 0 10px 17px;
+      padding: 0;
+      font-size: 14px;
+      color: var(--text-soft);
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo,
+        Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      background: rgba(15, 23, 42, 0.9);
+      padding: 2px 5px;
+      border-radius: 6px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      font-size: 12px;
+      color: #94a3b8;
+      text-align: center;
+    }
+
+    .footer-note span.duck {
+      filter: drop-shadow(0 0 4px rgba(250, 250, 115, 0.8));
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="hero-label">
+        <span class="dot"></span>
+        <span>Case Study · Phone-Only Dev Lab</span>
+      </div>
+      <h1>
+        From <span class="accent">zero dev experience</span> to a 250+ tool
+        lab,<br />using just an Android phone &amp; ChatGPT.
+      </h1>
+      <p class="hero-sub">
+        A real-world story of how a non-developer used ChatGPT, Termux and a
+        mid-range Android phone to build a working mini R&amp;D environment:
+        HTML dashboards, Python tools, Bash scripts, and a lot of quiet
+        experimentation.
+      </p>
+
+      <div class="hero-grid">
+        <div class="badge">
+          📱 <span class="key">Device</span> Android phone + Termux
+        </div>
+        <div class="badge">
+          🧠 <span class="key">Background</span> No formal software training
+        </div>
+        <div class="badge">
+          ⚡ <span class="key">Timeline</span> ≈ 7 weeks, evenings &amp; spare time
+        </div>
+        <div class="badge">
+          🧪 <span class="key">Output</span> 1,700+ Python scripts &amp; 250+ HTML tools
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- LEFT COLUMN -->
+      <section>
+        <article class="card">
+          <h2><span>01 · Starting point</span></h2>
+          <p>
+            I’m not a professional developer. Before this experiment I had:
+          </p>
+          <ul>
+            <li>No experience with web development or JavaScript.</li>
+            <li>No experience writing Bash scripts or using Linux day to day.</li>
+            <li>No large-scale Python projects.</li>
+          </ul>
+          <p>
+            My “starting kit” was:
+          </p>
+          <ul>
+            <li>A single Android phone.</li>
+            <li>Termux for a Linux-like shell.</li>
+            <li>A mobile browser.</li>
+            <li>ChatGPT as the main teacher, pair-programmer and debugger.</li>
+          </ul>
+          <p>
+            Everything else — HTML layouts, Python utilities, Bash tooling, and
+            file-organisation tricks — was learned inside real tasks, with
+            ChatGPT guiding each step.
+          </p>
+        </article>
+
+        <article class="card">
+          <h2><span>02 · What got built</span></h2>
+          <p>
+            Since <strong>20 October 2025</strong>, the phone + ChatGPT combo
+            produced a small but very real “lab OS”:
+          </p>
+          <ul>
+            <li>
+              <strong>1,700+ Python scripts</strong> for simulations, data
+              tools and helpers.
+            </li>
+            <li>
+              <strong>250+ HTML files</strong> forming dashboards and microsites:
+              physics toys, business tools, local heritage demos, and more.
+            </li>
+            <li>
+              Everything runs locally via
+              <code>python -m http.server</code> in Termux.
+            </li>
+          </ul>
+          <p>
+            Within a few weeks, my phone browser effectively became a
+            personalised dev environment and demo shelf — all assembled through
+            short, iterative chats.
+          </p>
+
+          <div class="metric-grid">
+            <div class="metric">
+              <div class="metric-label">Python scripts</div>
+              <div class="metric-value">1,700+</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">HTML tools</div>
+              <div class="metric-value">250+</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Files touched</div>
+              <div class="metric-value">24,000+</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Hardware</div>
+              <div class="metric-value">1 Android phone</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2><span>03 · How ChatGPT was used</span></h2>
+          <p>The assistant effectively played several roles at once:</p>
+          <ul>
+            <li>
+              <strong>Bash &amp; tooling coach</strong> — designing one-liner
+              commands and small scripts to:
+              <ul>
+                <li>List and filter files by date and type.</li>
+                <li>Compute file counts, sizes, and averages.</li>
+                <li>Automate stats like “how many HTML files since 3 Dec?”.</li>
+              </ul>
+            </li>
+            <li>
+              <strong>Python &amp; HTML co-author</strong> — drafting entire
+              interactive pages, then refining:
+              <ul>
+                <li>Mobile-safe layouts.</li>
+                <li>Neon but readable colour schemes.</li>
+                <li>Sliders, dropdowns, basic visualisations.</li>
+              </ul>
+            </li>
+            <li>
+              <strong>Explainer in the flow</strong> — answering
+              “What does this command do?” or “Why did this error happen?”
+              exactly when it occurred, without sending me off to a long course.
+            </li>
+            <li>
+              <strong>Project organiser</strong> — helping link together
+              separate tools into hubs, “front door” index pages and dashboards.
+            </li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h2><span>04 · Why it felt different</span></h2>
+          <p>As a non-developer, a few things really stood out:</p>
+          <ul>
+            <li>
+              <strong>No course barrier</strong> — I didn’t start by studying
+              programming. I started by trying to build something, and learned
+              just enough to get each piece working.
+            </li>
+            <li>
+              <strong>Low emotional friction</strong> — mistakes feel cheaper
+              when you can paste an error into a chat and get a friendly fix.
+            </li>
+            <li>
+              <strong>Fast idea → prototype loop</strong> — an idea in a queue
+              or at the school run could turn into a working HTML tool the same
+              day.
+            </li>
+            <li>
+              <strong>Accessible hardware</strong> — it’s empowering to discover
+              that one phone plus an AI assistant is enough to run a busy little
+              R&amp;D corner.
+            </li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h2><span>05 · Constructive wishes</span></h2>
+          <p>
+            From this experience, here are a few things that would make tools
+            like this even more powerful for beginners:
+          </p>
+          <ul>
+            <li>
+              <strong>Project-wide awareness</strong> — seeing a directory tree
+              and suggesting refactors across many scripts and pages, not just
+              one file at a time.
+            </li>
+            <li>
+              <strong>Auto-generated galleries</strong> — turning a folder of
+              HTML tools into a searchable, tagged gallery without manual glue.
+            </li>
+            <li>
+              <strong>Beginner-mode explanations on tap</strong> — a gentle
+              “explain this but don’t over-baby me” switch.
+            </li>
+            <li>
+              <strong>Guided upgrade paths</strong> — nudging users toward
+              version control, testing and better structure once they’ve built a
+              certain volume of tools.
+            </li>
+          </ul>
+
+          <div class="callout">
+            I’m not looking for publicity. I like my quiet life. If this story
+            is useful for anyone designing AI tools for beginners — especially
+            people working from a phone, in spare time — then it has already
+            done its job.
+          </div>
+        </article>
+      </section>
+
+      <!-- RIGHT COLUMN -->
+      <aside>
+        <div class="card">
+          <h2><span>Dev Profile</span></h2>
+          <p><strong>Who:</strong> Single user in the UK.</p>
+          <p>
+            <strong>Background:</strong> Basic computer literacy, a short
+            graphics design course years ago, no formal software training.
+          </p>
+          <p>
+            <strong>Setup:</strong> Android phone + Termux, browser, ChatGPT.
+          </p>
+
+          <div class="pill-list">
+            <span class="pill">Android-only</span>
+            <span class="pill">Termux</span>
+            <span class="pill">Python</span>
+            <span class="pill">HTML/JS</span>
+            <span class="pill">Bash</span>
+            <span class="pill">Beginner-friendly</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2><span>What this repo is</span></h2>
+          <p>
+            This page itself is part of the demo: a single, static HTML
+            document, styled for readability, that:
+          </p>
+          <ul>
+            <li>Tells the story in human language.</li>
+            <li>Shows a clean layout with no external dependencies.</li>
+            <li>Can be dropped straight onto GitHub Pages.</li>
+          </ul>
+          <p>
+            The aim is to demonstrate how quickly a non-developer can go from
+            “rough idea” to a shareable, production-style page with a bit of
+            AI-assisted scaffolding.
+          </p>
+        </div>
+
+        <div class="card">
+          <h2><span>How to view locally</span></h2>
+          <p>On a machine with Python installed:</p>
+          <ul>
+            <li>Clone or download the repo.</li>
+            <li>From the repo folder, run:</li>
+          </ul>
+          <p><code>python -m http.server 8000</code></p>
+          <p>Then open:</p>
+          <p><code>http://127.0.0.1:8000/</code></p>
+          <p>
+            On Android with Termux, the same command works — just open the URL
+            in your mobile browser.
+          </p>
+        </div>
+
+        <div class="card">
+          <h2><span>Why it matters</span></h2>
+          <p>
+            A single user with a phone and curiosity can now build and maintain
+            a surprisingly large stack of tools — science toys, business
+            dashboards, and personal utilities — without traditional training.
+          </p>
+          <p>
+            This is less about “look what I did” and more about:
+            <strong>look what becomes possible for anyone</strong> when the
+            tooling meets them where they are.
+          </p>
+        </div>
+      </aside>
+    </main>
+
+    <div class="footer-note">
+      Built on an Android phone with Termux, curiosity, and a very patient
+      language model. <span class="duck">🦆</span>
+    </div>
+  </div>
+</body>
+</html>

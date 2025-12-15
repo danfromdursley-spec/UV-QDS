@@ -1,0 +1,875 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Triage Quick Sheet (v2)</title>
+  <style>
+    :root{
+      --nhs-blue:#005eb8;
+      --nhs-dark:#003087;
+      --bg:#f6f8fb;
+      --card:#ffffff;
+      --ink:#0b1220;
+      --muted:#5a6573;
+      --line:#e3e8ef;
+      --shadow: 0 10px 30px rgba(15,23,42,.12);
+      --r:18px;
+
+      --green:#1e8e3e;
+      --amber:#b26a00;
+      --red:#c62828;
+      --purple:#6a1b9a;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    /* Top bar */
+    .topbar{
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: linear-gradient(0deg, var(--nhs-blue), var(--nhs-dark));
+      color:#fff;
+      padding: 14px 14px 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.18);
+    }
+    .topbar h1{
+      margin:0;
+      font-size: 18px;
+      letter-spacing:.2px;
+    }
+    .topbar .sub{
+      margin-top:3px;
+      font-size: 12px;
+      opacity:.92;
+    }
+    .chips{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .chip{
+      background: rgba(255,255,255,.18);
+      border: 1px solid rgba(255,255,255,.25);
+      padding:10px 12px;
+      border-radius: 999px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-size: 12px;
+      min-height:40px;
+      backdrop-filter: blur(6px);
+    }
+    .chip b{font-weight:700}
+    .dot{
+      width:10px;height:10px;border-radius:50%;
+      background:#7CFCB2;
+      box-shadow: 0 0 0 4px rgba(124,252,178,.18);
+    }
+    .dot.warn{background:#ffd166; box-shadow:0 0 0 4px rgba(255,209,102,.18);}
+    .dot.bad{background:#ff6b6b; box-shadow:0 0 0 4px rgba(255,107,107,.18);}
+
+    /* Layout */
+    .wrap{
+      max-width: 980px;
+      margin: 14px auto 90px;
+      padding: 0 12px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 12px;
+    }
+    @media (max-width: 900px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    .card{
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .cardHead{
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      background: #fbfdff;
+    }
+    .cardHead h2{
+      margin:0;
+      font-size: 14px;
+      letter-spacing:.2px;
+    }
+    .cardBody{padding: 12px 14px}
+
+    /* Quick summary tiles */
+    .tiles{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .tile{
+      border:1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px 12px;
+      background: #fff;
+    }
+    .tile .k{font-size:12px;color:var(--muted)}
+    .tile .v{margin-top:2px;font-size:18px;font-weight:800}
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border-radius:999px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      background:#fff;
+      font-weight:800;
+      letter-spacing:.3px;
+    }
+    .badge.small{padding:6px 10px;font-size:12px;font-weight:700}
+    .badge.green{border-color: rgba(30,142,62,.35); background: rgba(30,142,62,.10); color: var(--green);}
+    .badge.amber{border-color: rgba(178,106,0,.35); background: rgba(178,106,0,.12); color: var(--amber);}
+    .badge.red{border-color: rgba(198,40,40,.35); background: rgba(198,40,40,.10); color: var(--red);}
+    .badge.purple{border-color: rgba(106,27,154,.35); background: rgba(106,27,154,.10); color: var(--purple);}
+
+    /* Forms */
+    label{display:block;font-size:12px;color:var(--muted); margin: 10px 0 6px}
+    input[type="text"], input[type="number"], textarea, select{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      outline: none;
+      font-size: 14px;
+      background:#fff;
+    }
+    textarea{min-height:88px; resize:vertical}
+    input:focus, textarea:focus, select:focus{
+      border-color: rgba(0,94,184,.55);
+      box-shadow: 0 0 0 4px rgba(0,94,184,.12);
+    }
+    .row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 520px){
+      .row{grid-template-columns:1fr}
+    }
+
+    /* Sliders */
+    .sliderRow{
+      display:grid;
+      grid-template-columns: 1fr 120px;
+      gap: 10px;
+      align-items:center;
+      margin: 8px 0 2px;
+    }
+    input[type="range"]{width:100%}
+    .pill{
+      text-align:center;
+      border:1px solid var(--line);
+      border-radius: 999px;
+      padding: 10px 10px;
+      font-weight:800;
+      background:#fff;
+    }
+
+    /* Buttons */
+    .btns{display:flex; gap:10px; flex-wrap:wrap}
+    .btn{
+      border:1px solid var(--line);
+      background:#fff;
+      color: var(--ink);
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-weight:800;
+      cursor:pointer;
+      min-height:44px;
+    }
+    .btn.primary{
+      background: var(--nhs-blue);
+      border-color: rgba(0,0,0,.08);
+      color:#fff;
+    }
+    .btn.danger{
+      background:#c62828;
+      border-color: rgba(0,0,0,.08);
+      color:#fff;
+    }
+    .btn.ghost{
+      background:#fff;
+      border-style:dashed;
+      color: var(--muted);
+    }
+    .btn:active{transform: translateY(1px)}
+    .hint{
+      margin-top:8px;
+      font-size:12px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    details{
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+      margin-top: 10px;
+    }
+    summary{
+      cursor:pointer;
+      font-weight:900;
+      list-style:none;
+      user-select:none;
+    }
+    summary::-webkit-details-marker{display:none}
+
+    /* Footer bar actions (mobile speed) */
+    .footerBar{
+      position: fixed;
+      left:0; right:0; bottom:0;
+      padding: 10px 12px;
+      background: rgba(246,248,251,.92);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid var(--line);
+      z-index: 30;
+    }
+    .footerBar .btns{justify-content:space-between}
+    .footerBar .btn{flex:1}
+    .footerBar .btns .btn{min-width:0}
+    .footerBar .btns{gap:8px}
+    @media (min-width: 900px){
+      .footerBar{display:none}
+    }
+
+    /* Print */
+    @media print{
+      .topbar, .footerBar, .noprint{display:none !important}
+      body{background:#fff}
+      .wrap{margin:0; padding:0}
+      .card{box-shadow:none}
+    }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <h1>Triage Quick Sheet <span style="opacity:.85;font-weight:800">v2</span></h1>
+    <div class="sub">Fast snapshot • SBAR handover • Export/Import • Offline-friendly (workflow aid)</div>
+    <div class="chips">
+      <div class="chip"><span class="dot" id="statusDot"></span><b id="statusText">Ready</b><span style="opacity:.9">• autosave on</span></div>
+      <div class="chip"><span style="opacity:.9">Auto time:</span> <b id="clock">—</b></div>
+      <div class="chip"><span style="opacity:.9">Build:</span> <b id="buildStamp">2025-12-15</b></div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="grid">
+
+      <!-- LEFT: main form -->
+      <section class="card">
+        <div class="cardHead">
+          <h2>Patient & Presentation</h2>
+          <span class="badge small" id="privacyBadge">No identifiers required</span>
+        </div>
+        <div class="cardBody">
+
+          <div class="row">
+            <div>
+              <label>Patient ID / local ref (optional)</label>
+              <input id="patientId" type="text" placeholder="e.g., ED-12345" />
+            </div>
+            <div>
+              <label>Location (optional)</label>
+              <input id="location" type="text" placeholder="e.g., ED / Ward / Bay" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label>Age (optional)</label>
+              <input id="age" type="text" placeholder="e.g., 42" />
+            </div>
+            <div>
+              <label>Name (optional)</label>
+              <input id="name" type="text" placeholder="Optional" />
+            </div>
+          </div>
+
+          <label>Presenting problem (one-liner)</label>
+          <textarea id="presenting" placeholder="One-line summary. What brought them in?"></textarea>
+
+          <div class="row">
+            <div>
+              <label>Allergies</label>
+              <input id="allergies" type="text" placeholder="e.g., NKDA / details" />
+            </div>
+            <div>
+              <label>Key risks (free text)</label>
+              <input id="risks" type="text" placeholder="e.g., falls risk, sepsis concern, chest pain..." />
+            </div>
+          </div>
+
+          <details open>
+            <summary>Observations</summary>
+
+            <div class="row">
+              <div>
+                <label>HR (bpm)</label>
+                <input id="hr" type="number" inputmode="numeric" placeholder="e.g., 78" />
+              </div>
+              <div>
+                <label>RR (/min)</label>
+                <input id="rr" type="number" inputmode="numeric" placeholder="e.g., 16" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <label>Temp (°C)</label>
+                <input id="temp" type="number" step="0.1" inputmode="decimal" placeholder="e.g., 36.8" />
+              </div>
+              <div>
+                <label>SBP (mmHg)</label>
+                <input id="sbp" type="number" inputmode="numeric" placeholder="e.g., 122" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <label>SpO₂ (%)</label>
+                <input id="spo2" type="number" inputmode="numeric" placeholder="e.g., 98" />
+              </div>
+              <div>
+                <label>Neuro / AVPU / notes</label>
+                <input id="neuro" type="text" placeholder="e.g., Alert / confused / GCS..." />
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <label>Pain (0–10)</label>
+                <div class="sliderRow">
+                  <input id="pain" type="range" min="0" max="10" step="1" value="0" />
+                  <div class="pill"><span id="painV">0</span> /10</div>
+                </div>
+              </div>
+              <div>
+                <label>Clinician concern (0–10)</label>
+                <div class="sliderRow">
+                  <input id="concern" type="range" min="0" max="10" step="1" value="2" />
+                  <div class="pill"><span id="concernV">2</span> /10</div>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <details open>
+            <summary>Triage snapshot</summary>
+
+            <div class="row">
+              <div>
+                <label>Acuity score (0–10) — local heuristic</label>
+                <div class="sliderRow">
+                  <input id="acuity" type="range" min="0" max="10" step="1" value="2" />
+                  <div class="pill"><span id="acuityV">2</span> /10</div>
+                </div>
+                <div class="hint">This score is a **demo input** for workflow/handover structure. Use local policy for actual triage decisions.</div>
+              </div>
+              <div>
+                <label>Suggested category (auto-mapped)</label>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; align-items:center">
+                  <span class="badge green" id="catBadge">GREEN</span>
+                  <span class="badge small" id="catHint">Routine review</span>
+                </div>
+              </div>
+            </div>
+
+            <label>Immediate actions / pending</label>
+            <textarea id="actions" placeholder="e.g., ECG ordered, bloods sent, fluids started, awaiting CT..."></textarea>
+          </details>
+
+          <details>
+            <summary>Optional: Psychosocial stability vector (A/K/D/N)</summary>
+            <div class="hint">Optional context for MH/safeguarding/aggression risk **as a communication aid**, not a diagnosis. Values 0–1.</div>
+
+            <label>Agency (A)</label>
+            <div class="sliderRow">
+              <input id="A" type="range" min="0" max="1" step="0.01" value="0.55" />
+              <div class="pill" id="AV">0.55</div>
+            </div>
+
+            <label>Coherence (K)</label>
+            <div class="sliderRow">
+              <input id="K" type="range" min="0" max="1" step="0.01" value="0.55" />
+              <div class="pill" id="KV">0.55</div>
+            </div>
+
+            <label>Dependency (D)</label>
+            <div class="sliderRow">
+              <input id="D" type="range" min="0" max="1" step="0.01" value="0.40" />
+              <div class="pill" id="DV">0.40</div>
+            </div>
+
+            <label>Noise/Stress (N)</label>
+            <div class="sliderRow">
+              <input id="N" type="range" min="0" max="1" step="0.01" value="0.45" />
+              <div class="pill" id="NV">0.45</div>
+            </div>
+
+            <div class="hint">
+              Phrase for notes: <b>“A/K/D/N: 0.55/0.55/0.40/0.45”</b>
+            </div>
+          </details>
+
+          <details open>
+            <summary>SBAR handover (auto-built)</summary>
+            <label>SBAR preview</label>
+            <textarea id="sbar" readonly></textarea>
+            <div class="hint">Tip: tap <b>Copy SBAR</b> then paste into notes/message. (Some browsers don’t allow programmatic paste — that’s normal.)</div>
+          </details>
+
+          <div class="noprint" style="margin-top:12px">
+            <div class="btns">
+              <button class="btn primary" id="btnSave">Save snapshot</button>
+              <button class="btn" id="btnCopy">Copy SBAR</button>
+              <button class="btn" id="btnExport">Export JSON</button>
+              <label class="btn ghost" style="display:inline-flex;align-items:center;justify-content:center;">
+                Import JSON
+                <input id="importFile" type="file" accept="application/json" style="display:none" />
+              </label>
+              <button class="btn" id="btnPrint">Print</button>
+              <button class="btn danger" id="btnClear">Clear</button>
+            </div>
+            <div class="hint">
+              <b>Workflow aid only.</b> Not a medical device, not diagnostic, not a substitute for clinical judgement or local policy.
+              Keep identifiers minimal.
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- RIGHT: quick tiles -->
+      <aside class="card">
+        <div class="cardHead">
+          <h2>Quick glance</h2>
+          <span class="badge small" id="autosaveBadge">Autosave: ON</span>
+        </div>
+        <div class="cardBody">
+          <div class="tiles">
+            <div class="tile">
+              <div class="k">Category</div>
+              <div class="v" id="catText">GREEN</div>
+              <div class="k" id="catSub">Routine review</div>
+            </div>
+            <div class="tile">
+              <div class="k">Acuity score</div>
+              <div class="v"><span id="scoreText">2</span> /10</div>
+              <div class="k">Local heuristic input</div>
+            </div>
+            <div class="tile">
+              <div class="k">Obs summary</div>
+              <div class="k" style="margin-top:6px" id="obsSummary">HR — • RR — • SpO₂ — • Temp — • SBP —</div>
+            </div>
+            <div class="tile">
+              <div class="k">Pain / Concern</div>
+              <div class="k" style="margin-top:6px" id="pcSummary">Pain 0/10 • Concern 2/10</div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px; border-top:1px solid var(--line); padding-top:12px">
+            <div class="k" style="font-weight:900;color:var(--ink)">Speed notes</div>
+            <div class="hint">
+              • Keep it to one-liners.<br/>
+              • Use <b>Copy SBAR</b> for handover.<br/>
+              • Use <b>Export JSON</b> to move between devices (offline).<br/>
+              • If it’s not relevant, leave it blank. Blank is a feature.
+            </div>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- Mobile footer bar: fast actions -->
+  <div class="footerBar noprint">
+    <div class="btns">
+      <button class="btn primary" id="btnSave2">Save</button>
+      <button class="btn" id="btnCopy2">Copy SBAR</button>
+      <button class="btn" id="btnExport2">Export</button>
+      <button class="btn danger" id="btnClear2">Clear</button>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const BUILD = "2025-12-15 • nhs_triage_quick_sheet_v2";
+  const KEY = "nhs_triage_quick_sheet_v2_state";
+
+  const $ = (id) => document.getElementById(id);
+
+  const els = {
+    clock: $("clock"),
+    buildStamp: $("buildStamp"),
+    statusDot: $("statusDot"),
+    statusText: $("statusText"),
+
+    patientId: $("patientId"),
+    location: $("location"),
+    age: $("age"),
+    name: $("name"),
+    presenting: $("presenting"),
+    allergies: $("allergies"),
+    risks: $("risks"),
+
+    hr: $("hr"),
+    rr: $("rr"),
+    temp: $("temp"),
+    sbp: $("sbp"),
+    spo2: $("spo2"),
+    neuro: $("neuro"),
+
+    pain: $("pain"),
+    painV: $("painV"),
+    concern: $("concern"),
+    concernV: $("concernV"),
+
+    acuity: $("acuity"),
+    acuityV: $("acuityV"),
+
+    actions: $("actions"),
+
+    A: $("A"), AV: $("AV"),
+    K: $("K"), KV: $("KV"),
+    D: $("D"), DV: $("DV"),
+    N: $("N"), NV: $("NV"),
+
+    catBadge: $("catBadge"),
+    catHint: $("catHint"),
+    catText: $("catText"),
+    catSub: $("catSub"),
+    scoreText: $("scoreText"),
+    obsSummary: $("obsSummary"),
+    pcSummary: $("pcSummary"),
+
+    sbar: $("sbar"),
+
+    btnSave: $("btnSave"),
+    btnCopy: $("btnCopy"),
+    btnExport: $("btnExport"),
+    btnPrint: $("btnPrint"),
+    btnClear: $("btnClear"),
+    importFile: $("importFile"),
+
+    btnSave2: $("btnSave2"),
+    btnCopy2: $("btnCopy2"),
+    btnExport2: $("btnExport2"),
+    btnClear2: $("btnClear2"),
+  };
+
+  els.buildStamp.textContent = BUILD.split(" • ")[0];
+
+  const nowClock = () => {
+    const d = new Date();
+    const pad = (n)=> String(n).padStart(2,"0");
+    const s = `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}, ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    els.clock.textContent = s;
+  };
+  setInterval(nowClock, 500);
+  nowClock();
+
+  const clamp01 = (x)=> Math.max(0, Math.min(1, x));
+
+  function mapCategory(score10){
+    // Demo mapping (not clinical). Keep it simple and predictable.
+    if (score10 >= 8) return {cat:"PURPLE", cls:"purple", hint:"Immediate attention"};
+    if (score10 >= 5) return {cat:"RED", cls:"red", hint:"Urgent review"};
+    if (score10 >= 3) return {cat:"AMBER", cls:"amber", hint:"Soon review"};
+    return {cat:"GREEN", cls:"green", hint:"Routine review"};
+  }
+
+  function setBadge(catObj){
+    const b = els.catBadge;
+    b.classList.remove("green","amber","red","purple");
+    b.classList.add(catObj.cls);
+    b.textContent = catObj.cat;
+
+    els.catHint.textContent = catObj.hint;
+    els.catText.textContent = catObj.cat;
+    els.catSub.textContent = catObj.hint;
+  }
+
+  function fmt(v){
+    if (v === "" || v === null || typeof v === "undefined") return "—";
+    return String(v);
+  }
+
+  function buildObsSummary(){
+    const parts = [
+      `HR ${fmt(els.hr.value)}`,
+      `RR ${fmt(els.rr.value)}`,
+      `SpO₂ ${fmt(els.spo2.value)}`,
+      `Temp ${fmt(els.temp.value)}`,
+      `SBP ${fmt(els.sbp.value)}`
+    ];
+    els.obsSummary.textContent = parts.join(" • ");
+  }
+
+  function buildSBAR(){
+    const score = parseInt(els.acuity.value,10);
+    const catObj = mapCategory(score);
+
+    const A = Number(els.A.value).toFixed(2);
+    const K = Number(els.K.value).toFixed(2);
+    const D = Number(els.D.value).toFixed(2);
+    const N = Number(els.N.value).toFixed(2);
+
+    const who = [els.name.value.trim(), els.age.value.trim() && `(${els.age.value.trim()})`].filter(Boolean).join(" ");
+    const where = [els.location.value.trim()].filter(Boolean).join(" ");
+    const id = els.patientId.value.trim();
+
+    const header = [
+      who ? `Patient: ${who}` : `Patient: (no name)`,
+      id ? `Ref: ${id}` : null,
+      where ? `Location: ${where}` : null
+    ].filter(Boolean).join(" • ");
+
+    const situation = `S: ${header}. Triage ${catObj.cat} (score ${score}/10). Presenting: ${els.presenting.value.trim() || "—"}`;
+
+    const backgroundBits = [];
+    if (els.allergies.value.trim()) backgroundBits.push(`Allergies: ${els.allergies.value.trim()}`);
+    if (els.risks.value.trim()) backgroundBits.push(`Risks: ${els.risks.value.trim()}`);
+    const background = `B: ${backgroundBits.length ? backgroundBits.join(". ") : "—"}`;
+
+    const obs = [
+      `HR ${fmt(els.hr.value)}`,
+      `RR ${fmt(els.rr.value)}`,
+      `SpO₂ ${fmt(els.spo2.value)}%`,
+      `Temp ${fmt(els.temp.value)}°C`,
+      `SBP ${fmt(els.sbp.value)}`,
+      els.neuro.value.trim() ? `Neuro ${els.neuro.value.trim()}` : `Neuro —`,
+      `Pain ${els.pain.value}/10`,
+      `Concern ${els.concern.value}/10`
+    ].join(", ");
+
+    const psychoAny = (els.A.value || els.K.value || els.D.value || els.N.value) ? ` Psychosocial A/K/D/N: ${A}/${K}/${D}/${N}.` : "";
+
+    const assessment = `A: Obs: ${obs}.${psychoAny}`;
+
+    const actions = els.actions.value.trim() || "—";
+    const rec = `R: ${catObj.hint}. Actions/pending: ${actions}`;
+
+    els.sbar.value = [situation, background, assessment, rec].join("\n\n");
+  }
+
+  function updateUI(){
+    els.painV.textContent = els.pain.value;
+    els.concernV.textContent = els.concern.value;
+    els.acuityV.textContent = els.acuity.value;
+
+    els.AV.textContent = Number(els.A.value).toFixed(2);
+    els.KV.textContent = Number(els.K.value).toFixed(2);
+    els.DV.textContent = Number(els.D.value).toFixed(2);
+    els.NV.textContent = Number(els.N.value).toFixed(2);
+
+    els.scoreText.textContent = els.acuity.value;
+    els.pcSummary.textContent = `Pain ${els.pain.value}/10 • Concern ${els.concern.value}/10`;
+
+    setBadge(mapCategory(parseInt(els.acuity.value,10)));
+    buildObsSummary();
+    buildSBAR();
+  }
+
+  function getState(){
+    return {
+      _build: BUILD,
+      t: new Date().toISOString(),
+      patientId: els.patientId.value,
+      location: els.location.value,
+      age: els.age.value,
+      name: els.name.value,
+      presenting: els.presenting.value,
+      allergies: els.allergies.value,
+      risks: els.risks.value,
+      hr: els.hr.value,
+      rr: els.rr.value,
+      temp: els.temp.value,
+      sbp: els.sbp.value,
+      spo2: els.spo2.value,
+      neuro: els.neuro.value,
+      pain: els.pain.value,
+      concern: els.concern.value,
+      acuity: els.acuity.value,
+      actions: els.actions.value,
+      A: els.A.value, K: els.K.value, D: els.D.value, N: els.N.value
+    };
+  }
+
+  function setState(s){
+    const safe = (k, fallback="") => (s && typeof s[k] !== "undefined") ? s[k] : fallback;
+
+    els.patientId.value = safe("patientId");
+    els.location.value = safe("location");
+    els.age.value = safe("age");
+    els.name.value = safe("name");
+    els.presenting.value = safe("presenting");
+    els.allergies.value = safe("allergies");
+    els.risks.value = safe("risks");
+
+    els.hr.value = safe("hr");
+    els.rr.value = safe("rr");
+    els.temp.value = safe("temp");
+    els.sbp.value = safe("sbp");
+    els.spo2.value = safe("spo2");
+    els.neuro.value = safe("neuro");
+
+    els.pain.value = safe("pain", "0");
+    els.concern.value = safe("concern", "2");
+    els.acuity.value = safe("acuity", "2");
+    els.actions.value = safe("actions");
+
+    els.A.value = safe("A", "0.55");
+    els.K.value = safe("K", "0.55");
+    els.D.value = safe("D", "0.40");
+    els.N.value = safe("N", "0.45");
+
+    updateUI();
+  }
+
+  function markStatus(kind, text){
+    els.statusDot.classList.remove("warn","bad");
+    if (kind === "warn") els.statusDot.classList.add("warn");
+    if (kind === "bad") els.statusDot.classList.add("bad");
+    els.statusText.textContent = text;
+  }
+
+  function saveLocal(){
+    try{
+      localStorage.setItem(KEY, JSON.stringify(getState()));
+      markStatus("","Saved");
+      setTimeout(()=> markStatus("","Ready"), 900);
+    }catch(e){
+      markStatus("bad","Storage error");
+    }
+  }
+
+  // Autosave on input (light touch)
+  let saveTimer = null;
+  function scheduleSave(){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveLocal, 450);
+  }
+
+  // Wire inputs
+  const inputs = [
+    "patientId","location","age","name","presenting","allergies","risks",
+    "hr","rr","temp","sbp","spo2","neuro",
+    "pain","concern","acuity","actions","A","K","D","N"
+  ].map(id => $(id));
+
+  inputs.forEach(el => {
+    el.addEventListener("input", () => { updateUI(); scheduleSave(); });
+    el.addEventListener("change", () => { updateUI(); scheduleSave(); });
+  });
+
+  // Buttons
+  function copySBAR(){
+    const text = els.sbar.value;
+    navigator.clipboard?.writeText(text).then(() => {
+      markStatus("","Copied");
+      setTimeout(()=> markStatus("","Ready"), 900);
+    }).catch(() => {
+      // Fallback: select text
+      els.sbar.focus();
+      els.sbar.select();
+      markStatus("warn","Select & copy");
+      setTimeout(()=> markStatus("","Ready"), 1400);
+    });
+  }
+
+  function exportJSON(){
+    const data = JSON.stringify(getState(), null, 2);
+    const blob = new Blob([data], {type:"application/json"});
+    const a = document.createElement("a");
+    const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,"-");
+    a.href = URL.createObjectURL(blob);
+    a.download = `triage_quick_sheet_v2_${stamp}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=> URL.revokeObjectURL(a.href), 1500);
+    markStatus("","Exported");
+    setTimeout(()=> markStatus("","Ready"), 900);
+  }
+
+  function clearAll(){
+    if (!confirm("Clear all fields?")) return;
+    localStorage.removeItem(KEY);
+    setState({});
+    markStatus("warn","Cleared");
+    setTimeout(()=> markStatus("","Ready"), 900);
+  }
+
+  function importJSON(file){
+    const reader = new FileReader();
+    reader.onload = () => {
+      try{
+        const s = JSON.parse(reader.result);
+        setState(s);
+        saveLocal();
+        markStatus("","Imported");
+        setTimeout(()=> markStatus("","Ready"), 900);
+      }catch(e){
+        markStatus("bad","Bad JSON");
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  els.btnSave.addEventListener("click", saveLocal);
+  els.btnCopy.addEventListener("click", copySBAR);
+  els.btnExport.addEventListener("click", exportJSON);
+  els.btnPrint.addEventListener("click", () => window.print());
+  els.btnClear.addEventListener("click", clearAll);
+
+  els.btnSave2.addEventListener("click", saveLocal);
+  els.btnCopy2.addEventListener("click", copySBAR);
+  els.btnExport2.addEventListener("click", exportJSON);
+  els.btnClear2.addEventListener("click", clearAll);
+
+  els.importFile.addEventListener("change", (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (f) importJSON(f);
+    els.importFile.value = "";
+  });
+
+  // Load from storage if present
+  try{
+    const raw = localStorage.getItem(KEY);
+    if (raw) setState(JSON.parse(raw));
+    else updateUI();
+  }catch(e){
+    updateUI();
+    markStatus("bad","Storage blocked");
+  }
+
+})();
+</script>
+</body>
+</html>

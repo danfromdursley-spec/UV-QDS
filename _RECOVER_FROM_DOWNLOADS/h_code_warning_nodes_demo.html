@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>H-Code Warning Nodes Demo · QDS Nervous System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #030712;
+      --bg-alt: #050b18;
+      --card: #060b1f;
+      --border: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent1: #4de6ff;
+      --accent2: #7bff6b;
+      --accent3: #c77dff;
+      --danger: #f97373;
+      --warn: #facc15;
+      --ok: #22c55e;
+      --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font);
+      background: radial-gradient(circle at top, #0b1120 0%, #020617 50%, #020617 100%);
+      color: var(--text);
+    }
+
+    .shell {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 16px 12px 24px;
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    @media (min-width: 700px) {
+      header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+    }
+
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    h1 {
+      font-size: 1.25rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h1 span.badge {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid #1f2937;
+      background: radial-gradient(circle at top left, #0f172a, #020617);
+      color: var(--muted);
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: var(--muted);
+      max-width: 460px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    button {
+      border-radius: 999px;
+      border: 1px solid #1f2937;
+      background: radial-gradient(circle at top left, #0b1120, #020617);
+      color: var(--text);
+      font-size: 0.8rem;
+      padding: 6px 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.35);
+      border-color: var(--accent1);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 2px 9px;
+      font-size: 0.7rem;
+      border: 1px solid #1f2937;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--accent2);
+      box-shadow: 0 0 8px rgba(123,255,107,0.8);
+    }
+
+    /* Layout */
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2.3fr) minmax(0, 1.7fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .panel {
+      background: linear-gradient(145deg, rgba(37,99,235,0.04), rgba(16,185,129,0.02));
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      padding: 10px;
+      box-shadow: 0 14px 30px rgba(0,0,0,0.4);
+      backdrop-filter: blur(18px);
+    }
+
+    .panel-title {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .panel-title span.right {
+      font-size: 0.68rem;
+      opacity: 0.8;
+    }
+
+    /* Node grid */
+    .nodes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 8px;
+    }
+
+    .node-card {
+      background: radial-gradient(circle at top, #020617, #030712 55%, #020617 100%);
+      border-radius: 16px;
+      border: 1px solid #111827;
+      padding: 9px 9px 8px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .node-card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at top left, rgba(77,230,255,0.10), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(199,125,255,0.14), transparent 55%);
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .node-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 1;
+    }
+
+    .node-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .node-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 7px;
+      background: radial-gradient(circle at top, #22c55e, #16a34a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      color: #022c22;
+      box-shadow: 0 0 12px rgba(34,197,94,0.8);
+    }
+
+    .node-role {
+      font-size: 0.65rem;
+      color: var(--muted);
+      padding: 1px 6px;
+      border-radius: 999px;
+      border: 1px solid #111827;
+      background: rgba(15,23,42,0.8);
+    }
+
+    .node-main {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 6px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .node-code {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 1.4rem;
+      letter-spacing: 0.14em;
+      padding-left: 2px;
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    .node-code span.node-id {
+      color: var(--accent1);
+      text-shadow: 0 0 10px rgba(77,230,255,0.8);
+    }
+
+    .node-code span.state {
+      color: var(--accent2);
+      text-shadow: 0 0 10px rgba(123,255,107,0.9);
+    }
+
+    .node-code span.trend {
+      color: var(--accent3);
+      text-shadow: 0 0 8px rgba(199,125,255,0.9);
+    }
+
+    .node-status {
+      text-align: right;
+    }
+
+    .status-label {
+      font-size: 0.7rem;
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 1px solid #1f2937;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      box-shadow: 0 0 8px rgba(148,163,184,0.8);
+    }
+
+    .status-dot.ok { background: var(--ok); }
+    .status-dot.warn { background: var(--warn); }
+    .status-dot.danger { background: var(--danger); }
+
+    .status-text {
+      color: var(--muted);
+    }
+
+    .node-bar {
+      position: relative;
+      z-index: 1;
+      margin-top: 4px;
+      height: 6px;
+      border-radius: 999px;
+      background: #020617;
+      overflow: hidden;
+      border: 1px solid #111827;
+    }
+
+    .node-bar-fill {
+      height: 100%;
+      width: 30%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--ok), var(--warn), var(--danger));
+      box-shadow: 0 0 12px rgba(34,197,94,0.8);
+      transition: width 0.4s ease-out;
+    }
+
+    .node-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 3px;
+      font-size: 0.65rem;
+      color: var(--muted);
+      position: relative;
+      z-index: 1;
+    }
+
+    .node-last {
+      opacity: 0.8;
+    }
+
+    .node-rate {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      opacity: 0.9;
+    }
+
+    /* Log panel */
+    .log-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 240px;
+      overflow: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #4b5563 #020617;
+      font-size: 0.74rem;
+    }
+
+    .log-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .log-list::-webkit-scrollbar-track {
+      background: #020617;
+    }
+
+    .log-list::-webkit-scrollbar-thumb {
+      background: #4b5563;
+      border-radius: 999px;
+    }
+
+    .log-item {
+      padding: 4px 4px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      border-bottom: 1px dashed rgba(31,41,55,0.7);
+    }
+
+    .log-item:last-child {
+      border-bottom: none;
+    }
+
+    .log-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .log-top {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .log-node {
+      font-weight: 500;
+      color: var(--accent1);
+    }
+
+    .log-code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      letter-spacing: 0.12em;
+      font-size: 0.76rem;
+      color: var(--accent2);
+    }
+
+    .log-meta {
+      color: var(--muted);
+    }
+
+    .log-time {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      opacity: 0.8;
+    }
+
+    .log-level-ok {
+      color: var(--ok);
+    }
+
+    .log-level-warn {
+      color: var(--warn);
+    }
+
+    .log-level-crit {
+      color: var(--danger);
+    }
+
+    /* Legend */
+    .legend {
+      margin-top: 10px;
+      font-size: 0.7rem;
+      color: var(--muted);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 6px;
+    }
+
+    .legend-block {
+      background: rgba(15,23,42,0.85);
+      border-radius: 12px;
+      padding: 6px 8px;
+      border: 1px solid #111827;
+    }
+
+    .legend-title {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 4px;
+      color: #9ca3af;
+    }
+
+    .legend-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 8px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .legend-code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.72rem;
+      padding: 2px 5px;
+      border-radius: 6px;
+      background: #020617;
+      border: 1px solid #1f2937;
+      color: var(--accent2);
+    }
+
+    footer {
+      margin-top: 14px;
+      font-size: 0.68rem;
+      color: var(--muted);
+      text-align: center;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="title-block">
+        <h1>
+          H-Code Warning Nodes
+          <span class="badge">QDS Nervous System · Live Demo</span>
+        </h1>
+        <div class="subtitle">
+          Tiny internal “Hawking-style” data language for machines: each node speaks in short codes like
+          <strong>CO~</strong>, <strong>GS+</strong>, <strong>SD+</strong>. The grid below shows a simulated PC
+          nervous system chatting in real time.
+        </div>
+        <div class="controls">
+          <button id="toggleSimBtn">
+            <span id="simStatusDot" class="pill-dot"></span>
+            <span id="simStatusText">Running</span>
+          </button>
+          <button id="injectEventBtn">
+            ⚡ Inject Stress Event
+          </button>
+          <span class="pill">
+            <span class="pill-dot"></span>
+            H-Code alphabet: [Node][State][Trend]
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <!-- Left: Nodes -->
+      <section class="panel">
+        <div class="panel-title">
+          <span>Node Mesh · Internal Health Beacons</span>
+          <span class="right" id="globalSummary">Baseline load pattern · Calm</span>
+        </div>
+        <div class="nodes-grid" id="nodesGrid">
+          <!-- Node cards populated by JS -->
+        </div>
+      </section>
+
+      <!-- Right: Log -->
+      <section class="panel">
+        <div class="panel-title">
+          <span>Event Stream · H-Code Log</span>
+          <span class="right" id="logSummary">Waiting for first packets…</span>
+        </div>
+        <ul class="log-list" id="logList"></ul>
+        <div class="legend">
+          <div class="legend-block">
+            <div class="legend-title">Nodes</div>
+            <div class="legend-list">
+              <div class="legend-item"><span class="legend-code">C</span><span>CPU</span></div>
+              <div class="legend-item"><span class="legend-code">G</span><span>GPU</span></div>
+              <div class="legend-item"><span class="legend-code">R</span><span>RAM</span></div>
+              <div class="legend-item"><span class="legend-code">V</span><span>VRM / Power</span></div>
+              <div class="legend-item"><span class="legend-code">S</span><span>SSD / Storage</span></div>
+              <div class="legend-item"><span class="legend-code">P</span><span>PSU</span></div>
+              <div class="legend-item"><span class="legend-code">A</span><span>Ambient / Case</span></div>
+            </div>
+          </div>
+          <div class="legend-block">
+            <div class="legend-title">States</div>
+            <div class="legend-list">
+              <div class="legend-item"><span class="legend-code">O</span><span>OK / Calm</span></div>
+              <div class="legend-item"><span class="legend-code">W</span><span>Warming</span></div>
+              <div class="legend-item"><span class="legend-code">S</span><span>Stressed</span></div>
+              <div class="legend-item"><span class="legend-code">D</span><span>Degrading</span></div>
+              <div class="legend-item"><span class="legend-code">F</span><span>Critical / Fail</span></div>
+            </div>
+          </div>
+          <div class="legend-block">
+            <div class="legend-title">Trends</div>
+            <div class="legend-list">
+              <div class="legend-item"><span class="legend-code">+</span><span>Rising / worsening</span></div>
+              <div class="legend-item"><span class="legend-code">-</span><span>Cooling / recovering</span></div>
+              <div class="legend-item"><span class="legend-code">~</span><span>Stable</span></div>
+              <div class="legend-item"><span class="legend-code">?</span><span>Noisy / uncertain</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      H-Code demo: simulated data only. Drop this file into your local QDS lab and imagine these packets riding
+      a tiny bus inside a PC, a battery pack, or a beacon hill.
+    </footer>
+  </div>
+
+  <script>
+    // === H-Code Warning Nodes Demo ===
+    // Each node emits [Node][State][Trend] codewords:
+    // Node: C,G,R,V,S,P,A
+    // State: O,W,S,D,F
+    // Trend: +,-,~,?
+
+    const nodeDefinitions = [
+      { id: "C", name: "CPU Corefield", role: "Compute" },
+      { id: "G", name: "GPU Array", role: "Graphics" },
+      { id: "R", name: "RAM Lattice", role: "Memory" },
+      { id: "V", name: "VRM Spine", role: "Power Rail" },
+      { id: "S", name: "SSD Channel", role: "Storage" },
+      { id: "P", name: "PSU Anchor", role: "Supply" },
+      { id: "A", name: "Ambient Shell", role: "Chassis" }
+    ];
+
+    // Internal state for simulation
+    const nodesState = {};
+    const loadBaseline = {
+      C: 0.35,
+      G: 0.30,
+      R: 0.25,
+      V: 0.28,
+      S: 0.22,
+      P: 0.26,
+      A: 0.18
+    };
+
+    const nodeElements = {};
+    let simInterval = null;
+    let simRunning = true;
+    let lastEventLevel = "ok";
+
+    // DOM references
+    const nodesGridEl = document.getElementById("nodesGrid");
+    const logListEl = document.getElementById("logList");
+    const logSummaryEl = document.getElementById("logSummary");
+    const globalSummaryEl = document.getElementById("globalSummary");
+    const toggleSimBtn = document.getElementById("toggleSimBtn");
+    const simStatusDot = document.getElementById("simStatusDot");
+    const simStatusText = document.getElementById("simStatusText");
+    const injectEventBtn = document.getElementById("injectEventBtn");
+
+    // Utility: random with normal-ish flavour
+    function jitter(scale = 0.05) {
+      return (Math.random() - 0.5) * scale * 2;
+    }
+
+    function clamp(x, min, max) {
+      return x < min ? min : x > max ? max : x;
+    }
+
+    // Map load (0..1) to H-state
+    function loadToState(load, degradingFlag) {
+      if (degradingFlag && load < 0.85) {
+        // occasional quiet degradation
+        return "D";
+      }
+      if (load < 0.35) return "O";
+      if (load < 0.6) return "W";
+      if (load < 0.8) return "S";
+      if (load < 0.95) return degradingFlag ? "D" : "S";
+      return degradingFlag ? "F" : "S";
+    }
+
+    function stateToLabel(state) {
+      switch (state) {
+        case "O": return "OK";
+        case "W": return "Warming";
+        case "S": return "Stressed";
+        case "D": return "Degrading";
+        case "F": return "Critical";
+        default:  return "Unknown";
+      }
+    }
+
+    function stateToLevel(state) {
+      if (state === "O" || state === "W") return "ok";
+      if (state === "S" || state === "D") return "warn";
+      return "crit";
+    }
+
+    function trendToText(trend) {
+      switch (trend) {
+        case "+": return "Rising";
+        case "-": return "Recovering";
+        case "~": return "Stable";
+        case "?": return "Noisy";
+        default: return "";
+      }
+    }
+
+    // Build node cards
+    function buildNodes() {
+      nodeDefinitions.forEach(def => {
+        const outer = document.createElement("div");
+        outer.className = "node-card";
+        outer.dataset.nodeId = def.id;
+
+        outer.innerHTML = `
+          <div class="node-header">
+            <div class="node-name">
+              <div class="node-icon">${def.id}</div>
+              <div>${def.name}</div>
+            </div>
+            <div class="node-role">${def.role}</div>
+          </div>
+          <div class="node-main">
+            <div class="node-code">
+              <span class="node-id">${def.id}</span><span class="state">O</span><span class="trend">~</span>
+            </div>
+            <div class="node-status">
+              <div class="status-label">
+                <div class="status-dot ok"></div>
+                <span class="status-text">OK · Stable</span>
+              </div>
+            </div>
+          </div>
+          <div class="node-bar">
+            <div class="node-bar-fill" style="width:30%"></div>
+          </div>
+          <div class="node-footer">
+            <span class="node-last">Last change: —</span>
+            <span class="node-rate">0.0 pkt/s</span>
+          </div>
+        `;
+
+        nodesGridEl.appendChild(outer);
+
+        // keep references
+        nodeElements[def.id] = {
+          root: outer,
+          codeId: outer.querySelector(".node-code .node-id"),
+          codeState: outer.querySelector(".node-code .state"),
+          codeTrend: outer.querySelector(".node-code .trend"),
+          statusLabel: outer.querySelector(".status-text"),
+          statusDot: outer.querySelector(".status-dot"),
+          barFill: outer.querySelector(".node-bar-fill"),
+          lastChange: outer.querySelector(".node-last"),
+          rate: outer.querySelector(".node-rate")
+        };
+
+        // initial state
+        nodesState[def.id] = {
+          load: clamp(loadBaseline[def.id] + jitter(0.08), 0.05, 0.6),
+          lastLoad: loadBaseline[def.id],
+          degradingScore: 0,
+          lastTimestamp: performance.now(),
+          packetCountWindow: 0,
+          lastRateUpdate: performance.now(),
+          lastCode: null
+        };
+      });
+    }
+
+    // Logging
+    function addLogEntry(nodeId, state, trend) {
+      const now = new Date();
+      const t = now.toLocaleTimeString(undefined, { hour12: false });
+
+      const level = stateToLevel(state);
+      lastEventLevel = level;
+
+      const li = document.createElement("li");
+      li.className = "log-item";
+
+      li.innerHTML = `
+        <div class="log-left">
+          <div class="log-top">
+            <span class="log-node">${nodeId}</span>
+            <span class="log-code">${nodeId}${state}${trend}</span>
+          </div>
+          <div class="log-meta">
+            <span class="log-desc"></span>
+          </div>
+        </div>
+        <div class="log-time">${t}</div>
+      `;
+
+      const descSpan = li.querySelector(".log-desc");
+      const humanState = stateToLabel(state);
+      const trendText = trendToText(trend);
+      descSpan.textContent = `${humanState}${trendText ? " · " + trendText : ""}`;
+
+      if (level === "ok") {
+        li.querySelector(".log-code").classList.add("log-level-ok");
+      } else if (level === "warn") {
+        li.querySelector(".log-code").classList.add("log-level-warn");
+      } else {
+        li.querySelector(".log-code").classList.add("log-level-crit");
+      }
+
+      // Prepend
+      logListEl.insertBefore(li, logListEl.firstChild);
+
+      // Trim log
+      const maxItems = 28;
+      while (logListEl.children.length > maxItems) {
+        logListEl.removeChild(logListEl.lastChild);
+      }
+
+      // Update summary
+      if (level === "ok") {
+        logSummaryEl.textContent = "Recent packets: calm to medium load.";
+      } else if (level === "warn") {
+        logSummaryEl.textContent = "Recent packets: nodes reporting stress / degradation.";
+      } else {
+        logSummaryEl.textContent = "Recent packets: CRITICAL activity detected.";
+      }
+    }
+
+    // Update node visual state
+    function updateNodeVisual(nodeId, state, trend, load, ts) {
+      const els = nodeElements[nodeId];
+      const st = nodesState[nodeId];
+      if (!els || !st) return;
+
+      els.codeState.textContent = state;
+      els.codeTrend.textContent = trend;
+
+      const label = stateToLabel(state);
+      const trendText = trendToText(trend);
+      els.statusLabel.textContent = `${label}${trendText ? " · " + trendText : ""}`;
+
+      // Status dot colour
+      els.statusDot.classList.remove("ok", "warn", "danger");
+      const level = stateToLevel(state);
+      if (level === "ok") {
+        els.statusDot.classList.add("ok");
+      } else if (level === "warn") {
+        els.statusDot.classList.add("warn");
+      } else {
+        els.statusDot.classList.add("danger");
+      }
+
+      // Bar fill as load (15–96%)
+      const width = 15 + load * 81;
+      els.barFill.style.width = `${width.toFixed(0)}%`;
+
+      // Last change text
+      els.lastChange.textContent = "Last change: just now";
+
+      // Rate estimate (simple window)
+      st.packetCountWindow++;
+      const nowMs = ts;
+      if (nowMs - st.lastRateUpdate > 2000) {
+        const dt = (nowMs - st.lastRateUpdate) / 1000;
+        const rate = st.packetCountWindow / dt;
+        els.rate.textContent = `${rate.toFixed(1)} pkt/s`;
+        st.packetCountWindow = 0;
+        st.lastRateUpdate = nowMs;
+      }
+
+      // Log when code actually changed
+      const newCode = nodeId + state + trend;
+      if (newCode !== st.lastCode) {
+        addLogEntry(nodeId, state, trend);
+        st.lastCode = newCode;
+      }
+    }
+
+    function updateGlobalSummary() {
+      let totalLoad = 0;
+      let count = 0;
+      let worstLevel = "ok";
+      for (const id in nodesState) {
+        const st = nodesState[id];
+        totalLoad += st.load;
+        count++;
+        const state = loadToState(st.load, st.degradingScore > 0.6);
+        const level = stateToLevel(state);
+        if (worstLevel === "ok" && (level === "warn" || level === "crit")) {
+          worstLevel = level;
+        } else if (worstLevel === "warn" && level === "crit") {
+          worstLevel = "crit";
+        }
+      }
+      const avgLoad = totalLoad / Math.max(1, count);
+      let text;
+      if (worstLevel === "ok") {
+        if (avgLoad < 0.35) text = "Baseline load pattern · Calm";
+        else text = "Normal activity · Load oscillating safely";
+      } else if (worstLevel === "warn") {
+        text = "Mesh reporting stress · Watch conditions";
+      } else {
+        text = "Mesh in critical band · Intervene now";
+      }
+      globalSummaryEl.textContent = text;
+    }
+
+    // Simulation step
+    function stepSimulation() {
+      const now = performance.now();
+
+      nodeDefinitions.forEach(def => {
+        const id = def.id;
+        const st = nodesState[id];
+
+        // Drift load toward baseline with jitter
+        const baseline = loadBaseline[id];
+        const relax = 0.08;
+        const toBaseline = baseline - st.load;
+        let load = st.load + toBaseline * relax + jitter(0.04);
+
+        // Occasionally push into stress bands
+        if (Math.random() < 0.02) {
+          load += 0.25 + Math.random() * 0.25;
+        }
+
+        // Slow degradation creep for storage / PSU
+        if (id === "S" || id === "P" || id === "V") {
+          if (Math.random() < 0.01) {
+            st.degradingScore = clamp(st.degradingScore + 0.08, 0, 1);
+          } else {
+            st.degradingScore = clamp(st.degradingScore - 0.01, 0, 1);
+          }
+        }
+
+        load = clamp(load, 0, 1);
+        const trend =
+          Math.abs(load - st.lastLoad) < 0.02
+            ? (Math.random() < 0.15 ? "?" : "~")
+            : load > st.lastLoad
+              ? "+"
+              : "-";
+
+        const state = loadToState(load, st.degradingScore > 0.6);
+
+        st.lastLoad = st.load;
+        st.load = load;
+        st.lastTimestamp = now;
+
+        updateNodeVisual(id, state, trend, load, now);
+      });
+
+      updateGlobalSummary();
+    }
+
+    // Inject stress burst (for button)
+    function injectStressEvent() {
+      Object.keys(nodesState).forEach(id => {
+        const st = nodesState[id];
+        // Stress CPU & GPU hardest, others moderately
+        let bump = 0.0;
+        if (id === "C" || id === "G") bump = 0.35 + Math.random() * 0.2;
+        else if (id === "V" || id === "P" || id === "S") bump = 0.18 + Math.random() * 0.18;
+        else bump = 0.12 + Math.random() * 0.12;
+
+        st.load = clamp(st.load + bump, 0, 1);
+        if (id === "S" || id === "P") {
+          st.degradingScore = clamp(st.degradingScore + 0.2, 0, 1);
+        }
+      });
+
+      // Run a couple of extra steps to make it lively
+      stepSimulation();
+      setTimeout(stepSimulation, 220);
+      setTimeout(stepSimulation, 520);
+    }
+
+    // Simulation controls
+    function startSimulation() {
+      if (simInterval) return;
+      simInterval = setInterval(stepSimulation, 850);
+      simRunning = true;
+      simStatusText.textContent = "Running";
+      simStatusDot.style.boxShadow = "0 0 10px rgba(123,255,107,0.9)";
+    }
+
+    function stopSimulation() {
+      if (!simInterval) return;
+      clearInterval(simInterval);
+      simInterval = null;
+      simRunning = false;
+      simStatusText.textContent = "Paused";
+      simStatusDot.style.boxShadow = "0 0 3px rgba(148,163,184,0.8)";
+    }
+
+    // Init
+    buildNodes();
+    // First few steps to populate UI
+    for (let i = 0; i < 3; i++) {
+      stepSimulation();
+    }
+    startSimulation();
+
+    toggleSimBtn.addEventListener("click", () => {
+      if (simRunning) stopSimulation();
+      else startSimulation();
+    });
+
+    injectEventBtn.addEventListener("click", () => {
+      injectStressEvent();
+    });
+  </script>
+</body>
+</html>

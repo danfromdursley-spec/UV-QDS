@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>QDS Page Forge v1 — Neon HTML AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #050510;
+      --panel: #0c0c1a;
+      --border-soft: #202040;
+      --text-main: #f8f9ff;
+      --text-muted: #8f93c9;
+      --danger: #ff5c7a;
+      --radius-xl: 18px;
+      --shadow-soft: 0 0 40px rgba(0, 255, 204, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #101035 0, #050510 55%, #020209 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-shell {
+      display: flex;
+      flex-direction: column;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 16px 12px 32px;
+      gap: 16px;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.3rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h1 span.logo-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #00f6ff, #00ff95);
+      box-shadow: 0 0 10px #00ffc3;
+    }
+
+    .subtitle {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 0.72rem;
+    }
+
+    .badge {
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid #252557;
+      background: linear-gradient(120deg, #121226, #050512);
+      color: var(--text-muted);
+    }
+
+    .badge strong {
+      color: #00ffd1;
+      font-weight: 600;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.3fr);
+      gap: 14px;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, #161628 0, #050510 60%);
+      border-radius: var(--radius-xl);
+      border: 1px solid #1b1b3b;
+      box-shadow: var(--shadow-soft);
+      padding: 14px 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(120deg, rgba(0, 255, 213, 0.16), transparent 40%),
+        radial-gradient(circle at top right, rgba(255, 0, 174, 0.15), transparent 55%);
+      mix-blend-mode: screen;
+      opacity: 0.7;
+    }
+
+    .card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: #c0c3ff;
+    }
+
+    .pill {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid #273058;
+      background: rgba(0, 0, 0, 0.45);
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .card-body {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 0.86rem;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 8px;
+    }
+
+    @media (min-width: 640px) {
+      .field-grid.two-col {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #a3a6dd;
+      margin-bottom: 4px;
+      display: inline-block;
+    }
+
+    input[type="text"],
+    select,
+    textarea {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid #252555;
+      padding: 7px 9px;
+      font-size: 0.86rem;
+      background: rgba(5, 7, 20, 0.85);
+      color: var(--text-main);
+      outline: none;
+      transition: border 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    input[type="text"]:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #00ffd1;
+      box-shadow: 0 0 0 1px rgba(0, 255, 209, 0.3);
+      background: rgba(6, 10, 30, 0.95);
+    }
+
+    textarea {
+      min-height: 60px;
+      resize: vertical;
+    }
+
+    .hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .flag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 12px;
+      font-size: 0.8rem;
+    }
+
+    .flag-row label {
+      text-transform: none;
+      letter-spacing: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 0;
+      color: #c8ccff;
+    }
+
+    .flag-row input[type="checkbox"] {
+      accent-color: #00ffc3;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    button {
+      border-radius: 999px;
+      border: 1px solid #22f2c4;
+      background: radial-gradient(circle at top, #1bffd2 0, #00a3ff 45%, #03242f 100%);
+      color: #020309;
+      font-size: 0.82rem;
+      padding: 7px 14px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 0 18px rgba(0, 255, 196, 0.45);
+      white-space: nowrap;
+    }
+
+    button.secondary {
+      border-color: #3a3a70;
+      background: linear-gradient(135deg, #111121, #050510);
+      color: #e4e3ff;
+      box-shadow: none;
+    }
+
+    button.danger {
+      border-color: var(--danger);
+      background: radial-gradient(circle at top, #ff6584, #6b1230);
+      color: #fff5fa;
+      box-shadow: 0 0 18px rgba(255, 92, 122, 0.4);
+    }
+
+    button span.dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #00ffb7;
+    }
+
+    button span.icon {
+      font-size: 0.9rem;
+    }
+
+    .panel-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .panel-footer span.key-hint {
+      font-family: monospace;
+      padding: 1px 6px;
+      border-radius: 999px;
+      border: 1px solid #333561;
+      background: rgba(4, 6, 24, 0.9);
+    }
+
+    .code-output {
+      font-family: "SF Mono", ui-monospace, Menlo, Monaco, Consolas, "Courier New", monospace;
+      font-size: 0.78rem;
+      background: rgba(3, 4, 18, 0.95);
+      border-radius: 12px;
+      border: 1px solid #24244a;
+      padding: 8px;
+      color: #e9f2ff;
+      min-height: 150px;
+      white-space: pre;
+      overflow: auto;
+    }
+
+    .preview-frame {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid #23244b;
+      overflow: hidden;
+      background: #050510;
+      min-height: 220px;
+      box-shadow: 0 0 24px rgba(0, 0, 0, 0.7);
+    }
+
+    .preview-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .pill-mini {
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 1px solid #2a2a59;
+      background: rgba(5, 7, 22, 0.9);
+    }
+
+    footer {
+      padding: 6px 4px 0;
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      text-align: right;
+      max-width: 1280px;
+      margin: 0 auto 6px;
+    }
+
+    footer span.qds {
+      color: #00ffd1;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header>
+      <div class="title-block">
+        <h1>
+          <span class="logo-dot"></span>
+          QDS Page Forge
+          <span style="font-weight:400; font-size:0.8rem; opacity:0.9;">v1 · HTML AI</span>
+        </h1>
+        <div class="subtitle">
+          Describe the page · pick a layout · hit <strong>Generate</strong>. Page skeleton + neon skin ready for nano.
+        </div>
+      </div>
+      <div class="badge-row">
+        <div class="badge"><strong>Device</strong> · Micro-Lab (Termux)</div>
+        <div class="badge"><strong>Output</strong> · Single HTML file</div>
+        <div class="badge"><strong>Use</strong> · Copy / Download · tweak text</div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <!-- LEFT: CONTROLS -->
+      <section class="card">
+        <div class="card-header">
+          <div class="card-title">Spec · What do you want to build?</div>
+          <div class="pill">Step 1 · Describe</div>
+        </div>
+        <div class="card-body">
+          <div class="field-grid two-col">
+            <div>
+              <label for="fileName">File name</label>
+              <input id="fileName" type="text" placeholder="qds_new_dashboard.html" />
+              <div class="hint">This is just a hint. The generator won’t write files, but the name is shown in the code.</div>
+            </div>
+            <div>
+              <label for="layoutType">Layout type</label>
+              <select id="layoutType">
+                <option value="dashboard">Neon dashboard (cards + grid)</option>
+                <option value="single">Single panel page</option>
+                <option value="news">News / QDS vs Mainstream vault</option>
+                <option value="blank">Minimal skeleton</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-grid">
+            <div>
+              <label for="pageTitle">Page title (browser tab)</label>
+              <input id="pageTitle" type="text" placeholder="QDS Battery Habitat · v1.3" />
+            </div>
+          </div>
+
+          <div class="field-grid">
+            <div>
+              <label for="mainHeading">Main heading</label>
+              <input id="mainHeading" type="text" placeholder="QDS Lab · New Dashboard" />
+            </div>
+            <div>
+              <label for="subHeading">Subtitle / tagline</label>
+              <input id="subHeading" type="text" placeholder="Fast neon scaffold for micro-experiments." />
+            </div>
+          </div>
+
+          <div class="field-grid">
+            <div>
+              <label for="sections">Sections / panels</label>
+              <textarea id="sections" placeholder="One per line, e.g.&#10;Inputs·Controls&#10;Live metrics&#10;Notes / scratchpad"></textarea>
+              <div class="hint">These become card titles or section headings depending on layout.</div>
+            </div>
+          </div>
+
+          <div class="field-grid two-col">
+            <div>
+              <label for="theme">Color theme</label>
+              <select id="theme">
+                <option value="blueGreen">Neon Blue + Green</option>
+                <option value="orangePink">Burnt Orange + Magenta</option>
+                <option value="cyberLime">Cyber Lime + Violet</option>
+                <option value="matrix">Matrix Green</option>
+              </select>
+            </div>
+            <div>
+              <label>Modules</label>
+              <div class="flag-row">
+                <label><input type="checkbox" id="modNav" checked /> Nav bar</label>
+                <label><input type="checkbox" id="modHero" checked /> Hero block</label>
+                <label><input type="checkbox" id="modStats" checked /> Stats strip</label>
+                <label><input type="checkbox" id="modFooter" checked /> Footer</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button type="button" onclick="generateHtml()">
+              <span class="icon">⚙️</span>
+              Generate HTML
+            </button>
+            <button type="button" class="secondary" onclick="copyCode()">
+              <span class="icon">📋</span>
+              Copy code
+            </button>
+            <button type="button" class="secondary" onclick="downloadHtml()">
+              <span class="icon">💾</span>
+              Download .html
+            </button>
+            <button type="button" class="danger" onclick="clearForm()">
+              <span class="icon">🧹</span>
+              Reset
+            </button>
+          </div>
+
+          <div class="panel-footer">
+            <span>Tip: write a rough spec, generate, then tweak text inside nano.</span>
+            <span class="key-hint">nano new_page.html</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: PREVIEW + CODE -->
+      <section class="card">
+        <div class="card-header">
+          <div class="card-title">Output · Code + Live preview</div>
+          <div class="pill">Step 2 · Copy / Save</div>
+        </div>
+        <div class="card-body">
+          <div>
+            <div class="preview-label-row">
+              <span>Live preview (in-browser)</span>
+              <span class="pill-mini">Read-only · Use code box to edit later</span>
+            </div>
+            <div class="preview-frame">
+              <iframe id="livePreview" style="width:100%;height:100%;border:none;background:#050510;"></iframe>
+            </div>
+          </div>
+
+          <div>
+            <label for="generatedCode">Generated HTML</label>
+            <textarea id="generatedCode" class="code-output" spellcheck="false" placeholder="Click ‘Generate HTML’ to build a page skeleton…"></textarea>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <footer>
+    <span class="qds">QDS Page Forge</span> · local-only · no network · built for Termux micro-lab.
+  </footer>
+
+  <script>
+    function getThemePalette(key) {
+      switch (key) {
+        case "orangePink":
+          return {
+            primary: "#ff9a3c",
+            secondary: "#ff4b8b",
+            glow: "rgba(255, 154, 60, 0.4)"
+          };
+        case "cyberLime":
+          return {
+            primary: "#b8ff3b",
+            secondary: "#ad55ff",
+            glow: "rgba(184, 255, 59, 0.4)"
+          };
+        case "matrix":
+          return {
+            primary: "#1eff6b",
+            secondary: "#41ffb0",
+            glow: "rgba(30, 255, 107, 0.45)"
+          };
+        case "blueGreen":
+        default:
+          return {
+            primary: "#00f6ff",
+            secondary: "#00ffb3",
+            glow: "rgba(0, 244, 217, 0.45)"
+          };
+      }
+    }
+
+    function escapeHtml(str) {
+      return (str || "").replace(/[&<>]/g, s => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[s]));
+    }
+
+    function buildBodyContent(opts, theme) {
+      const sections = (opts.sections || []).filter(Boolean);
+      const t = theme;
+      const hasHero = opts.modHero;
+      const hasStats = opts.modStats;
+      const hasNav = opts.modNav;
+      const hasFooter = opts.modFooter;
+
+      let html = "";
+
+      if (hasNav) {
+        html += `
+  <header class="qds-nav">
+    <div class="qds-nav-left">
+      <div class="qds-orb"></div>
+      <div class="qds-nav-text">
+        <span class="qds-nav-label">QDS LAB</span>
+        <span class="qds-nav-title">${escapeHtml(opts.mainHeading || "New Dashboard")}</span>
+      </div>
+    </div>
+    <div class="qds-nav-right">
+      <span class="qds-pill">LOCAL</span>
+      <span class="qds-pill qds-pill-accent">${escapeHtml(opts.layoutLabel)}</span>
+    </div>
+  </header>`;
+      }
+
+      if (hasHero) {
+        html += `
+  <section class="qds-hero">
+    <div class="qds-hero-main">
+      <h1>${escapeHtml(opts.mainHeading || "QDS Neon Board")}</h1>
+      <p>${escapeHtml(opts.subHeading || "Describe experiment, wire inputs, read outputs.")}</p>
+      <div class="qds-hero-tags">
+        <span class="qds-tag">Phone-lab</span>
+        <span class="qds-tag">Offline-ready</span>
+        <span class="qds-tag">Neon-HTML</span>
+      </div>
+    </div>
+    <div class="qds-hero-meta">
+      <div class="qds-metric">
+        <div class="qds-metric-label">LAYOUT</div>
+        <div class="qds-metric-value">${escapeHtml(opts.layoutShort)}</div>
+      </div>
+      <div class="qds-metric">
+        <div class="qds-metric-label">THEME</div>
+        <div class="qds-metric-value">${escapeHtml(opts.themeLabel)}</div>
+      </div>
+      <div class="qds-metric">
+        <div class="qds-metric-label">SECTIONS</div>
+        <div class="qds-metric-value">${sections.length || 0}</div>
+      </div>
+    </div>
+  </section>`;
+      }
+
+      if (hasStats) {
+        html += `
+  <section class="qds-strip">
+    <div class="qds-strip-item">
+      <span class="qds-strip-label">MODE</span>
+      <span class="qds-strip-value">Design</span>
+    </div>
+    <div class="qds-strip-item">
+      <span class="qds-strip-label">DEVICE</span>
+      <span class="qds-strip-value">Termux Micro-Lab</span>
+    </div>
+    <div class="qds-strip-item">
+      <span class="qds-strip-label">STATUS</span>
+      <span class="qds-strip-value qds-online">Ready</span>
+    </div>
+  </section>`;
+      }
+
+      if (opts.layoutType === "dashboard") {
+        html += `
+  <main class="qds-main-grid">`;
+        sections.forEach((sec, idx) => {
+          html += `
+    <section class="qds-panel">
+      <div class="qds-panel-header">
+        <h2>${escapeHtml(sec)}</h2>
+        <span class="qds-panel-pill">Panel ${idx + 1}</span>
+      </div>
+      <div class="qds-panel-body">
+        <p>Describe what lives here: controls, tables, charts, or notes.</p>
+      </div>
+    </section>`;
+        });
+        html += `
+  </main>`;
+      } else if (opts.layoutType === "single") {
+        html += `
+  <main class="qds-main-single">
+    <section class="qds-panel qds-panel-full">
+      <div class="qds-panel-header">
+        <h2>${escapeHtml(sections[0] || "Main workspace")}</h2>
+        <span class="qds-panel-pill">Core</span>
+      </div>
+      <div class="qds-panel-body">
+        <p>Use this wide panel for a single flow: inputs on top, live readout below, notes at the bottom.</p>
+      </div>
+    </section>`;
+        if (sections.length > 1) {
+          html += `
+    <section class="qds-panel-row">`;
+          sections.slice(1).forEach((sec, idx) => {
+            html += `
+      <div class="qds-panel qds-panel-mini">
+        <div class="qds-panel-header">
+          <h3>${escapeHtml(sec)}</h3>
+        </div>
+        <div class="qds-panel-body">
+          <p>Secondary panel ${idx + 1}. Logs, stats or quick controls.</p>
+        </div>
+      </div>`;
+          });
+          html += `
+    </section>`;
+        }
+        html += `
+  </main>`;
+      } else if (opts.layoutType === "news") {
+        html += `
+  <main class="qds-main-news">
+    <section class="qds-news-column">
+      <h2>QDS vs Mainstream</h2>
+      <p class="qds-news-hint">Paste articles and mark: supports, contradicts, or neutral to a QDS prediction.</p>
+      <div class="qds-news-lane qds-news-lane-vs">
+        <h3>Potentially vs QDS</h3>
+        <ul class="qds-list" id="qds-vs-list">
+          <li>• Drop bullet points here while reading.</li>
+        </ul>
+      </div>
+      <div class="qds-news-lane qds-news-lane-comp">
+        <h3>Complementary / supporting</h3>
+        <ul class="qds-list" id="qds-comp-list">
+          <li>• Use this lane for “nice match” notes.</li>
+        </ul>
+      </div>
+      <div class="qds-news-lane qds-news-lane-neutral">
+        <h3>Neutral / background</h3>
+        <ul class="qds-list" id="qds-neutral-list">
+          <li>• Good context, but not decisive.</li>
+        </ul>
+      </div>
+    </section>
+    <section class="qds-news-column">
+      <h2>Triage scratchpad</h2>
+      <textarea class="qds-scratch" placeholder="Drop quotes, numbers, and quick verdicts here…"></textarea>
+      <p class="qds-news-hint">When done, copy this whole block into your QDS log / evidence pack.</p>
+    </section>
+  </main>`;
+      } else {
+        html += `
+  <main class="qds-main-blank">
+    <section class="qds-panel qds-panel-full">
+      <div class="qds-panel-header">
+        <h2>${escapeHtml(sections[0] || "Blank canvas")}</h2>
+        <span class="qds-panel-pill">Skeleton</span>
+      </div>
+      <div class="qds-panel-body">
+        <p>Start from scratch. Add your own layout, grids, charts and widgets.</p>
+      </div>
+    </section>
+  </main>`;
+      }
+
+      if (hasFooter) {
+        html += `
+  <footer class="qds-footer">
+    <span>Built with <strong>QDS Page Forge v1</strong> on a phone-lab.</span>
+    <span class="qds-footer-meta">File: ${escapeHtml(opts.fileName || "new_page.html")}</span>
+  </footer>`;
+      }
+
+      return html;
+    }
+
+    function generateHtml() {
+      const fileName = (document.getElementById("fileName").value || "").trim();
+      const layoutType = document.getElementById("layoutType").value;
+      const pageTitle = (document.getElementById("pageTitle").value || "").trim() || "QDS Neon Page";
+      const mainHeading = document.getElementById("mainHeading").value.trim();
+      const subHeading = document.getElementById("subHeading").value.trim();
+      const sectionsRaw = document.getElementById("sections").value;
+      const sections = sectionsRaw.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+      const themeKey = document.getElementById("theme").value;
+
+      const modNav = document.getElementById("modNav").checked;
+      const modHero = document.getElementById("modHero").checked;
+      const modStats = document.getElementById("modStats").checked;
+      const modFooter = document.getElementById("modFooter").checked;
+
+      let layoutLabel, layoutShort;
+      switch (layoutType) {
+        case "dashboard":
+          layoutLabel = "Neon dashboard";
+          layoutShort = "DASH";
+          break;
+        case "single":
+          layoutLabel = "Single panel";
+          layoutShort = "SINGLE";
+          break;
+        case "news":
+          layoutLabel = "News / QDS Vault";
+          layoutShort = "NEWS";
+          break;
+        case "blank":
+        default:
+          layoutLabel = "Blank skeleton";
+          layoutShort = "RAW";
+          break;
+      }
+
+      let themeLabel;
+      switch (themeKey) {
+        case "orangePink": themeLabel = "Orange / Magenta"; break;
+        case "cyberLime": themeLabel = "Cyber Lime / Violet"; break;
+        case "matrix": themeLabel = "Matrix Green"; break;
+        default: themeLabel = "Blue / Green"; break;
+      }
+
+      const palette = getThemePalette(themeKey);
+
+      const opts = {
+        fileName,
+        layoutType,
+        layoutLabel,
+        layoutShort,
+        mainHeading,
+        subHeading,
+        sections,
+        modNav,
+        modHero,
+        modStats,
+        modFooter,
+        themeLabel
+      };
+
+      const bodyContent = buildBodyContent(opts, palette);
+
+      const fullHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>${escapeHtml(pageTitle)}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --qds-bg: #050410;
+      --qds-panel: #0c0c1c;
+      --qds-border: #25254a;
+      --qds-text: #f6f7ff;
+      --qds-muted: #8e94c5;
+      --qds-primary: ${palette.primary};
+      --qds-secondary: ${palette.secondary};
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #141432 0, var(--qds-bg) 55%, #020208 100%);
+      color: var(--qds-text);
+      min-height: 100vh;
+      padding: 12px;
+    }
+    .qds-shell {
+      max-width: 1200px;
+      margin: 0 auto 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .qds-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: linear-gradient(120deg, rgba(0,0,0,0.75), rgba(20,20,60,0.9));
+      box-shadow: 0 0 22px rgba(0,0,0,0.65), 0 0 30px ${palette.glow};
+    }
+    .qds-nav-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .qds-orb {
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #fff, var(--qds-primary));
+      box-shadow: 0 0 14px var(--qds-primary), 0 0 26px var(--qds-secondary);
+    }
+    .qds-nav-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .qds-nav-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--qds-muted);
+    }
+    .qds-nav-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .qds-nav-right {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .qds-pill {
+      font-size: 0.7rem;
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.09);
+      background: rgba(5,5,14,0.95);
+      color: var(--qds-muted);
+    }
+    .qds-pill-accent {
+      border-color: var(--qds-primary);
+      color: var(--qds-primary);
+    }
+    .qds-hero {
+      margin-top: 8px;
+      padding: 14px 14px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--qds-border);
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.12), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(0,0,0,0.85), #050414);
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.3fr);
+      gap: 10px;
+    }
+    @media (max-width: 800px) {
+      .qds-hero {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+    .qds-hero-main h1 {
+      margin: 0 0 4px;
+      font-size: 1.4rem;
+    }
+    .qds-hero-main p {
+      margin: 0 0 7px;
+      font-size: 0.9rem;
+      color: var(--qds-muted);
+    }
+    .qds-hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 3px;
+    }
+    .qds-tag {
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(5,5,18,0.9);
+    }
+    .qds-hero-meta {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+      align-content: flex-start;
+    }
+    .qds-metric {
+      padding: 7px 9px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(3,5,18,0.95);
+    }
+    .qds-metric-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.11em;
+      color: var(--qds-muted);
+      margin-bottom: 3px;
+    }
+    .qds-metric-value {
+      font-size: 0.9rem;
+    }
+    .qds-strip {
+      margin-top: 10px;
+      padding: 8px 11px;
+      border-radius: 999px;
+      border: 1px dashed rgba(255,255,255,0.12);
+      background: rgba(5,6,20,0.92);
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+      font-size: 0.78rem;
+    }
+    @media (max-width: 640px) {
+      .qds-strip {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+    .qds-strip-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .qds-strip-label {
+      color: var(--qds-muted);
+    }
+    .qds-strip-value {
+      font-weight: 600;
+    }
+    .qds-online {
+      color: var(--qds-primary);
+    }
+    .qds-main-grid {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+    }
+    .qds-panel {
+      border-radius: 18px;
+      border: 1px solid var(--qds-border);
+      background: radial-gradient(circle at top left, rgba(255,255,255,0.08), transparent 60%), #050412;
+      padding: 10px 11px 12px;
+      min-height: 80px;
+    }
+    .qds-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .qds-panel-header h2,
+    .qds-panel-header h3 {
+      margin: 0;
+      font-size: 0.95rem;
+    }
+    .qds-panel-pill {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--qds-muted);
+    }
+    .qds-panel-body {
+      font-size: 0.82rem;
+      color: var(--qds-muted);
+    }
+    .qds-main-single {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .qds-panel-full {
+      width: 100%;
+    }
+    .qds-panel-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+    }
+    .qds-panel-mini h3 {
+      font-size: 0.9rem;
+    }
+    .qds-main-news {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.3fr);
+      gap: 12px;
+    }
+    @media (max-width: 880px) {
+      .qds-main-news {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+    .qds-news-column h2 {
+      margin: 0 0 4px;
+      font-size: 1.05rem;
+    }
+    .qds-news-hint {
+      margin: 0 0 8px;
+      font-size: 0.78rem;
+      color: var(--qds-muted);
+    }
+    .qds-news-lane {
+      border-radius: 14px;
+      border: 1px solid var(--qds-border);
+      background: rgba(5,5,20,0.95);
+      padding: 8px 10px;
+      margin-bottom: 8px;
+    }
+    .qds-news-lane h3 {
+      margin: 0 0 4px;
+      font-size: 0.9rem;
+    }
+    .qds-news-lane-vs { border-color: #ff6a88; }
+    .qds-news-lane-comp { border-color: var(--qds-primary); }
+    .qds-news-lane-neutral { border-style: dashed; }
+    .qds-list {
+      margin: 0;
+      padding-left: 14px;
+      font-size: 0.8rem;
+      color: var(--qds-muted);
+    }
+    .qds-scratch {
+      width: 100%;
+      min-height: 150px;
+      border-radius: 14px;
+      border: 1px solid var(--qds-border);
+      background: rgba(5,6,24,0.96);
+      color: var(--qds-text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.8rem;
+      padding: 8px 9px;
+      resize: vertical;
+    }
+    .qds-main-blank {
+      margin-top: 10px;
+    }
+    .qds-footer {
+      margin-top: 12px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.09);
+      background: rgba(4,4,16,0.94);
+      font-size: 0.78rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: space-between;
+      color: var(--qds-muted);
+    }
+    .qds-footer-meta {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="qds-shell">
+${buildBodyContent(opts, palette)}
+  </div>
+</body>
+</html>`;
+
+      const codeBox = document.getElementById("generatedCode");
+      codeBox.value = fullHtml;
+
+      const iframe = document.getElementById("livePreview");
+      iframe.srcdoc = fullHtml;
+    }
+
+    function copyCode() {
+      const codeBox = document.getElementById("generatedCode");
+      if (!codeBox.value.trim()) {
+        alert("Nothing to copy yet. Generate a page first.");
+        return;
+      }
+      codeBox.select();
+      try {
+        document.execCommand("copy");
+        alert("HTML copied to clipboard. Paste into nano on the target file.");
+      } catch (e) {
+        alert("Clipboard copy may not be supported here. Long-press and copy manually.");
+      }
+    }
+
+    function downloadHtml() {
+      const code = document.getElementById("generatedCode").value;
+      if (!code.trim()) {
+        alert("Generate some HTML first.");
+        return;
+      }
+      const rawName = document.getElementById("fileName").value.trim();
+      const name = rawName || "qds_neon_page.html";
+      const blob = new Blob([code], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function clearForm() {
+      document.getElementById("fileName").value = "";
+      document.getElementById("layoutType").value = "dashboard";
+      document.getElementById("pageTitle").value = "";
+      document.getElementById("mainHeading").value = "";
+      document.getElementById("subHeading").value = "";
+      document.getElementById("sections").value = "";
+      document.getElementById("theme").value = "blueGreen";
+      document.getElementById("modNav").checked = true;
+      document.getElementById("modHero").checked = true;
+      document.getElementById("modStats").checked = true;
+      document.getElementById("modFooter").checked = true;
+      document.getElementById("generatedCode").value = "";
+      document.getElementById("livePreview").srcdoc = "";
+    }
+
+    // Auto-generate a starter layout on load
+    window.addEventListener("load", () => {
+      document.getElementById("layoutType").value = "dashboard";
+      document.getElementById("theme").value = "blueGreen";
+      document.getElementById("fileName").value = "qds_new_lab.html";
+      document.getElementById("pageTitle").value = "QDS New Lab · Neon Board";
+      document.getElementById("mainHeading").value = "QDS Experimental Board";
+      document.getElementById("subHeading").value = "Fast neon scaffold for the next micro-lab idea.";
+      document.getElementById("sections").value =
+        "Inputs · Controls\nLive metrics\nNotes / scratchpad";
+      generateHtml();
+    });
+  </script>
+</body>
+</html>

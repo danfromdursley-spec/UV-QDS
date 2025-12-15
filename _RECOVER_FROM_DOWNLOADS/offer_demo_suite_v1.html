@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Offer — Interactive Demo Suite</title>
+<style>
+:root{
+  --bg:#07080d; --panel:#0e111b; --panel2:#0b0e16;
+  --text:#eef1ff; --muted:#a7acc7;
+  --accent:#a78bfa; --accent2:#22d3ee; --ok:#7cffa7; --radius:22px;
+  --shadow:0 10px 40px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.04);
+}
+*{box-sizing:border-box}
+body{
+  margin:0; color:var(--text);
+  background:
+    radial-gradient(900px 600px at 15% 10%, rgba(167,139,250,.12), transparent 60%),
+    radial-gradient(900px 700px at 85% 20%, rgba(34,211,238,.10), transparent 60%),
+    linear-gradient(180deg, #05060a, var(--bg) 35%, #05060a);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+.wrap{max-width:940px; margin:0 auto; padding:26px 16px 60px}
+.badge{
+  display:inline-flex; gap:8px; align-items:center;
+  padding:8px 12px; border-radius:999px;
+  background:linear-gradient(90deg, rgba(167,139,250,.18), rgba(34,211,238,.14));
+  border:1px solid rgba(255,255,255,.06); color:var(--muted);
+  font-size:12px;
+}
+h1{font-size:clamp(28px, 6vw, 42px); margin:14px 0 8px}
+p.lead{color:var(--muted); font-size:clamp(14px, 2.5vw, 18px); line-height:1.5}
+.panel{
+  background:linear-gradient(180deg, rgba(255,255,255,.03), transparent 35%), var(--panel);
+  border-radius:var(--radius); padding:18px; box-shadow:var(--shadow);
+  border:1px solid rgba(255,255,255,.06); margin-top:14px;
+}
+.grid{display:grid; gap:12px}
+@media(min-width:760px){.grid{grid-template-columns:1.1fr .9fr}}
+.price{
+  font-weight:800; font-size:28px;
+  background:linear-gradient(90deg, var(--accent), #ff6bd6);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+ul{margin:10px 0 0 18px; padding:0}
+li{margin:6px 0; color:var(--muted)}
+.pill{
+  display:inline-flex; padding:6px 10px; border-radius:999px;
+  background:rgba(124,255,167,.08);
+  border:1px solid rgba(124,255,167,.22);
+  color:var(--ok); font-size:11px;
+}
+.btn{
+  display:inline-block; padding:12px 14px; border-radius:14px;
+  text-decoration:none; color:var(--text);
+  background:linear-gradient(90deg, rgba(167,139,250,.18), rgba(34,211,238,.12));
+  border:1px solid rgba(255,255,255,.08);
+}
+.btn.secondary{background:linear-gradient(90deg, rgba(255,255,255,.05), rgba(255,255,255,.02))}
+.small{font-size:12px; color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="badge">Offer • 2–4 tools • Versioned releases</span>
+  <h1>Interactive Demo Suite</h1>
+  <p class="lead">
+    A small set of focused mini-apps that turn complex tech into a friendly,
+    testable experience. Great for investors, customers, and internal alignment.
+  </p>
+
+  <div class="grid">
+    <div class="panel">
+      <h3>What you get <span class="pill">fast + tidy</span></h3>
+      <ul>
+        <li>2–4 lightweight interactive tools</li>
+        <li>Unified styling + clear nav</li>
+        <li>Versioned release discipline (v1, v1.1, etc.)</li>
+        <li>Optional one-command local launch script</li>
+        <li>Simple “repro pack” notes for credibility</li>
+      </ul>
+
+      <div class="panel" style="background:rgba(255,255,255,.02)">
+        <h3>Examples in your ecosystem</h3>
+        <ul>
+          <li>Battery Hub + Stress Lab + Coach</li>
+          <li>Universe + Solar showcase pair</li>
+          <li>Indus Atlas + test task packs</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Pricing</h3>
+      <div class="price">£1,500–£5,500</div>
+      <div class="small">Depends on tool count, data modelling, and polish load.</div>
+
+      <div class="panel" style="background:rgba(255,255,255,.02)">
+        <h3>Scope guardrails</h3>
+        <ul>
+          <li>We agree the “wow path” first</li>
+          <li>Each tool has a single purpose</li>
+          <li>Extra features = small scoped add-ons</li>
+        </ul>
+      </div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px">
+        <a class="btn" href="offer_index_v1.html">← Back to offers</a>
+        <a class="btn secondary" href="qds_battery_hub_v9_7_science_neon_lab.html">See flagship vibe</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Contact</h3>
+    <div class="small">Add your preferred line here (email / GitHub). Keep it simple.</div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>QDS Avian Magnetoreception Lab v3 PRO+</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+/* ————————————————————————
+   HYBRID QDS SCIENCE + NEON STYLE
+———————————————————————— */
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: linear-gradient(160deg, #0b0f17, #04060a 65%, #020409 100%);
+  color: #e8faff;
+}
+.wrapper {
+  max-width: 940px;
+  margin: auto;
+  padding: 20px 12px 60px;
+}
+h1 {
+  text-align: center;
+  font-size: 1.9rem;
+  color: #60f4ff;
+  text-shadow: 0 0 18px rgba(0,255,255,0.4);
+}
+.section-title {
+  margin: 18px 0 10px;
+  font-size: 1.2rem;
+  color: #d8faff;
+  border-left: 6px solid #35e6bb;
+  padding-left: 10px;
+}
+
+/* CARDS */
+.card {
+  background: radial-gradient(circle at top left, #121a25, #0a0f15 75%);
+  padding: 14px 16px 18px;
+  border-radius: 14px;
+  box-shadow: 0 0 14px rgba(0,255,255,0.25);
+  border: 1px solid rgba(60,220,255,0.18);
+  margin-bottom: 18px;
+}
+
+/* SLIDERS */
+.slider-label {
+  font-size: 0.88rem;
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+}
+.value-pill {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: rgba(34,197,94,0.25);
+  font-size: 0.75rem;
+}
+input[type=range] {
+  width: 100%;
+  -webkit-appearance: none;
+  height: 6px;
+  border-radius: 6px;
+  background: linear-gradient(90deg,#0ea5e9,#22c55e);
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #f97316;
+  border: 2px solid #e0f2fe;
+  box-shadow: 0 0 10px rgba(249,115,22,0.8);
+}
+
+/* HYBRID COMPASS v3 */
+.compass-shell {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+.compass {
+  width: 240px;
+  height: 240px;
+  position: relative;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 30%, #121826, #070b11 80%);
+  border: 4px solid #49e9ff;
+  box-shadow: 0 0 20px rgba(73,233,255,0.45);
+}
+.compass-tick {
+  position: absolute;
+  width: 2px;
+  height: 14px;
+  background: #d0f7ff;
+  left: 50%;
+  top: 4px;
+  transform-origin: bottom center;
+}
+.compass-label {
+  color: #e8faff;
+  font-size: 0.75rem;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 22px;
+  letter-spacing: 0.22em;
+}
+.needle {
+  width: 6px;
+  height: 90px;
+  background: #ff4455;
+  border-radius: 999px;
+  position: absolute;
+  left: 50%;
+  bottom: 50%;
+  transform-origin: bottom center;
+  box-shadow: 0 0 14px rgba(255,80,80,0.8);
+}
+
+/* STATUS BAR */
+.status {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  font-size: 0.95rem;
+  text-align: center;
+  box-shadow: 0 0 14px rgba(0,0,0,0.6);
+}
+.ok { background: rgba(34,197,94,0.25); border:1px solid #22c55e; }
+.warn { background: rgba(234,179,8,0.25); border:1px solid #eab308; }
+.bad { background: rgba(248,113,113,0.25); border:1px solid #ef4444; }
+
+/* BUTTONS */
+.btn {
+  border: none;
+  padding: 10px 14px;
+  margin: 4px 0;
+  border-radius: 10px;
+  background: linear-gradient(120deg,#0ea5e9,#22c55e);
+  color: #041014;
+  font-weight: 600;
+  width: 100%;
+  box-shadow: 0 0 15px rgba(14,165,233,0.45);
+}
+.btn-outline {
+  background: transparent;
+  border: 1px solid #35e6ff;
+  color: #bcf4ff;
+}
+
+/* CRYPTOCHROME GLOW */
+#activationSphere {
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  margin: 0 auto;
+  background: radial-gradient(circle at 30% 20%, #4c1d95, #020617);
+  box-shadow: 0 0 0 rgba(56,189,248,0.0);
+}
+
+</style>
+</head>
+
+<body>
+<div class="wrapper">
+
+<h1>🦅 QDS Avian Magnetoreception Lab v3 PRO+</h1>
+
+<!-- SPECIES SELECTOR -->
+<div class="card">
+  <div class="section-title">Species Mode</div>
+  <select id="speciesSelect" style="width:100%;padding:10px;border-radius:10px;background:#0f172a;color:#e0faff;border:1px solid #35e6ff;">
+    <option value="robin">European Robin</option>
+    <option value="pigeon">Racing Pigeon</option>
+    <option value="albatross">Wandering Albatross</option>
+    <option value="hummingbird">Hummingbird</option>
+    <option value="crow">Crow / Raven</option>
+  </select>
+</div>
+
+<!-- CORE PARAMETERS -->
+<div class="card">
+  <div class="section-title">Quantum Parameters</div>
+
+  <div class="slider-label">τ<sub>c</sub> (ms) <span id="tcVal" class="value-pill"></span></div>
+  <input id="tc" type="range" min="0.3" max="5" step="0.05" value="1.2">
+
+  <div class="slider-label">λ<sub>c</sub> (nm) <span id="lcVal" class="value-pill"></span></div>
+  <input id="lc" type="range" min="0.2" max="2.0" step="0.05" value="0.8">
+
+  <div class="slider-label">EM Noise <span id="noiseVal" class="value-pill"></span></div>
+  <input id="noise" type="range" min="0" max="1" step="0.01" value="0.10">
+</div>
+
+<!-- COMPASS -->
+<div class="card">
+  <div class="section-title">Compass v3 Hybrid</div>
+  <div class="compass-shell">
+    <div class="compass" id="compass">
+      <!-- Ticks -->
+      <div class="compass-tick" style="transform:rotate(0deg)"></div>
+      <div class="compass-tick" style="transform:rotate(90deg)"></div>
+      <div class="compass-tick" style="transform:rotate(180deg)"></div>
+      <div class="compass-tick" style="transform:rotate(270deg)"></div>
+      <div class="compass-label">N</div>
+      <div id="needle" class="needle"></div>
+    </div>
+  </div>
+  <div id="status" class="status warn">Initialising…</div>
+</div>
+
+<!-- CRYPTOCHROME -->
+<div class="card">
+  <div class="section-title">Cryptochrome Activation</div>
+  <div id="activationSphere"></div>
+  <p style="font-size:0.8rem;color:#a3f7ff;text-align:center;margin-top:6px;">
+    Glow intensity scales with kernel strength K and species model.
+  </p>
+</div>
+
+<!-- PRESETS -->
+<div class="card">
+  <div class="section-title">Environment Presets</div>
+  <button class="btn" onclick="preset('forest')">🌲 Quiet Forest</button>
+  <button class="btn" onclick="preset('urban')">🏙️ Urban Corridor</button>
+  <button class="btn" onclick="preset('storm')">⛈️ Magnetic Storm</button>
+  <button class="btn" onclick="preset('flare')">☀️ Solar Flare</button>
+  <button class="btn" onclick="preset('lab')">🧪 Quantum Lab</button>
+  <button class="btn-outline" onclick="toggle5G()">📡 Toggle 5G Tower</button>
+</div>
+
+<!-- EXPORT -->
+<div class="card">
+  <div class="section-title">Export Tools</div>
+  <button class="btn-outline" onclick="snapshot()">📸 Export Snapshot</button>
+</div>
+
+</div>
+
+<script>
+/* ————————————————————————
+   JAVASCRIPT ENGINE v3 PRO+
+———————————————————————— */
+
+let fiveG = false;
+
+/* SPECIES PARAM SETS */
+const species = {
+  robin:       { tau: [0.8,1.4],  lambda:[0.3,0.8],  sens:1.0, jitter:0.9 },
+  pigeon:      { tau: [1.0,2.0],  lambda:[0.4,1.2],  sens:0.6, jitter:0.5 },
+  albatross:   { tau: [2.5,5.0],  lambda:[0.7,2.0],  sens:0.3, jitter:0.2 },
+  hummingbird: { tau: [0.4,0.9],  lambda:[0.2,0.6],  sens:1.5, jitter:1.4 },
+  crow:        { tau: [1.8,3.2],  lambda:[0.6,1.4],  sens:0.5, jitter:0.6 }
+};
+
+/* UI ELEMENTS */
+const tc    = document.getElementById("tc");
+const lc    = document.getElementById("lc");
+const noise = document.getElementById("noise");
+const tcVal = document.getElementById("tcVal");
+const lcVal = document.getElementById("lcVal");
+const noiseVal = document.getElementById("noiseVal");
+const needle = document.getElementById("needle");
+const statusBox = document.getElementById("status");
+const sphere = document.getElementById("activationSphere");
+const speciesSelect = document.getElementById("speciesSelect");
+
+/* UPDATE LABELS */
+function updateLabels() {
+  tcVal.textContent = tc.value + " ms";
+  lcVal.textContent = lc.value + " nm";
+  noiseVal.textContent = Number(noise.value).toFixed(2);
+}
+
+/* KERNEL COMPUTATION */
+function computeK() {
+  const T = parseFloat(tc.value);
+  const L = parseFloat(lc.value);
+  let N = parseFloat(noise.value);
+
+  if (fiveG) N += 0.2;
+
+  const K = (T * L) / (1 + 6*N*N);
+  return K;
+}
+
+/* COMPASS UPDATE */
+let angle = 0;
+function updateCompass(K, sp) {
+  const sens = species[sp].sens;
+  const jitter = species[sp].jitter;
+
+  let baseAngle;
+  if (K > 8) baseAngle = 0;
+  else if (K > 4) baseAngle = 20;
+  else if (K > 2) baseAngle = 70;
+  else baseAngle = 150;
+
+  const jitterAmp = jitter * (1/(K+0.3));
+  const randomKick = (Math.random()-0.5)*jitterAmp*10;
+
+  angle = angle*0.7 + (baseAngle+randomKick)*0.3;
+  needle.style.transform = "rotate("+angle+"deg)";
+}
+
+/* STATUS */
+function updateStatus(K) {
+  if (K > 8) {
+    statusBox.textContent="Stable Navigation — Ideal Conditions";
+    statusBox.className="status ok";
+  } else if (K > 4) {
+    statusBox.textContent="Functional Navigation — Mild Noise";
+    statusBox.className="status warn";
+  } else if (K > 2) {
+    statusBox.textContent="Compromised — Navigation Drift Likely";
+    statusBox.className="status warn";
+  } else {
+    statusBox.textContent="Compass Collapse — Disorientation";
+    statusBox.className="status bad";
+  }
+}
+
+/* CRYPTOCHROME SPHERE */
+function updateSphere(K) {
+  const glow = Math.min(1, K/8);
+  sphere.style.boxShadow = 
+    "0 0 "+(20+glow*40)+"px "+(4+glow*10)+"px rgba(56,189,248,"+(0.2+0.5*glow)+")";
+}
+
+/* PRESETS */
+function preset(type) {
+  if (type=="forest")     { tc.value=1.6; lc.value=1.0; noise.value=0.12; }
+  if (type=="urban")      { tc.value=1.2; lc.value=0.8; noise.value=0.42; }
+  if (type=="storm")      { tc.value=0.9; lc.value=0.5; noise.value=0.7; }
+  if (type=="flare")      { tc.value=0.6; lc.value=0.3; noise.value=0.88; }
+  if (type=="lab")        { tc.value=3.5; lc.value=1.6; noise.value=0.03; }
+  updateLabels();
+}
+
+/* 5G Toggle */
+function toggle5G() {
+  fiveG = !fiveG;
+}
+
+/* Species Change */
+speciesSelect.addEventListener("change", () => {
+  let sp = speciesSelect.value;
+  const s = species[sp];
+  tc.min = s.tau[0];
+  tc.max = s.tau[1];
+  lc.min = s.lambda[0];
+  lc.max = s.lambda[1];
+});
+
+/* EXPORT SNAPSHOT */
+function snapshot() {
+  const data = {
+    tc: tc.value,
+    lc: lc.value,
+    noise: noise.value,
+    fiveG,
+    species: speciesSelect.value,
+    K: computeK(),
+    timestamp: new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href=url;
+  a.download="qds_avian_lab_v3_snapshot.json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* MAIN LOOP */
+function loop() {
+  updateLabels();
+  const K = computeK();
+  updateCompass(K, speciesSelect.value);
+  updateStatus(K);
+  updateSphere(K);
+  requestAnimationFrame(loop);
+}
+loop();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>QDS Battery Whisperer – Demo Lab</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+  <!-- Chart.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="qds_battery_lab.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="title-block">
+        <h1>QDS Battery Whisperer</h1>
+        <p class="subtitle">
+          Phone-safe demo for exploring how <span class="accent">correlated noise</span>
+          changes battery lifetime statistics.
+        </p>
+      </div>
+      <div class="badge-row">
+        <span class="badge badge-demo">DEMO ONLY – SYNTHETIC DATA</span>
+        <span class="badge badge-open">Open QDS model prototype</span>
+      </div>
+    </header>
+
+    <main class="layout-grid">
+      <!-- LEFT: controls -->
+      <section class="card control-card">
+        <h2>Test plan</h2>
+        <p class="card-intro">
+          Set up a virtual pack and compare plain white noise with a
+          QDS-style correlated noise model.
+        </p>
+
+        <div class="control-group">
+          <div class="control">
+            <label for="nCells">Cells in pack</label>
+            <div class="control-row">
+              <input type="range" id="nCells" min="50" max="600" step="10" value="340">
+              <span class="value" id="nCellsVal">340</span>
+            </div>
+          </div>
+
+          <div class="control">
+            <label for="maxCycles">Cycles per run</label>
+            <div class="control-row">
+              <input type="range" id="maxCycles" min="100" max="1500" step="50" value="250">
+              <span class="value" id="maxCyclesVal">250</span>
+            </div>
+          </div>
+
+          <div class="control">
+            <label for="baseDrain">Average drain per cycle (% of SoH)</label>
+            <div class="control-row">
+              <input type="range" id="baseDrain" min="0.3" max="3.0" step="0.1" value="1.5">
+              <span class="value" id="baseDrainVal">1.5</span>
+            </div>
+          </div>
+
+          <div class="control">
+            <label for="noiseAmp">Noise amplitude (σ, %)</label>
+            <div class="control-row">
+              <input type="range" id="noiseAmp" min="0.2" max="5.0" step="0.1" value="2.0">
+              <span class="value" id="noiseAmpVal">2.0</span>
+            </div>
+          </div>
+
+          <div class="control">
+            <label for="rho">Correlation strength ρ (QDS-style)</label>
+            <div class="control-row">
+              <input type="range" id="rho" min="0" max="0.98" step="0.02" value="0.80">
+              <span class="value" id="rhoVal">0.80</span>
+            </div>
+          </div>
+
+          <div class="control">
+            <label for="failThresh">Failure threshold (% SoH)</label>
+            <div class="control-row">
+              <input type="range" id="failThresh" min="0" max="40" step="2" value="0">
+              <span class="value" id="failThreshVal">0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="button-row">
+          <button id="runLifetime" class="btn primary">Run simulation</button>
+          <button id="resetLifetime" class="btn ghost">Reset defaults</button>
+          <button id="ludicrousLifetime" class="btn ghost">
+            Ludicrous mode (1200 cycles)
+          </button>
+        </div>
+
+        <p class="footnote">
+          This is a <strong>concept model</strong>: it shows how noise + correlation
+          shape outcomes. It is <strong>not</strong> a calibrated battery tester.
+        </p>
+      </section>
+
+      <!-- RIGHT: summary + stats -->
+      <section class="card summary-card">
+        <h2>Simulation summary</h2>
+        <div class="stats-grid">
+          <div class="stat">
+            <span class="label">Duration (median)</span>
+            <span class="value" id="statDuration">–</span>
+          </div>
+          <div class="stat">
+            <span class="label">Cells failing early</span>
+            <span class="value" id="statEarlyFail">–</span>
+          </div>
+          <div class="stat">
+            <span class="label">Residual RMS</span>
+            <span class="value" id="statRms">–</span>
+          </div>
+          <div class="stat">
+            <span class="label">QDS-style K (lag-1 corr)</span>
+            <span class="value" id="statK">–</span>
+          </div>
+        </div>
+
+        <p id="statComment" class="stat-comment">
+          Hit <span class="accent">Run simulation</span> to generate a synthetic pack and
+          see how correlated noise reshapes lifetime.
+        </p>
+
+        <div class="legend">
+          <span class="legend-item">
+            <span class="swatch swatch-blue"></span> White-noise baseline
+          </span>
+          <span class="legend-item">
+            <span class="swatch swatch-green"></span> QDS-style correlated
+          </span>
+        </div>
+      </section>
+
+      <!-- ROW 2: charts -->
+      <section class="card chart-card">
+        <div class="card-header-row">
+          <h2>Lifetime spread across cells</h2>
+          <p class="card-subtitle">
+            Each point is one cell: how long it survived before hitting the
+            failure threshold.
+          </p>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="lifetimeChart"></canvas>
+        </div>
+      </section>
+
+      <section class="card chart-card">
+        <div class="card-header-row">
+          <h2>Sample health profile</h2>
+          <p class="card-subtitle">
+            One representative cell under each noise model. Same average drain,
+            different correlation structure.
+          </p>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="healthChart"></canvas>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      QDS Battery Whisperer Demo ·
+      <span class="accent">synthetic, illustrative only</span> · built phone-first.
+    </footer>
+  </div>
+</body>
+</html>

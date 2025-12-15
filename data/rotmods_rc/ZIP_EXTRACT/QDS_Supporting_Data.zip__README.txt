@@ -1,0 +1,30 @@
+Quantum Dark Substrate (QDS) Supporting Observational Data
+Daniel Brian Williams, Independent Researcher, United Kingdom, October 2025
+
+This archive contains the empirical datasets and supporting figures used in the
+Quantum Dark Substrate (QDS) analysis. Each file is described below.
+
+CONTENTS:
+-----------
+1. rotmod.dat
+   - SPARC galaxy rotation-curve residuals.
+   - Source: Lelli et al. (2019), "One Law to Rule Them All", MNRAS 482, 5459.
+
+2. sfb_LTG.zip
+   - Surface-brightness and baryonic-mass profiles for late-type galaxies.
+   - Source: SPARC database, McGaugh et al. (2016).
+
+3. Figure_G5_QDS_vs_LambdaCDM_Performance.png
+   - Bar chart showing performance comparison between QDS and ΛCDM across five
+     metrics (Empirical Fit, Predictive Novelty, Parameter Efficiency, Rotation-
+     Curve Accuracy, Credibility Index).
+
+4. QDS_FigureG5_Data.csv
+   - Numeric data underlying Figure G.5.
+
+CITATIONS:
+-----------
+Planck Collaboration (2020). Planck 2018 Results. A&A, 641, A6.
+DESI Collaboration (2024). Cosmological Constraints from BAO and RSD. ApJ.
+Lelli F., McGaugh S.S., Schombert J.M. (2019). MNRAS, 482, 5459.
+McGaugh S.S. et al. (2016). AJ, 152, 157.

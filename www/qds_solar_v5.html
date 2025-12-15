@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>QDS Solar System V5 – CMEs, Magnetospheres & Solar Cycle</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #05060a;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #f5f5f5;
+    }
+
+    #renderCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .panel {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      width: 260px;
+      padding: 10px 12px;
+      background: rgba(10, 10, 18, 0.9);
+      border-radius: 10px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
+      font-size: 11px;
+      z-index: 10;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .panel h1 {
+      font-size: 13px;
+      margin: 0 0 6px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .panel h1 span {
+      font-size: 11px;
+      opacity: 0.7;
+    }
+
+    .control {
+      margin: 4px 0;
+    }
+
+    .control label {
+      display: block;
+      font-size: 10px;
+      margin-bottom: 2px;
+      opacity: 0.9;
+    }
+
+    .control input[type="range"] {
+      width: 100%;
+    }
+
+    .inline {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 3px 0;
+    }
+
+    .inline label {
+      margin: 0;
+    }
+
+    .tiny {
+      font-size: 9px;
+      opacity: 0.75;
+      margin-top: 4px;
+      line-height: 1.3;
+    }
+
+    a {
+      color: #ffc857;
+      text-decoration: none;
+    }
+  </style>
+  <script src="https://cdn.babylonjs.com/babylon.js"></script>
+</head>
+<body>
+  <canvas id="renderCanvas"></canvas>
+
+  <div class="panel">
+    <h1>
+      QDS Solar System V5 🎩
+      <span>Kepler + QDS + CMEs</span>
+    </h1>
+
+    <div class="control">
+      <label>Spatial correlation λ<sub>c</sub></label>
+      <input id="lambdaSlider" type="range" min="0.8" max="3.0" step="0.1" value="1.7">
+    </div>
+
+    <div class="control">
+      <label>Temporal correlation τ<sub>c</sub></label>
+      <input id="tauSlider" type="range" min="0.8" max="3.0" step="0.1" value="1.5">
+    </div>
+
+    <div class="control">
+      <label>Field amplitude A (QDS wobble)</label>
+      <input id="fieldSlider" type="range" min="0.0" max="1.0" step="0.05" value="0.25">
+    </div>
+
+    <div class="control">
+      <label>Orbit speed (sim time)</label>
+      <input id="speedSlider" type="range" min="0.2" max="5.0" step="0.1" value="1.5">
+    </div>
+
+    <div class="control">
+      <label>CME intensity</label>
+      <input id="cmeIntensitySlider" type="range" min="0.0" max="1.0" step="0.05" value="0.5">
+    </div>
+
+    <div class="control">
+      <label>Solar cycle activity</label>
+      <input id="solarCycleSlider" type="range" min="0.0" max="3.0" step="0.1" value="1.0">
+    </div>
+
+    <div class="inline">
+      <input id="showOrbits" type="checkbox" checked>
+      <label for="showOrbits">Show orbit lines</label>
+    </div>
+
+    <div class="inline">
+      <input id="showMagnetospheres" type="checkbox" checked>
+      <label for="showMagnetospheres">Show magnetospheres</label>
+    </div>
+
+    <div class="inline">
+      <input id="autoCME" type="checkbox" checked>
+      <label for="autoCME">Auto CME (solar sneezes)</label>
+    </div>
+
+    <div class="inline">
+      <button id="fireCME" style="flex:1; font-size:10px; padding:4px 6px;">Fire CME now 💥</button>
+    </div>
+
+    <div class="tiny">
+      Drag to orbit · Pinch / scroll to zoom.<br>
+      QDS kernel (λ<sub>c</sub>, τ<sub>c</sub>, A) adds gentle vacuum wobble on top of clean Kepler orbits.  
+      CMEs are expanding shock fronts: they kick planets & magnetospheres when they pass.
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("renderCanvas");
+    const engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true });
+
+    const params = {
+      lambda_c: 1.7,
+      tau_c: 1.5,
+      fieldA: 0.25,
+      orbitSpeed: 1.5,
+      cmeIntensity: 0.5,
+      solarActivity: 1.0,
+      showOrbits: true,
+      showMagnetospheres: true,
+      autoCME: true
+    };
+
+    function createScene() {
+      const scene = new BABYLON.Scene(engine);
+      scene.clearColor = new BABYLON.Color4(0.02, 0.03, 0.06, 1);
+
+      const camera = new BABYLON.ArcRotateCamera(
+        "camera",
+        -Math.PI / 2.2,
+        Math.PI / 2.3,
+        120,
+        new BABYLON.Vector3(0, 0, 0),
+        scene
+      );
+      camera.attachControl(canvas, true);
+      camera.lowerRadiusLimit = 40;
+      camera.upperRadiusLimit = 400;
+      camera.wheelDeltaPercentage = 0.01;
+
+      const light = new BABYLON.HemisphericLight(
+        "light",
+        new BABYLON.Vector3(0, 1, 0),
+        scene
+      );
+      light.intensity = 0.7;
+
+      const sunLight = new BABYLON.PointLight(
+        "sunLight",
+        new BABYLON.Vector3(0, 0, 0),
+        scene
+      );
+      sunLight.intensity = 1.2;
+      sunLight.radius = 300;
+
+      // --- Sun ---
+      const sunMaterial = new BABYLON.StandardMaterial("sunMat", scene);
+      sunMaterial.emissiveColor = new BABYLON.Color3(1.0, 0.9, 0.4);
+      sunMaterial.diffuseColor = new BABYLON.Color3(0.8, 0.7, 0.3);
+      sunMaterial.specularColor = new BABYLON.Color3(0.0, 0.0, 0.0);
+
+      const sun = BABYLON.MeshBuilder.CreateSphere("sun", {
+        diameter: 20,
+        segments: 32
+      }, scene);
+      sun.material = sunMaterial;
+
+      // Sun "corona" halo
+      const corona = BABYLON.MeshBuilder.CreateDisc("corona", {
+        radius: 24,
+        tessellation: 64
+      }, scene);
+      corona.rotation.x = Math.PI / 2;
+      const coronaMat = new BABYLON.StandardMaterial("coronaMat", scene);
+      coronaMat.emissiveColor = new BABYLON.Color3(1.0, 0.7, 0.2);
+      coronaMat.alpha = 0.4;
+      corona.material = coronaMat;
+
+      // Sunspots
+      const sunspots = [];
+      function updateSunspots(activityLevel) {
+        // Kill existing spots
+        sunspots.forEach(s => s.dispose());
+        sunspots.length = 0;
+
+        const count = Math.floor(activityLevel * 6); // up to ~18
+        for (let i = 0; i < count; i++) {
+          const spot = BABYLON.MeshBuilder.CreateSphere("spot" + i, {
+            diameter: 1.2
+          }, scene);
+          const theta = Math.random() * 2 * Math.PI;
+          const phi = (Math.random() - 0.5) * Math.PI / 2; // band around equator
+          const r = 10.1;
+          spot.position = new BABYLON.Vector3(
+            r * Math.cos(theta) * Math.cos(phi),
+            r * Math.sin(phi),
+            r * Math.sin(theta) * Math.cos(phi)
+          );
+          const spotMat = new BABYLON.StandardMaterial("spotMat" + i, scene);
+          spotMat.diffuseColor = new BABYLON.Color3(0.1, 0.05, 0.02);
+          spotMat.emissiveColor = new BABYLON.Color3(0.0, 0.0, 0.0);
+          spot.material = spotMat;
+          sunspots.push(spot);
+        }
+      }
+
+      // --- QDS field “vacuum nodes” ---
+      const fieldMaterial = new BABYLON.StandardMaterial("fieldMat", scene);
+      fieldMaterial.emissiveColor = new BABYLON.Color3(0.4, 0.8, 1.0);
+      fieldMaterial.alpha = 0.7;
+
+      const fieldNodes = [];
+      const gridRadius = 140;
+      const step = 14;
+
+      for (let x = -gridRadius; x <= gridRadius; x += step) {
+        for (let z = -gridRadius; z <= gridRadius; z += step) {
+          const r = Math.sqrt(x * x + z * z);
+          if (r < 18 || r > 135) continue; // keep a nice band
+          const node = BABYLON.MeshBuilder.CreateSphere("fieldNode", {
+            diameter: 1.0
+          }, scene);
+          node.position = new BABYLON.Vector3(x, 0, z);
+          node.material = fieldMaterial;
+          fieldNodes.push(node);
+        }
+      }
+
+      // --- Planets ---
+      const planetData = [
+        { name: "Mercury", color: new BABYLON.Color3(0.8, 0.7, 0.6), radius: 1.3, orbitRadius: 26, period: 0.24, hasMag: false },
+        { name: "Venus",   color: new BABYLON.Color3(0.95, 0.8, 0.5), radius: 1.7, orbitRadius: 34, period: 0.62, hasMag: false },
+        { name: "Earth",   color: new BABYLON.Color3(0.2, 0.4, 1.0), radius: 1.8, orbitRadius: 42, period: 1.0,  hasMag: true,  magScale: 1.6, magColor: new BABYLON.Color3(0.1, 0.7, 1.0) },
+        { name: "Mars",    color: new BABYLON.Color3(0.9, 0.4, 0.2), radius: 1.4, orbitRadius: 52, period: 1.88, hasMag: false },
+        { name: "Jupiter", color: new BABYLON.Color3(0.9, 0.8, 0.6), radius: 4.0, orbitRadius: 70, period: 11.86, hasMag: true, magScale: 2.0, magColor: new BABYLON.Color3(0.9, 0.6, 0.2) },
+        { name: "Saturn",  color: new BABYLON.Color3(0.95, 0.9, 0.7), radius: 3.5, orbitRadius: 88, period: 29.4, hasMag: true, magScale: 1.8, magColor: new BABYLON.Color3(0.9, 0.8, 0.4) },
+        { name: "Uranus",  color: new BABYLON.Color3(0.6, 0.9, 1.0), radius: 3.0, orbitRadius: 106, period: 84.0, hasMag: true, magScale: 1.7, magColor: new BABYLON.Color3(0.4, 0.9, 0.9) },
+        { name: "Neptune", color: new BABYLON.Color3(0.3, 0.5, 1.0), radius: 3.0, orbitRadius: 122, period: 164.8, hasMag: true, magScale: 1.7, magColor: new BABYLON.Color3(0.4, 0.6, 1.0) },
+        { name: "Pluto",   color: new BABYLON.Color3(0.8, 0.8, 0.8), radius: 1.0, orbitRadius: 140, period: 248.0, hasMag: false }
+      ];
+
+      const planets = [];
+      const orbitLines = [];
+
+      const orbitMat = new BABYLON.StandardMaterial("orbitMat", scene);
+      orbitMat.emissiveColor = new BABYLON.Color3(0.3, 0.5, 0.9);
+      orbitMat.alpha = 0.4;
+
+      const asteroidMaterial = new BABYLON.StandardMaterial("asteroidMat", scene);
+      asteroidMaterial.diffuseColor = new BABYLON.Color3(0.7, 0.7, 0.7);
+      asteroidMaterial.emissiveColor = new BABYLON.Color3(0.3, 0.3, 0.35);
+      asteroidMaterial.specularColor = new BABYLON.Color3(0,0,0);
+
+      // Asteroid belt
+      const asteroids = [];
+      const asteroidCount = 250;
+      for (let i = 0; i < asteroidCount; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const radius = 60 + Math.random() * 16;
+        const y = (Math.random() - 0.5) * 4;
+        const rock = BABYLON.MeshBuilder.CreateSphere("asteroid" + i, {
+          diameter: 0.7 + Math.random() * 0.8,
+          segments: 6
+        }, scene);
+        rock.position = new BABYLON.Vector3(
+          radius * Math.cos(angle),
+          y,
+          radius * Math.sin(angle)
+        );
+        rock.material = asteroidMaterial;
+        asteroids.push(rock);
+      }
+
+      planetData.forEach((pd, index) => {
+        // orbit line
+        const points = [];
+        const segments = 128;
+        for (let i = 0; i <= segments; i++) {
+          const a = i / segments * Math.PI * 2;
+          points.push(new BABYLON.Vector3(
+            pd.orbitRadius * Math.cos(a),
+            0,
+            pd.orbitRadius * Math.sin(a)
+          ));
+        }
+        const orbit = BABYLON.MeshBuilder.CreateLines("orbit_" + pd.name, {
+          points: points
+        }, scene);
+        orbit.color = orbitMat.emissiveColor.clone();
+        orbit.alpha = orbitMat.alpha;
+        orbitLines.push(orbit);
+
+        // planet
+        const mat = new BABYLON.StandardMaterial("mat_" + pd.name, scene);
+        mat.diffuseColor = pd.color;
+        mat.emissiveColor = pd.color.scale(0.35);
+        mat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
+
+        const mesh = BABYLON.MeshBuilder.CreateSphere("planet_" + pd.name, {
+          diameter: pd.radius * 2,
+          segments: 24
+        }, scene);
+        mesh.material = mat;
+
+        // magnetosphere
+        let mag = null;
+        if (pd.hasMag) {
+          const magMat = new BABYLON.StandardMaterial("magMat_" + pd.name, scene);
+          magMat.emissiveColor = (pd.magColor || new BABYLON.Color3(0.3, 0.8, 1.0));
+          magMat.alpha = 0.15;
+          mag = BABYLON.MeshBuilder.CreateSphere("mag_" + pd.name, {
+            diameter: pd.radius * 2 * (pd.magScale || 1.6),
+            segments: 24
+          }, scene);
+          mag.material = magMat;
+        }
+
+        planets.push({
+          data: pd,
+          mesh: mesh,
+          orbit: orbit,
+          angle: Math.random() * Math.PI * 2,
+          verticalOffset: 0,
+          verticalVelocity: 0,
+          mag: mag,
+          magPulse: 0
+        });
+      });
+
+      // --- CME ring (single at a time for now) ---
+      const cmeRing = BABYLON.MeshBuilder.CreateTorus("cmeRing", {
+        diameter: 40,
+        thickness: 4,
+        tessellation: 80
+      }, scene);
+      cmeRing.rotation.x = Math.PI / 2;
+      const cmeMat = new BABYLON.StandardMaterial("cmeMat", scene);
+      cmeMat.emissiveColor = new BABYLON.Color3(1.0, 0.8, 0.25);
+      cmeMat.diffuseColor = new BABYLON.Color3(0.8, 0.6, 0.1);
+      cmeMat.alpha = 0.6;
+      cmeRing.material = cmeMat;
+      cmeRing.isVisible = false;
+
+      const cmeState = {
+        active: false,
+        radius: 40,
+        speed: 40,   // units per "year"
+        intensity: 0.5,
+        age: 0
+      };
+
+      function fireCME(intensityOverride) {
+        cmeState.active = true;
+        cmeState.age = 0;
+        cmeState.radius = 30;
+        cmeState.intensity = intensityOverride !== undefined ? intensityOverride : params.cmeIntensity;
+        cmeRing.isVisible = true;
+      }
+
+      // --- QDS kernel noise helpers ---
+      function qdsNoise(t, coord, seed) {
+        // Very simple pseudo-noise: sin + cos layered
+        const l = params.lambda_c;
+        const tc = params.tau_c;
+        const k1 = (coord.x + coord.z * 0.37 + seed) / (25 * l);
+        const k2 = (coord.z - coord.x * 0.19 - seed * 2.0) / (33 * l);
+        const w1 = t / (8 * tc);
+        const w2 = t / (13 * tc);
+        return Math.sin(k1 + w1) * 0.6 + Math.cos(k2 - w2) * 0.4;
+      }
+
+      // --- UI wiring ---
+      const lambdaSlider = document.getElementById("lambdaSlider");
+      const tauSlider = document.getElementById("tauSlider");
+      const fieldSlider = document.getElementById("fieldSlider");
+      const speedSlider = document.getElementById("speedSlider");
+      const cmeIntensitySlider = document.getElementById("cmeIntensitySlider");
+      const solarCycleSlider = document.getElementById("solarCycleSlider");
+      const showOrbitsBox = document.getElementById("showOrbits");
+      const showMagBox = document.getElementById("showMagnetospheres");
+      const autoCMEBox = document.getElementById("autoCME");
+      const fireCMEBtn = document.getElementById("fireCME");
+
+      lambdaSlider.oninput = () => params.lambda_c = parseFloat(lambdaSlider.value);
+      tauSlider.oninput = () => params.tau_c = parseFloat(tauSlider.value);
+      fieldSlider.oninput = () => params.fieldA = parseFloat(fieldSlider.value);
+      speedSlider.oninput = () => params.orbitSpeed = parseFloat(speedSlider.value);
+      cmeIntensitySlider.oninput = () => params.cmeIntensity = parseFloat(cmeIntensitySlider.value);
+      solarCycleSlider.oninput = () => {
+        params.solarActivity = parseFloat(solarCycleSlider.value);
+        updateSunspots(params.solarActivity);
+      };
+      showOrbitsBox.onchange = () => {
+        params.showOrbits = showOrbitsBox.checked;
+        orbitLines.forEach(o => o.isVisible = params.showOrbits);
+      };
+      showMagBox.onchange = () => {
+        params.showMagnetospheres = showMagBox.checked;
+      };
+      autoCMEBox.onchange = () => {
+        params.autoCME = autoCMEBox.checked;
+      };
+      fireCMEBtn.onclick = () => fireCME();
+
+      updateSunspots(params.solarActivity);
+
+      // --- Animation loop ---
+      let simTime = 0;
+      let lastTime = performance.now();
+      let cmeCooldown = 0;
+
+      scene.registerBeforeRender(() => {
+        const now = performance.now();
+        const dtMs = now - lastTime;
+        lastTime = now;
+
+        const dtYears = dtMs / 1000 * params.orbitSpeed * 0.25; // scale factor
+        simTime += dtYears;
+
+        // Camera gentle wobble from QDS kernel
+        const camBaseTarget = new BABYLON.Vector3(0, 0, 0);
+        const wobble = qdsNoise(simTime, camBaseTarget, 1.23) * 0.5 * params.fieldA;
+        camera.target = new BABYLON.Vector3(0, wobble, 0);
+
+        // QDS field nodes vertical shimmer
+        fieldNodes.forEach((node, idx) => {
+          const n = qdsNoise(simTime, node.position, idx * 0.01);
+          node.position.y = n * params.fieldA * 2.0;
+        });
+
+        // Planets
+        planets.forEach((p, idx) => {
+          const pd = p.data;
+          const angSpeed = (2 * Math.PI) / pd.period;
+          p.angle += angSpeed * dtYears;
+
+          const baseX = pd.orbitRadius * Math.cos(p.angle);
+          const baseZ = pd.orbitRadius * Math.sin(p.angle);
+
+          // vertical wobble from QDS kernel
+          const qNoise = qdsNoise(simTime, { x: baseX, z: baseZ }, idx * 0.37);
+          const qOffset = qNoise * params.fieldA * 2.0;
+
+          // Damped vertical velocity from CME kicks
+          p.verticalVelocity *= 0.98;
+          p.verticalOffset += p.verticalVelocity * dtYears;
+          p.verticalOffset *= 0.98;
+
+          const y = qOffset + p.verticalOffset;
+
+          p.mesh.position.set(baseX, y, baseZ);
+
+          if (p.mag) {
+            p.mag.position.copyFrom(p.mesh.position);
+
+            // magnetosphere pulse
+            if (p.magPulse > 0) {
+              p.magPulse *= 0.94;
+              const s = 1.0 + p.magPulse * 0.6;
+              p.mag.scaling.set(s, s, s);
+            } else {
+              p.mag.scaling.set(1, 1, 1);
+            }
+            p.mag.isVisible = params.showMagnetospheres;
+          }
+        });
+
+        // asteroids wobble slightly and get mild CME kicks
+        asteroids.forEach((rock, i) => {
+          const baseY = (rock.position.y || 0);
+          const noise = qdsNoise(simTime, rock.position, i * 0.12);
+          rock.position.y = noise * params.fieldA * 1.0 + baseY * 0.03;
+        });
+
+        // CME evolution
+        if (cmeState.active) {
+          cmeState.age += dtYears;
+          cmeState.radius += cmeState.speed * dtYears;
+
+          const scale = cmeState.radius / 20;
+          cmeRing.scaling.x = scale;
+          cmeRing.scaling.z = scale;
+
+          const fade = Math.max(0, 1.0 - cmeState.age * 0.5);
+          cmeRing.material.alpha = 0.6 * fade;
+
+          if (fade <= 0 || cmeState.radius > 200) {
+            cmeState.active = false;
+            cmeRing.isVisible = false;
+          } else {
+            // interact with planets
+            planets.forEach((p) => {
+              const rOrb = p.data.orbitRadius;
+              const dist = Math.abs(rOrb - cmeState.radius);
+              if (dist < 3.0) {
+                const kick = (0.8 + Math.random() * 0.4) * cmeState.intensity;
+                p.verticalVelocity += kick * (Math.random() > 0.5 ? 1 : -1);
+                if (p.mag) {
+                  p.magPulse = Math.min(1.0, p.magPulse + kick * 1.5);
+                }
+              }
+            });
+
+            // interact with asteroids (just slight radial shuffle)
+            asteroids.forEach((rock) => {
+              const r = Math.sqrt(rock.position.x * rock.position.x + rock.position.z * rock.position.z);
+              const d = Math.abs(r - cmeState.radius);
+              if (d < 2.0) {
+                const dir = Math.atan2(rock.position.z, rock.position.x);
+                const push = (0.5 + Math.random() * 0.7) * cmeState.intensity;
+                const sign = (r > cmeState.radius) ? 1 : -1;
+                const newR = r + sign * push;
+                rock.position.x = newR * Math.cos(dir);
+                rock.position.z = newR * Math.sin(dir);
+              }
+            });
+          }
+        }
+
+        // auto CME logic
+        cmeCooldown -= dtYears;
+        if (params.autoCME && !cmeState.active && cmeCooldown <= 0) {
+          // Activity level controls CME probability & intensity band
+          const act = params.solarActivity;
+          const baseInt = 0.2 + act * 0.3;
+          const randomInt = baseInt + Math.random() * (0.3 + act * 0.2);
+          fireCME(randomInt);
+
+          // next cooldown based on activity (higher activity => shorter wait)
+          const minWait = Math.max(0.4, 2.5 - act * 0.6);
+          const maxWait = Math.max(0.8, 4.0 - act * 0.8);
+          cmeCooldown = minWait + Math.random() * (maxWait - minWait);
+        }
+
+        // corona breathing with solar activity / QDS field
+        const baseCoronaScale = 1.0 + params.solarActivity * 0.15;
+        const puls = 1.0 + Math.sin(simTime * 4.0) * 0.03 * (1.0 + params.solarActivity * 0.6);
+        const sCorona = baseCoronaScale * puls;
+        corona.scaling.set(sCorona, sCorona, sCorona);
+      });
+
+      return scene;
+    }
+
+    const scene = createScene();
+    engine.runRenderLoop(() => {
+      scene.render();
+    });
+
+    window.addEventListener("resize", () => {
+      engine.resize();
+    });
+  </script>
+</body>
+</html>

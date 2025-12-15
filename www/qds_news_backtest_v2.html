@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>QDS • News Backtest Vault</title>
+<style>
+  :root{
+    --bg:#07090f;
+    --panel:#0b1020cc;
+    --card:#0b1326cc;
+    --text:#e9eefc;
+    --muted:#9aa7c4;
+    --line:#ffffff14;
+    --glow1:#ff3b00;
+    --glow2:#ffb300;
+    --glow3:#ff0055;
+    --good:#39ff88;
+    --warn:#ffcc33;
+    --bad:#ff3b5c;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(1200px 600px at 20% -10%, rgba(255,179,0,.18), transparent 60%),
+      radial-gradient(900px 500px at 80% 0%, rgba(255,0,85,.14), transparent 60%),
+      radial-gradient(900px 700px at 50% 110%, rgba(255,59,0,.14), transparent 60%),
+      linear-gradient(#04060d, #07090f 60%, #050712);
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:14px 12px 90px}
+  .header{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    margin:6px 0 12px;
+  }
+  h1{
+    font-size:20px;margin:0;letter-spacing:.2px;
+    text-shadow:0 0 18px rgba(255,179,0,.20);
+  }
+  .ready{
+    display:flex;align-items:center;gap:10px;
+    padding:10px 12px;border-radius:999px;
+    background:linear-gradient(180deg, rgba(11,16,32,.92), rgba(11,16,32,.62));
+    border:1px solid var(--line);
+    box-shadow:0 0 0 1px rgba(255,179,0,.10), 0 18px 48px rgba(0,0,0,.30);
+    font-size:13px;color:var(--muted);
+  }
+  .dot{width:10px;height:10px;border-radius:50%;background:var(--good);box-shadow:0 0 16px rgba(57,255,136,.6)}
+  .panel{
+    background:linear-gradient(180deg, rgba(11,16,32,.92), rgba(11,16,32,.62));
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:14px;
+    box-shadow:
+      0 0 0 1px rgba(255,179,0,.10),
+      0 30px 80px rgba(0,0,0,.45);
+  }
+  .row{display:flex;flex-wrap:wrap;gap:10px}
+  .row > *{flex:1 1 200px}
+  .label{font-size:11px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin:10px 0 6px}
+  select,input[type="text"]{
+    width:100%;
+    padding:12px 12px;
+    border-radius:14px;
+    border:1px solid var(--line);
+    background:rgba(7,9,15,.75);
+    color:var(--text);
+    outline:none;
+  }
+  input[type="range"]{width:100%}
+  .btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  button{
+    appearance:none;border:1px solid var(--line);
+    background:rgba(7,9,15,.65);
+    color:var(--text);
+    padding:12px 14px;border-radius:16px;
+    font-weight:600;
+    cursor:pointer;
+  }
+  button.primary{
+    border-color:rgba(255,179,0,.35);
+    box-shadow:0 0 0 1px rgba(255,179,0,.10), 0 0 24px rgba(255,179,0,.10);
+  }
+  button.good{border-color:rgba(57,255,136,.28)}
+  button.bad{border-color:rgba(255,59,92,.28)}
+  button:active{transform:translateY(1px)}
+  .meta{
+    margin-top:10px;
+    display:flex;flex-wrap:wrap;gap:10px;
+    color:var(--muted);font-size:13px
+  }
+  .pill{
+    padding:10px 12px;border-radius:999px;
+    border:1px solid var(--line);
+    background:rgba(7,9,15,.55);
+    display:flex;gap:8px;align-items:center
+  }
+  .pill b{color:var(--text)}
+  .grid2{display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px}
+  @media(min-width:880px){.grid2{grid-template-columns:1.1fr .9fr}}
+  canvas{
+    width:100%;height:260px;
+    background:rgba(7,9,15,.42);
+    border:1px solid var(--line);
+    border-radius:18px;
+  }
+  .log{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+    font-size:12px;line-height:1.35;
+    background:rgba(7,9,15,.42);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:12px;
+    max-height:260px;overflow:auto;
+    color:#cdd6f6;
+  }
+  .tiny{font-size:12px;color:var(--muted)}
+  .topbar{
+    display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px
+  }
+  .topbar button{padding:10px 12px;border-radius:999px}
+  .hidden{display:none}
+  .kbd{font-family:ui-monospace,monospace;font-size:11px;color:var(--muted)}
+  a{color:inherit}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <h1>QDS • News Backtest Vault</h1>
+    <div class="ready"><span class="dot"></span> ready</div>
+  </div>
+
+  <div class="panel">
+
+    <div class="topbar">
+      <button class="primary" id="btnMode">Mode ▾</button>
+      <button class="primary" id="btnDates">Dates ▾</button>
+      <button class="good" id="btnRun">Run backtest</button>
+      <button class="bad" id="btnClear">Clear history</button>
+    </div>
+
+    <div class="row hidden" id="modeBox">
+      <div>
+        <div class="label">Mode</div>
+        <select id="modeSel">
+          <option value="ALL">All</option>
+        </select>
+      </div>
+      <div>
+        <div class="label">Harshness (threshold)</div>
+        <input id="harsh" type="range" min="0" max="100" value="62"/>
+        <div class="tiny">Low = generous (more “QDS vs MAINST” hits). High = strict.</div>
+      </div>
+      <div>
+        <div class="label">Limit per day</div>
+        <select id="limitSel">
+          <option>100</option><option>250</option><option selected>500</option><option>1000</option><option>2000</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row hidden" id="datesBox">
+      <div>
+        <div class="label">Start date</div>
+        <select id="startDate"></select>
+      </div>
+      <div>
+        <div class="label">End date</div>
+        <select id="endDate"></select>
+      </div>
+      <div>
+        <div class="label">Rip base</div>
+        <input id="basePath" type="text" value="/news_rips/physorg"/>
+        <div class="tiny">Default matches your existing engine: <span class="kbd">/news_rips/physorg/YYYY-MM-DD/MASTER.json</span></div>
+      </div>
+    </div>
+
+    <div class="meta">
+      <div class="pill"><span>Dates found:</span> <b id="datesCount">0</b></div>
+      <div class="pill"><span>Last run:</span> <b id="lastRun">—</b></div>
+      <div class="pill"><span>Harsh:</span> <b id="harshVal">62</b></div>
+      <div class="pill"><span>Total processed:</span> <b id="totalProc">0</b></div>
+    </div>
+
+    <div class="grid2">
+      <div>
+        <div class="label">Results graph</div>
+        <canvas id="chart" width="900" height="260"></canvas>
+        <div class="tiny" style="margin-top:8px">
+          Graph lines: <b>QDS-vs</b>, <b>Complement</b>, <b>Neutral</b>, <b>Total</b> (per day). Stored locally (no cloud).
+        </div>
+      </div>
+      <div>
+        <div class="label">Run log</div>
+        <div class="log" id="log"></div>
+        <div class="btns">
+          <button class="primary" id="btnExport">Export backtest</button>
+          <button class="primary" id="btnImport">Import triage exports</button>
+          <input id="filePick" type="file" accept="application/json" multiple class="hidden"/>
+        </div>
+        <div class="tiny">Import supports your <span class="kbd">qds_news_triage_YYYY-MM-DD.json</span> exports and merges manual tallies into the graph.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = (id)=>document.getElementById(id);
+  const logEl = $("log");
+  const chart = $("chart");
+  const ctx = chart.getContext("2d");
+  const KEY = "QDS_NEWS_BACKTEST_V2";
+  const TRIAGE_KEY = "QDS_NEWS_TRIAGE_EXPORTS_V1";
+
+  const state = {
+    dates: [],
+    results: load(KEY, []),
+    triageExports: load(TRIAGE_KEY, {}), // date -> {triage:{id:label}}
+  };
+
+  function nowISO(){
+    const d = new Date();
+    const z = (n)=>String(n).padStart(2,"0");
+    return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}:${z(d.getSeconds())}`;
+  }
+  function save(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
+  function load(k, fallback){
+    try{ const v = localStorage.getItem(k); return v?JSON.parse(v):fallback; }
+    catch(e){ return fallback; }
+  }
+  function log(line){
+    const t = new Date().toLocaleTimeString();
+    logEl.textContent += `[${t}] ${line}\n`;
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+  function clamp(n,a,b){ return Math.max(a, Math.min(b,n)); }
+
+  // --- Auto-test scoring (harshness tunes the threshold) ---
+  // This is intentionally heuristic (fast + explainable).
+  const QDS_TERMS = [
+    ["correlated", 2], ["correlation",2], ["coherence",3], ["stochastic",3],
+    ["fluctuation",2], ["noise",2], ["turbulence",2], ["kernel",3],
+    ["decoherence",3], ["nonlocal",2], ["memory",2], ["hysteresis",2],
+    ["phonon",2], ["hot phonon",3], ["nanopore",3], ["vortex",2],
+    ["magnetic landscape",2], ["metamaterial",2], ["Josephson",2],
+    ["NV center",2], ["SQUID",2], ["quantum sensor",2], ["ion transport",2],
+    ["edge localized mode",3], ["plasma turbulence",3]
+  ];
+  const MAINSTREAM_TERMS = [
+    ["dark matter",3], ["lambda",2], ["ΛCDM",3], ["inflation",2],
+    ["standard model",2], ["general relativity",2], ["Hubble tension",3]
+  ];
+
+  function scoreItem(item){
+    const text = `${item.title||""} ${item.description||item.summary||""} ${item.category||item.mode||""}`.toLowerCase();
+    let q=0, m=0;
+
+    for (const [t,w] of QDS_TERMS){
+      if (text.includes(t)) q += w;
+    }
+    for (const [t,w] of MAINSTREAM_TERMS){
+      if (text.includes(t.toLowerCase())) m += w;
+    }
+    // bonus: multi-hit density
+    const len = Math.max(80, text.length);
+    const density = (q + m) / Math.sqrt(len);
+    return {q, m, density};
+  }
+
+  function classify(item, harsh){
+    const {q, m, density} = scoreItem(item);
+
+    // harshness scales threshold 0..100 -> 0.8..3.2 approx
+    const th = 0.8 + (harsh/100)*2.4;
+
+    // interpret:
+    // - QDS vs MAINST if strong "QDS-ish signal" OR high density with some mainstream tension
+    // - Complement if strongly mainstream but low QDS-ish
+    // - Neutral otherwise
+    const qsig = (q/3) + density;
+    const msig = (m/3) + density*0.6;
+
+    if (qsig >= th && (q >= 3 || density >= 1.2)) return "vs";
+    if (msig >= th && q < 3) return "complements";
+    return "neutral";
+  }
+
+  // --- Data loading ---
+  async function fetchText(url){
+    const r = await fetch(url, {cache:"no-store"});
+    if(!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+    return await r.text();
+  }
+  async function fetchJson(url){
+    const r = await fetch(url, {cache:"no-store"});
+    if(!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+    return await r.json();
+  }
+
+  function parseDatesFromDirHtml(html){
+    // python http.server directory listing -> <a href="2025-12-14/">2025-12-14/</a>
+    const re = /href="(\d{4}-\d{2}-\d{2})\/"/g;
+    const out = [];
+    let m;
+    while((m = re.exec(html))) out.push(m[1]);
+    return [...new Set(out)].sort();
+  }
+
+  async function refreshDates(){
+    const base = $("basePath").value.trim().replace(/\/$/,"");
+    try{
+      const html = await fetchText(base + "/");
+      state.dates = parseDatesFromDirHtml(html);
+      $("datesCount").textContent = String(state.dates.length);
+
+      // fill dropdowns
+      fillDateSelectors();
+      log(`Found ${state.dates.length} date folders under ${base}/`);
+    }catch(e){
+      log(`Could not list dates at ${base}/ (needs dir listing or symlink). Error: ${e.message}`);
+      // fallback: keep whatever is already in selects
+    }
+  }
+
+  function fillDateSelectors(){
+    const s = $("startDate"), e = $("endDate");
+    const prevS = s.value, prevE = e.value;
+
+    s.innerHTML = "";
+    e.innerHTML = "";
+    for(const d of state.dates){
+      s.appendChild(new Option(d, d));
+      e.appendChild(new Option(d, d));
+    }
+    // default: last 7 days range if possible
+    if(state.dates.length){
+      const end = state.dates[state.dates.length-1];
+      const start = state.dates[Math.max(0, state.dates.length-7)];
+      s.value = prevS || start;
+      e.value = prevE || end;
+    }
+  }
+
+  function dateRange(start, end){
+    const out = [];
+    const s = new Date(start+"T00:00:00");
+    const t = new Date(end+"T00:00:00");
+    if (isNaN(s) || isNaN(t)) return out;
+    const step = s <= t ? 1 : -1;
+    const cur = new Date(s);
+    const z = (n)=>String(n).padStart(2,"0");
+    while((step===1 && cur<=t) || (step===-1 && cur>=t)){
+      out.push(`${cur.getFullYear()}-${z(cur.getMonth()+1)}-${z(cur.getDate())}`);
+      cur.setDate(cur.getDate()+step);
+    }
+    return out;
+  }
+
+  // --- Charting (simple canvas line chart) ---
+  function draw(){
+    const W = chart.width, H = chart.height;
+    ctx.clearRect(0,0,W,H);
+
+    const rows = state.results.slice().sort((a,b)=>a.date.localeCompare(b.date));
+    if(!rows.length){
+      ctx.fillStyle = "rgba(233,238,252,.65)";
+      ctx.font = "16px system-ui";
+      ctx.fillText("No backtest history yet. Hit Run backtest.", 18, 38);
+      return;
+    }
+
+    const padL=48, padR=18, padT=14, padB=32;
+    const plotW = W - padL - padR;
+    const plotH = H - padT - padB;
+
+    const maxY = Math.max(10, ...rows.map(r=>r.total||0));
+    const x = (i)=> padL + (rows.length===1 ? plotW/2 : (i/(rows.length-1))*plotW);
+    const y = (v)=> padT + (1 - (v/maxY))*plotH;
+
+    // grid
+    ctx.strokeStyle = "rgba(255,179,0,.10)";
+    ctx.lineWidth = 1;
+    for(let k=0;k<=4;k++){
+      const yy = padT + (k/4)*plotH;
+      ctx.beginPath(); ctx.moveTo(padL,yy); ctx.lineTo(W-padR,yy); ctx.stroke();
+      const val = Math.round(maxY*(1-k/4));
+      ctx.fillStyle = "rgba(154,167,196,.8)";
+      ctx.font = "11px system-ui";
+      ctx.fillText(String(val), 8, yy+4);
+    }
+
+    function line(getter, alpha){
+      ctx.globalAlpha = alpha;
+      ctx.beginPath();
+      rows.forEach((r,i)=>{
+        const xx=x(i), yy=y(getter(r));
+        if(i===0) ctx.moveTo(xx,yy); else ctx.lineTo(xx,yy);
+      });
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
+    // total
+    ctx.strokeStyle = "rgba(255,179,0,.85)";
+    ctx.lineWidth = 2.5;
+    line(r=>r.total||0, 0.9);
+
+    // vs
+    ctx.strokeStyle = "rgba(255,59,0,.85)";
+    ctx.lineWidth = 2.2;
+    line(r=>r.vs||0, 0.95);
+
+    // complements
+    ctx.strokeStyle = "rgba(57,255,136,.85)";
+    ctx.lineWidth = 2.0;
+    line(r=>r.complements||0, 0.85);
+
+    // neutral
+    ctx.strokeStyle = "rgba(233,238,252,.55)";
+    ctx.lineWidth = 1.8;
+    line(r=>r.neutral||0, 0.75);
+
+    // x labels (sparse)
+    ctx.fillStyle = "rgba(154,167,196,.85)";
+    ctx.font = "11px system-ui";
+    const step = Math.max(1, Math.floor(rows.length/6));
+    rows.forEach((r,i)=>{
+      if(i%step!==0 && i!==rows.length-1) return;
+      const xx=x(i);
+      ctx.fillText(r.date.slice(5), xx-14, H-12);
+    });
+
+    // legend
+    ctx.fillStyle = "rgba(233,238,252,.85)";
+    ctx.font = "12px system-ui";
+    ctx.fillText("total", padL+0, 16);
+    ctx.fillStyle = "rgba(255,59,0,.9)"; ctx.fillText("vs", padL+52, 16);
+    ctx.fillStyle = "rgba(57,255,136,.9)"; ctx.fillText("complements", padL+80, 16);
+    ctx.fillStyle = "rgba(233,238,252,.65)"; ctx.fillText("neutral", padL+178, 16);
+  }
+
+  // --- Backtest run ---
+  async function run(){
+    const base = $("basePath").value.trim().replace(/\/$/,"");
+    const mode = $("modeSel").value;
+    const harsh = parseInt($("harsh").value,10);
+    const limit = parseInt($("limitSel").value,10);
+    $("harshVal").textContent = String(harsh);
+
+    const start = $("startDate").value || (state.dates[0]||"");
+    const end   = $("endDate").value   || (state.dates[state.dates.length-1]||"");
+    if(!start || !end){
+      log("No dates selected (and date listing failed). Try refreshing dates, or set basePath correctly.");
+      return;
+    }
+
+    const days = dateRange(start, end);
+    log(`Backtest: ${days.length} day(s), mode=${mode}, harsh=${harsh}, limit=${limit}`);
+    let totalAll = 0;
+
+    for(const d of days){
+      const url = `${base}/${d}/MASTER.json`;
+      let master;
+      try{
+        master = await fetchJson(url);
+      }catch(e){
+        log(`MISS ${d}: ${url} (${e.message})`);
+        continue;
+      }
+
+      const items = (master.items || master || []).slice(0, limit);
+      const filtered = items.filter(it=>{
+        if(mode==="ALL") return true;
+        const c = (it.category || it.mode || it.section || "").toString();
+        return c.toLowerCase().includes(mode.toLowerCase());
+      });
+
+      let vs=0, comps=0, neu=0;
+      for(const it of filtered){
+        const c = classify(it, harsh);
+        if(c==="vs") vs++;
+        else if(c==="complements") comps++;
+        else neu++;
+      }
+
+      totalAll += filtered.length;
+
+      // merge triage export tallies if we have them
+      const tri = state.triageExports[d]?.triage || null;
+      let manual_vs=0, manual_comps=0, manual_broken=0;
+      if(tri){
+        for(const k in tri){
+          if(tri[k]==="vs") manual_vs++;
+          else if(tri[k]==="complements") manual_comps++;
+          else if(tri[k]==="broken") manual_broken++;
+        }
+      }
+
+      upsertResult({
+        date:d,
+        mode,
+        harsh,
+        total: filtered.length,
+        vs, complements: comps, neutral: neu,
+        manual_vs, manual_complements: manual_comps, manual_broken
+      });
+
+      log(`OK ${d}: total=${filtered.length}  vs=${vs}  comps=${comps}  neutral=${neu}` + (tri ? `  | manual(vs=${manual_vs}, comps=${manual_comps}, broken=${manual_broken})` : ""));
+      await sleep(40);
+    }
+
+    $("lastRun").textContent = nowISO();
+    $("totalProc").textContent = String(totalAll);
+    save(KEY, state.results);
+    draw();
+  }
+
+  function upsertResult(row){
+    const i = state.results.findIndex(r => r.date===row.date && r.mode===row.mode && r.harsh===row.harsh);
+    if(i>=0) state.results[i] = {...state.results[i], ...row};
+    else state.results.push(row);
+  }
+
+  function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+  // --- Import / export backtest + triage exports ---
+  function download(name, obj){
+    const blob = new Blob([JSON.stringify(obj,null,2)], {type:"application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 1500);
+  }
+
+  function guessDateFromFilename(fn){
+    const m = (fn||"").match(/(\d{4}-\d{2}-\d{2})/);
+    return m ? m[1] : null;
+  }
+
+  async function importFiles(files){
+    for(const f of files){
+      try{
+        const text = await f.text();
+        const j = JSON.parse(text);
+
+        // expected export shape:
+        // { version, exported_at, triage: {id: label, ...}, notes: {...} }
+        const tri = j.triage || j || {};
+        const dt = guessDateFromFilename(f.name) || (j.exported_at ? String(j.exported_at).slice(0,10) : null);
+        if(!dt){
+          log(`Import skipped (no date found): ${f.name}`);
+          continue;
+        }
+        state.triageExports[dt] = { triage: tri, meta: {file:f.name, exported_at:j.exported_at||null} };
+        log(`Imported triage: ${f.name} -> date ${dt} (${Object.keys(tri).length} marks)`);
+      }catch(e){
+        log(`Import failed: ${f.name} (${e.message})`);
+      }
+    }
+    save(TRIAGE_KEY, state.triageExports);
+  }
+
+  // --- UI wiring ---
+  $("btnMode").onclick = ()=>toggle("modeBox");
+  $("btnDates").onclick = ()=>toggle("datesBox");
+  $("btnRun").onclick = run;
+  $("btnClear").onclick = ()=>{
+    if(!confirm("Clear stored backtest history?")) return;
+    state.results = [];
+    save(KEY, state.results);
+    $("totalProc").textContent = "0";
+    $("lastRun").textContent = "—";
+    logEl.textContent = "";
+    log("Cleared backtest history.");
+    draw();
+  };
+  $("btnExport").onclick = ()=>{
+    download(`qds_news_backtest_${new Date().toISOString().slice(0,10)}.json`, {
+      version:"backtest_v2",
+      exported_at: nowISO(),
+      results: state.results,
+      triage_exports_index: Object.keys(state.triageExports)
+    });
+  };
+  $("btnImport").onclick = ()=> $("filePick").click();
+  $("filePick").addEventListener("change", async (e)=>{
+    const files = Array.from(e.target.files||[]);
+    if(files.length) await importFiles(files);
+    e.target.value = "";
+    draw();
+  });
+
+  $("harsh").addEventListener("input", ()=> $("harshVal").textContent = $("harsh").value);
+
+  function toggle(id){
+    const el = $(id);
+    el.classList.toggle("hidden");
+  }
+
+  async function init(){
+    log("Booting…");
+    $("harshVal").textContent = $("harsh").value;
+    await refreshDates();
+
+    // build mode list from newest day (best-effort)
+    if(state.dates.length){
+      const base = $("basePath").value.trim().replace(/\/$/,"");
+      const newest = state.dates[state.dates.length-1];
+      try{
+        const master = await fetchJson(`${base}/${newest}/MASTER.json`);
+        const items = (master.items || master || []);
+        const modes = new Set(["ALL"]);
+        for(const it of items){
+          const c = (it.category || it.mode || it.section || "").toString().trim();
+          if(c) modes.add(c);
+        }
+        const sel = $("modeSel");
+        sel.innerHTML = "";
+        [...modes].slice(0,80).forEach(m=> sel.appendChild(new Option(m, m==="ALL"?"ALL":m)));
+        log(`Mode list loaded from ${newest} (${modes.size-1} category(s))`);
+      }catch(e){
+        log(`Mode list load failed (ok): ${e.message}`);
+      }
+    }
+
+    $("datesCount").textContent = String(state.dates.length);
+    if(state.results.length) $("lastRun").textContent = "stored";
+    draw();
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>QDS • Learning Alphabet Lab vMAX</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #050814;
+      --bg-elevated: #0f1628;
+      --bg-soft: #101827;
+      --border-soft: #222b3b;
+      --text-main: #f9fafb;
+      --text-soft: #cbd5f5;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.15);
+      --danger: #fb7185;
+      --success: #4ade80;
+      --card-radius: 18px;
+      --shadow-soft: 0 14px 40px rgba(15, 23, 42, 0.8);
+      --font-main: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px 14px 40px;
+      font-family: var(--font-main);
+      background: radial-gradient(circle at top, #0f172a 0, #020617 55%, #000 100%);
+      color: var(--text-main);
+    }
+
+    .app {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .shell {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.18), rgba(129, 140, 248, 0.08));
+      border-radius: 28px;
+      padding: 2px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .inner {
+      border-radius: 26px;
+      background: radial-gradient(circle at top left, #020617 0, #020617 40%, #000 100%);
+      padding: 18px 14px 26px;
+    }
+
+    h1 {
+      font-size: 1.25rem;
+      margin: 0 0 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h1 span.badge {
+      font-size: 0.78rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--accent-soft);
+      color: var(--accent);
+      background: rgba(15,23,42,0.8);
+    }
+
+    .subtitle {
+      font-size: 0.86rem;
+      color: var(--text-soft);
+      margin-bottom: 12px;
+      line-height: 1.45;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    @media (min-width: 720px) {
+      .controls {
+        flex-direction: row;
+      }
+    }
+
+    .control-card {
+      flex: 1;
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: 18px;
+      padding: 10px 10px 11px;
+      border: 1px solid var(--border-soft);
+    }
+
+    .control-title {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .helper-pill {
+      font-size: 0.78rem;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: rgba(15, 118, 110, 0.28);
+      border: 1px solid rgba(34, 197, 180, 0.3);
+      color: #a5f3fc;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    select,
+    button,
+    input[type="text"] {
+      font-family: inherit;
+      font-size: 0.86rem;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      background: #020617;
+      color: var(--text-main);
+      padding: 7px 10px;
+      width: 100%;
+      outline: none;
+    }
+
+    select:focus,
+    button:focus-visible,
+    input[type="text"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
+    }
+
+    button {
+      border-radius: 20px;
+      background: linear-gradient(135deg, #0ea5e9, #6366f1);
+      border: none;
+      padding: 7px 14px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid var(--border-soft);
+      color: var(--text-soft);
+    }
+
+    button.small {
+      font-size: 0.8rem;
+      padding: 5px 10px;
+      border-radius: 999px;
+    }
+
+    .pill-text {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 5px;
+      line-height: 1.3;
+    }
+
+    .section {
+      margin-bottom: 18px;
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: 20px;
+      border: 1px solid var(--border-soft);
+      padding: 11px 11px 13px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      font-size: 0.98rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .section-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .badge-soft {
+      font-size: 0.76rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 1);
+      border: 1px solid var(--border-soft);
+      color: var(--text-soft);
+      white-space: nowrap;
+    }
+
+    /* Phoneme grid */
+    .phoneme-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    @media (min-width: 640px) {
+      .phoneme-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    .phoneme-card {
+      position: relative;
+      border-radius: 18px;
+      padding: 8px 9px 10px;
+      background: radial-gradient(circle at top left, #020617 0, #020617 50%, #000 100%);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      min-height: 76px;
+    }
+
+    .phoneme-border-m { box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.5); }
+    .phoneme-border-n { box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.5); }
+    .phoneme-border-p,
+    .phoneme-border-t,
+    .phoneme-border-k { box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.55); }
+    .phoneme-border-s,
+    .phoneme-border-sh,
+    .phoneme-border-ch,
+    .phoneme-border-th { box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.6); }
+    .phoneme-border-a,
+    .phoneme-border-e,
+    .phoneme-border-i,
+    .phoneme-border-o,
+    .phoneme-border-ai,
+    .phoneme-border-ee,
+    .phoneme-border-oo { box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.65); }
+
+    .phoneme-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 1px;
+    }
+
+    .phoneme-label {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .phoneme-emoji {
+      font-size: 1.1rem;
+    }
+
+    .phoneme-example {
+      font-size: 0.78rem;
+      color: var(--text-soft);
+    }
+
+    .phoneme-type {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .phoneme-extra {
+      font-size: 0.72rem;
+      color: var(--accent);
+      margin-top: 2px;
+    }
+
+    /* Words */
+    .words-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .word-card {
+      border-radius: 16px;
+      padding: 8px 10px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(30, 64, 175, 0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .word-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .word-main {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .word-title {
+      font-size: 0.96rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .word-spelling {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .word-path {
+      font-size: 0.8rem;
+      color: var(--text-soft);
+    }
+
+    .word-note {
+      font-size: 0.78rem;
+      color: #facc15;
+    }
+
+    /* Play lab */
+    .play-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    @media (min-width: 720px) {
+      .play-grid {
+        flex-direction: row;
+      }
+    }
+
+    .play-panel {
+      flex: 1;
+      border-radius: 16px;
+      padding: 9px 10px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--border-soft);
+    }
+
+    .play-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .play-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .path-display {
+      font-size: 0.84rem;
+      background: rgba(15, 23, 42, 0.95);
+      border-radius: 999px;
+      padding: 6px 10px;
+      border: 1px dashed var(--border-soft);
+      margin-bottom: 6px;
+      color: var(--text-soft);
+    }
+
+    .path-display span.value {
+      color: #facc15;
+    }
+
+    .spell-input {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .spell-input input {
+      flex: 1;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .sound-chip {
+      border-radius: 999px;
+      padding: 5px 9px 5px 7px;
+      background: rgba(15, 23, 42, 1);
+      border: 1px solid rgba(148, 163, 184, 0.65);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.82rem;
+      cursor: pointer;
+    }
+
+    .sound-chip span.emoji {
+      font-size: 1rem;
+    }
+
+    .sound-chip:active {
+      transform: translateY(1px);
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .helper-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Helper section */
+    .helper-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    @media (min-width: 720px) {
+      .helper-grid {
+        flex-direction: row;
+      }
+    }
+
+    .helper-card {
+      flex: 1;
+      border-radius: 16px;
+      padding: 9px 10px;
+      background: rgba(15, 23, 42, 0.98);
+      border: 1px solid var(--border-soft);
+      font-size: 0.8rem;
+      color: var(--text-soft);
+    }
+
+    .helper-card h3 {
+      font-size: 0.88rem;
+      margin: 0 0 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .helper-card ul {
+      padding-left: 18px;
+      margin: 4px 0 2px;
+    }
+
+    .helper-card li {
+      margin-bottom: 3px;
+    }
+
+    .tagline {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-top: 10px;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="shell">
+      <div class="inner">
+        <header>
+          <h1>
+            <span>🔤 QDS • Learning Alphabet Lab</span>
+            <span class="badge">vMAX prototype</span>
+          </h1>
+          <div class="subtitle">
+            One phoneme kernel, many <b>“alphabet skins”</b>. Tune it to the brain in front of you,
+            not the other way around. Colour, movement, rules – all different views on the same
+            sound system.
+          </div>
+        </header>
+
+        <!-- Top controls -->
+        <section class="controls">
+          <div class="control-card">
+            <div class="control-title">
+              👤 Learner profile
+              <span class="helper-pill">QDS helper online (offline brain-AI)</span>
+            </div>
+            <select id="profileSelect">
+              <option value="default">Default / mixed group</option>
+              <option value="movement">Movement / rhythm first</option>
+              <option value="nd">ND blend (autistic / ADHD etc.)</option>
+              <option value="dyslexia">Dyslexia-friendly focus</option>
+              <option value="eal">EAL / language-learner</option>
+            </select>
+            <div id="profileDescription" class="pill-text">
+              Mixed group: start visual and playful, then layer in rules as needed.
+            </div>
+          </div>
+
+          <div class="control-card">
+            <div class="control-title">
+              🎛 View mode
+            </div>
+            <select id="viewModeSelect">
+              <option value="visual">Visual chunks (colour + cards)</option>
+              <option value="movement">Movement (gestures & rhythm)</option>
+              <option value="classic">Classic (phonics baseline)</option>
+              <option value="logic">Logic grid (features & rules)</option>
+            </select>
+            <div id="viewModeDescription" class="pill-text">
+              Colour-coded chunks – great for visual pattern brains.
+            </div>
+          </div>
+        </section>
+
+        <!-- Phoneme kernel -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">
+              🧩 Phoneme kernel
+            </div>
+            <span class="badge-soft">Same sounds • different “alphabets”</span>
+          </div>
+          <div id="phonemeCaption" class="section-sub" style="margin-bottom:6px;">
+            Colour-coded chunks – good for visual pattern brains.
+          </div>
+          <div id="phonemeGrid" class="phoneme-grid"></div>
+        </section>
+
+        <!-- Words built from kernel -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">
+              📚 Words built from kernel
+            </div>
+            <span class="badge-soft">Same words • different skins</span>
+          </div>
+          <div class="section-sub" style="margin-bottom:6px;">
+            Classic tricky spellings shown as clean phoneme paths. Letters are just the costume.
+          </div>
+          <div id="wordsList" class="words-list"></div>
+        </section>
+
+        <!-- Play lab -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">
+              🎮 Play lab – build & quiz
+            </div>
+            <span class="badge-soft">Great for kids <i>and</i> grown-ups</span>
+          </div>
+          <div class="section-sub" style="margin-bottom:8px;">
+            Tap sounds to build words, see the kernel path, then flip a quick quiz. Let the learner
+            talk you through their logic.
+          </div>
+          <div class="play-grid">
+            <!-- Build panel -->
+            <div class="play-panel">
+              <div class="play-title">🧱 Build a word</div>
+              <div class="play-label">
+                Tap sounds to build a path; spelling is just a skin on top.
+              </div>
+              <div class="path-display">
+                Kernel path:
+                <span id="buildPathDisplay" class="value">tap sounds below…</span>
+              </div>
+              <div class="spell-input">
+                <input
+                  id="buildSpelling"
+                  type="text"
+                  placeholder="Spelling guess (optional)…"
+                />
+                <button id="clearBuild" class="secondary small">Clear</button>
+              </div>
+              <div class="chip-row" id="buildChips"></div>
+              <div class="helper-note">
+                Tip: For ND profiles, keep it short and fun – 3–5 taps, quick win, reset.
+              </div>
+            </div>
+
+            <!-- Quiz panel -->
+            <div class="play-panel">
+              <div class="play-title">🎯 Quick quiz</div>
+              <div class="play-label">
+                See the word, predict its kernel path, then tap “Show kernel path”.
+              </div>
+              <div class="path-display">
+                <span id="quizWordLabel" class="value">math</span>
+              </div>
+              <div class="helper-note" id="quizPrompt">
+                Predict the path. Then tap <b>Show kernel path</b>.
+              </div>
+              <div class="chip-row" style="margin-top:6px;">
+                <button id="showQuizPath" class="small">
+                  Show kernel path
+                </button>
+                <button id="nextQuizWord" class="secondary small">
+                  Next word
+                </button>
+              </div>
+              <div class="helper-note" id="quizAnswer" style="margin-top:6px;">
+                kernel path: m • a • th — simple front-mouth consonants + short vowel.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Helper section -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">
+              🤖 QDS helper – teacher notes
+            </div>
+            <span class="badge-soft">Offline brain-AI presets</span>
+          </div>
+          <div class="helper-grid">
+            <div class="helper-card">
+              <h3>🧠 Profile tips</h3>
+              <ul>
+                <li><b>Default / mixed:</b> Start in visual mode. When it feels easy, flip to classic.</li>
+                <li><b>Movement first:</b> Say the sound and do the gesture together every time.</li>
+                <li><b>ND blend:</b> Keep colour + emoji, avoid long text. Lots of breaks.</li>
+                <li><b>Dyslexia-friendly:</b> Emphasise <i>chunks</i> (sh, th, oo) more than single letters.</li>
+                <li><b>EAL:</b> Use emoji + gesture as anchors, then add native-language examples out loud.</li>
+              </ul>
+            </div>
+            <div class="helper-card">
+              <h3>📋 Session ideas</h3>
+              <ul>
+                <li>Let the learner pick 2–3 sounds and invent a “nonsense word”. Say it together.</li>
+                <li>Hide the screen: you say the word, they try to build the path from memory.</li>
+                <li>Flip: they build a path, you guess the spelling. Celebrate their “gotcha”.</li>
+                <li>Use the same kernel with paper / magnets – screen is just the demo lab.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="tagline">
+            Modes &amp; profiles are just interfaces – the underlying phoneme kernel stays the same.
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Data ---------------------------------------------------------------
+
+    const phonemes = [
+      {
+        id: "m",
+        label: "m",
+        example: "m-at",
+        typeChunk: "consonant chunk",
+        typeClassic: "consonant sound",
+        place: "lips",
+        manner: "nasal",
+        voice: true,
+        movement: "tap chest once",
+        emoji: "🐻"
+      },
+      {
+        id: "n",
+        label: "n",
+        example: "n-et",
+        typeChunk: "consonant chunk",
+        typeClassic: "consonant sound",
+        place: "front",
+        manner: "nasal",
+        voice: true,
+        movement: "touch nose",
+        emoji: "👃"
+      },
+      {
+        id: "p",
+        label: "p",
+        example: "p-at",
+        typeChunk: "consonant chunk",
+        typeClassic: "consonant sound",
+        place: "lips",
+        manner: "stop",
+        voice: false,
+        movement: "small finger pop",
+        emoji: "🎈"
+      },
+      {
+        id: "t",
+        label: "t",
+        example: "t-ap",
+        typeChunk: "consonant chunk",
+        typeClassic: "consonant sound",
+        place: "front",
+        manner: "stop",
+        voice: false,
+        movement: "tap finger on table",
+        emoji: "🪵"
+      },
+      {
+        id: "k",
+        label: "k",
+        example: "k-it",
+        typeChunk: "consonant chunk",
+        typeClassic: "consonant sound",
+        place: "back",
+        manner: "stop",
+        voice: false,
+        movement: "small head nod",
+        emoji: "🎯"
+      },
+      {
+        id: "s",
+        label: "s",
+        example: "s-un",
+        typeChunk: "consonant chunk",
+        typeClassic: "consonant sound",
+        place: "front",
+        manner: "fricative",
+        voice: false,
+        movement: "snake hand wiggle",
+        emoji: "🐍"
+      },
+      {
+        id: "sh",
+        label: "sh",
+        example: "sh-ip",
+        typeChunk: "consonant chunk",
+        typeClassic: "consonant sound",
+        place: "middle",
+        manner: "fricative",
+        voice: false,
+        movement: "finger to lips",
+        emoji: "🤫"
+      },
+      {
+        id: "ch",
+        label: "ch",
+        example: "ch-ip",
+        typeChunk: "consonant chunk",
+        typeClassic: "consonant sound",
+        place: "front",
+        manner: "affricate",
+        voice: false,
+        movement: "two-finger tap",
+        emoji: "🧱"
+      },
+      {
+        id: "th",
+        label: "th",
+        example: "th-in",
+        typeChunk: "consonant chunk",
+        typeClassic: "consonant sound",
+        place: "front",
+        manner: "fricative",
+        voice: "mixed",
+        movement: "thumb on chin",
+        emoji: "🦷"
+      },
+      {
+        id: "a",
+        label: "a",
+        example: "c-a-t",
+        typeChunk: "vowel chunk",
+        typeClassic: "vowel sound",
+        place: "front",
+        manner: "short",
+        voice: true,
+        movement: "open hand forward",
+        emoji: "⭐"
+      },
+      {
+        id: "e",
+        label: "e",
+        example: "b-e-d",
+        typeChunk: "vowel chunk",
+        typeClassic: "vowel sound",
+        place: "front",
+        manner: "short",
+        voice: true,
+        movement: "small step",
+        emoji: "📏"
+      },
+      {
+        id: "i",
+        label: "i",
+        example: "f-i-sh",
+        typeChunk: "vowel chunk",
+        typeClassic: "vowel sound",
+        place: "front",
+        manner: "short",
+        voice: true,
+        movement: "small step forward",
+        emoji: "📌"
+      },
+      {
+        id: "o",
+        label: "o",
+        example: "h-o-t",
+        typeChunk: "vowel chunk",
+        typeClassic: "vowel sound",
+        place: "back",
+        manner: "short",
+        voice: true,
+        movement: "round lips",
+        emoji: "🔥"
+      },
+      {
+        id: "ai",
+        label: "ai",
+        example: "r-ai-n",
+        typeChunk: "vowel chunk",
+        typeClassic: "vowel sound",
+        place: "front",
+        manner: "long",
+        voice: true,
+        movement: "two steps forward",
+        emoji: "🌈"
+      },
+      {
+        id: "ee",
+        label: "ee",
+        example: "s-ee",
+        typeChunk: "vowel chunk",
+        typeClassic: "vowel sound",
+        place: "front",
+        manner: "long",
+        voice: true,
+        movement: "big smile",
+        emoji: "😊"
+      },
+      {
+        id: "oo",
+        label: "oo",
+        example: "m-oo-n",
+        typeChunk: "vowel chunk",
+        typeClassic: "vowel sound",
+        place: "back",
+        manner: "long",
+        voice: true,
+        movement: "round lips long",
+        emoji: "🌕"
+      }
+    ];
+
+    const words = [
+      {
+        id: "ship",
+        icon: "🚢",
+        spelling: "ship",
+        phonemes: ["sh", "i", "p"],
+        pathPretty: "sh • i • p",
+        note: "Shows chunk [sh] instead of s+h."
+      },
+      {
+        id: "math",
+        icon: "🧮",
+        spelling: "math",
+        phonemes: ["m", "a", "th"],
+        pathPretty: "m • a • th",
+        note: "Simple front-mouth consonants + short vowel."
+      },
+      {
+        id: "tree",
+        icon: "🌳",
+        spelling: "tree",
+        phonemes: ["t", "r?", "ee"],
+        pathPretty: "t • r? • ee",
+        note: "Prototype: r? could be a later-stage add-on."
+      },
+      {
+        id: "book",
+        icon: "📚",
+        spelling: "book",
+        phonemes: ["b?", "oo", "k"],
+        pathPretty: "b? • oo • k",
+        note: "Focus on [oo] as a stable vowel chunk."
+      },
+      {
+        id: "night",
+        icon: "🌙",
+        spelling: "night",
+        phonemes: ["n", "ai", "t"],
+        pathPretty: "n • ai • t",
+        note: "Classic tricky spelling, clean phoneme path."
+      }
+    ];
+
+    const profileDescriptions = {
+      default:
+        "Mixed group: start visual + emoji, then visit movement and logic views when they’re ready.",
+      movement:
+        "Needs motion first. Say the sound and do the gesture together every time.",
+      nd:
+        "ND blend: keep colour + gesture, avoid overload. Short bursts, lots of wins, no pressure.",
+      dyslexia:
+        "Dyslexia-friendly: emphasise shared chunks (sh, th, oo) and patterns over single letters.",
+      eal:
+        "EAL / language-learner: combine emoji + gesture with examples in their home language out loud."
+    };
+
+    const viewModeDescriptions = {
+      visual: "Colour-coded chunks – good for visual pattern brains.",
+      movement: "Gestures & rhythm notes – sound as motion.",
+      classic: "Plain phonics view – label, example, basic type.",
+      logic: "Feature grid: place / manner / voice. For rule-brains."
+    };
+
+    // --- Helpers ------------------------------------------------------------
+
+    function byId(id) {
+      return document.getElementById(id);
+    }
+
+    const profileSelect = byId("profileSelect");
+    const viewModeSelect = byId("viewModeSelect");
+    const profileDescription = byId("profileDescription");
+    const viewModeDescription = byId("viewModeDescription");
+    const phonemeCaption = byId("phonemeCaption");
+    const phonemeGrid = byId("phonemeGrid");
+    const wordsList = byId("wordsList");
+
+    const buildPathDisplay = byId("buildPathDisplay");
+    const buildSpelling = byId("buildSpelling");
+    const clearBuild = byId("clearBuild");
+    const buildChips = byId("buildChips");
+
+    const quizWordLabel = byId("quizWordLabel");
+    const quizPrompt = byId("quizPrompt");
+    const quizAnswer = byId("quizAnswer");
+    const showQuizPath = byId("showQuizPath");
+    const nextQuizWord = byId("nextQuizWord");
+
+    let buildPath = [];
+    let quizIndex = 0;
+    let quizRevealed = false;
+
+    // --- Rendering ----------------------------------------------------------
+
+    function renderPhonemes() {
+      const mode = viewModeSelect.value;
+      phonemeGrid.innerHTML = "";
+
+      phonemeCaption.textContent = viewModeDescriptions[mode];
+
+      phonemes.forEach((ph) => {
+        const card = document.createElement("div");
+        card.className =
+          "phoneme-card phoneme-border-" + ph.id.replace("?", "");
+
+        const head = document.createElement("div");
+        head.className = "phoneme-head";
+
+        const label = document.createElement("div");
+        label.className = "phoneme-label";
+        label.textContent = ph.label;
+
+        const emoji = document.createElement("div");
+        emoji.className = "phoneme-emoji";
+        emoji.textContent = ph.emoji;
+
+        head.appendChild(label);
+        head.appendChild(emoji);
+        card.appendChild(head);
+
+        const ex = document.createElement("div");
+        ex.className = "phoneme-example";
+        ex.textContent = ph.example;
+        card.appendChild(ex);
+
+        const type = document.createElement("div");
+        type.className = "phoneme-type";
+
+        if (mode === "visual") {
+          type.textContent = ph.typeChunk;
+        } else if (mode === "movement") {
+          type.textContent = "mouth action • " + ph.movement;
+        } else if (mode === "classic") {
+          type.textContent = ph.typeClassic;
+        } else {
+          // logic
+          type.textContent =
+            "place: " +
+            ph.place +
+            ", manner: " +
+            ph.manner +
+            ", voice: " +
+            ph.voice;
+        }
+
+        card.appendChild(type);
+
+        if (mode === "logic") {
+          const extra = document.createElement("div");
+          extra.className = "phoneme-extra";
+          extra.textContent = "Great for sorting into rule groups.";
+          card.appendChild(extra);
+        }
+
+        phonemeGrid.appendChild(card);
+      });
+    }
+
+    function renderWords() {
+      wordsList.innerHTML = "";
+
+      words.forEach((w) => {
+        const card = document.createElement("div");
+        card.className = "word-card";
+
+        const head = document.createElement("div");
+        head.className = "word-head";
+
+        const main = document.createElement("div");
+        main.className = "word-main";
+
+        const title = document.createElement("div");
+        title.className = "word-title";
+        title.innerHTML =
+          "<span>" + w.icon + "</span><span>" + w.spelling + "</span>";
+
+        const spelling = document.createElement("div");
+        spelling.className = "word-spelling";
+        spelling.textContent = "spelling: " + w.spelling;
+
+        main.appendChild(title);
+        main.appendChild(spelling);
+
+        const path = document.createElement("div");
+        path.className = "word-path";
+        path.textContent = w.pathPretty;
+
+        head.appendChild(main);
+        head.appendChild(path);
+        card.appendChild(head);
+
+        const note = document.createElement("div");
+        note.className = "word-note";
+        note.textContent = w.note;
+        card.appendChild(note);
+
+        wordsList.appendChild(card);
+      });
+    }
+
+    function renderBuildChips() {
+      buildChips.innerHTML = "";
+      phonemes.forEach((ph) => {
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "sound-chip";
+        chip.innerHTML =
+          '<span class="emoji">' +
+          ph.emoji +
+          '</span><span class="label">' +
+          ph.label +
+          "</span>";
+        chip.addEventListener("click", () => {
+          buildPath.push(ph.id);
+          updateBuildPathDisplay();
+        });
+        buildChips.appendChild(chip);
+      });
+    }
+
+    function updateBuildPathDisplay() {
+      if (!buildPath.length) {
+        buildPathDisplay.textContent = "tap sounds below…";
+        return;
+      }
+      const labels = buildPath.map((id) => {
+        const ph = phonemes.find((p) => p.id === id);
+        return ph ? ph.label : id;
+      });
+      buildPathDisplay.textContent = labels.join(" • ");
+    }
+
+    function clearBuildPath() {
+      buildPath = [];
+      buildSpelling.value = "";
+      updateBuildPathDisplay();
+    }
+
+    function renderQuizWord() {
+      const w = words[quizIndex];
+      quizWordLabel.textContent = w.spelling;
+      quizPrompt.innerHTML =
+        "Predict the kernel path. Then tap <b>Show kernel path</b>.";
+      quizAnswer.textContent =
+        "kernel path: " + w.pathPretty + " — " + w.note;
+      quizAnswer.style.opacity = quizRevealed ? "1" : "0.15";
+    }
+
+    // --- Event wiring -------------------------------------------------------
+
+    profileSelect.addEventListener("change", () => {
+      const val = profileSelect.value;
+      profileDescription.textContent = profileDescriptions[val];
+
+      // Light-touch auto view hints
+      if (val === "movement") {
+        viewModeSelect.value = "movement";
+      } else if (val === "dyslexia") {
+        viewModeSelect.value = "visual";
+      } else if (val === "eal") {
+        viewModeSelect.value = "visual";
+      } else if (val === "nd") {
+        viewModeSelect.value = "visual";
+      } else {
+        viewModeSelect.value = viewModeSelect.value || "visual";
+      }
+      viewModeDescription.textContent =
+        viewModeDescriptions[viewModeSelect.value];
+      renderPhonemes();
+    });
+
+    viewModeSelect.addEventListener("change", () => {
+      const mode = viewModeSelect.value;
+      viewModeDescription.textContent = viewModeDescriptions[mode];
+      renderPhonemes();
+    });
+
+    clearBuild.addEventListener("click", (e) => {
+      e.preventDefault();
+      clearBuildPath();
+    });
+
+    showQuizPath.addEventListener("click", (e) => {
+      e.preventDefault();
+      quizRevealed = true;
+      renderQuizWord();
+    });
+
+    nextQuizWord.addEventListener("click", (e) => {
+      e.preventDefault();
+      quizIndex = (quizIndex + 1) % words.length;
+      quizRevealed = false;
+      renderQuizWord();
+    });
+
+    // --- Init ---------------------------------------------------------------
+
+    function init() {
+      profileDescription.textContent = profileDescriptions["default"];
+      viewModeDescription.textContent = viewModeDescriptions["visual"];
+      renderPhonemes();
+      renderWords();
+      renderBuildChips();
+      clearBuildPath();
+      renderQuizWord();
+    }
+
+    init();
+  </script>
+</body>
+</html>

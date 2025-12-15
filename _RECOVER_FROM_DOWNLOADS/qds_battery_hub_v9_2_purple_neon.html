@@ -1,0 +1,1175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>QDS Battery Hub v9.2 — Purple / Neon Green 🔋</title>
+<style>
+  :root{
+    --bg:#05010a;
+    --panel:#0d0418;
+    --panel-2:#120721;
+    --purple:#8b2cff;
+    --purple-2:#c07bff;
+    --green:#39ff88;
+    --green-2:#9dffca;
+    --text:#f5ecff;
+    --muted:#cdb7ff;
+    --warn:#ff5bd4;
+    --shadow: 0 10px 30px rgba(0,0,0,.45), inset 0 0 0 1px rgba(139,44,255,.18);
+    --glowP: 0 0 14px rgba(139,44,255,.45), 0 0 40px rgba(139,44,255,.18);
+    --glowG: 0 0 14px rgba(57,255,136,.45), 0 0 40px rgba(57,255,136,.18);
+    --radius: 16px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; color:var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    background:
+      radial-gradient(1200px 800px at 10% 10%, rgba(139,44,255,.12), transparent 60%),
+      radial-gradient(1000px 700px at 90% 20%, rgba(57,255,136,.10), transparent 60%),
+      linear-gradient(180deg, #040109, var(--bg) 40%, #05010c);
+    min-height:100vh;
+  }
+  header{
+    padding: 18px 16px 10px 16px;
+    position: sticky; top:0; z-index:20;
+    backdrop-filter: blur(10px);
+    background: linear-gradient(180deg, rgba(5,1,10,.9), rgba(5,1,10,.4), transparent);
+  }
+  .titlebar{
+    display:flex; gap:12px; align-items:center; justify-content:space-between;
+  }
+  .brand{
+    display:flex; align-items:center; gap:12px;
+  }
+  .badge{
+    padding:4px 10px; border-radius:999px; font-weight:700; font-size:11px;
+    background: linear-gradient(90deg, rgba(139,44,255,.25), rgba(57,255,136,.22));
+    border:1px solid rgba(255,255,255,.06);
+  }
+  h1{
+    margin:0; font-size:20px; letter-spacing:.3px;
+    text-shadow: 0 0 10px rgba(139,44,255,.35);
+  }
+  .subtitle{
+    margin-top:4px; font-size:11.5px; color:var(--muted);
+  }
+  .battery-icon{
+    width:44px; height:22px; border-radius:6px;
+    border:2px solid var(--green);
+    position:relative; box-shadow: var(--glowG);
+  }
+  .battery-icon::after{
+    content:""; position:absolute; right:-6px; top:6px; width:5px; height:10px;
+    background: var(--green); border-radius:2px;
+    box-shadow: var(--glowG);
+  }
+  .battery-fill{
+    position:absolute; inset:3px; border-radius:4px;
+    background: linear-gradient(90deg, var(--green), var(--purple));
+    filter: saturate(1.2);
+    animation: pulse 3.2s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{opacity:.75}
+    50%{opacity:1}
+  }
+
+  .tabs{
+    display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;
+  }
+  .tabbtn{
+    background: linear-gradient(180deg, rgba(139,44,255,.12), rgba(57,255,136,.08));
+    border:1px solid rgba(255,255,255,.06);
+    padding:8px 10px; border-radius:10px; color:var(--text);
+    font-size:12px; font-weight:650;
+  }
+  .tabbtn.active{
+    border-color: rgba(57,255,136,.45);
+    box-shadow: var(--glowG), inset 0 0 0 1px rgba(139,44,255,.25);
+    background: linear-gradient(90deg, rgba(139,44,255,.22), rgba(57,255,136,.18));
+  }
+
+  main{padding: 8px 14px 24px}
+  .grid{
+    display:grid; gap:12px;
+    grid-template-columns: 1fr;
+  }
+  @media(min-width: 980px){
+    .grid.two{grid-template-columns: 1.05fr .95fr}
+    .grid.three{grid-template-columns: 1fr 1fr 1fr}
+  }
+
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00)),
+                linear-gradient(135deg, rgba(139,44,255,.08), rgba(57,255,136,.06));
+    border:1px solid rgba(255,255,255,.06);
+    border-radius: var(--radius);
+    padding: 12px;
+    box-shadow: var(--shadow);
+  }
+  .card h3{
+    margin:0 0 8px 0; font-size:14px;
+    color: var(--purple-2);
+  }
+  .card h4{
+    margin: 10px 0 6px 0; font-size:12.5px; color: var(--green-2);
+  }
+  .muted{color:var(--muted); font-size:11.5px}
+
+  label{font-size:11px; color:var(--muted); display:block; margin-bottom:4px}
+  input[type="number"], input[type="range"], select{
+    width:100%;
+  }
+  input[type="number"], select{
+    background: var(--panel);
+    color: var(--text);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius: 10px;
+    padding: 8px 10px;
+    font-size: 12.5px;
+    outline:none;
+  }
+  input[type="range"]{
+    accent-color: var(--green);
+  }
+  .row{
+    display:grid; gap:10px;
+    grid-template-columns: 1fr 1fr;
+  }
+  @media(max-width:520px){
+    .row{grid-template-columns: 1fr}
+  }
+
+  .btn{
+    background: linear-gradient(90deg, rgba(139,44,255,.35), rgba(57,255,136,.30));
+    color: white; border:1px solid rgba(255,255,255,.08);
+    padding: 10px 12px; border-radius: 12px;
+    font-size: 12px; font-weight: 800; letter-spacing:.2px;
+    box-shadow: var(--glowP);
+  }
+  .btn.secondary{
+    background: linear-gradient(90deg, rgba(255,255,255,.04), rgba(255,255,255,.01));
+    font-weight:650; box-shadow:none;
+  }
+  .btn.warn{
+    background: linear-gradient(90deg, rgba(255,91,212,.25), rgba(139,44,255,.22));
+    border-color: rgba(255,91,212,.35);
+  }
+  .btn:active{transform: translateY(1px)}
+
+  .kpi{
+    display:grid; gap:8px;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media(min-width:980px){
+    .kpi{grid-template-columns: repeat(4, 1fr)}
+  }
+  .pill{
+    background: linear-gradient(180deg, rgba(0,0,0,.2), rgba(255,255,255,.03));
+    border:1px solid rgba(255,255,255,.06);
+    border-radius: 12px; padding: 10px;
+  }
+  .pill .label{font-size:10px; color:var(--muted)}
+  .pill .value{font-size:16px; font-weight:800; margin-top:2px}
+  .pill.good .value{color: var(--green)}
+  .pill.purp .value{color: var(--purple-2)}
+  .pill.warn .value{color: var(--warn)}
+
+  canvas{
+    width:100%; height:220px;
+    background: radial-gradient(600px 220px at 30% 0%, rgba(57,255,136,.06), transparent 60%),
+                radial-gradient(600px 220px at 70% 0%, rgba(139,44,255,.08), transparent 60%),
+                linear-gradient(180deg, rgba(255,255,255,.02), transparent);
+    border:1px solid rgba(255,255,255,.06);
+    border-radius: 12px;
+  }
+
+  .history{
+    display:grid; gap:8px;
+  }
+  .history-item{
+    padding: 8px 10px;
+    background: linear-gradient(90deg, rgba(139,44,255,.08), rgba(57,255,136,.06));
+    border:1px solid rgba(255,255,255,.06);
+    border-radius: 10px;
+    font-size: 11px;
+  }
+
+  .table{
+    width:100%; border-collapse: collapse; font-size: 11px;
+  }
+  .table th, .table td{
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    padding: 6px 6px; text-align:left;
+  }
+  .table th{color: var(--green-2); font-weight:800}
+  .table td{color: var(--text)}
+  .tiny{font-size:10px}
+  .right{float:right}
+  .hidden{display:none !important}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="titlebar">
+    <div class="brand">
+      <div class="battery-icon"><div class="battery-fill"></div></div>
+      <div>
+        <h1>QDS Battery Hub v9.2 — Purple / Neon Green</h1>
+        <div class="subtitle">Offline • Phone-safe • White vs QDS-correlated noise intuition lab • AutoBench log viewer</div>
+      </div>
+    </div>
+    <div class="badge">Shed Edition ⚙️🔋</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tabbtn active" data-tab="overview">Overview</button>
+    <button class="tabbtn" data-tab="lab">Noise & Lifetime Lab</button>
+    <button class="tabbtn" data-tab="coach">Battery Coach</button>
+    <button class="tabbtn" data-tab="autobench">AutoBench Viewer</button>
+  </div>
+</header>
+
+<main>
+  <!-- OVERVIEW -->
+  <section id="tab-overview">
+    <div class="grid two">
+      <div class="card">
+        <h3>What this is</h3>
+        <div class="muted">
+          This hub shows how <b>uncorrelated white noise</b> vs <b>QDS-style correlated noise</b>
+          can change the <b>spread</b> of battery health/lifetime outcomes.
+          It's not a real chemistry model — it's an intuition engine.
+        </div>
+        <h4>Core toy model</h4>
+        <div class="muted">
+          Health starts at 100%. Each cycle drains:
+          <b>base</b> + <b>noise</b>.
+          White noise is independent each cycle.
+          QDS-style uses AR(1) noise with correlation <b>ρ</b>.
+        </div>
+        <h4>Why this matters (intuition)</h4>
+        <div class="muted">
+          Correlated noise can create <b>runs of good luck</b> and <b>runs of bad luck</b>.
+          That can widen σ while sometimes nudging the mean.
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Quick launch</h3>
+        <div class="muted">Use your existing server alias or copy these:</div>
+        <pre class="muted" style="white-space:pre-wrap; margin-top:8px">
+echo 'alias uv="cd ~/OMEGA_EMPIRE/UV_QDS/www"' >> ~/.bashrc
+echo 'alias battserve="cd ~/OMEGA_EMPIRE/UV_QDS/www && python -m http.server 8000"' >> ~/.bashrc
+echo 'alias batthub="termux-open-url http://127.0.0.1:8000/qds_battery_hub_v9_2_purple_neon.html"' >> ~/.bashrc
+source ~/.bashrc</pre>
+        <div class="muted">Run:</div>
+        <pre class="muted" style="white-space:pre-wrap">
+battserve
+# new tab
+batthub</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section id="tab-lab" class="hidden">
+    <div class="grid two">
+
+      <div class="card">
+        <h3>Controls</h3>
+        <div class="row">
+          <div>
+            <label>Base drain per cycle (%)</label>
+            <input id="baseDrain" type="number" min="0" max="20" step="0.1" value="1.2" />
+          </div>
+          <div>
+            <label>Noise amplitude (%)</label>
+            <input id="amp" type="number" min="0" max="30" step="0.1" value="1.8" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Correlation ρ (0–0.99)</label>
+            <input id="rho" type="number" min="0" max="0.99" step="0.01" value="0.25" />
+          </div>
+          <div>
+            <label>Failure threshold (%)</label>
+            <input id="thr" type="number" min="0" max="99" step="1" value="50" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Number of cells (runs)</label>
+            <input id="nRuns" type="number" min="50" max="6000" step="50" value="1200" />
+          </div>
+          <div>
+            <label>Max cycles simulated</label>
+            <input id="maxCycles" type="number" min="100" max="20000" step="100" value="4000" />
+          </div>
+        </div>
+
+        <div class="row">
+          <button class="btn" id="runBtn">Run simulation</button>
+          <button class="btn secondary" id="resetBtn">Reset defaults</button>
+        </div>
+
+        <h4>Presets</h4>
+        <div class="row">
+          <button class="btn secondary" data-preset="phone">Realistic phone</button>
+          <button class="btn secondary" data-preset="contrast">QDS contrast</button>
+          <button class="btn secondary" data-preset="chaos">Chaos</button>
+        </div>
+
+        <h4>Utilities</h4>
+        <div class="row">
+          <button class="btn secondary" id="copySummaryBtn">Copy summary</button>
+          <button class="btn secondary" id="exportLastBtn">Export last JSON</button>
+        </div>
+        <div class="row">
+          <button class="btn secondary" id="exportHistoryBtn">Export full history</button>
+          <button class="btn warn" id="clearHistoryBtn">Clear history</button>
+        </div>
+
+        <div id="status" class="muted" style="margin-top:8px"></div>
+      </div>
+
+      <div class="card">
+        <h3>Results</h3>
+        <div class="kpi">
+          <div class="pill purp">
+            <div class="label">White mean lifetime</div>
+            <div class="value" id="whiteMean">—</div>
+          </div>
+          <div class="pill purp">
+            <div class="label">White σ</div>
+            <div class="value" id="whiteStd">—</div>
+          </div>
+          <div class="pill good">
+            <div class="label">QDS mean lifetime</div>
+            <div class="value" id="qdsMean">—</div>
+          </div>
+          <div class="pill good">
+            <div class="label">QDS σ</div>
+            <div class="value" id="qdsStd">—</div>
+          </div>
+          <div class="pill warn">
+            <div class="label">Relative change</div>
+            <div class="value" id="deltaPct">—</div>
+          </div>
+          <div class="pill">
+            <div class="label">Runs per model</div>
+            <div class="value" id="runsLabel">—</div>
+          </div>
+          <div class="pill">
+            <div class="label">P10 / P50 / P90 (White)</div>
+            <div class="value tiny" id="whiteP">—</div>
+          </div>
+          <div class="pill">
+            <div class="label">P10 / P50 / P90 (QDS)</div>
+            <div class="value tiny" id="qdsP">—</div>
+          </div>
+        </div>
+
+        <h4>Cycles-to-failure distribution</h4>
+        <canvas id="histCanvas" width="900" height="260"></canvas>
+
+        <h4>Sample health profiles (1 each)</h4>
+        <canvas id="traceCanvas" width="900" height="260"></canvas>
+
+        <div class="muted" id="interpretation" style="margin-top:8px"></div>
+      </div>
+    </div>
+
+    <div class="grid two" style="margin-top:12px">
+      <div class="card">
+        <h3>Recent run history (local)</h3>
+        <div class="muted">Stored on your device. Last 6 entries.</div>
+        <div id="historyBox" class="history" style="margin-top:8px"></div>
+      </div>
+
+      <div class="card">
+        <h3>Model notes</h3>
+        <div class="muted">
+          - This is a toy, not a chemistry predictor.  
+          - AR(1) noise: <b>xₜ = ρ xₜ₋₁ + ε</b>.  
+          - Larger ρ produces “streaky” drift.  
+          - The point is to visualise <b>tail risk</b> and <b>spread shifts</b>.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COACH -->
+  <section id="tab-coach" class="hidden">
+    <div class="grid two">
+      <div class="card">
+        <h3>Battery Coach — Purple Edition</h3>
+        <div class="muted">
+          This is lightweight, practical guidance for everyday battery care.
+          It’s not medical or safety-critical advice — just common-sense habits.
+        </div>
+
+        <h4>Quick habits that usually help</h4>
+        <ul class="muted">
+          <li>Avoid long stays at 100% if you can. 80–90% daily tops is often friendlier.</li>
+          <li>Try not to deep-drain to 0% frequently.</li>
+          <li>Heat is the villain — reduce heavy gaming + charging together.</li>
+          <li>Use stable chargers/cables; flaky power can create noise-like stress.</li>
+        </ul>
+
+        <h4>QDS lens (toy interpretation)</h4>
+        <div class="muted">
+          If your system has more “correlated stress” periods
+          (heat streaks, repeated fast charging, sustained high load),
+          the <b>spread</b> of outcomes widens — some cells look fine, some fall off early.
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Live suggestion based on your last Lab run</h3>
+        <div id="coachLive" class="muted">Run the Lab once and I’ll summarise your last results here.</div>
+
+        <h4>Safe reminders</h4>
+        <div class="muted">
+          If a battery swells, smells, gets unusually hot, or the device deforms,
+          stop using it and seek professional help.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AUTOBENCH VIEWER -->
+  <section id="tab-autobench" class="hidden">
+    <div class="grid two">
+      <div class="card">
+        <h3>AutoBench log viewer</h3>
+        <div class="muted">
+          Drop in your JSON logs from <b>QDS_BATTERY_LOGS</b>.
+          This viewer stays offline — parsing happens locally.
+        </div>
+        <h4>Select one or many logs</h4>
+        <input id="abFiles" type="file" accept=".json,application/json" multiple />
+
+        <div class="row" style="margin-top:10px">
+          <button class="btn secondary" id="abClearBtn">Clear table</button>
+          <button class="btn secondary" id="abExportBtn">Export table JSON</button>
+        </div>
+
+        <div id="abStatus" class="muted" style="margin-top:8px"></div>
+      </div>
+
+      <div class="card">
+        <h3>Parsed summary</h3>
+        <div class="muted">Shows top-level fields if present. Friendly to small schema shifts.</div>
+        <div style="overflow:auto; max-height:420px; margin-top:8px">
+          <table class="table" id="abTable">
+            <thead>
+              <tr>
+                <th>File</th>
+                <th>Timestamp</th>
+                <th>Mean Δ</th>
+                <th>Min/Max Δ</th>
+                <th>Integrity</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+/* =========================
+   Utilities
+========================= */
+const $ = (id)=>document.getElementById(id);
+
+const STORAGE_KEY = "QDS_BATTERY_HUB_HISTORY_v9_2";
+const LAST_KEY = "QDS_BATTERY_HUB_LAST_v9_2";
+
+function nowStamp(){
+  const d = new Date();
+  return d.toLocaleString();
+}
+function clamp(x,a,b){ return Math.max(a, Math.min(b,x)); }
+
+function mean(arr){
+  if(!arr.length) return 0;
+  let s=0; for(const v of arr) s+=v;
+  return s/arr.length;
+}
+function std(arr){
+  if(arr.length<2) return 0;
+  const m = mean(arr);
+  let s=0; for(const v of arr){ const d=v-m; s+=d*d; }
+  return Math.sqrt(s/(arr.length-1));
+}
+function percentile(arr, p){
+  if(!arr.length) return 0;
+  const a = [...arr].sort((x,y)=>x-y);
+  const idx = (p/100)*(a.length-1);
+  const lo = Math.floor(idx), hi = Math.ceil(idx);
+  if(lo===hi) return a[lo];
+  const t = idx-lo;
+  return a[lo]*(1-t)+a[hi]*t;
+}
+
+function saveHistory(entry){
+  const hist = loadHistory();
+  hist.unshift(entry);
+  while(hist.length>60) hist.pop();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(hist));
+}
+function loadHistory(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return [];
+    const v = JSON.parse(raw);
+    return Array.isArray(v)? v : [];
+  }catch(e){ return []; }
+}
+function setLast(entry){
+  localStorage.setItem(LAST_KEY, JSON.stringify(entry));
+}
+function getLast(){
+  try{
+    const raw = localStorage.getItem(LAST_KEY);
+    if(!raw) return null;
+    return JSON.parse(raw);
+  }catch(e){ return null; }
+}
+function downloadJSON(obj, filename){
+  const blob = new Blob([JSON.stringify(obj,null,2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+async function copyText(t){
+  try{
+    await navigator.clipboard.writeText(t);
+    return true;
+  }catch(e){
+    return false;
+  }
+}
+
+/* =========================
+   Noise Sim
+========================= */
+function simulateLifetimes({base, amp, rho, nRuns, maxCycles, thr}){
+  base = Math.max(0, base);
+  amp  = Math.max(0, amp);
+  rho  = clamp(rho, 0, 0.99);
+  thr  = clamp(thr, 0, 99);
+
+  function runOneWhite(){
+    let health = 100;
+    for(let c=1;c<=maxCycles;c++){
+      const eps = (Math.random()*2-1) * amp;
+      health -= (base + eps);
+      if(health <= thr) return c;
+    }
+    return maxCycles;
+  }
+
+  function runOneQDS(){
+    let health = 100;
+    let x = 0;
+    for(let c=1;c<=maxCycles;c++){
+      const eps = (Math.random()*2-1) * amp;
+      x = rho * x + eps;
+      health -= (base + x);
+      if(health <= thr) return c;
+    }
+    return maxCycles;
+  }
+
+  const white = new Array(nRuns);
+  const qds   = new Array(nRuns);
+  for(let i=0;i<nRuns;i++){
+    white[i]=runOneWhite();
+    qds[i]=runOneQDS();
+  }
+  return {white, qds, rho};
+}
+
+/* =========================
+   Drawing
+========================= */
+function clearCanvas(ctx){
+  ctx.clearRect(0,0,ctx.canvas.width, ctx.canvas.height);
+}
+
+function drawHistogram(canvas, white, qds){
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+  clearCanvas(ctx);
+
+  if(!white.length || !qds.length){
+    ctx.fillStyle = "rgba(255,255,255,.6)";
+    ctx.fillText("No data yet.", 20, 30);
+    return;
+  }
+
+  const all = white.concat(qds);
+  const minV = Math.min(...all);
+  const maxV = Math.max(...all);
+  const bins = 28;
+
+  const bw = Math.max(1, Math.ceil((maxV-minV+1)/bins));
+  const wCounts = new Array(bins).fill(0);
+  const qCounts = new Array(bins).fill(0);
+
+  function idxOf(v){
+    const i = Math.floor((v-minV)/bw);
+    return clamp(i, 0, bins-1);
+  }
+  for(const v of white) wCounts[idxOf(v)]++;
+  for(const v of qds)   qCounts[idxOf(v)]++;
+
+  const maxC = Math.max(...wCounts, ...qCounts, 1);
+  const padL=34, padR=10, padT=12, padB=28;
+  const plotW = W-padL-padR, plotH = H-padT-padB;
+  const binPx = plotW/bins;
+
+  // axes
+  ctx.strokeStyle = "rgba(255,255,255,.12)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(padL, padT);
+  ctx.lineTo(padL, padT+plotH);
+  ctx.lineTo(padL+plotW, padT+plotH);
+  ctx.stroke();
+
+  // bars
+  for(let i=0;i<bins;i++){
+    const x = padL + i*binPx;
+    const wH = (wCounts[i]/maxC)*plotH;
+    const qH = (qCounts[i]/maxC)*plotH;
+
+    // white (purple)
+    ctx.fillStyle = "rgba(139,44,255,.45)";
+    ctx.fillRect(x+1, padT+plotH-wH, binPx*0.48, wH);
+
+    // qds (green)
+    ctx.fillStyle = "rgba(57,255,136,.45)";
+    ctx.fillRect(x+binPx*0.52, padT+plotH-qH, binPx*0.48-2, qH);
+  }
+
+  // labels
+  ctx.fillStyle = "rgba(255,255,255,.7)";
+  ctx.font = "12px system-ui";
+  ctx.fillText("Counts", 6, 20);
+  ctx.fillText("Cycles →", W-90, H-10);
+
+  ctx.font = "11px system-ui";
+  ctx.fillStyle = "rgba(255,255,255,.6)";
+  ctx.fillText(`min ${minV}`, padL, H-8);
+  ctx.fillText(`max ${maxV}`, padL+plotW-60, H-8);
+}
+
+function drawTraces(canvas, params, sampleWhiteCycle, sampleQdsCycle){
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+  clearCanvas(ctx);
+
+  const padL=34, padR=10, padT=12, padB=28;
+  const plotW = W-padL-padR, plotH = H-padT-padB;
+
+  // axes
+  ctx.strokeStyle = "rgba(255,255,255,.12)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(padL, padT);
+  ctx.lineTo(padL, padT+plotH);
+  ctx.lineTo(padL+plotW, padT+plotH);
+  ctx.stroke();
+
+  if(!params) return;
+
+  const {base, amp, rho, maxCycles, thr} = params;
+
+  function genWhiteSeries(){
+    let health = 100;
+    const arr = [];
+    for(let c=1;c<=maxCycles;c++){
+      const eps=(Math.random()*2-1)*amp;
+      health -= (base+eps);
+      arr.push(health);
+      if(health<=thr) break;
+    }
+    return arr;
+  }
+  function genQdsSeries(){
+    let health = 100;
+    let x=0;
+    const arr = [];
+    for(let c=1;c<=maxCycles;c++){
+      const eps=(Math.random()*2-1)*amp;
+      x = rho*x + eps;
+      health -= (base+x);
+      arr.push(health);
+      if(health<=thr) break;
+    }
+    return arr;
+  }
+
+  const w = genWhiteSeries();
+  const q = genQdsSeries();
+  const maxLen = Math.max(w.length,q.length,1);
+
+  function xOf(i){ return padL + (i/(maxLen-1||1))*plotW; }
+  function yOf(v){
+    const vv = clamp(v, 0, 100);
+    return padT + (1 - vv/100)*plotH;
+  }
+
+  // threshold line
+  ctx.strokeStyle = "rgba(255,91,212,.35)";
+  ctx.setLineDash([6,4]);
+  ctx.beginPath();
+  ctx.moveTo(padL, yOf(thr));
+  ctx.lineTo(padL+plotW, yOf(thr));
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // white line
+  ctx.strokeStyle = "rgba(139,44,255,.85)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  w.forEach((v,i)=>{
+    const x=xOf(i), y=yOf(v);
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  // qds line
+  ctx.strokeStyle = "rgba(57,255,136,.85)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  q.forEach((v,i)=>{
+    const x=xOf(i), y=yOf(v);
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  ctx.fillStyle = "rgba(255,255,255,.7)";
+  ctx.font="12px system-ui";
+  ctx.fillText("Health %", 6, 20);
+  ctx.fillText("Cycles →", W-90, H-10);
+
+  // legend
+  ctx.fillStyle = "rgba(139,44,255,.9)";
+  ctx.fillRect(padL+6, padT+6, 10, 10);
+  ctx.fillStyle = "rgba(255,255,255,.7)";
+  ctx.fillText("White", padL+22, padT+15);
+
+  ctx.fillStyle = "rgba(57,255,136,.9)";
+  ctx.fillRect(padL+80, padT+6, 10, 10);
+  ctx.fillStyle = "rgba(255,255,255,.7)";
+  ctx.fillText("QDS", padL+96, padT+15);
+}
+
+/* =========================
+   UI Wiring
+========================= */
+const tabs = document.querySelectorAll(".tabbtn");
+tabs.forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    tabs.forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    const key = btn.dataset.tab;
+    ["overview","lab","coach","autobench"].forEach(k=>{
+      const sec = $("tab-"+k);
+      if(k===key) sec.classList.remove("hidden");
+      else sec.classList.add("hidden");
+    });
+    if(key==="coach") refreshCoach();
+  });
+});
+
+function setDefaults(){
+  $("baseDrain").value = 1.2;
+  $("amp").value = 1.8;
+  $("rho").value = 0.25;
+  $("thr").value = 50;
+  $("nRuns").value = 1200;
+  $("maxCycles").value = 4000;
+}
+$("resetBtn").addEventListener("click", ()=>{
+  setDefaults();
+  $("status").textContent = "Defaults restored.";
+});
+
+document.querySelectorAll("[data-preset]").forEach(b=>{
+  b.addEventListener("click", ()=>{
+    const p = b.dataset.preset;
+    if(p==="phone"){
+      $("baseDrain").value = 1.2;
+      $("amp").value = 1.8;
+      $("rho").value = 0.25;
+      $("thr").value = 50;
+      $("nRuns").value = 1200;
+      $("maxCycles").value = 4000;
+    }else if(p==="contrast"){
+      $("baseDrain").value = 2.7;
+      $("amp").value = 2.3;
+      $("rho").value = 0.70;
+      $("thr").value = 85;
+      $("nRuns").value = 1200;
+      $("maxCycles").value = 2000;
+    }else if(p==="chaos"){
+      $("baseDrain").value = 2.0;
+      $("amp").value = 3.0;
+      $("rho").value = 0.90;
+      $("thr").value = 80;
+      $("nRuns").value = 500;
+      $("maxCycles").value = 4000;
+    }
+    $("status").textContent = `Preset loaded: ${p}`;
+  });
+});
+
+function renderHistory(){
+  const box = $("historyBox");
+  box.innerHTML = "";
+  const hist = loadHistory().slice(0,6);
+  if(!hist.length){
+    box.innerHTML = `<div class="history-item muted">No history yet.</div>`;
+    return;
+  }
+  hist.forEach(h=>{
+    const div = document.createElement("div");
+    div.className = "history-item";
+    div.innerHTML =
+      `<b>${h.timestamp}</b><br>`+
+      `base=${h.base}% • amp=${h.amp}% • ρ=${h.rho} • thr=${h.thr}% • n=${h.nRuns}<br>`+
+      `white μ=${h.whiteMean.toFixed(1)} σ=${h.whiteStd.toFixed(1)} • `+
+      `QDS μ=${h.qdsMean.toFixed(1)} σ=${h.qdsStd.toFixed(1)} • `+
+      `Δ=${h.deltaPct.toFixed(1)}%`;
+    box.appendChild(div);
+  });
+}
+
+function updateKPIs(entry){
+  $("whiteMean").textContent = entry ? entry.whiteMean.toFixed(1) : "—";
+  $("whiteStd").textContent  = entry ? entry.whiteStd.toFixed(1) : "—";
+  $("qdsMean").textContent   = entry ? entry.qdsMean.toFixed(1) : "—";
+  $("qdsStd").textContent    = entry ? entry.qdsStd.toFixed(1) : "—";
+  $("deltaPct").textContent  = entry ? (entry.deltaPct>=0?"+":"") + entry.deltaPct.toFixed(1)+"%" : "—";
+  $("runsLabel").textContent = entry ? `${entry.nRuns} per model` : "—";
+  $("whiteP").textContent    = entry ? `${entry.whiteP10.toFixed(1)} / ${entry.whiteP50.toFixed(1)} / ${entry.whiteP90.toFixed(1)}` : "—";
+  $("qdsP").textContent      = entry ? `${entry.qdsP10.toFixed(1)} / ${entry.qdsP50.toFixed(1)} / ${entry.qdsP90.toFixed(1)}` : "—";
+
+  if(!entry){
+    $("interpretation").textContent = "";
+    return;
+  }
+
+  const spreadMsg =
+    entry.qdsStd > entry.whiteStd*1.2 ? "Clear widening of lifetime spread under correlated noise."
+    : entry.qdsStd > entry.whiteStd*1.05 ? "Subtle widening of lifetime spread under correlated noise."
+    : "Spread looks similar in this regime.";
+
+  const meanMsg =
+    entry.deltaPct > 5 ? "Mean lifetime uplift is noticeable in this setup."
+    : entry.deltaPct > 0.5 ? "Mean lifetime uplift is mild."
+    : entry.deltaPct < -0.5 ? "Mean lifetime dips slightly here — tails may dominate."
+    : "Mean lifetime is roughly unchanged.";
+
+  $("interpretation").textContent =
+    `${spreadMsg} ${meanMsg} ρ=${entry.rho.toFixed(2)} tends to create streaky outcomes.`;
+}
+
+let lastLocalEntry = null;
+
+$("runBtn").addEventListener("click", ()=>{
+  const base = parseFloat($("baseDrain").value);
+  const amp  = parseFloat($("amp").value);
+  const rho  = parseFloat($("rho").value);
+  const thr  = parseFloat($("thr").value);
+  const nRuns = parseInt($("nRuns").value,10);
+  const maxCycles = parseInt($("maxCycles").value,10);
+
+  const safeNRuns = clamp(nRuns, 50, 6000);
+  const safeMax = clamp(maxCycles, 100, 20000);
+
+  $("status").textContent = "Running…";
+
+  // run
+  const {white, qds} = simulateLifetimes({
+    base, amp, rho, nRuns: safeNRuns, maxCycles: safeMax, thr
+  });
+
+  const wMean = mean(white), wStd = std(white);
+  const qMean = mean(qds),   qStd = std(qds);
+  const deltaPct = wMean>0 ? ((qMean-wMean)/wMean)*100 : 0;
+
+  const entry = {
+    version: "9.2",
+    timestamp: nowStamp(),
+    base, amp, rho: clamp(rho,0,0.99), thr,
+    nRuns: safeNRuns, maxCycles: safeMax,
+    whiteMean: wMean, whiteStd: wStd,
+    qdsMean: qMean, qdsStd: qStd,
+    deltaPct,
+    whiteP10: percentile(white,10),
+    whiteP50: percentile(white,50),
+    whiteP90: percentile(white,90),
+    qdsP10: percentile(qds,10),
+    qdsP50: percentile(qds,50),
+    qdsP90: percentile(qds,90),
+    lifetimes_preview: {
+      white_min: Math.min(...white),
+      white_max: Math.max(...white),
+      qds_min: Math.min(...qds),
+      qds_max: Math.max(...qds),
+    }
+  };
+
+  lastLocalEntry = entry;
+  setLast(entry);
+  saveHistory(entry);
+  renderHistory();
+  updateKPIs(entry);
+
+  drawHistogram($("histCanvas"), white, qds);
+  drawTraces($("traceCanvas"), {base,amp,rho:clamp(rho,0,0.99),maxCycles:safeMax,thr});
+
+  $("status").textContent = `Done. Δ=${deltaPct.toFixed(2)}%  • history updated.`;
+  refreshCoach();
+});
+
+$("copySummaryBtn").addEventListener("click", async ()=>{
+  const e = lastLocalEntry || getLast();
+  if(!e){ $("status").textContent = "No run yet."; return; }
+  const t =
+`QDS Battery Hub v${e.version} — ${e.timestamp}
+base=${e.base}% • amp=${e.amp}% • rho=${e.rho} • thr=${e.thr}% • n=${e.nRuns} • max=${e.maxCycles}
+white μ=${e.whiteMean.toFixed(2)} σ=${e.whiteStd.toFixed(2)}
+QDS   μ=${e.qdsMean.toFixed(2)} σ=${e.qdsStd.toFixed(2)}
+Δ=${(e.deltaPct>=0?"+":"")}${e.deltaPct.toFixed(2)}%
+P10/P50/P90 white: ${e.whiteP10.toFixed(1)} / ${e.whiteP50.toFixed(1)} / ${e.whiteP90.toFixed(1)}
+P10/P50/P90 QDS:   ${e.qdsP10.toFixed(1)} / ${e.qdsP50.toFixed(1)} / ${e.qdsP90.toFixed(1)}`;
+  const ok = await copyText(t);
+  $("status").textContent = ok ? "Summary copied." : "Copy failed (clipboard blocked).";
+});
+
+$("exportLastBtn").addEventListener("click", ()=>{
+  const e = lastLocalEntry || getLast();
+  if(!e){ $("status").textContent = "No run yet."; return; }
+  downloadJSON(e, `QDS_BatteryHub_Last_v${e.version}_${Date.now()}.json`);
+});
+
+$("exportHistoryBtn").addEventListener("click", ()=>{
+  const hist = loadHistory();
+  downloadJSON({version:"9.2", exported: nowStamp(), history: hist}, `QDS_BatteryHub_History_v9.2_${Date.now()}.json`);
+});
+
+$("clearHistoryBtn").addEventListener("click", ()=>{
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(LAST_KEY);
+  lastLocalEntry = null;
+  renderHistory();
+  updateKPIs(null);
+  $("status").textContent = "History cleared.";
+  $("coachLive").textContent = "Run the Lab once and I’ll summarise your last results here.";
+});
+
+/* =========================
+   Coach Live
+========================= */
+function refreshCoach(){
+  const e = lastLocalEntry || getLast();
+  if(!e){
+    $("coachLive").textContent = "Run the Lab once and I’ll summarise your last results here.";
+    return;
+  }
+
+  const spreadRatio = e.whiteStd>0 ? (e.qdsStd/e.whiteStd) : 1;
+  const tailNote =
+    spreadRatio>1.5 ? "Big tail widening: correlated stress streaks are a strong intuition fit here."
+    : spreadRatio>1.15 ? "Noticeable widening: this is the classic “streaky outcomes” signature."
+    : "Spread change is modest in this regime.";
+
+  const meanNote =
+    e.deltaPct>5 ? "Mean lifetime uplift is visible — your params are in a ‘beneficial drift’ pocket."
+    : e.deltaPct>0.5 ? "Mean uplift is mild — the story is mostly about tails."
+    : e.deltaPct<-0.5 ? "Mean dips a bit — correlated bad streaks can dominate."
+    : "Mean is roughly unchanged.";
+
+  const rhoNote =
+    e.rho>0.7 ? "High ρ: you’re modelling heavy correlation / long memory."
+    : e.rho>0.3 ? "Moderate ρ: realistic demo zone for visible widening."
+    : "Low ρ: close to white-noise behaviour.";
+
+  $("coachLive").innerHTML =
+    `<b>Last run:</b> ${e.timestamp}<br>`+
+    `white μ=${e.whiteMean.toFixed(1)} σ=${e.whiteStd.toFixed(1)} • `+
+    `QDS μ=${e.qdsMean.toFixed(1)} σ=${e.qdsStd.toFixed(1)} • `+
+    `Δ=${(e.deltaPct>=0?"+":"")}${e.deltaPct.toFixed(1)}%<br>`+
+    `<span class="tiny">${tailNote} ${meanNote} ${rhoNote}</span>`;
+}
+
+/* =========================
+   AutoBench Viewer
+========================= */
+let abRows = [];
+
+function parseAutoBenchObject(obj){
+  // We try to be schema-flexible.
+  const file = obj.__file || "unknown";
+  const timestamp =
+    obj.timestamp || obj.time || obj.generated || obj.created || obj.date || "";
+
+  // Try to locate summary-like fields
+  let meanDelta = null, minDelta=null, maxDelta=null, integrity=null, notes="";
+
+  // Common patterns you used:
+  // - "AutoBench sampler summary: mean Δ=..."
+  // In JSON you might store fields like mean_delta, min_delta, max_delta, integrity
+  if(typeof obj.mean_delta === "number") meanDelta = obj.mean_delta;
+  if(typeof obj.min_delta === "number") minDelta = obj.min_delta;
+  if(typeof obj.max_delta === "number") maxDelta = obj.max_delta;
+  if(typeof obj.integrity === "string") integrity = obj.integrity;
+
+  // If not present, attempt to infer from nested keys
+  const flatScan = (o)=>{
+    const out = {};
+    const stack = [{p:"", v:o}];
+    while(stack.length){
+      const {p,v} = stack.pop();
+      if(v && typeof v === "object" && !Array.isArray(v)){
+        for(const k of Object.keys(v)){
+          const np = p? (p+"."+k) : k;
+          stack.push({p:np, v:v[k]});
+        }
+      }else{
+        out[p]=v;
+      }
+    }
+    return out;
+  };
+
+  const f = flatScan(obj);
+
+  // Look for keys containing "mean" and "delta"
+  if(meanDelta===null){
+    for(const k in f){
+      const lk = k.toLowerCase();
+      if(lk.includes("mean") && lk.includes("delta") && typeof f[k]==="number"){
+        meanDelta = f[k]; break;
+      }
+    }
+  }
+  if(minDelta===null){
+    for(const k in f){
+      const lk = k.toLowerCase();
+      if(lk.includes("min") && lk.includes("delta") && typeof f[k]==="number"){
+        minDelta = f[k]; break;
+      }
+    }
+  }
+  if(maxDelta===null){
+    for(const k in f){
+      const lk = k.toLowerCase();
+      if(lk.includes("max") && lk.includes("delta") && typeof f[k]==="number"){
+        maxDelta = f[k]; break;
+      }
+    }
+  }
+  if(integrity===null){
+    for(const k in f){
+      const lk = k.toLowerCase();
+      if(lk.includes("integrity") && typeof f[k]==="string"){
+        integrity = f[k]; break;
+      }
+    }
+  }
+
+  // Notes
+  if(typeof obj.note === "string") notes = obj.note;
+  else if(typeof obj.notes === "string") notes = obj.notes;
+
+  return {
+    file,
+    timestamp: String(timestamp || ""),
+    meanDelta,
+    minDelta,
+    maxDelta,
+    integrity: integrity || "",
+    notes: notes || ""
+  };
+}
+
+function renderAbTable(){
+  const tbody = $("abTable").querySelector("tbody");
+  tbody.innerHTML = "";
+  abRows.forEach(r=>{
+    const tr = document.createElement("tr");
+    const fmt = (v)=> (typeof v==="number" ? v.toFixed(2)+"%" : "—");
+    tr.innerHTML =
+      `<td>${r.file}</td>`+
+      `<td>${r.timestamp || "—"}</td>`+
+      `<td>${fmt(r.meanDelta)}</td>`+
+      `<td>${fmt(r.minDelta)} / ${fmt(r.maxDelta)}</td>`+
+      `<td>${r.integrity || "—"}</td>`+
+      `<td class="tiny">${(r.notes||"").slice(0,80)}</td>`;
+    tbody.appendChild(tr);
+  });
+  $("abStatus").textContent = abRows.length ? `Loaded ${abRows.length} log(s).` : "No logs loaded.";
+}
+
+$("abFiles").addEventListener("change", async (ev)=>{
+  const files = [...ev.target.files||[]];
+  if(!files.length) return;
+
+  for(const file of files){
+    try{
+      const text = await file.text();
+      const obj = JSON.parse(text);
+      obj.__file = file.name;
+      const row = parseAutoBenchObject(obj);
+      abRows.push(row);
+    }catch(e){
+      abRows.push({file:file.name, timestamp:"", meanDelta:null, minDelta:null, maxDelta:null, integrity:"parse error", notes:String(e)});
+    }
+  }
+  renderAbTable();
+});
+
+$("abClearBtn").addEventListener("click", ()=>{
+  abRows = [];
+  $("abFiles").value = "";
+  renderAbTable();
+});
+
+$("abExportBtn").addEventListener("click", ()=>{
+  downloadJSON({version:"9.2", exported: nowStamp(), rows: abRows}, `QDS_AutoBench_Table_v9.2_${Date.now()}.json`);
+});
+
+/* =========================
+   Boot
+========================= */
+setDefaults();
+renderHistory();
+updateKPIs(getLast());
+if(getLast()){
+  // draw placeholders from last-known distributions if you want,
+  // but we keep it simple: prompt user to run.
+}
+refreshCoach();
+renderAbTable();
+</script>
+</body>
+</html>

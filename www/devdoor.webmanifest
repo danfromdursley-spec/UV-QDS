@@ -1,0 +1,12 @@
+{
+  "name": "DEV DOOR — Space Index",
+  "short_name": "DEV DOOR",
+  "start_url": "/dev_door_space.html",
+  "display": "standalone",
+  "background_color": "#050814",
+  "theme_color": "#050814",
+  "icons": [
+    { "src": "devdoor_icon_192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "devdoor_icon_512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

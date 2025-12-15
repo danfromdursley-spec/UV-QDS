@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>QDS Production Dashboard — Neon Edition</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: radial-gradient(circle at center, #050505, #000);
+        font-family: 'Arial', sans-serif;
+        color: #9dfcff;
+        overflow-x: hidden;
+    }
+
+    h1 {
+        text-align: center;
+        margin-top: 40px;
+        font-size: 3rem;
+        text-shadow: 0 0 15px #00eaff, 0 0 30px #00bcd4;
+        animation: glowPulse 3s infinite;
+    }
+
+    @keyframes glowPulse {
+        0% { text-shadow: 0 0 15px #00eaff; }
+        50% { text-shadow: 0 0 30px #00ffaa; }
+        100% { text-shadow: 0 0 15px #00eaff; }
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 25px;
+        padding: 40px;
+    }
+
+    .card {
+        background: rgba(10, 10, 20, 0.7);
+        border: 2px solid #00ffee55;
+        padding: 20px;
+        border-radius: 14px;
+        text-align: center;
+        box-shadow: 0 0 18px #0099ff33;
+        transition: 0.3s ease;
+    }
+
+    .card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 28px #00eaff88;
+        border-color: #00ffaa;
+    }
+
+    .bigNumber {
+        font-size: 3.2rem;
+        font-weight: bold;
+        text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffaa;
+        animation: countPulse 2.5s infinite;
+    }
+
+    @keyframes countPulse {
+        0% { color: #89f7ff; }
+        50% { color: #afff66; }
+        100% { color: #89f7ff; }
+    }
+
+    .label {
+        margin-top: 8px;
+        font-size: 1.2rem;
+        opacity: 0.85;
+    }
+
+    /* Hidden trophy mode */
+    #trophyMode {
+        position: fixed;
+        bottom: 15px;
+        right: 15px;
+        padding: 10px 15px;
+        background: #222;
+        border: 1px solid #00ffaa55;
+        color: #00ffaa;
+        cursor: pointer;
+        border-radius: 10px;
+        opacity: 0.7;
+        font-size: 0.9rem;
+    }
+
+    #trophyMessage {
+        display: none;
+        position: fixed;
+        bottom: 60px;
+        right: 15px;
+        color: #fff;
+        font-size: 1.1rem;
+        text-shadow: 0 0 10px #00ffaa;
+    }
+</style>
+</head>
+<body>
+
+<h1>QDS Production Dashboard</h1>
+
+<div class="grid">
+
+    <div class="card">
+        <div id="devCount" class="bigNumber">0</div>
+        <div class="label">Development Files (.py/.html/.js/.css/.sh)</div>
+    </div>
+
+    <div class="card">
+        <div id="docCount" class="bigNumber">0</div>
+        <div class="label">Documents (.pdf/.docx)</div>
+    </div>
+
+    <div class="card">
+        <div id="photoCount" class="bigNumber">0</div>
+        <div class="label">Images / Documentation Media</div>
+    </div>
+
+    <div class="card">
+        <div id="totalCount" class="bigNumber">0</div>
+        <div class="label">Total Outputs (Since 20 Oct 2025)</div>
+    </div>
+
+</div>
+
+<div id="trophyMode">Trophy Mode 🎩</div>
+<div id="trophyMessage">Hidden Achievement Unlocked: "Arcane Dev Machine" 🧙‍♂️💥</div>
+
+<script>
+function animateValue(id, end, duration) {
+    let obj = document.getElementById(id);
+    let start = 0;
+    let range = end - start;
+    let increment = end > start ? 1 : -1;
+    let stepTime = Math.abs(Math.floor(duration / range));
+
+    let timer = setInterval(function() {
+        start += increment;
+        obj.textContent = start.toLocaleString();
+        if (start == end) clearInterval(timer);
+    }, stepTime);
+}
+
+animateValue("devCount", 2182, 1500);
+animateValue("docCount", 793, 1300);
+animateValue("photoCount", 6797, 1700);
+animateValue("totalCount", 2182 + 793 + 6797, 2000);
+
+document.getElementById("trophyMode").onclick = function() {
+    let msg = document.getElementById("trophyMessage");
+    msg.style.display = (msg.style.display === "none") ? "block" : "none";
+};
+</script>
+
+</body>
+</html>

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<title>Catapult Balloon Pop — v1</title>
+<style>
+  html, body { margin:0; padding:0; background:#070b14; height:100%; overflow:hidden; }
+  canvas { display:block; width:100vw; height:100vh; touch-action:none; }
+  .hud{
+    position:fixed; top:10px; left:10px; right:10px;
+    display:flex; gap:10px; z-index:2; font-family:system-ui, sans-serif;
+  }
+  .card{
+    flex:1; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08);
+    color:#eaf2ff; padding:10px 12px; border-radius:14px; backdrop-filter: blur(8px);
+  }
+  .btn{
+    background:linear-gradient(135deg,#6cf,#b7f); color:#06101f; font-weight:700;
+    border:none; padding:10px 12px; border-radius:12px; width:100%;
+  }
+  .row{ display:flex; gap:8px; align-items:center; }
+  input[type="range"]{ width:100%; }
+  .small{ opacity:0.75; font-size:12px; }
+</style>
+</head>
+<body>
+<div class="hud">
+  <div class="card">
+    <div><b>Score</b> <span id="score">0</span></div>
+    <div class="small">Best <span id="best">0</span> · Combo <span id="combo">x1</span></div>
+  </div>
+  <div class="card">
+    <div class="row">
+      <button class="btn" id="reset">RESET</button>
+    </div>
+    <div class="small">Drag catapult → release 🎯</div>
+  </div>
+  <div class="card">
+    <div><b>Wind</b> <span id="windVal">0.00</span></div>
+    <input id="wind" type="range" min="-1" max="1" step="0.01" value="0">
+    <div class="small"><b>Mode</b> <span id="modeTxt">Normal</span></div>
+    <input id="violent" type="range" min="0" max="1" step="1" value="0">
+  </div>
+</div>
+
+<canvas id="c"></canvas>
+
+<script>
+(() => {
+  const canvas = document.getElementById("c");
+  const ctx = canvas.getContext("2d");
+
+  const scoreEl = document.getElementById("score");
+  const bestEl  = document.getElementById("best");
+  const comboEl = document.getElementById("combo");
+  const windEl  = document.getElementById("wind");
+  const windVal = document.getElementById("windVal");
+  const violentEl = document.getElementById("violent");
+  const modeTxt = document.getElementById("modeTxt");
+  const resetBtn = document.getElementById("reset");
+
+  let W, H, DPR;
+  function resize(){
+    DPR = Math.min(2, window.devicePixelRatio || 1);
+    W = Math.floor(window.innerWidth);
+    H = Math.floor(window.innerHeight);
+    canvas.width  = Math.floor(W * DPR);
+    canvas.height = Math.floor(H * DPR);
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  // ====== GAME STATE ======
+  let balloons = [];
+  let projectiles = [];
+  let score = 0;
+  let best = Number(localStorage.getItem("catapult_best") || 0);
+  let combo = 1;
+  let lastPopT = 0;
+
+  bestEl.textContent = best;
+
+  const catapult = {
+    baseX: 0, baseY: 0,
+    x: 0, y: 0,
+    radius: 26,
+    dragging: false,
+    pullX: 0, pullY: 0,
+    maxPull: 120
+  };
+
+  function reset(){
+    score = 0; combo = 1; lastPopT = 0;
+    scoreEl.textContent = score;
+    comboEl.textContent = "x1";
+    projectiles = [];
+    spawnBalloons();
+    placeCatapult();
+  }
+
+  function placeCatapult(){
+    catapult.baseX = Math.max(60, W * 0.12);
+    catapult.baseY = Math.min(H - 80, H * 0.86);
+    catapult.x = catapult.baseX;
+    catapult.y = catapult.baseY;
+    catapult.pullX = 0; catapult.pullY = 0;
+  }
+
+  function spawnBalloons(){
+    balloons = [];
+    const count = Math.max(10, Math.floor((W*H) / 45000));
+    for(let i=0;i<count;i++){
+      const r = 18 + Math.random()*18;
+      const x = r + 20 + Math.random()*(W - r*2 - 40);
+      const y = r + 70 + Math.random()*(H * 0.65);
+      const hue = 200 + Math.random()*120;
+      balloons.push({x,y,r,hue,popped:false});
+    }
+  }
+
+  function fireProjectile(vx, vy){
+    const speedCap = violentEl.value === "1" ? 22 : 16;
+    const mag = Math.hypot(vx, vy);
+    if(mag > speedCap){
+      vx = vx/mag * speedCap;
+      vy = vy/mag * speedCap;
+    }
+    projectiles.push({
+      x: catapult.baseX, y: catapult.baseY,
+      vx, vy,
+      r: 8,
+      life: 0
+    });
+  }
+
+  // ====== INPUT ======
+  function getPos(e){
+    const t = e.touches ? e.touches[0] : e;
+    return {x: t.clientX, y: t.clientY};
+  }
+
+  function startDrag(e){
+    const p = getPos(e);
+    const dx = p.x - catapult.baseX;
+    const dy = p.y - catapult.baseY;
+    if(Math.hypot(dx,dy) < catapult.radius*2.2){
+      catapult.dragging = true;
+      e.preventDefault();
+    }
+  }
+
+  function moveDrag(e){
+    if(!catapult.dragging) return;
+    const p = getPos(e);
+    let dx = p.x - catapult.baseX;
+    let dy = p.y - catapult.baseY;
+    const d = Math.hypot(dx,dy);
+    if(d > catapult.maxPull){
+      dx = dx/d * catapult.maxPull;
+      dy = dy/d * catapult.maxPull;
+    }
+    catapult.pullX = dx;
+    catapult.pullY = dy;
+    catapult.x = catapult.baseX + dx;
+    catapult.y = catapult.baseY + dy;
+    e.preventDefault();
+  }
+
+  function endDrag(){
+    if(!catapult.dragging) return;
+    catapult.dragging = false;
+    // Launch opposite of pull
+    const power = violentEl.value === "1" ? 0.22 : 0.18;
+    const vx = -catapult.pullX * power;
+    const vy = -catapult.pullY * power;
+    if(Math.hypot(vx,vy) > 1.2) fireProjectile(vx, vy);
+
+    catapult.pullX = 0; catapult.pullY = 0;
+    catapult.x = catapult.baseX; catapult.y = catapult.baseY;
+  }
+
+  canvas.addEventListener("mousedown", startDrag);
+  canvas.addEventListener("mousemove", moveDrag);
+  window.addEventListener("mouseup", endDrag);
+
+  canvas.addEventListener("touchstart", startDrag, {passive:false});
+  canvas.addEventListener("touchmove", moveDrag, {passive:false});
+  canvas.addEventListener("touchend", endDrag);
+
+  resetBtn.addEventListener("click", reset);
+
+  windEl.addEventListener("input", () => windVal.textContent = Number(windEl.value).toFixed(2));
+  violentEl.addEventListener("input", () => {
+    modeTxt.textContent = violentEl.value === "1" ? "Violent" : "Normal";
+  });
+
+  windVal.textContent = "0.00";
+
+  // ====== PHYSICS + COLLISIONS ======
+  function update(dt){
+    const violent = violentEl.value === "1";
+    const g = violent ? 0.75 : 0.52;
+    const drag = violent ? 0.995 : 0.992;
+    const wind = Number(windEl.value) * (violent ? 0.20 : 0.12);
+
+    for(const p of projectiles){
+      p.vx += wind;
+      p.vy += g;
+      p.vx *= drag; p.vy *= drag;
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.life += dt;
+
+      // soft floor bounce
+      if(p.y > H - 10){
+        p.y = H - 10;
+        p.vy *= -0.45;
+        p.vx *= 0.85;
+      }
+    }
+
+    // remove old/offscreen
+    projectiles = projectiles.filter(p =>
+      p.life < 240 &&
+      p.x > -80 && p.x < W + 80 &&
+      p.y > -120 && p.y < H + 120
+    );
+
+    // collision with balloons
+    const now = performance.now();
+    for(const b of balloons){
+      if(b.popped) continue;
+      for(const p of projectiles){
+        const dx = b.x - p.x;
+        const dy = b.y - p.y;
+        const d = Math.hypot(dx,dy);
+        if(d < b.r + p.r){
+          b.popped = true;
+
+          // combo logic
+          const dtPop = now - lastPopT;
+          if(dtPop < 900) combo = Math.min(10, combo + 1);
+          else combo = 1;
+          lastPopT = now;
+
+          const add = 10 * combo * (violent ? 2 : 1);
+          score += add;
+          best = Math.max(best, score);
+
+          scoreEl.textContent = score;
+          comboEl.textContent = "x" + combo;
+          bestEl.textContent = best;
+          localStorage.setItem("catapult_best", String(best));
+
+          // micro impulse
+          p.vx *= 0.7; p.vy *= 0.7;
+        }
+      }
+    }
+
+    // respawn if all popped
+    if(balloons.length && balloons.every(b => b.popped)){
+      spawnBalloons();
+    }
+  }
+
+  // ====== RENDER ======
+  function drawBG(){
+    ctx.fillStyle = "#070b14";
+    ctx.fillRect(0,0,W,H);
+
+    // faint stars
+    ctx.globalAlpha = 0.12;
+    for(let i=0;i<40;i++){
+      const x = (i*97) % W;
+      const y = (i*173) % H;
+      ctx.fillStyle = "#bcd7ff";
+      ctx.fillRect(x, y, 1.5, 1.5);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function drawBalloons(){
+    for(const b of balloons){
+      if(b.popped) continue;
+      const grad = ctx.createRadialGradient(b.x-b.r*0.3, b.y-b.r*0.3, 2, b.x, b.y, b.r);
+      grad.addColorStop(0, `hsla(${b.hue},90%,75%,0.95)`);
+      grad.addColorStop(1, `hsla(${b.hue},90%,45%,0.85)`);
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
+      ctx.fill();
+
+      ctx.strokeStyle = "rgba(255,255,255,0.15)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+  }
+
+  function drawProjectiles(){
+    for(const p of projectiles){
+      ctx.fillStyle = "rgba(200,230,255,0.9)";
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fill();
+    }
+  }
+
+  function drawCatapult(){
+    // base
+    ctx.fillStyle = "rgba(255,255,255,0.08)";
+    ctx.beginPath();
+    ctx.arc(catapult.baseX, catapult.baseY, catapult.radius*1.25, 0, Math.PI*2);
+    ctx.fill();
+
+    // elastic line
+    if(catapult.dragging){
+      ctx.strokeStyle = "rgba(140,190,255,0.45)";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(catapult.baseX, catapult.baseY);
+      ctx.lineTo(catapult.x, catapult.y);
+      ctx.stroke();
+    }
+
+    // handle
+    const g = ctx.createRadialGradient(catapult.x-6, catapult.y-6, 2, catapult.x, catapult.y, catapult.radius);
+    g.addColorStop(0,"rgba(160,220,255,0.95)");
+    g.addColorStop(1,"rgba(120,140,255,0.65)");
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(catapult.x, catapult.y, catapult.radius, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.strokeStyle = "rgba(255,255,255,0.12)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  // ====== LOOP ======
+  let last = performance.now();
+  function loop(t){
+    const dt = Math.min(2.2, (t - last) / 16.666);
+    last = t;
+
+    update(dt);
+    drawBG();
+    drawBalloons();
+    drawProjectiles();
+    drawCatapult();
+
+    requestAnimationFrame(loop);
+  }
+
+  // init
+  placeCatapult();
+  spawnBalloons();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

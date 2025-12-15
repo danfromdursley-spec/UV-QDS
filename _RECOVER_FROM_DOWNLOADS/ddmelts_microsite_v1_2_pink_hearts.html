@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>DDmelts • Denny’s Delights — Microsite v1.2</title>
+  <meta name="description" content="Handmade wax melts, burners, bath bombs & more — local, small-batch, gift-ready." />
+  <style>
+    :root{
+      --bg-0: #0d0a10;
+      --bg-1: #140f1d;
+      --bg-2: #1a1326;
+      --glass-1: rgba(255,255,255,0.06);
+      --glass-2: rgba(255,255,255,0.10);
+      --stroke-1: rgba(255,255,255,0.10);
+      --stroke-2: rgba(255,255,255,0.18);
+
+      --pink-1: #ffb3d9;
+      --pink-2: #ff8ac7;
+      --pink-3: #ff6fb8;
+      --rose-1: #ffc7e6;
+      --rose-2: #ffd9ee;
+
+      --mint-1: #9ff2d0;
+
+      --text-1: #fff7fb;
+      --text-2: rgba(255,247,251,0.78);
+      --text-3: rgba(255,247,251,0.56);
+
+      --shadow-1: 0 10px 30px rgba(0,0,0,0.40);
+      --shadow-2: 0 0 0 1px rgba(255,255,255,0.04) inset;
+
+      --radius-1: 14px;
+      --radius-2: 22px;
+      --radius-3: 28px;
+
+      --tap: 52px;
+      --maxw: 980px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color: var(--text-1);
+      background:
+        radial-gradient(1200px 800px at 10% 10%, rgba(255,111,184,0.12), transparent 50%),
+        radial-gradient(900px 900px at 90% 15%, rgba(255,179,217,0.10), transparent 55%),
+        radial-gradient(900px 900px at 20% 85%, rgba(159,242,208,0.08), transparent 55%),
+        linear-gradient(160deg, var(--bg-0), var(--bg-1) 35%, var(--bg-2) 100%);
+      overflow-x:hidden;
+    }
+
+    .wrap{
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 22px 16px 90px;
+    }
+
+    /* Floating hearts background */
+    .hearts{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:0.10;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(255,179,217,0.35) 0 2px, transparent 3px),
+        radial-gradient(circle at 80% 15%, rgba(255,138,199,0.30) 0 2px, transparent 3px),
+        radial-gradient(circle at 35% 70%, rgba(255,111,184,0.35) 0 2px, transparent 3px),
+        radial-gradient(circle at 70% 80%, rgba(255,199,230,0.35) 0 2px, transparent 3px);
+      filter: blur(0.2px);
+    }
+
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding: 8px 2px 18px;
+    }
+
+    .brand-left{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .logo{
+      width:52px; height:52px;
+      border-radius: 18px;
+      display:grid; place-items:center;
+      background:
+        linear-gradient(135deg, rgba(255,179,217,0.22), rgba(255,111,184,0.12)),
+        rgba(255,255,255,0.06);
+      border:1px solid var(--stroke-1);
+      box-shadow: var(--shadow-2), var(--shadow-1);
+      font-weight:700;
+      letter-spacing:0.5px;
+      color: var(--rose-2);
+    }
+
+    .brand-kicker{
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 4px;
+    }
+    .brand-title{
+      font-size: 24px;
+      line-height:1.05;
+      margin:0;
+      font-weight: 800;
+    }
+    .brand-sub{
+      font-size: 12.5px;
+      color: var(--text-3);
+      margin-top: 4px;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--glass-1);
+      border:1px solid var(--stroke-1);
+      color: var(--text-2);
+      font-size: 11.5px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .hero{
+      position:relative;
+      background:
+        linear-gradient(135deg, rgba(255,179,217,0.08), rgba(255,111,184,0.06)),
+        var(--glass-1);
+      border: 1px solid var(--stroke-1);
+      border-radius: var(--radius-3);
+      padding: 22px 18px 18px;
+      box-shadow: var(--shadow-1), var(--shadow-2);
+      overflow:hidden;
+    }
+
+    .hero-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border:1px solid var(--stroke-1);
+      font-size: 11px;
+      color: var(--text-2);
+      margin-bottom: 12px;
+    }
+    .dot{
+      width:8px; height:8px; border-radius:50%;
+      background: var(--mint-1);
+      box-shadow: 0 0 12px rgba(159,242,208,0.7);
+    }
+
+    .hero h1{
+      margin: 0 0 10px;
+      font-size: clamp(26px, 6.2vw, 44px);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+    .hero p{
+      margin: 0 0 16px;
+      color: var(--text-2);
+      font-size: clamp(14.5px, 3.5vw, 17px);
+    }
+
+    .tag-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin: 8px 0 18px;
+    }
+    .tag{
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      border:1px solid var(--stroke-1);
+      font-size: 11.5px;
+      color: var(--text-2);
+    }
+
+    .cta-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+    .btn{
+      min-height: var(--tap);
+      padding: 12px 16px;
+      border-radius: 16px;
+      border:1px solid var(--stroke-2);
+      background:
+        linear-gradient(135deg, rgba(255,179,217,0.18), rgba(255,111,184,0.10)),
+        rgba(255,255,255,0.06);
+      color: var(--text-1);
+      font-weight: 650;
+      letter-spacing: 0.01em;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      box-shadow: var(--shadow-2);
+      transition: transform .08s ease, border-color .12s ease, background .12s ease;
+    }
+    .btn:active{ transform: translateY(1px) scale(0.99); }
+    .btn.secondary{
+      background: rgba(255,255,255,0.05);
+      font-weight: 600;
+      color: var(--text-2);
+    }
+
+    .grid{
+      display:grid;
+      gap: 14px;
+      margin-top: 16px;
+    }
+    @media(min-width: 860px){
+      .grid.cols-2{ grid-template-columns: 1.05fr 0.95fr; }
+      .grid.cols-3{ grid-template-columns: repeat(3, 1fr); }
+    }
+
+    .card{
+      background: var(--glass-1);
+      border: 1px solid var(--stroke-1);
+      border-radius: var(--radius-2);
+      padding: 18px 16px;
+      box-shadow: var(--shadow-2);
+    }
+    .card h3{
+      margin: 0 0 8px;
+      font-size: 18px;
+      letter-spacing: -0.01em;
+    }
+    .muted{ color: var(--text-3); }
+    .small{ font-size: 12.5px; color: var(--text-3); }
+    .lead{ color: var(--text-2); font-size: 14.5px; }
+
+    .section-title{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 26px 2px 10px;
+    }
+    .section-title h2{
+      margin:0;
+      font-size: clamp(18px, 4.2vw, 24px);
+    }
+
+    .price-card{
+      border-radius: 18px;
+      padding: 14px 14px 12px;
+      border: 1px solid var(--stroke-1);
+      background:
+        linear-gradient(135deg, rgba(255,179,217,0.08), rgba(255,111,184,0.05)),
+        rgba(255,255,255,0.05);
+    }
+    .price-tag{
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--rose-1);
+      letter-spacing: -0.02em;
+      margin-top: 6px;
+    }
+
+    .photo-grid{
+      display:grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    @media(min-width: 560px){
+      .photo-grid{ grid-template-columns: repeat(3, 1fr); }
+    }
+
+    .photo-slot{
+      aspect-ratio: 1/1;
+      border-radius: 16px;
+      border: 1px dashed rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.03);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding: 10px;
+      color: var(--text-3);
+      font-size: 11.5px;
+    }
+
+    .field{
+      width:100%;
+      min-height: var(--tap);
+      border-radius: 14px;
+      border: 1px solid var(--stroke-1);
+      background: rgba(255,255,255,0.05);
+      color: var(--text-1);
+      padding: 12px 12px;
+      outline: none;
+      font-size: 14px;
+    }
+    textarea.field{ min-height: 90px; resize: vertical; }
+
+    .row{
+      display:grid;
+      gap: 10px;
+    }
+    @media(min-width: 860px){
+      .row.cols-2{ grid-template-columns: 1fr 1fr; }
+      .row.cols-3{ grid-template-columns: 1fr 1fr 1fr; }
+    }
+
+    .divider{
+      height:1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+      margin: 18px 0;
+    }
+
+    .sticky-mini{
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      padding: 10px 12px 18px;
+      background:
+        linear-gradient(180deg, transparent, rgba(13,10,16,0.35) 18%, rgba(13,10,16,0.75) 60%, rgba(13,10,16,0.95) 100%);
+      backdrop-filter: blur(10px);
+    }
+    .sticky-inner{
+      max-width: var(--maxw);
+      margin: 0 auto;
+      display:flex;
+      gap: 8px;
+      justify-content:center;
+      flex-wrap:wrap;
+    }
+    .mini-btn{
+      min-height: 44px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px solid var(--stroke-1);
+      background: rgba(255,255,255,0.06);
+      color: var(--text-2);
+      text-decoration:none;
+      font-size: 11.5px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    footer{
+      margin-top: 30px;
+      text-align:center;
+      color: var(--text-3);
+      font-size: 11.5px;
+    }
+
+    /* tiny sparkle hearts */
+    .spark{
+      display:inline-block;
+      transform: translateY(-1px);
+      color: var(--pink-1);
+      text-shadow: 0 0 10px rgba(255,179,217,0.35);
+    }
+  </style>
+</head>
+<body>
+  <div class="hearts"></div>
+
+  <div class="wrap">
+    <header>
+      <div class="brand-left">
+        <div class="logo">DD</div>
+        <div>
+          <div class="brand-kicker">Handmade scent & bath treats</div>
+          <h1 class="brand-title">DDmelts • Denny’s Delights</h1>
+          <div class="brand-sub">Local • small-batch • gift-ready <span class="spark">💗</span></div>
+        </div>
+      </div>
+      <div class="pill">Microsite v1.2</div>
+    </header>
+
+    <section class="hero" id="top">
+      <div class="hero-badge"><span class="dot"></span> Taking orders • UK shipping / local drop</div>
+      <h1>Cosy scents & bath-time joy — made with love. <span class="spark">✨</span></h1>
+      <p>
+        Wax melts, burners, bath bombs, soaps and sweet little gift sets designed for warm evenings,
+        thoughtful surprises, and that “new house, new vibes” feeling.
+        Small batches, big heart. <span class="spark">💞</span>
+      </p>
+
+      <div class="tag-row">
+        <span class="tag">Wax melts</span>
+        <span class="tag">Burners</span>
+        <span class="tag">Bath bombs</span>
+        <span class="tag">Soaps</span>
+        <span class="tag">Seasonal launches</span>
+        <span class="tag">Gift sets</span>
+      </div>
+
+      <div class="cta-row">
+        <!-- SumUp store -->
+        <a class="btn" id="storeBtn" href="https://ddmelts.sumupstore.com" target="_blank" rel="noreferrer">
+          🛍️ Shop online
+        </a>
+
+        <!-- Jump links -->
+        <a class="btn secondary" href="#order">💌 Order / Enquire</a>
+        <a class="btn secondary" href="#bestsellers">⭐ Bestsellers</a>
+        <a class="btn secondary" href="#range">🧺 The range</a>
+        <a class="btn secondary" href="#prices">💗 Prices</a>
+        <a class="btn secondary" href="#photos">📸 Photos</a>
+      </div>
+    </section>
+
+    <div class="grid cols-2">
+      <section class="card">
+        <div class="section-title">
+          <h2>Why DDmelts? <span class="spark">🌸</span></h2>
+          <span class="pill">Small-batch love</span>
+        </div>
+        <div class="card" style="padding:14px 14px; background: rgba(255,255,255,0.04);">
+          <h3>Handmade with care</h3>
+          <div class="lead">
+            Every batch is made to feel personal — cosy scents, soothing baths, and gifts that actually mean something.
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="card" style="padding:14px 14px; background: rgba(255,255,255,0.04);">
+          <h3>Perfect little pick-me-ups</h3>
+          <div class="lead">
+            From house-warming bundles to mini treat packs — easy wins you can smell and feel.
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="small">
+          Local maker based in Dursley. Pop a message for custom bundles, allergy notes, or “make it a surprise” requests.
+        </div>
+      </section>
+
+      <aside class="card">
+        <div class="section-title">
+          <h2>Quick info <span class="spark">💗</span></h2>
+          <span class="pill">Real details</span>
+        </div>
+        <div class="row">
+          <div class="price-card">
+            <div class="small">Instagram</div>
+            <div style="font-weight:700; margin-top:2px;">@dennysdelightswaxm… (DD Melts)</div>
+            <div class="small">Update handle text anytime.</div>
+          </div>
+          <div class="price-card">
+            <div class="small">Online store</div>
+            <div style="font-weight:700; margin-top:2px;">ddmelts.sumupstore.com</div>
+            <div class="small">Fastest way to convert clicks.</div>
+          </div>
+          <div class="price-card">
+            <div class="small">Location</div>
+            <div style="font-weight:700; margin-top:2px;">16 Forge Road, Dursley, GL11 4GB</div>
+            <div class="small">Great for local drop & trust.</div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <section class="card" id="bestsellers">
+      <div class="section-title">
+        <h2>⭐ Bestsellers</h2>
+        <span class="pill">Rename to real lines</span>
+      </div>
+      <div class="grid cols-3">
+        <div class="price-card">
+          <div class="pill">Wax melts • crowd-pleaser</div>
+          <h3>Gold Orchid</h3>
+          <div class="lead">A robust oriental accord with warm floral vanilla softness.</div>
+        </div>
+        <div class="price-card">
+          <div class="pill">Bath bombs • self-care</div>
+          <h3>Sunday Self-Care</h3>
+          <div class="lead">Soft, gentle, gift-ready — perfect boxed sets.</div>
+        </div>
+        <div class="price-card">
+          <div class="pill">Burners • gift-ready</div>
+          <h3>Cat burner favourite</h3>
+          <div class="lead">Cute statement pieces that pair perfectly with a melt bundle.</div>
+        </div>
+      </div>
+      <div class="small muted" style="margin-top:10px;">
+        These are safe placeholders inspired by her current vibe — swap titles/descriptions to match her live catalogue.
+      </div>
+    </section>
+
+    <section class="card" id="range">
+      <div class="section-title">
+        <h2>🧺 The range</h2>
+        <span class="pill">Scroll-friendly menu</span>
+      </div>
+      <div class="grid cols-3">
+        <div class="price-card">
+          <div class="pill">Wax melts</div>
+          <h3>Snap bars & minis</h3>
+          <div class="lead">Seasonal drops, fresh-clean staples, bakery treats, and cosy blends.</div>
+        </div>
+        <div class="price-card">
+          <div class="pill">Bath bombs</div>
+          <h3>Foam, fizz & soft skin</h3>
+          <div class="lead">Gentle scents and fun colours for relaxing evenings.</div>
+        </div>
+        <div class="price-card">
+          <div class="pill">Soaps</div>
+          <h3>Handy little luxuries</h3>
+          <div class="lead">Pretty, practical, and perfect for gift baskets.</div>
+        </div>
+        <div class="price-card">
+          <div class="pill">Burners</div>
+          <h3>Classic & cute displays</h3>
+          <div class="lead">Simple, sturdy styles + character pieces (hello cat burner <span class="spark">🐾</span>).</div>
+        </div>
+        <div class="price-card">
+          <div class="pill">Gift sets</div>
+          <h3>Bundles for new homes</h3>
+          <div class="lead">Pick a vibe: clean, cosy, sweet, or seasonal sparkle.</div>
+        </div>
+        <div class="price-card">
+          <div class="pill">Seasonal</div>
+          <h3>Halloween + winter lines</h3>
+          <div class="lead">Limited themed drops that make the feed pop.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="prices">
+      <div class="section-title">
+        <h2>💗 Quick price guide (edit anytime)</h2>
+        <span class="pill">Keeps page sell-ready</span>
+      </div>
+      <div class="grid cols-3">
+        <div class="price-card">
+          <div class="pill">Popular</div>
+          <h3>Wax melt snap bars</h3>
+          <div class="lead">Standard bars, seasonal designs.</div>
+          <div class="price-tag">£X.XX</div>
+        </div>
+        <div class="price-card">
+          <div class="pill">Gift-friendly</div>
+          <h3>Mini melt bundles</h3>
+          <div class="lead">Mix-and-match scent packs.</div>
+          <div class="price-tag">£X.XX</div>
+        </div>
+        <div class="price-card">
+          <div class="pill">Self-care</div>
+          <h3>Bath bombs</h3>
+          <div class="lead">Single or multi-buy options.</div>
+          <div class="price-tag">£X.XX</div>
+        </div>
+        <div class="price-card">
+          <div class="pill">Burners</div>
+          <h3>Classic burners</h3>
+          <div class="lead">Simple, pretty, sturdy designs.</div>
+          <div class="price-tag">£X.XX</div>
+        </div>
+        <div class="price-card">
+          <div class="pill">Bundles</div>
+          <h3>Gift sets</h3>
+          <div class="lead">House-warming, birthdays, seasonal boxes.</div>
+          <div class="price-tag">£X.XX</div>
+        </div>
+        <div class="price-card">
+          <div class="pill">Local special</div>
+          <h3>Sunday offers</h3>
+          <div class="lead">Perfect for quick IG promos.</div>
+          <div class="price-tag">£X.XX</div>
+        </div>
+      </div>
+      <div class="small muted">Swap these placeholders to her real prices when you’re ready.</div>
+    </section>
+
+    <section class="card" id="photos">
+      <div class="section-title">
+        <h2>📸 Photos</h2>
+        <span class="pill">Drop real pics later</span>
+      </div>
+      <div class="photo-grid">
+        <div class="photo-slot">Hero product shot<br/>Add photo when ready</div>
+        <div class="photo-slot">Gold Orchid line<br/>Add photo when ready</div>
+        <div class="photo-slot">Sunday Self-Care box<br/>Add photo when ready</div>
+        <div class="photo-slot">Burners display<br/>Add photo when ready</div>
+        <div class="photo-slot">Bath bomb colours<br/>Add photo when ready</div>
+        <div class="photo-slot">Packaging / thank-you cards<br/>Add photo when ready</div>
+      </div>
+      <div class="small muted" style="margin-top:10px;">
+        For now it’s clean + safe placeholders so the layout stays gorgeous on mobile.
+      </div>
+    </section>
+
+    <section class="card" id="order">
+      <div class="section-title">
+        <h2>💌 Order / Enquire</h2>
+        <span class="pill">Low-friction message builder</span>
+      </div>
+
+      <div class="lead">
+        Fill this in, tap <b>Generate message</b>, then copy it to send via Instagram / Facebook / WhatsApp.
+        No checkout complexity needed for V1.2. <span class="spark">💗</span>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="row cols-2">
+        <div>
+          <div class="small">Your name</div>
+          <input class="field" id="custName" placeholder="e.g., Sarah" />
+        </div>
+        <div>
+          <div class="small">Delivery type</div>
+          <select class="field" id="delivery">
+            <option>Local drop</option>
+            <option>UK shipping</option>
+            <option>Collect</option>
+            <option>Gift direct to recipient</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row cols-3" style="margin-top:10px;">
+        <div>
+          <div class="small">Product type</div>
+          <select class="field" id="productType">
+            <option>Wax melts</option>
+            <option>Burner</option>
+            <option>Bath bombs</option>
+            <option>Soap</option>
+            <option>Gift set</option>
+            <option>Seasonal bundle</option>
+          </select>
+        </div>
+        <div>
+          <div class="small">Quantity</div>
+          <input class="field" id="qty" type="number" min="1" value="1" />
+        </div>
+        <div>
+          <div class="small">Budget (optional)</div>
+          <input class="field" id="budget" placeholder="e.g., £10–£20" />
+        </div>
+      </div>
+
+      <div class="row cols-2" style="margin-top:10px;">
+        <div>
+          <div class="small">Scent / vibe</div>
+          <input class="field" id="vibe" placeholder="clean • cosy • sweet • seasonal..." />
+        </div>
+        <div>
+          <div class="small">Occasion (optional)</div>
+          <input class="field" id="occasion" placeholder="birthday, new home, self-care, etc." />
+        </div>
+      </div>
+
+      <div style="margin-top:10px;">
+        <div class="small">Notes</div>
+        <textarea class="field" id="notes" placeholder="Any favourites, allergies, gift message, dates, etc."></textarea>
+      </div>
+
+      <div class="cta-row" style="margin-top:12px;">
+        <button class="btn" id="genBtn" type="button">✨ Generate message</button>
+        <button class="btn secondary" id="copyBtn" type="button">📋 Copy message</button>
+        <a class="btn secondary" id="storeInline" href="https://ddmelts.sumupstore.com" target="_blank" rel="noreferrer">🛍️ Open store</a>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="card" style="background: rgba(255,255,255,0.04);">
+        <div class="small">Your generated order message will appear here.</div>
+        <div id="outMsg" style="white-space: pre-wrap; margin-top: 10px; font-size: 14.5px; color: var(--text-2);"></div>
+      </div>
+
+      <div class="small muted" style="margin-top:10px;">
+        You can later wire this to a real email/WhatsApp deep link if you want — but this keeps V1.2 ultra reliable offline.
+      </div>
+    </section>
+
+    <footer>
+      DDmelts • Denny’s Delights — Microsite v1.2 • Offline-friendly • Phone-safe •
+      Made with extra hearts. <span class="spark">💗</span>
+    </footer>
+  </div>
+
+  <div class="sticky-mini">
+    <div class="sticky-inner">
+      <a class="mini-btn" href="#top">Top</a>
+      <a class="mini-btn" href="https://ddmelts.sumupstore.com" target="_blank" rel="noreferrer">Shop</a>
+      <a class="mini-btn" href="#order">Order</a>
+      <a class="mini-btn" href="#bestsellers">Bestsellers</a>
+      <a class="mini-btn" href="#range">Range</a>
+      <a class="mini-btn" href="#prices">Prices</a>
+      <a class="mini-btn" href="#photos">Photos</a>
+    </div>
+  </div>
+
+  <script>
+    // --- Message builder (simple + reliable) ---
+    const $ = (id) => document.getElementById(id);
+
+    function buildMessage(){
+      const name = $("custName").value.trim() || "Hi";
+      const delivery = $("delivery").value;
+      const type = $("productType").value;
+      const qty = Math.max(1, parseInt($("qty").value || "1", 10));
+      const vibe = $("vibe").value.trim();
+      const budget = $("budget").value.trim();
+      const occasion = $("occasion").value.trim();
+      const notes = $("notes").value.trim();
+
+      const lines = [];
+      lines.push(`Hi DDmelts 💗`);
+      lines.push(`Name: ${name}`);
+      lines.push(`Order type: ${type}`);
+      lines.push(`Quantity: ${qty}`);
+      lines.push(`Delivery: ${delivery}`);
+
+      if(vibe) lines.push(`Scent / vibe: ${vibe}`);
+      if(occasion) lines.push(`Occasion: ${occasion}`);
+      if(budget) lines.push(`Budget: ${budget}`);
+      if(notes) lines.push(`Notes: ${notes}`);
+
+      lines.push(``);
+      lines.push(`Thanks! ✨`);
+
+      return lines.join("\n");
+    }
+
+    $("genBtn").addEventListener("click", () => {
+      $("outMsg").textContent = buildMessage();
+    });
+
+    $("copyBtn").addEventListener("click", async () => {
+      const msg = $("outMsg").textContent.trim() || buildMessage();
+      try{
+        await navigator.clipboard.writeText(msg);
+        $("outMsg").textContent = msg + "\n\n(✅ Copied to clipboard)";
+      }catch(e){
+        $("outMsg").textContent = msg + "\n\n(⚠️ Copy blocked by browser — long-press to select)";
+      }
+    });
+  </script>
+</body>
+</html>

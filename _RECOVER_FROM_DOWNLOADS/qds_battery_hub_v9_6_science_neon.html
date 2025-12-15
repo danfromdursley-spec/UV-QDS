@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>QDS Battery Hub v9.6 — Science Neon</title>
+<style>
+  :root{
+    --bg:#07040c;
+    --panel:#0f071a;
+    --panel-2:#120b22;
+    --ink:#e9e6ff;
+    --muted:#b8b1d9;
+    --accent:#9b5cff;      /* purple */
+    --accent-2:#39ff8a;    /* neon green */
+    --accent-3:#22d3ff;    /* cyan hint */
+    --danger:#ff4d7a;
+    --good:#52ffb3;
+    --shadow: 0 10px 30px rgba(0,0,0,0.45);
+    --glow: 0 0 12px rgba(155,92,255,.35), 0 0 22px rgba(57,255,138,.20);
+    --radius: 16px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, rgba(155,92,255,.18), transparent 60%),
+      radial-gradient(900px 500px at 95% 0%, rgba(57,255,138,.14), transparent 55%),
+      radial-gradient(1200px 900px at 50% 110%, rgba(34,211,255,.10), transparent 60%),
+      var(--bg);
+    color:var(--ink);
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  }
+  header{
+    padding:18px 16px 8px 16px;
+  }
+  .title{
+    font-size:20px;
+    font-weight:800;
+    letter-spacing:.3px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .subtitle{
+    margin-top:6px;
+    color:var(--muted);
+    font-size:12.5px;
+  }
+  .badge{
+    padding:2px 8px;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:999px;
+    font-size:10.5px;
+    color:var(--muted);
+    background: linear-gradient(90deg, rgba(155,92,255,.12), rgba(57,255,138,.10));
+  }
+
+  .tabs{
+    display:flex;
+    gap:8px;
+    padding: 0 12px 10px 12px;
+    overflow-x:auto;
+  }
+  .tab-btn{
+    border:1px solid rgba(255,255,255,.08);
+    background: linear-gradient(180deg, rgba(155,92,255,.08), rgba(57,255,138,.05));
+    color:var(--ink);
+    padding:8px 12px;
+    border-radius:12px;
+    font-size:12px;
+    font-weight:650;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .tab-btn.active{
+    border-color: rgba(57,255,138,.45);
+    box-shadow: var(--glow);
+    background:
+      linear-gradient(90deg, rgba(155,92,255,.18), rgba(57,255,138,.18));
+  }
+
+  .wrap{
+    padding: 0 12px 22px 12px;
+    display:grid;
+    grid-template-columns: 1fr;
+    gap:12px;
+  }
+  .panel{
+    background: linear-gradient(180deg, rgba(255,255,255,.02), transparent 40%), var(--panel);
+    border:1px solid rgba(255,255,255,.07);
+    border-radius: var(--radius);
+    padding: 14px;
+    box-shadow: var(--shadow);
+  }
+  .panel.soft{
+    background: linear-gradient(180deg, rgba(57,255,138,.06), rgba(155,92,255,.06)), var(--panel-2);
+  }
+
+  .sec-title{
+    font-size:13.5px;
+    font-weight:800;
+    letter-spacing:.2px;
+    margin: 0 0 8px 0;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns: 1fr;
+    gap:10px;
+  }
+  @media (min-width: 860px){
+    .wrap{ grid-template-columns: 1.15fr .85fr; }
+    .grid.two{ grid-template-columns: 1fr 1fr; }
+  }
+
+  label{
+    font-size:11.5px;
+    color:var(--muted);
+    display:block;
+    margin-bottom:4px;
+  }
+  input[type="range"], input[type="number"], select{
+    width:100%;
+  }
+  input[type="number"], select{
+    background: rgba(255,255,255,.04);
+    color: var(--ink);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 10px;
+    padding: 8px 10px;
+    font-size: 12.5px;
+    outline:none;
+  }
+  input[type="range"]{
+    accent-color: var(--accent-2);
+  }
+  .row{
+    display:grid;
+    grid-template-columns: 1fr auto;
+    gap:8px;
+    align-items:center;
+  }
+  .value-pill{
+    min-width:72px;
+    text-align:right;
+    font-size:11.5px;
+    color: var(--accent-2);
+    font-weight:700;
+  }
+
+  .btn-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  button{
+    border:1px solid rgba(255,255,255,.08);
+    background:
+      linear-gradient(90deg, rgba(155,92,255,.16), rgba(57,255,138,.14));
+    color: var(--ink);
+    padding: 9px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor:pointer;
+  }
+  button.secondary{
+    background: rgba(255,255,255,.04);
+  }
+  button.danger{
+    background: linear-gradient(90deg, rgba(255,77,122,.18), rgba(155,92,255,.12));
+    border-color: rgba(255,77,122,.35);
+  }
+  button.good{
+    background: linear-gradient(90deg, rgba(57,255,138,.22), rgba(34,211,255,.10));
+    border-color: rgba(57,255,138,.45);
+  }
+
+  .tiny{
+    font-size:10.5px;
+    color:var(--muted);
+  }
+
+  .kvs{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:8px;
+  }
+  .kv{
+    background: rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.06);
+    border-radius: 12px;
+    padding: 10px;
+  }
+  .kv .k{
+    font-size:10px;
+    color:var(--muted);
+  }
+  .kv .v{
+    font-size:18px;
+    font-weight: 900;
+    letter-spacing:.2px;
+    margin-top:2px;
+  }
+
+  .divider{
+    height:1px;
+    background: linear-gradient(90deg, transparent, rgba(155,92,255,.35), rgba(57,255,138,.35), transparent);
+    margin: 10px 0;
+  }
+
+  canvas{
+    width:100%;
+    height:160px;
+    background: rgba(255,255,255,.02);
+    border:1px solid rgba(255,255,255,.06);
+    border-radius: 12px;
+  }
+  .spark{
+    height:44px !important;
+  }
+
+  .history-list{
+    display:grid;
+    gap:8px;
+  }
+  .hist-item{
+    border:1px solid rgba(255,255,255,.06);
+    background: rgba(255,255,255,.03);
+    border-radius: 12px;
+    padding: 9px 10px;
+  }
+  .hist-head{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    gap:8px;
+  }
+  .hist-tag{
+    font-size:10px;
+    color: var(--accent-3);
+    font-weight: 800;
+    letter-spacing:.25px;
+  }
+  .hist-time{
+    font-size:10px;
+    color: var(--muted);
+  }
+  .hist-body{
+    margin-top:4px;
+    font-size:11.3px;
+    color: var(--ink);
+    line-height:1.25em;
+  }
+  .pin{
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size:9.5px;
+    border:1px solid rgba(57,255,138,.35);
+    color: var(--accent-2);
+    background: rgba(57,255,138,.08);
+  }
+  .pin.off{
+    border-color: rgba(255,255,255,.08);
+    color: var(--muted);
+    background: rgba(255,255,255,.02);
+  }
+
+  .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .hidden{ display:none !important; }
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title">
+    QDS Battery Hub v9.6 — Science Neon
+    <span class="badge">Offline</span>
+    <span class="badge">Phone-safe</span>
+    <span class="badge">White vs QDS AR(1) Stress</span>
+    <span class="badge">Shed Edition ⚙️🔋</span>
+  </div>
+  <div class="subtitle">
+    Semi-empirical capacity-fade toy for intuition. Not a chemistry-grade predictor.
+    Goal: correct qualitative behaviour (spread, tails, regime flips) without fake certainty.
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="lab">Overview & Lab</button>
+  <button class="tab-btn" data-tab="coach">Battery Coach</button>
+  <button class="tab-btn" data-tab="bench">AutoBench Viewer</button>
+</div>
+
+<div class="wrap">
+
+  <!-- LEFT COLUMN -->
+  <div id="tab-lab" class="tab-panel">
+
+    <div class="panel">
+      <div class="sec-title">Controls</div>
+
+      <div class="grid two">
+
+        <div>
+          <label>Base cycle fade scale (k₁)</label>
+          <div class="row">
+            <input id="k1" type="range" min="0.0008" max="0.0060" step="0.0001" value="0.0018"/>
+            <div class="value-pill mono" id="k1v">0.0018</div>
+          </div>
+          <div class="tiny">Higher = faster cycle-driven loss (toy). Think C-rate + DoD effects pooled.</div>
+        </div>
+
+        <div>
+          <label>Secondary linear wear (k₂)</label>
+          <div class="row">
+            <input id="k2" type="range" min="0.0001" max="0.0020" step="0.0001" value="0.0004"/>
+            <div class="value-pill mono" id="k2v">0.0004</div>
+          </div>
+          <div class="tiny">Captures “steady grind” modes; kept small for stability.</div>
+        </div>
+
+        <div>
+          <label>Noise amplitude (operating stress %)</label>
+          <div class="row">
+            <input id="amp" type="range" min="0.1" max="8.0" step="0.1" value="2.4"/>
+            <div class="value-pill mono" id="ampv">2.4%</div>
+          </div>
+          <div class="tiny">Random per-cycle stress multiplier affecting effective fade rate.</div>
+        </div>
+
+        <div>
+          <label>Correlation ρ (0–0.99)</label>
+          <div class="row">
+            <input id="rho" type="range" min="0.0" max="0.99" step="0.01" value="0.60"/>
+            <div class="value-pill mono" id="rhov">0.60</div>
+          </div>
+          <div class="tiny">QDS-style persistence in operating stress (AR(1)).</div>
+        </div>
+
+        <div>
+          <label>Temperature (°C)</label>
+          <div class="row">
+            <input id="temp" type="range" min="0" max="60" step="1" value="25"/>
+            <div class="value-pill mono" id="tempv">25°C</div>
+          </div>
+          <div class="tiny">Toy Arrhenius-like multiplier. Hotter = faster fade.</div>
+        </div>
+
+        <div>
+          <label>Failure threshold (capacity %)</label>
+          <div class="row">
+            <input id="thr" type="range" min="50" max="95" step="1" value="80"/>
+            <div class="value-pill mono" id="thrv">80%</div>
+          </div>
+          <div class="tiny">Typical “end of life” bands in consumer literature hover ~80%.</div>
+        </div>
+
+        <div>
+          <label>DoD window</label>
+          <select id="dod">
+            <option value="20-80" selected>20–80 (phone-friendly)</option>
+            <option value="10-90">10–90</option>
+            <option value="40-80">40–80 (gentle)</option>
+            <option value="60-100">60–100 (stressful)</option>
+            <option value="0-100">0–100 (full depth)</option>
+          </select>
+          <div class="tiny">Maps to a simple stress factor. Narrow mid-window = gentler.</div>
+        </div>
+
+        <div>
+          <label>Cell count (Monte Carlo)</label>
+          <div class="row">
+            <input id="n" type="range" min="100" max="2500" step="50" value="1200"/>
+            <div class="value-pill mono" id="nv">1200</div>
+          </div>
+          <div class="tiny">Histogram + stats scale with this. Phone-safe defaults.</div>
+        </div>
+
+        <div>
+          <label>Max cycles simulated</label>
+          <div class="row">
+            <input id="maxc" type="range" min="200" max="5000" step="50" value="2500"/>
+            <div class="value-pill mono" id="maxcv">2500</div>
+          </div>
+          <div class="tiny">Upper cap to avoid runaway tails on mobile.</div>
+        </div>
+
+        <div>
+          <label>Seed lock (same seed = cleaner A/B)</label>
+          <select id="seedlock">
+            <option value="on" selected>ON</option>
+            <option value="off">OFF</option>
+          </select>
+          <div class="tiny">Lock ON = reproducible comparisons.</div>
+        </div>
+
+        <div>
+          <label>Poster Mode (tames extremes)</label>
+          <select id="poster">
+            <option value="on" selected>Poster ON</option>
+            <option value="off">Poster OFF</option>
+          </select>
+          <div class="tiny">Clamps extreme stress factors to keep demo sane.</div>
+        </div>
+
+        <div>
+          <label>NoRegen (prevents negative “healing” drift)</label>
+          <select id="noregen">
+            <option value="on" selected>NoRegen ON</option>
+            <option value="off">NoRegen OFF</option>
+          </select>
+          <div class="tiny">Ensures capacity only decreases in this toy.</div>
+        </div>
+
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="btn-row">
+        <button class="good" id="runBtn">Run simulation</button>
+        <button class="secondary" id="resetBtn">Reset defaults</button>
+        <button id="sweepBtn">QuickSweep ×10</button>
+      </div>
+
+      <div class="btn-row" style="margin-top:8px;">
+        <button class="secondary" id="presetPhone">Preset: Realistic phone</button>
+        <button class="secondary" id="presetQDS">Preset: QDS contrast</button>
+        <button class="secondary" id="presetChaos">Preset: Chaos</button>
+      </div>
+
+      <div class="btn-row" style="margin-top:8px;">
+        <button class="secondary" id="copyBtn">Copy summary</button>
+        <button class="secondary" id="exportLastBtn">Export last JSON</button>
+        <button class="secondary" id="exportAllBtn">Export full history</button>
+        <button class="danger" id="clearBtn">Clear history</button>
+      </div>
+
+      <div class="tiny" style="margin-top:8px;">
+        Model: capacity starts at 100%. Per-cycle loss uses:
+        <span class="mono">ΔC(t) ≈ [k₁·√t + k₂·t] · S · F(T) · F(DoD)</span>.
+        White: <span class="mono">S</span> i.i.d. | QDS: <span class="mono">S</span> is AR(1) correlated with ρ.
+      </div>
+    </div>
+
+    <div class="panel soft">
+      <div class="sec-title">Results</div>
+
+      <div class="kvs">
+        <div class="kv">
+          <div class="k">White mean cycles to threshold</div>
+          <div class="v" id="wMean">—</div>
+          <div class="tiny" id="wP">P10/P50/P90 —</div>
+        </div>
+        <div class="kv">
+          <div class="k">QDS mean cycles to threshold</div>
+          <div class="v" id="qMean">—</div>
+          <div class="tiny" id="qP">P10/P50/P90 —</div>
+        </div>
+        <div class="kv">
+          <div class="k">White σ</div>
+          <div class="v" id="wStd">—</div>
+          <div class="tiny">Independent operating stress</div>
+        </div>
+        <div class="kv">
+          <div class="k">QDS σ</div>
+          <div class="v" id="qStd">—</div>
+          <div class="tiny">AR(1) correlated stress</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="grid two">
+        <div class="kv">
+          <div class="k">Relative change (QDS vs White)</div>
+          <div class="v" id="delta">—</div>
+          <div class="tiny" id="condLine">—</div>
+        </div>
+        <div class="kv">
+          <div class="k">Auto-compare last 2 runs</div>
+          <div class="tiny" id="autoCompare">Run twice to populate.</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <label class="tiny">Cycles-to-threshold distribution (binned for mobile speed)</label>
+      <canvas id="histCanvas" width="600" height="220"></canvas>
+
+      <div class="divider"></div>
+
+      <label class="tiny">Sample capacity traces (1 white + 1 QDS)</label>
+      <canvas id="traceCanvas" width="600" height="220"></canvas>
+
+    </div>
+
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div id="tab-right">
+
+    <div id="tab-coach" class="tab-panel hidden">
+      <div class="panel">
+        <div class="sec-title">Battery Coach</div>
+        <div class="tiny">
+          This is a guidance layer over toy parameters. It’s about
+          <b>good habits + intuition</b>, not chemistry-grade prediction.
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="kv">
+          <div class="k">Current setup verdict</div>
+          <div class="v" style="font-size:15px" id="coachNow">—</div>
+          <div class="tiny" id="coachWhy">—</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="sec-title">Rule-of-thumb ladder</div>
+        <div class="tiny">
+          • Cooler = kinder. <br/>
+          • Mid-window DoD (20–80) = calmer wear. <br/>
+          • High amp + high ρ = streaky stress → wider tails. <br/>
+          • Poster OFF is for brave souls and bigger spreads. <br/>
+        </div>
+      </div>
+
+      <div class="panel soft">
+        <div class="sec-title">Pinned “best run” snapshot</div>
+        <div class="tiny" id="pinnedBox">
+          No pinned run yet. Pin one in history below.
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-bench" class="tab-panel hidden">
+      <div class="panel">
+        <div class="sec-title">AutoBench Viewer</div>
+        <div class="tiny">
+          Lightweight run log explorer using your on-device history.
+          You can export JSON and archive to the Shed.
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="kv">
+          <div class="k">Δ% trend sparkline (last ~40)</div>
+          <canvas id="sparkCanvas" class="spark" width="600" height="80"></canvas>
+          <div class="tiny">Shows how your QDS-vs-White effect changes across experiments.</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="sec-title">Quick filters</div>
+        <div class="btn-row">
+          <button class="secondary" id="filterAll">Show all</button>
+          <button class="secondary" id="filterSweeps">Sweeps</button>
+          <button class="secondary" id="filterChaos">Chaos</button>
+          <button class="secondary" id="filterPhone">Realistic</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="sec-title">Recent run history (local)</div>
+      <div class="tiny">Stored on-device via localStorage. Dedupe active: identical settings replace newest entry.</div>
+      <div class="divider"></div>
+      <div id="history" class="history-list"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+/* ==========================================================
+   QDS Battery Hub v9.6 — single-file, no deps, phone-safe
+   ========================================================== */
+
+const LS_KEY = "QDS_BATT_HUB_HISTORY_V96";
+const LS_PIN = "QDS_BATT_HUB_PIN_V96";
+const MAX_SHOW = 8;
+
+const defaults = {
+  k1: 0.0018,
+  k2: 0.0004,
+  amp: 2.4,
+  rho: 0.60,
+  temp: 25,
+  thr: 80,
+  dod: "20-80",
+  n: 1200,
+  maxc: 2500,
+  seedlock: "on",
+  poster: "on",
+  noregen: "on",
+};
+
+const dodMap = {
+  "40-80": { factor: 0.85, label:"40–80 (gentle)" },
+  "20-80": { factor: 1.00, label:"20–80 (phone-friendly)" },
+  "10-90": { factor: 1.12, label:"10–90" },
+  "60-100":{ factor: 1.25, label:"60–100 (stressful)" },
+  "0-100": { factor: 1.40, label:"0–100 (full depth)" },
+};
+
+// toy temperature multiplier
+function tempFactor(T){
+  // mild exponential so it doesn't explode
+  const beta = 0.028; // tuned for stability in toy space
+  return Math.exp(beta * (T - 25));
+}
+
+// small PRNG for repeatability
+function mulberry32(a){
+  return function(){
+    let t = a += 0x6D2B79F5;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  }
+}
+
+// Box-Muller normal from uniform PRNG
+function randn(rng){
+  let u = 0, v = 0;
+  while(u === 0) u = rng();
+  while(v === 0) v = rng();
+  return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+}
+
+// percentile helper
+function percentile(arr, p){
+  if(!arr.length) return NaN;
+  const a = [...arr].sort((x,y)=>x-y);
+  const idx = (p/100) * (a.length - 1);
+  const lo = Math.floor(idx), hi = Math.ceil(idx);
+  if(lo === hi) return a[lo];
+  const w = idx - lo;
+  return a[lo]*(1-w) + a[hi]*w;
+}
+
+function mean(arr){
+  let s=0; for(const x of arr) s+=x;
+  return s/arr.length;
+}
+function std(arr){
+  const m = mean(arr);
+  let s=0; for(const x of arr){ const d=x-m; s+=d*d; }
+  return Math.sqrt(s/(arr.length-1 || 1));
+}
+
+function getControls(){
+  return {
+    k1: parseFloat(el("k1").value),
+    k2: parseFloat(el("k2").value),
+    amp: parseFloat(el("amp").value),
+    rho: parseFloat(el("rho").value),
+    temp: parseFloat(el("temp").value),
+    thr: parseFloat(el("thr").value),
+    dod: el("dod").value,
+    n: parseInt(el("n").value),
+    maxc: parseInt(el("maxc").value),
+    seedlock: el("seedlock").value,
+    poster: el("poster").value,
+    noregen: el("noregen").value,
+  };
+}
+
+function applyControls(s){
+  el("k1").value = s.k1;
+  el("k2").value = s.k2;
+  el("amp").value = s.amp;
+  el("rho").value = s.rho;
+  el("temp").value = s.temp;
+  el("thr").value = s.thr;
+  el("dod").value = s.dod;
+  el("n").value = s.n;
+  el("maxc").value = s.maxc;
+  el("seedlock").value = s.seedlock;
+  el("poster").value = s.poster;
+  el("noregen").value = s.noregen;
+  syncLabels();
+  updateCoachNow();
+}
+
+function syncLabels(){
+  el("k1v").textContent = Number(el("k1").value).toFixed(4);
+  el("k2v").textContent = Number(el("k2").value).toFixed(4);
+  el("ampv").textContent = Number(el("amp").value).toFixed(1) + "%";
+  el("rhov").textContent = Number(el("rho").value).toFixed(2);
+  el("tempv").textContent = Number(el("temp").value) + "°C";
+  el("thrv").textContent = Number(el("thr").value) + "%";
+  el("nv").textContent = el("n").value;
+  el("maxcv").textContent = el("maxc").value;
+}
+
+function el(id){ return document.getElementById(id); }
+
+// ----------------------------------------------------------
+// Core simulation
+// ----------------------------------------------------------
+function simulateOneModel(mode, settings, rng){
+  const {
+    k1, k2, amp, rho, temp, thr, dod, n, maxc, poster, noregen
+  } = settings;
+
+  const dodF = (dodMap[dod] || dodMap["20-80"]).factor;
+  const tF = tempFactor(temp);
+
+  // small cell-to-cell variation in k1/k2
+  const k1_sd = k1 * 0.06;
+  const k2_sd = k2 * 0.08;
+
+  const lifetimes = new Array(n);
+  let sampleTrace = [];
+  let sampleFail = null;
+
+  for(let i=0; i<n; i++){
+    const k1_i = Math.max(0, k1 + randn(rng)*k1_sd);
+    const k2_i = Math.max(0, k2 + randn(rng)*k2_sd);
+
+    let cap = 100.0;
+    let x = 0.0; // AR(1) state for QDS stress
+    let trace = (i===0) ? [] : null;
+
+    for(let t=1; t<=maxc; t++){
+      // base composite fade per cycle index
+      const baseLoss = (k1_i * Math.sqrt(t) + k2_i * t);
+
+      // stress factor
+      let stressZ;
+      if(mode === "white"){
+        stressZ = randn(rng);
+      }else{
+        // AR(1) with stationary variance ~1
+        const eps = randn(rng);
+        const scale = Math.sqrt(Math.max(0, 1 - rho*rho));
+        x = rho * x + scale * eps;
+        stressZ = x;
+      }
+
+      let S = 1 + (amp/100) * stressZ;
+
+      if(poster === "on"){
+        // keep reasonable for demos
+        if(S < 0.2) S = 0.2;
+        if(S > 3.0) S = 3.0;
+      }
+
+      let loss = baseLoss * S * tF * dodF * 100; 
+      // multiply by 100 to move toy params into "capacity % per cycle" scale
+
+      if(noregen === "on"){
+        if(loss < 0) loss = 0;
+      }
+
+      cap -= loss;
+
+      if(trace){
+        trace.push(Math.max(cap, 0));
+      }
+
+      if(cap <= thr){
+        lifetimes[i] = t;
+        if(i===0){
+          sampleTrace = trace;
+          sampleFail = t;
+        }
+        break;
+      }
+
+      if(t === maxc){
+        lifetimes[i] = maxc;
+        if(i===0){
+          sampleTrace = trace;
+          sampleFail = maxc;
+        }
+      }
+    }
+  }
+
+  return {
+    lifetimes,
+    sampleTrace,
+    sampleFail
+  };
+}
+
+function runSimulation(tagOverride=null){
+  const settings = getControls();
+
+  // seed logic
+  const baseSeed = 0xC0FFEE;
+  const salt = Math.floor(Math.random()*1e9);
+  const seed = (settings.seedlock === "on") ? baseSeed : salt;
+
+  const rngA = mulberry32(seed ^ 0xA5A5A5A5);
+  const rngB = mulberry32(seed ^ 0x5A5A5A5A);
+
+  const t0 = performance.now();
+
+  const white = simulateOneModel("white", settings, rngA);
+  const qds   = simulateOneModel("qds", settings, rngB);
+
+  const wArr = white.lifetimes;
+  const qArr = qds.lifetimes;
+
+  const wMean = mean(wArr), qMean = mean(qArr);
+  const wStd = std(wArr),  qStd = std(qArr);
+
+  const wP10 = percentile(wArr,10), wP50 = percentile(wArr,50), wP90 = percentile(wArr,90);
+  const qP10 = percentile(qArr,10), qP50 = percentile(qArr,50), qP90 = percentile(qArr,90);
+
+  const delta = ((qMean - wMean) / (wMean || 1)) * 100;
+
+  const t1 = performance.now();
+
+  const runTag = tagOverride || inferRunTag(settings);
+
+  const entry = {
+    id: "run_" + Date.now() + "_" + Math.floor(Math.random()*9999),
+    ts: new Date().toISOString(),
+    tag: runTag,
+    settings,
+    results: {
+      wMean, qMean, wStd, qStd,
+      wP10, wP50, wP90,
+      qP10, qP50, qP90,
+      delta,
+      n: settings.n,
+      maxc: settings.maxc,
+      sampleWhiteFail: white.sampleFail,
+      sampleQDSFail: qds.sampleFail,
+      ms: Math.round(t1 - t0)
+    },
+    traces: {
+      white: white.sampleTrace.slice(0, 600), // keep light
+      qds: qds.sampleTrace.slice(0, 600)
+    }
+  };
+
+  saveHistory(entry);
+  renderFromEntry(entry);
+
+  refreshHistoryUI();
+  updateAutoCompare();
+  updateSparkline();
+  updateCoachNow();
+}
+
+function inferRunTag(s){
+  if(s.rho >= 0.95 || s.amp >= 5 || s.temp >= 45 || s.dod === "0-100") return "CHAOS";
+  if(s.dod === "20-80" && s.temp <= 30 && s.amp <= 2.6 && s.rho <= 0.70) return "REALISTIC";
+  if(s.rho >= 0.70 && s.amp >= 2.0) return "QDS-CONTRAST";
+  return "RUN";
+}
+
+// ----------------------------------------------------------
+// History with dedupe + pin + filters
+// ----------------------------------------------------------
+function loadHistory(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){
+    return [];
+  }
+}
+
+function saveHistory(entry){
+  const hist = loadHistory();
+
+  // dedupe by settings signature
+  const sig = settingsSignature(entry.settings);
+  const idx = hist.findIndex(h => settingsSignature(h.settings) === sig);
+
+  if(idx >= 0){
+    // replace the existing matching settings with the new run
+    hist[idx] = entry;
+  }else{
+    hist.unshift(entry);
+  }
+
+  // trim long history to keep storage sane
+  const trimmed = hist.slice(0, 120);
+  localStorage.setItem(LS_KEY, JSON.stringify(trimmed));
+}
+
+function settingsSignature(s){
+  return [
+    s.k1.toFixed(4), s.k2.toFixed(4),
+    s.amp.toFixed(1), s.rho.toFixed(2),
+    s.temp, s.thr, s.dod,
+    s.n, s.maxc,
+    s.seedlock, s.poster, s.noregen
+  ].join("|");
+}
+
+function clearHistory(){
+  localStorage.removeItem(LS_KEY);
+  localStorage.removeItem(LS_PIN);
+  refreshHistoryUI();
+  updateSparkline();
+  el("autoCompare").textContent = "Run twice to populate.";
+  el("pinnedBox").textContent = "No pinned run yet. Pin one in history below.";
+  wipeResults();
+}
+
+// pin logic
+function getPinnedId(){
+  return localStorage.getItem(LS_PIN) || "";
+}
+function setPinnedId(id){
+  if(id) localStorage.setItem(LS_PIN, id);
+  else localStorage.removeItem(LS_PIN);
+}
+
+let historyFilter = "ALL";
+
+function refreshHistoryUI(){
+  const hist = loadHistory();
+  const pinnedId = getPinnedId();
+
+  const filtered = hist.filter(h=>{
+    if(historyFilter === "ALL") return true;
+    if(historyFilter === "SWEEP") return (h.tag || "").includes("SWEEP");
+    if(historyFilter === "CHAOS") return h.tag === "CHAOS";
+    if(historyFilter === "REALISTIC") return h.tag === "REALISTIC";
+    return true;
+  });
+
+  const show = filtered.slice(0, MAX_SHOW);
+
+  const box = el("history");
+  box.innerHTML = "";
+
+  if(show.length === 0){
+    const empty = document.createElement("div");
+    empty.className = "tiny";
+    empty.textContent = "No runs yet. Hit Run simulation.";
+    box.appendChild(empty);
+    return;
+  }
+
+  for(const h of show){
+    const item = document.createElement("div");
+    item.className = "hist-item";
+
+    const head = document.createElement("div");
+    head.className = "hist-head";
+
+    const left = document.createElement("div");
+    left.innerHTML = `<span class="hist-tag">${escapeHtml(h.tag || "RUN")}</span>`;
+
+    const right = document.createElement("div");
+    right.className = "hist-time";
+    right.textContent = prettyTime(h.ts);
+
+    head.appendChild(left);
+    head.appendChild(right);
+
+    const body = document.createElement("div");
+    body.className = "hist-body";
+    const s = h.settings, r = h.results;
+
+    const verdict = coachOneLine(s, r);
+
+    body.innerHTML =
+      `<div class="tiny mono">
+        k1=${fmt(s.k1,4)} • k2=${fmt(s.k2,4)} • amp=${fmt(s.amp,2)}% • ρ=${fmt(s.rho,2)} • T=${s.temp}°C • DoD=${escapeHtml(s.dod)} • thr=${s.thr}% • n=${s.n}
+      </div>
+      <div>
+        white μ=${fmt(r.wMean,2)} σ=${fmt(r.wStd,2)} • QDS μ=${fmt(r.qMean,2)} σ=${fmt(r.qStd,2)} • <b>Δ=${fmt(r.delta,2)}%</b>
+      </div>
+      <div class="tiny">Coach: <b>${escapeHtml(verdict)}</b></div>`;
+
+    const actions = document.createElement("div");
+    actions.style.marginTop = "6px";
+    actions.className = "btn-row";
+
+    const loadBtn = document.createElement("button");
+    loadBtn.className = "secondary";
+    loadBtn.textContent = "Load";
+    loadBtn.onclick = ()=> {
+      applyControls(h.settings);
+      renderFromEntry(h);
+      updateAutoCompare();
+      updateSparkline();
+      updatePinnedBox();
+    };
+
+    const pinBtn = document.createElement("button");
+    const isPinned = (h.id === pinnedId);
+    pinBtn.className = isPinned ? "pin" : "pin off";
+    pinBtn.textContent = isPinned ? "Pinned ★" : "Pin ☆";
+    pinBtn.onclick = ()=>{
+      const nowPinned = (getPinnedId() === h.id) ? "" : h.id;
+      setPinnedId(nowPinned);
+      refreshHistoryUI();
+      updatePinnedBox();
+    };
+
+    const copyBtn = document.createElement("button");
+    copyBtn.className = "secondary";
+    copyBtn.textContent = "Copy";
+    copyBtn.onclick = ()=> copyText(formatEntryText(h));
+
+    actions.appendChild(loadBtn);
+    actions.appendChild(pinBtn);
+    actions.appendChild(copyBtn);
+
+    item.appendChild(head);
+    item.appendChild(body);
+    item.appendChild(actions);
+
+    box.appendChild(item);
+  }
+
+  updatePinnedBox();
+}
+
+// ----------------------------------------------------------
+// Rendering charts + results
+// ----------------------------------------------------------
+function wipeResults(){
+  el("wMean").textContent = "—";
+  el("qMean").textContent = "—";
+  el("wStd").textContent = "—";
+  el("qStd").textContent = "—";
+  el("delta").textContent = "—";
+  el("wP").textContent = "P10/P50/P90 —";
+  el("qP").textContent = "P10/P50/P90 —";
+  el("condLine").textContent = "—";
+  drawEmpty(el("histCanvas"));
+  drawEmpty(el("traceCanvas"));
+}
+
+function renderFromEntry(h){
+  const s = h.settings, r = h.results;
+
+  el("wMean").textContent = fmt(r.wMean,2);
+  el("qMean").textContent = fmt(r.qMean,2);
+  el("wStd").textContent = fmt(r.wStd,2);
+  el("qStd").textContent = fmt(r.qStd,2);
+  el("delta").textContent = (r.delta>=0?"+":"") + fmt(r.delta,2) + "%";
+
+  el("wP").textContent = `P10/P50/P90 ${fmt(r.wP10,1)} / ${fmt(r.wP50,1)} / ${fmt(r.wP90,1)}`;
+  el("qP").textContent = `P10/P50/P90 ${fmt(r.qP10,1)} / ${fmt(r.qP50,1)} / ${fmt(r.qP90,1)}`;
+
+  el("condLine").textContent =
+    `ρ=${fmt(s.rho,2)} · T=${s.temp}°C · DoD=${s.dod} · Poster=${s.poster==="on"} · NoRegen=${s.noregen==="on"} · ${r.n} runs/model`;
+
+  drawHistogram(el("histCanvas"), h);
+  drawTraces(el("traceCanvas"), h);
+
+  // update "current setup verdict" for coach tab
+  updateCoachNow();
+}
+
+function drawEmpty(canvas){
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.globalAlpha = 0.9;
+  ctx.font = "12px system-ui";
+  ctx.fillStyle = "#b8b1d9";
+  ctx.fillText("Run simulation to draw.", 12, 22);
+}
+
+function drawHistogram(canvas, h){
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // We don't store full lifetime arrays in history for size,
+  // so rebuild a small proxy histogram from summary + settings
+  // by re-running a lighter quick sim if needed.
+  // But to keep v9.6 lean, we approximate bins around P10-P90.
+  const r = h.results;
+  const min = Math.max(1, Math.floor(Math.min(r.wP10, r.qP10) - 5));
+  const max = Math.ceil(Math.max(r.wP90, r.qP90) + 5);
+
+  const bins = 18;
+  const binW = (max-min)/bins;
+
+  function bell(x, mu, sig){
+    sig = Math.max(sig, 0.2);
+    const z = (x-mu)/sig;
+    return Math.exp(-0.5*z*z);
+  }
+
+  const wHeights = [];
+  const qHeights = [];
+  let wMax=0, qMax=0;
+
+  for(let i=0;i<bins;i++){
+    const x = min + (i+0.5)*binW;
+    const wh = bell(x, r.wP50, r.wStd);
+    const qh = bell(x, r.qP50, r.qStd);
+    wHeights.push(wh); qHeights.push(qh);
+    wMax = Math.max(wMax, wh);
+    qMax = Math.max(qMax, qh);
+  }
+  const maxH = Math.max(wMax, qMax) || 1;
+
+  const W = canvas.width, H = canvas.height;
+  const pad = 24;
+
+  // axes line
+  ctx.strokeStyle = "rgba(255,255,255,.08)";
+  ctx.beginPath();
+  ctx.moveTo(pad, H-pad);
+  ctx.lineTo(W-pad, H-pad);
+  ctx.stroke();
+
+  // bars
+  for(let i=0;i<bins;i++){
+    const x0 = pad + i * ((W-2*pad)/bins);
+    const barW = ((W-2*pad)/bins) * 0.42;
+
+    const wh = wHeights[i]/maxH;
+    const qh = qHeights[i]/maxH;
+
+    const wBarH = wh * (H-2*pad);
+    const qBarH = qh * (H-2*pad);
+
+    // White (purple)
+    ctx.fillStyle = "rgba(155,92,255,.45)";
+    ctx.fillRect(x0, (H-pad)-wBarH, barW, wBarH);
+
+    // QDS (green), offset
+    ctx.fillStyle = "rgba(57,255,138,.45)";
+    ctx.fillRect(x0 + barW + 2, (H-pad)-qBarH, barW, qBarH);
+  }
+
+  ctx.fillStyle = "rgba(255,255,255,.75)";
+  ctx.font = "11px system-ui";
+  ctx.fillText("Approx histogram (mobile-fast)", pad, 14);
+  ctx.fillStyle = "rgba(155,92,255,.9)";
+  ctx.fillText("White", pad, 28);
+  ctx.fillStyle = "rgba(57,255,138,.9)";
+  ctx.fillText("QDS", pad+48, 28);
+}
+
+function drawTraces(canvas, h){
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  const W = canvas.width, H = canvas.height;
+  const pad = 22;
+
+  const wTrace = (h.traces && h.traces.white) ? h.traces.white : [];
+  const qTrace = (h.traces && h.traces.qds) ? h.traces.qds : [];
+
+  const maxLen = Math.max(wTrace.length, qTrace.length, 10);
+  const xScale = (W-2*pad) / (maxLen-1);
+
+  // y scale 0..100
+  function yMap(v){
+    const vv = Math.max(0, Math.min(100, v));
+    return pad + (1 - vv/100) * (H-2*pad);
+  }
+
+  // grid line
+  ctx.strokeStyle = "rgba(255,255,255,.06)";
+  ctx.beginPath();
+  ctx.moveTo(pad, yMap(80));
+  ctx.lineTo(W-pad, yMap(80));
+  ctx.stroke();
+
+  // white line
+  if(wTrace.length){
+    ctx.strokeStyle = "rgba(155,92,255,.9)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for(let i=0;i<wTrace.length;i++){
+      const x = pad + i*xScale;
+      const y = yMap(wTrace[i]);
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+
+  // qds line
+  if(qTrace.length){
+    ctx.strokeStyle = "rgba(57,255,138,.9)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for(let i=0;i<qTrace.length;i++){
+      const x = pad + i*xScale;
+      const y = yMap(qTrace[i]);
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+
+  ctx.fillStyle = "rgba(255,255,255,.75)";
+  ctx.font = "11px system-ui";
+  ctx.fillText("Sample traces (1 each)", pad, 14);
+}
+
+// ----------------------------------------------------------
+// Auto-compare last 2 runs
+// ----------------------------------------------------------
+function updateAutoCompare(){
+  const hist = loadHistory();
+  if(hist.length < 2){
+    el("autoCompare").textContent = "Run twice to populate.";
+    return;
+  }
+  const a = hist[0], b = hist[1];
+
+  const da = a.results.delta, db = b.results.delta;
+
+  const line =
+    `Latest vs previous:
+     Δ ${fmt(da,2)}% vs ${fmt(db,2)}% •
+     QDS μ ${fmt(a.results.qMean,2)} vs ${fmt(b.results.qMean,2)} •
+     White μ ${fmt(a.results.wMean,2)} vs ${fmt(b.results.wMean,2)}.
+     T ${a.settings.temp}°C→${b.settings.temp}°C • DoD ${a.settings.dod}→${b.settings.dod} • ρ ${fmt(a.settings.rho,2)}→${fmt(b.settings.rho,2)}.`;
+
+  el("autoCompare").textContent = line.replace(/\s+/g," ").trim();
+}
+
+// ----------------------------------------------------------
+// Coach logic
+// ----------------------------------------------------------
+function coachOneLine(s, r=null){
+  const dodLabel = (dodMap[s.dod]||{}).label || s.dod;
+
+  const heat = s.temp >= 40 ? "Hot" : (s.temp <= 15 ? "Cool" : "Moderate");
+  const depth = (s.dod === "40-80" || s.dod === "20-80") ? "mid-window" :
+                (s.dod === "0-100" ? "full-depth" : "wide-window");
+
+  const streak = (s.rho >= 0.85 && s.amp >= 3) ? "streaky tails" :
+                 (s.rho >= 0.70 ? "mild persistence" : "mostly i.i.d.");
+
+  let effect = "";
+  if(r){
+    const d = r.delta;
+    if(Math.abs(d) < 0.5) effect = "QDS effect subtle";
+    else if(d > 0) effect = "QDS lifts mean slightly";
+    else effect = "QDS trims mean slightly";
+  }else{
+    effect = (s.rho >= 0.8) ? "expect wider spread" : "expect subtle spread shift";
+  }
+
+  return `${heat}, ${depth} (${dodLabel}), ${streak}; ${effect}.`;
+}
+
+function updateCoachNow(){
+  const s = getControls();
+  el("coachNow").textContent = coachOneLine(s);
+  el("coachWhy").textContent =
+    `T=${s.temp}°C · DoD=${s.dod} · amp=${fmt(s.amp,1)}% · ρ=${fmt(s.rho,2)} · Poster=${s.poster==="on"}.`;
+}
+
+// pinned box
+function updatePinnedBox(){
+  const hist = loadHistory();
+  const pid = getPinnedId();
+  const h = hist.find(x=>x.id===pid);
+
+  if(!h){
+    el("pinnedBox").textContent = "No pinned run yet. Pin one in history below.";
+    return;
+  }
+
+  el("pinnedBox").innerHTML =
+    `<div class="tiny"><span class="pin">Pinned ★</span></div>
+     <div class="tiny mono">${prettyTime(h.ts)} • ${escapeHtml(h.tag||"RUN")}</div>
+     <div class="tiny mono">
+       k1=${fmt(h.settings.k1,4)} • k2=${fmt(h.settings.k2,4)} • amp=${fmt(h.settings.amp,2)}% •
+       ρ=${fmt(h.settings.rho,2)} • T=${h.settings.temp}°C • DoD=${escapeHtml(h.settings.dod)} • thr=${h.settings.thr}%
+     </div>
+     <div>
+       white μ=${fmt(h.results.wMean,2)} σ=${fmt(h.results.wStd,2)} •
+       QDS μ=${fmt(h.results.qMean,2)} σ=${fmt(h.results.qStd,2)} •
+       <b>Δ=${fmt(h.results.delta,2)}%</b>
+     </div>
+     <div class="tiny">Coach: <b>${escapeHtml(coachOneLine(h.settings, h.results))}</b></div>`;
+}
+
+// ----------------------------------------------------------
+// Sparkline
+// ----------------------------------------------------------
+function updateSparkline(){
+  const hist = loadHistory();
+  drawSpark(el("sparkCanvas"), hist.slice(0, 40).reverse());
+}
+
+function drawSpark(canvas, arr){
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  const W = canvas.width, H = canvas.height;
+  const padX = 10, padY = 10;
+
+  if(!arr.length){
+    ctx.fillStyle = "rgba(255,255,255,.7)";
+    ctx.font = "11px system-ui";
+    ctx.fillText("No history yet.", padX, 18);
+    return;
+  }
+
+  const vals = arr.map(h => Number(h.results && h.results.delta || 0));
+  const vMin = Math.min(...vals, -5);
+  const vMax = Math.max(...vals, 5);
+  const range = (vMax - vMin) || 1;
+
+  function xMap(i){
+    return padX + i * ((W-2*padX)/(vals.length-1 || 1));
+  }
+  function yMap(v){
+    const norm = (v - vMin)/range;
+    return padY + (1-norm) * (H-2*padY);
+  }
+
+  // zero line
+  const y0 = yMap(0);
+  ctx.strokeStyle = "rgba(255,255,255,.08)";
+  ctx.beginPath();
+  ctx.moveTo(padX, y0);
+  ctx.lineTo(W-padX, y0);
+  ctx.stroke();
+
+  // line
+  ctx.strokeStyle = "rgba(57,255,138,.9)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  vals.forEach((v,i)=>{
+    const x = xMap(i), y = yMap(v);
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  // points
+  ctx.fillStyle = "rgba(155,92,255,.9)";
+  vals.forEach((v,i)=>{
+    const x = xMap(i), y = yMap(v);
+    ctx.fillRect(x-1.5, y-1.5, 3, 3);
+  });
+
+  ctx.fillStyle = "rgba(255,255,255,.75)";
+  ctx.font = "10px system-ui";
+  ctx.fillText("Δ% trend", padX, 12);
+}
+
+// ----------------------------------------------------------
+// Export / copy
+// ----------------------------------------------------------
+function formatEntryText(h){
+  const s=h.settings, r=h.results;
+  return `${(h.tag||"RUN")} ${prettyTime(h.ts)}
+k1=${fmt(s.k1,4)} • k2=${fmt(s.k2,4)} • amp=${fmt(s.amp,2)}% • ρ=${fmt(s.rho,2)} • T=${s.temp}°C • DoD=${s.dod} • thr=${s.thr}% • n=${s.n}
+white μ=${fmt(r.wMean,2)} σ=${fmt(r.wStd,2)} • QDS μ=${fmt(r.qMean,2)} σ=${fmt(r.qStd,2)} • Δ=${fmt(r.delta,2)}%`;
+}
+
+function exportJSON(obj, filename){
+  const blob = new Blob([JSON.stringify(obj, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 500);
+}
+
+function copyText(txt){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).catch(()=>{});
+  }else{
+    const ta = document.createElement("textarea");
+    ta.value = txt;
+    document.body.appendChild(ta);
+    ta.select();
+    try{ document.execCommand("copy"); }catch(e){}
+    ta.remove();
+  }
+}
+
+// ----------------------------------------------------------
+// Utilities
+// ----------------------------------------------------------
+function fmt(x, d=2){
+  if(!isFinite(x)) return "—";
+  return Number(x).toFixed(d);
+}
+function prettyTime(iso){
+  try{
+    const d = new Date(iso);
+    return d.toLocaleString();
+  }catch(e){
+    return iso;
+  }
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, m=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[m]));
+}
+
+// ----------------------------------------------------------
+// Tabs
+// ----------------------------------------------------------
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    const tab = btn.dataset.tab;
+
+    el("tab-lab").classList.toggle("hidden", tab!=="lab");
+    el("tab-coach").classList.toggle("hidden", tab!=="coach");
+    el("tab-bench").classList.toggle("hidden", tab!=="bench");
+
+    // refresh visuals when switching
+    if(tab==="bench") updateSparkline();
+    if(tab==="coach") updatePinnedBox();
+  });
+});
+
+// ----------------------------------------------------------
+// Presets
+// ----------------------------------------------------------
+function presetPhone(){
+  applyControls({
+    ...defaults,
+    amp: 2.0, rho: 0.55, temp: 25, dod:"20-80", n:1200, maxc:2500,
+    poster:"on", noregen:"on"
+  });
+}
+function presetQDS(){
+  applyControls({
+    ...defaults,
+    amp: 2.4, rho: 0.70, temp: 25, dod:"20-80", n:1200,
+    poster:"on", noregen:"on"
+  });
+}
+function presetChaos(){
+  applyControls({
+    ...defaults,
+    k1:0.0022, k2:0.0005, amp: 3.2, rho: 0.99, temp: 40,
+    dod:"0-100", thr: 80, n: 600, maxc: 2500,
+    poster:"off", noregen:"on"
+  });
+}
+
+// ----------------------------------------------------------
+// QuickSweep ×10
+// ----------------------------------------------------------
+function quickSweep(){
+  const base = getControls();
+  for(let i=0;i<10;i++){
+    // tiny jitter to avoid dedupe eating everything during sweeps
+    el("rho").value = Math.min(0.99, Math.max(0, base.rho + (i-5)*0.002));
+    syncLabels();
+    runSimulation("SWEEP");
+  }
+  // restore base
+  applyControls(base);
+}
+
+// ----------------------------------------------------------
+// Wire UI events
+// ----------------------------------------------------------
+["k1","k2","amp","rho","temp","thr","n","maxc"].forEach(id=>{
+  el(id).addEventListener("input", ()=>{ syncLabels(); updateCoachNow(); });
+});
+["dod","seedlock","poster","noregen"].forEach(id=>{
+  el(id).addEventListener("change", ()=>{ updateCoachNow(); });
+});
+
+el("runBtn").onclick = ()=> runSimulation();
+el("resetBtn").onclick = ()=> applyControls(defaults);
+el("sweepBtn").onclick = ()=> quickSweep();
+
+el("presetPhone").onclick = presetPhone;
+el("presetQDS").onclick = presetQDS;
+el("presetChaos").onclick = presetChaos;
+
+el("copyBtn").onclick = ()=>{
+  const hist = loadHistory();
+  if(hist[0]) copyText(formatEntryText(hist[0]));
+};
+el("exportLastBtn").onclick = ()=>{
+  const hist = loadHistory();
+  if(hist[0]) exportJSON(hist[0], "qds_battery_last_run_v9_6.json");
+};
+el("exportAllBtn").onclick = ()=>{
+  const hist = loadHistory();
+  exportJSON(hist, "qds_battery_history_v9_6.json");
+};
+el("clearBtn").onclick = clearHistory;
+
+// filters (bench tab buttons)
+el("filterAll").onclick = ()=>{ historyFilter="ALL"; refreshHistoryUI(); };
+el("filterSweeps").onclick = ()=>{ historyFilter="SWEEP"; refreshHistoryUI(); };
+el("filterChaos").onclick = ()=>{ historyFilter="CHAOS"; refreshHistoryUI(); };
+el("filterPhone").onclick = ()=>{ historyFilter="REALISTIC"; refreshHistoryUI(); };
+
+// ----------------------------------------------------------
+// Init
+// ----------------------------------------------------------
+(function init(){
+  applyControls(defaults);
+  refreshHistoryUI();
+  updateAutoCompare();
+  updateSparkline();
+  updatePinnedBox();
+
+  // if existing history, render most recent
+  const hist = loadHistory();
+  if(hist[0]){
+    renderFromEntry(hist[0]);
+  }else{
+    wipeResults();
+  }
+})();
+</script>
+
+</body>
+</html>

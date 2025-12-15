@@ -1,0 +1,519 @@
+cat > ~/OMEGA_EMPIRE/UV_QDS/www/physorg_news_dashboard.html <<'HTML'
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>QDS · Phys.org News Vault</title>
+<style>
+  :root{
+    --bg0:#05070b; --bg1:#070b14; --card:#0b1226cc; --line:#1f2a44;
+    --txt:#eaf2ff; --mut:#9bb0d3; --a:#66e3ff; --b:#63ffb6; --c:#b06bff; --d:#ff5bd6;
+    --warn:#ffcc66; --bad:#ff6b6b;
+    --r:18px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; color:var(--txt); font:14px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell;
+    background:
+      radial-gradient(1200px 900px at 15% 10%, rgba(102,227,255,.12), transparent 55%),
+      radial-gradient(900px 700px at 90% 25%, rgba(99,255,182,.10), transparent 60%),
+      radial-gradient(800px 600px at 30% 90%, rgba(176,107,255,.10), transparent 55%),
+      linear-gradient(180deg, var(--bg0), var(--bg1));
+    min-height:100vh;
+    padding:14px 12px 60px;
+  }
+  .wrap{max-width:1100px; margin:0 auto;}
+  .top{
+    display:flex; gap:12px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;
+    padding:14px; border:1px solid var(--line); border-radius:var(--r);
+    background:linear-gradient(180deg, rgba(11,18,38,.78), rgba(11,18,38,.55));
+    box-shadow:0 18px 50px rgba(0,0,0,.45);
+    position:sticky; top:10px; z-index:10; backdrop-filter: blur(10px);
+  }
+  .brand{display:flex; flex-direction:column; gap:6px; min-width:240px}
+  .title{
+    font-size:18px; letter-spacing:.4px; font-weight:800;
+    display:flex; align-items:center; gap:10px;
+  }
+  .pill{
+    font-size:12px; font-weight:700; padding:4px 10px; border-radius:999px;
+    border:1px solid var(--line);
+    background:rgba(255,255,255,.04);
+    color:var(--mut);
+  }
+  .sub{color:var(--mut); font-size:12px}
+  .ctrls{display:grid; gap:10px; align-content:start; grid-template-columns: repeat(6, minmax(0,1fr)); width:min(820px,100%);}
+  .ctrl{
+    display:flex; flex-direction:column; gap:6px;
+    padding:10px; border:1px solid var(--line); border-radius:14px;
+    background:rgba(255,255,255,.03);
+  }
+  .ctrl label{font-size:11px; color:var(--mut); font-weight:700; letter-spacing:.3px}
+  select,input{
+    width:100%; padding:10px 10px; border-radius:12px;
+    border:1px solid rgba(255,255,255,.10); outline:none;
+    background:rgba(0,0,0,.25); color:var(--txt);
+  }
+  input::placeholder{color:#7f93ba}
+  .btnrow{display:flex; gap:10px; align-items:center; justify-content:flex-end; flex-wrap:wrap; margin-top:8px}
+  button{
+    border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.05);
+    color:var(--txt); padding:10px 12px; border-radius:14px; font-weight:800; letter-spacing:.2px;
+  }
+  button:hover{border-color:rgba(102,227,255,.35)}
+  .grid{
+    display:grid; gap:12px; margin-top:14px;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width:920px){
+    .grid{grid-template-columns: 1.1fr .9fr;}
+  }
+  .panel{
+    border:1px solid var(--line); border-radius:var(--r);
+    background:linear-gradient(180deg, rgba(11,18,38,.62), rgba(11,18,38,.40));
+    box-shadow:0 16px 45px rgba(0,0,0,.35);
+    overflow:hidden;
+  }
+  .ph{padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.06); display:flex; gap:10px; align-items:center; justify-content:space-between}
+  .ph h2{margin:0; font-size:13px; letter-spacing:.5px; text-transform:uppercase; color:var(--mut)}
+  .stats{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:flex-end}
+  .kpi{font-size:12px; padding:5px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.10); background:rgba(0,0,0,.18); color:var(--mut)}
+  .kpi strong{color:var(--txt)}
+  .list{padding:10px 12px; display:grid; gap:10px}
+  .card{
+    border:1px solid rgba(255,255,255,.08); border-radius:16px;
+    background:rgba(0,0,0,.18);
+    padding:12px 12px;
+  }
+  .row{display:flex; gap:10px; align-items:flex-start; justify-content:space-between}
+  .headline{
+    margin:0; font-size:14px; font-weight:900; letter-spacing:.2px;
+  }
+  .headline a{color:var(--txt); text-decoration:none}
+  .headline a:hover{color:var(--a)}
+  .meta{margin-top:6px; color:var(--mut); font-size:12px; display:flex; gap:8px; flex-wrap:wrap}
+  .tag{border:1px solid rgba(255,255,255,.10); background:rgba(255,255,255,.04); padding:3px 8px; border-radius:999px}
+  .tag.good{border-color:rgba(99,255,182,.35); color:#bfffe2}
+  .tag.mid{border-color:rgba(255,204,102,.35); color:#ffe1a6}
+  .tag.bad{border-color:rgba(255,107,107,.35); color:#ffd1d1}
+  .desc{margin:8px 0 0; color:#cfe0ff; opacity:.88}
+  .mini{font-size:11px; color:#7f93ba}
+  .bars{padding:12px 14px; display:grid; gap:10px}
+  .bar{
+    display:grid; grid-template-columns: 1fr 80px; gap:10px; align-items:center;
+    padding:10px; border:1px solid rgba(255,255,255,.08); border-radius:14px; background:rgba(0,0,0,.15);
+  }
+  .barline{height:10px; border-radius:999px; background:rgba(255,255,255,.06); overflow:hidden; border:1px solid rgba(255,255,255,.08)}
+  .fill{height:100%; width:0%;}
+  .barname{font-weight:900; letter-spacing:.2px}
+  .small{color:var(--mut); font-size:12px}
+  .sep{height:1px; background:rgba(255,255,255,.06); margin:8px 0}
+  .foot{margin-top:12px; color:#7f93ba; font-size:12px; text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div class="brand">
+      <div class="title">QDS · Phys.org News Vault <span class="pill" id="pillStatus">offline</span></div>
+      <div class="sub">Reads your local RSS rips: <span class="mini">/news_rips/physorg/YYYY-MM-DD/MASTER.json</span></div>
+      <div class="sub" id="subHint"></div>
+    </div>
+
+    <div class="ctrls">
+      <div class="ctrl">
+        <label>DATE</label>
+        <select id="selDate"></select>
+      </div>
+
+      <div class="ctrl">
+        <label>MODE</label>
+        <select id="selMode">
+          <option value="single">Single</option>
+          <option value="compare">Compare (Date A vs Date B)</option>
+        </select>
+      </div>
+
+      <div class="ctrl" id="ctrlCompare" style="display:none">
+        <label>COMPARE DATE B</label>
+        <select id="selDateB"></select>
+      </div>
+
+      <div class="ctrl">
+        <label>CATEGORY</label>
+        <select id="selCat">
+          <option value="">All</option>
+        </select>
+      </div>
+
+      <div class="ctrl">
+        <label>SEARCH</label>
+        <input id="q" placeholder="title / description keywords…" />
+      </div>
+
+      <div class="ctrl">
+        <label>SORT</label>
+        <select id="selSort">
+          <option value="new">Newest first</option>
+          <option value="old">Oldest first</option>
+          <option value="az">Title A→Z</option>
+        </select>
+      </div>
+
+      <div class="btnrow" style="grid-column: 1 / -1;">
+        <button id="btnReload">Reload JSON</button>
+        <button id="btnOpenFolder">Open rip folder</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="panel">
+      <div class="ph">
+        <h2 id="hMain">Feed</h2>
+        <div class="stats">
+          <div class="kpi">Items: <strong id="kItems">0</strong></div>
+          <div class="kpi">Cats: <strong id="kCats">0</strong></div>
+          <div class="kpi">Query: <strong id="kQuery">—</strong></div>
+        </div>
+      </div>
+      <div class="list" id="list"></div>
+    </div>
+
+    <div class="panel">
+      <div class="ph">
+        <h2>Category mix</h2>
+        <div class="stats">
+          <div class="kpi">Top: <strong id="kTop">—</strong></div>
+        </div>
+      </div>
+      <div class="bars" id="bars"></div>
+      <div class="sep"></div>
+      <div class="bars">
+        <div class="small">
+          <strong>Bias-risk hint</strong> (quick heuristic):<br/>
+          <span class="tag good">low</span> more “instrument/measurement” heavy (space/physics/chem/nano).<br/>
+          <span class="tag mid">mid</span> archaeology/history, general science summaries.<br/>
+          <span class="tag bad">high</span> business/social/policy domains (framing creeps in).
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    Update flow: run <code>ripphys</code> (or your refresh script) in Termux → come back here → tap “Reload JSON”.
+  </div>
+</div>
+
+<script>
+const $ = (id)=>document.getElementById(id);
+
+const BASE = "/news_rips/physorg/";
+const DEFAULT_DATE = new URLSearchParams(location.search).get("date") || new Date().toISOString().slice(0,10);
+
+const state = {
+  manifest: null,
+  dateA: DEFAULT_DATE,
+  dateB: DEFAULT_DATE,
+  mode: "single",
+  cat: "",
+  q: "",
+  sort: "new",
+  itemsA: [],
+  itemsB: []
+};
+
+// Quick bias heuristic by category keywords (adjust as you like)
+function biasTag(categoriesText){
+  const t = (categoriesText||"").toLowerCase();
+  if (/(business|economics|finance|policy|social|education|psychology|politics)/.test(t)) return "bad";
+  if (/(archaeology|history|culture|society)/.test(t)) return "mid";
+  return "good";
+}
+
+function safeText(s){ return (s||"").replace(/\s+/g," ").trim(); }
+
+function parseDate(d){
+  // RSS pubDate is a string; keep as string for display, but also try Date parse for sorting
+  const dt = new Date(d);
+  return isNaN(dt.getTime()) ? null : dt;
+}
+
+async function fetchJSON(url){
+  const res = await fetch(url, {cache:"no-store"});
+  if(!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+  return await res.json();
+}
+
+async function loadManifest(){
+  // We generate this with a bash script below; if missing, we fall back to just DEFAULT_DATE.
+  try{
+    const m = await fetchJSON(BASE + "manifest.json?x=" + Date.now());
+    state.manifest = m;
+    $("pillStatus").textContent = "online";
+    $("pillStatus").style.borderColor = "rgba(99,255,182,.35)";
+    $("pillStatus").style.color = "#bfffe2";
+    $("subHint").textContent = `Last refresh: ${m.last_run || "unknown"} · Dates: ${m.dates?.length || 0}`;
+  }catch(e){
+    state.manifest = null;
+    $("pillStatus").textContent = "manifest missing";
+    $("pillStatus").style.borderColor = "rgba(255,204,102,.35)";
+    $("pillStatus").style.color = "#ffe1a6";
+    $("subHint").textContent = `Tip: create manifest.json via Termux refresh script. Using date=${state.dateA}.`;
+  }
+}
+
+function fillDateSelect(sel, dates, selected){
+  sel.innerHTML = "";
+  for(const d of dates){
+    const opt = document.createElement("option");
+    opt.value = d;
+    opt.textContent = d;
+    if(d === selected) opt.selected = true;
+    sel.appendChild(opt);
+  }
+}
+
+async function loadDate(dateStr){
+  const url = `${BASE}${dateStr}/MASTER.json?x=${Date.now()}`;
+  return await fetchJSON(url);
+}
+
+function unionCategories(items){
+  const set = new Set();
+  for(const it of items){
+    (it.categories||[]).forEach(c=> set.add(c));
+  }
+  return Array.from(set).sort((a,b)=>a.localeCompare(b));
+}
+
+function getCatKey(it){
+  const cats = (it.categories||[]);
+  return cats.length ? cats[0] : "Uncategorised";
+}
+
+function applyFilters(items){
+  const q = state.q.trim().toLowerCase();
+  const cat = state.cat;
+  let out = items;
+
+  if(cat){
+    out = out.filter(it => (it.categories||[]).includes(cat));
+  }
+  if(q){
+    out = out.filter(it => {
+      const t = (it.title||"").toLowerCase();
+      const d = (it.description||"").toLowerCase();
+      const c = (it.categories||[]).join(" ").toLowerCase();
+      return t.includes(q) || d.includes(q) || c.includes(q);
+    });
+  }
+
+  // sort
+  const sort = state.sort;
+  out = out.slice();
+  if(sort==="az"){
+    out.sort((a,b)=> (a.title||"").localeCompare(b.title||""));
+  }else{
+    out.sort((a,b)=>{
+      const da = parseDate(a.pubDate) || new Date(0);
+      const db = parseDate(b.pubDate) || new Date(0);
+      return (sort==="new") ? (db-da) : (da-db);
+    });
+  }
+  return out;
+}
+
+function renderList(items, itemsB=null){
+  const list = $("list");
+  list.innerHTML = "";
+
+  // Compare mode: mark items new in A vs B (by link)
+  const bLinks = new Set((itemsB||[]).map(x=>x.link).filter(Boolean));
+
+  for(const it of items){
+    const cats = (it.categories||[]);
+    const catsText = cats.join(", ");
+    const tag = biasTag(catsText);
+    const isNew = itemsB ? !bLinks.has(it.link) : false;
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const h = safeText(it.title);
+    const link = it.link || "#";
+    const pub = safeText(it.pubDate);
+
+    const badge = document.createElement("span");
+    badge.className = `tag ${tag}`;
+    badge.textContent = tag==="good" ? "low framing" : tag==="mid" ? "mid framing" : "high framing";
+
+    const newb = document.createElement("span");
+    newb.className = "tag";
+    newb.style.borderColor = "rgba(102,227,255,.35)";
+    newb.style.color = "#c8f4ff";
+    newb.textContent = "new vs B";
+
+    card.innerHTML = `
+      <div class="row">
+        <div style="min-width:0">
+          <p class="headline"><a href="${link}" target="_blank" rel="noopener">${h}</a></p>
+          <div class="meta">
+            <span class="tag">${pub || "—"}</span>
+            ${(cats||[]).slice(0,4).map(c=>`<span class="tag">${c}</span>`).join("")}
+          </div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end">
+        </div>
+      </div>
+      <p class="desc">${safeText(it.description) || ""}</p>
+    `;
+
+    const right = card.querySelector(".row > div:last-child");
+    right.appendChild(badge);
+    if(isNew) right.appendChild(newb);
+
+    list.appendChild(card);
+  }
+}
+
+function renderBars(items){
+  const bars = $("bars");
+  bars.innerHTML = "";
+
+  const counts = new Map();
+  for(const it of items){
+    const k = getCatKey(it);
+    counts.set(k, (counts.get(k)||0)+1);
+  }
+  const arr = Array.from(counts.entries()).sort((a,b)=>b[1]-a[1]);
+  const top = arr[0] ? `${arr[0][0]} (${arr[0][1]})` : "—";
+  $("kTop").textContent = top;
+
+  const max = arr[0] ? arr[0][1] : 1;
+  for(const [name, n] of arr.slice(0,14)){
+    const row = document.createElement("div");
+    row.className = "bar";
+    const pct = Math.round((n/max)*100);
+    row.innerHTML = `
+      <div>
+        <div class="barname">${name}</div>
+        <div class="small">${n} item(s)</div>
+        <div class="barline"><div class="fill" style="width:${pct}%; background: linear-gradient(90deg, rgba(102,227,255,.9), rgba(99,255,182,.9));"></div></div>
+      </div>
+      <div style="text-align:right; font-weight:900; color:#cfe0ff">${pct}%</div>
+    `;
+    bars.appendChild(row);
+  }
+}
+
+function renderCategorySelect(cats){
+  const sel = $("selCat");
+  const current = state.cat;
+  sel.innerHTML = `<option value="">All</option>` + cats.map(c=>`<option value="${c}">${c}</option>`).join("");
+  if(current) sel.value = current;
+}
+
+async function refreshData(){
+  $("pillStatus").textContent = "loading…";
+  $("pillStatus").style.borderColor = "rgba(102,227,255,.35)";
+  $("pillStatus").style.color = "#c8f4ff";
+
+  const dateA = $("selDate").value;
+  const mode = $("selMode").value;
+  const dateB = $("selDateB").value;
+
+  state.dateA = dateA;
+  state.mode = mode;
+  state.dateB = dateB;
+
+  // load A always
+  state.itemsA = await loadDate(state.dateA);
+
+  // load B if compare
+  state.itemsB = (state.mode==="compare") ? await loadDate(state.dateB) : [];
+
+  const cats = unionCategories(state.itemsA.concat(state.itemsB));
+  renderCategorySelect(cats);
+
+  // Apply filters on A
+  state.cat = $("selCat").value;
+  state.q = $("q").value || "";
+  state.sort = $("selSort").value;
+
+  const filteredA = applyFilters(state.itemsA);
+  const compareItemsB = (state.mode==="compare") ? state.itemsB : null;
+
+  $("hMain").textContent = state.mode==="compare"
+    ? `Compare: ${state.dateA} (A) vs ${state.dateB} (B)`
+    : `Feed: ${state.dateA}`;
+
+  $("kItems").textContent = filteredA.length;
+  $("kCats").textContent = cats.length;
+  $("kQuery").textContent = (state.cat || state.q) ? `${state.cat || "All"} · ${state.q || "—"}` : "—";
+
+  renderList(filteredA, compareItemsB);
+  renderBars(filteredA);
+
+  $("pillStatus").textContent = "ready";
+  $("pillStatus").style.borderColor = "rgba(99,255,182,.35)";
+  $("pillStatus").style.color = "#bfffe2";
+
+  // Update URL date param
+  const u = new URL(location.href);
+  u.searchParams.set("date", state.dateA);
+  history.replaceState({}, "", u.toString());
+}
+
+function setupUI(){
+  $("selMode").addEventListener("change", ()=>{
+    const mode = $("selMode").value;
+    $("ctrlCompare").style.display = (mode==="compare") ? "" : "none";
+    refreshData().catch(err=>alert(err.message));
+  });
+
+  $("selDate").addEventListener("change", ()=>refreshData().catch(err=>alert(err.message)));
+  $("selDateB").addEventListener("change", ()=>refreshData().catch(err=>alert(err.message)));
+  $("selCat").addEventListener("change", ()=>refreshData().catch(err=>alert(err.message)));
+  $("selSort").addEventListener("change", ()=>refreshData().catch(err=>alert(err.message)));
+
+  let t=null;
+  $("q").addEventListener("input", ()=>{
+    clearTimeout(t);
+    t = setTimeout(()=>refreshData().catch(err=>alert(err.message)), 180);
+  });
+
+  $("btnReload").addEventListener("click", ()=>refreshData().catch(err=>alert(err.message)));
+
+  $("btnOpenFolder").addEventListener("click", ()=>{
+    // open the folder listing for the date (python http.server directory listing)
+    const url = `${location.origin}${BASE}${$("selDate").value}/`;
+    window.open(url, "_blank");
+  });
+}
+
+(async function main(){
+  setupUI();
+  await loadManifest();
+
+  const dates = (state.manifest && Array.isArray(state.manifest.dates) && state.manifest.dates.length)
+    ? state.manifest.dates
+    : [DEFAULT_DATE];
+
+  // Prefer latest date from manifest
+  const latest = dates[0] || DEFAULT_DATE;
+
+  state.dateA = dates.includes(DEFAULT_DATE) ? DEFAULT_DATE : latest;
+  state.dateB = latest;
+
+  fillDateSelect($("selDate"), dates, state.dateA);
+  fillDateSelect($("selDateB"), dates, state.dateB);
+
+  await refreshData();
+})();
+</script>
+</body>
+</html>
+HTML

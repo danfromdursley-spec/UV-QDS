@@ -1,0 +1,8 @@
+{
+  "source":"DfT EV charging infrastructure statistics",
+  "timestamp_utc":"2025-12-15T10:28:56Z",
+  "pages":[
+    {"name":"govuk_collection","url":"https://www.gov.uk/government/collections/electric-vehicle-charging-infrastructure-statistics","file":"collection.html"},
+    {"name":"findtransportdata_dataset","url":"https://findtransportdata.dft.gov.uk/dataset/electric-vehicle-charging-infrastructure-statistics-17eb4e7de79","file":"dataset.html"}
+  ]
+}

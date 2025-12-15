@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Solar System V6 — QDS Edition</title>
+<style>
+    body { background:#000; color:white; margin:0; overflow:hidden; }
+    #ui {
+        position:fixed; top:10px; left:10px;
+        background:rgba(0,0,0,0.6); padding:12px;
+        border-radius:10px; font-family:Arial; font-size:14px;
+    }
+    button, input[type=range] {
+        width:100%; margin:6px 0; font-size:14px;
+    }
+</style>
+</head>
+
+<body>
+
+<div id="ui">
+    <h3>QDS Controls 🎩</h3>
+    <label>λc (spatial coherence)</label>
+    <input type="range" id="lambdaSlider" min="0.1" max="5" step="0.1" value="2">
+
+    <label>τc (temporal coherence)</label>
+    <input type="range" id="tauSlider" min="0.1" max="5" step="0.1" value="2">
+
+    <button onclick="fireCME()">💥 Fire CME</button>
+    <button onclick="enableMuseumMode(true)">🎨 Enable Museum Mode</button>
+    <button onclick="enableMuseumMode(false)">💠 Normal Mode</button>
+</div>
+
+<canvas id="renderCanvas"></canvas>
+
+<script src="https://cdn.babylonjs.com/babylon.js"></script>
+
+<script>
+// ==========================================================
+// SOLAR SYSTEM V6 — SINGLE FILE
+// ==========================================================
+
+// Canvas + Engine
+const canvas = document.getElementById("renderCanvas");
+const engine = new BABYLON.Engine(canvas, true);
+const scene = new BABYLON.Scene(engine);
+scene.clearColor = new BABYLON.Color3(0, 0, 0);
+
+// Camera
+const cam = new BABYLON.ArcRotateCamera("cam",
+    Math.PI/2, Math.PI/3, 120,
+    new BABYLON.Vector3(0,0,0), scene);
+cam.attachControl(canvas, true);
+
+// Lighting
+const light = new BABYLON.PointLight("light",
+    new BABYLON.Vector3(0,0,0), scene);
+light.intensity = 2.0;
+
+const glow = new BABYLON.GlowLayer("glow", scene);
+glow.intensity = 0.6;
+
+// ==========================================================
+// TEXTURES
+// ==========================================================
+
+const TEX = {
+    sun: "https://upload.wikimedia.org/wikipedia/commons/4/4c/Solar_system_scaled.jpg",
+    mercury: "https://www.solarsystemscope.com/textures/download/2k_mercury.jpg",
+    venus:   "https://www.solarsystemscope.com/textures/download/2k_venus_surface.jpg",
+    earth:   "https://www.solarsystemscope.com/textures/download/2k_earth_daymap.jpg",
+    mars:    "https://www.solarsystemscope.com/textures/download/2k_mars.jpg",
+    jupiter: "https://www.solarsystemscope.com/textures/download/2k_jupiter.jpg",
+    saturn:  "https://www.solarsystemscope.com/textures/download/2k_saturn.jpg",
+    uranus:  "https://www.solarsystemscope.com/textures/download/2k_uranus.jpg",
+    neptune: "https://www.solarsystemscope.com/textures/download/2k_neptune.jpg",
+    pluto:   "https://www.solarsystemscope.com/textures/download/pluto.jpg",
+    rings:   "https://upload.wikimedia.org/wikipedia/commons/0/06/Saturn_rings_perspective.png"
+};
+
+// ==========================================================
+// PLANET BUILDER
+// ==========================================================
+
+function createPlanet(name, size, distance, speed, texture) {
+    const mesh = BABYLON.MeshBuilder.CreateSphere(name, { diameter: size }, scene);
+    const mat = new BABYLON.StandardMaterial(name+"_mat", scene);
+    mat.diffuseTexture = new BABYLON.Texture(texture, scene);
+    mesh.material = mat;
+    mesh.position.x = distance;
+
+    return { mesh, distance, speed, angle: Math.random()*Math.PI*2 };
+}
+
+window.SOLAR = {};
+
+(function buildSolarSystem() {
+
+    // Sun
+    SOLAR.sun = BABYLON.MeshBuilder.CreateSphere("sun", { diameter: 18 }, scene);
+    const sunMat = new BABYLON.StandardMaterial("sunMat", scene);
+    sunMat.emissiveTexture = new BABYLON.Texture(TEX.sun, scene);
+    SOLAR.sun.material = sunMat;
+
+    // Planets
+    SOLAR.planets = [
+        createPlanet("mercury", 1.4, 20, 0.020, TEX.mercury),
+        createPlanet("venus",   2.0, 30, 0.015, TEX.venus),
+        createPlanet("earth",   2.1, 40, 0.012, TEX.earth),
+        createPlanet("mars",    1.6, 50, 0.010, TEX.mars),
+        createPlanet("jupiter", 8.0, 70, 0.008, TEX.jupiter),
+        createPlanet("saturn",  7.0, 90, 0.006, TEX.saturn),
+        createPlanet("uranus",  4.0,110, 0.004, TEX.uranus),
+        createPlanet("neptune", 4.0,130, 0.003, TEX.neptune),
+        createPlanet("pluto",   0.8,150, 0.002, TEX.pluto)
+    ];
+
+    // Saturn rings
+    const rings = BABYLON.MeshBuilder.CreateDisc("rings", {
+        radius: 11,
+        tessellation: 90,
+        sideOrientation: BABYLON.Mesh.DOUBLESIDE
+    }, scene);
+    const ringMat = new BABYLON.StandardMaterial("ringMat", scene);
+    ringMat.diffuseTexture = new BABYLON.Texture(TEX.rings, scene);
+    rings.material = ringMat;
+    rings.rotation.x = Math.PI/2;
+    rings.parent = SOLAR.planets[5].mesh; // Saturn
+
+})();
+
+// ==========================================================
+// ORBIT ANIMATION
+// ==========================================================
+
+scene.onBeforeRenderObservable.add(() => {
+    SOLAR.planets.forEach(p => {
+        p.angle += p.speed;
+        p.mesh.position.x = Math.cos(p.angle)*p.distance;
+        p.mesh.position.z = Math.sin(p.angle)*p.distance;
+    });
+});
+
+// ==========================================================
+// QDS WARP GRID
+// ==========================================================
+
+const grid = BABYLON.MeshBuilder.CreateGround("qdsGrid", {
+    width: 300, height: 300, subdivisions: 120
+}, scene);
+
+const gridMat = new BABYLON.StandardMaterial("gridMat", scene);
+gridMat.wireframe = true;
+gridMat.emissiveColor = new BABYLON.Color3(0.1, 0.6, 1.0);
+grid.material = gridMat;
+grid.position.y = -6;
+
+let QDS = { lambda: 2, tau: 2 };
+
+scene.registerBeforeRender(() => {
+    const t = performance.now()*0.001;
+    grid.updateMeshPositions(pos => {
+        for (let i=0; i<pos.length; i+=3) {
+            const x = pos[i], z = pos[i+2];
+            const r = Math.sqrt(x*x + z*z);
+            pos[i+1] = Math.sin(r*QDS.lambda - t*QDS.tau)*0.3;
+        }
+    });
+});
+
+// Slider connections
+document.getElementById("lambdaSlider").oninput =
+ e => QDS.lambda = parseFloat(e.target.value);
+document.getElementById("tauSlider").oninput =
+ e => QDS.tau = parseFloat(e.target.value);
+
+// ==========================================================
+// CME — CORONAL MASS EJECTIONS
+// ==========================================================
+
+let cmeWaves = [];
+
+function fireCME(intensity=1) {
+    const ring = BABYLON.MeshBuilder.CreateTorus("cme", {
+        diameter: 2, thickness: 0.15
+    }, scene);
+
+    const mat = new BABYLON.StandardMaterial("cmeMat", scene);
+    mat.emissiveColor = new BABYLON.Color3(1, 0.6, 0.1);
+    ring.material = mat;
+
+    ring.position = SOLAR.sun.position.clone();
+    ring.scaling = new BABYLON.Vector3(1,0.1,1);
+
+    cmeWaves.push({ mesh:ring, size:1, intensity });
+}
+
+window.fireCME = fireCME;
+
+scene.onBeforeRenderObservable.add(() => {
+    cmeWaves.forEach(w => {
+        w.size += engine.getDeltaTime()*0.012*w.intensity;
+        w.mesh.scaling.x = w.size;
+        w.mesh.scaling.z = w.size;
+
+        w.mesh.material.emissiveColor = new BABYLON.Color3(
+            1*(1-w.size/50),
+            0.6*(1-w.size/50),
+            0.1*(1-w.size/50)
+        );
+    });
+
+    cmeWaves = cmeWaves.filter(w => w.size < 50);
+});
+
+// ==========================================================
+// MUSEUM MODE
+// ==========================================================
+
+function enableMuseumMode(on) {
+    if (on) {
+        gridMat.emissiveColor = new BABYLON.Color3(0.2,0.5,1);
+        glow.intensity = 0.9;
+    } else {
+        gridMat.emissiveColor = new BABYLON.Color3(0.1,0.6,1);
+        glow.intensity = 0.6;
+    }
+}
+
+window.enableMuseumMode = enableMuseumMode;
+
+// ==========================================================
+// RENDER LOOP
+// ==========================================================
+
+engine.runRenderLoop(() => scene.render());
+window.addEventListener("resize", () => engine.resize());
+
+</script>
+</body>
+</html>

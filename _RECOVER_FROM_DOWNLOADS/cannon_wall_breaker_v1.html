@@ -1,0 +1,891 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>Ω Cannon Wall Breaker v1</title>
+<style>
+  :root{
+    --bg:#070b12;
+    --panel:#0b1220cc;
+    --panel2:#0c1628;
+    --accent:#7cf3ff;
+    --accent2:#9bffb0;
+    --warn:#ff8fb3;
+    --text:#e9f2ff;
+    --muted:#9fb0c9;
+  }
+  html,body{height:100%; margin:0; background:radial-gradient(1200px 700px at 20% 10%, #0b1a32 0%, var(--bg) 45%, #05070b 100%); color:var(--text); font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif;}
+  #wrap{display:flex; flex-direction:column; height:100%;}
+  header{
+    padding:10px 14px 0 14px;
+    display:flex; gap:10px; align-items:center; justify-content:space-between;
+  }
+  .title{
+    font-weight:700; letter-spacing:.5px; font-size:18px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .badge{
+    font-size:11px; padding:2px 8px; border-radius:999px;
+    background:linear-gradient(90deg, #193a5f, #0a213b);
+    border:1px solid #214a75;
+    color:var(--accent);
+  }
+  .right{display:flex; gap:8px; align-items:center;}
+  button{
+    appearance:none; border:1px solid #1e3a5f; color:var(--text);
+    background:linear-gradient(180deg, #0e1b2f, #0a1424);
+    padding:8px 10px; border-radius:10px; font-weight:600; font-size:12px;
+    box-shadow:0 6px 18px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  button:active{transform:translateY(1px);}
+  button.secondary{border-color:#1f4a2f;}
+  button.warn{border-color:#5a1f34; color:#ffd6e2;}
+  #main{
+    display:grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    gap:10px;
+    padding:10px 12px 12px 12px;
+    height:100%;
+    box-sizing:border-box;
+  }
+  #panel{
+    background:linear-gradient(135deg, var(--panel), rgba(9,16,30,.65));
+    border:1px solid #163152;
+    border-radius:14px;
+    padding:10px;
+  }
+  #panelInner{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:8px 10px;
+  }
+  .row{display:flex; align-items:center; gap:8px;}
+  label{font-size:11px; color:var(--muted); min-width:76px;}
+  input[type="range"]{width:100%;}
+  .val{
+    font-size:11px; color:#dbe9ff; padding:2px 6px; border-radius:6px;
+    background:var(--panel2); border:1px solid #1a365b; min-width:44px; text-align:center;
+  }
+  #hud{
+    display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;
+  }
+  .chip{
+    font-size:10px; padding:4px 8px; border-radius:999px;
+    background:#0b1a2e; border:1px solid #1b3556; color:#cfe2ff;
+  }
+  .chip.ok{border-color:#1f4a2f; color:var(--accent2);}
+  .chip.hot{border-color:#5a1f34; color:var(--warn);}
+  #canvasBox{
+    position:relative;
+    background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
+    border:1px solid #122a48;
+    border-radius:14px;
+    overflow:hidden;
+    min-height:320px;
+  }
+  canvas{display:block; width:100%; height:100%;}
+  #touchHint{
+    position:absolute; right:10px; bottom:10px;
+    font-size:10px; color:#9fb0c9;
+    background:#0b1322cc; border:1px solid #1a2f4c;
+    padding:6px 8px; border-radius:8px;
+  }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <header>
+    <div class="title">
+      <span>Ω Cannon Wall Breaker</span>
+      <span class="badge">v1 • offline • phone-safe</span>
+    </div>
+    <div class="right">
+      <button id="btnFire">FIRE 💥</button>
+      <button id="btnReset" class="secondary">Reset Wall</button>
+      <button id="btnSlow">Slow-Mo</button>
+      <button id="btnCam">Cam: Orbit</button>
+    </div>
+  </header>
+
+  <div id="main">
+    <div id="panel">
+      <div id="panelInner">
+        <div class="row">
+          <label>Power</label>
+          <input id="power" type="range" min="10" max="120" value="70" />
+          <span class="val" id="powerVal"></span>
+        </div>
+        <div class="row">
+          <label>Elevation</label>
+          <input id="elev" type="range" min="5" max="75" value="28" />
+          <span class="val" id="elevVal"></span>
+        </div>
+        <div class="row">
+          <label>Yaw</label>
+          <input id="yaw" type="range" min="-45" max="45" value="0" />
+          <span class="val" id="yawVal"></span>
+        </div>
+        <div class="row">
+          <label>Ball Size</label>
+          <input id="radius" type="range" min="0.3" max="1.6" step="0.1" value="0.9" />
+          <span class="val" id="radiusVal"></span>
+        </div>
+        <div class="row">
+          <label>Wall Width</label>
+          <input id="wW" type="range" min="6" max="18" value="10" />
+          <span class="val" id="wWVal"></span>
+        </div>
+        <div class="row">
+          <label>Wall Height</label>
+          <input id="wH" type="range" min="4" max="14" value="7" />
+          <span class="val" id="wHVal"></span>
+        </div>
+        <div class="row">
+          <label>Block Size</label>
+          <input id="bS" type="range" min="0.7" max="1.6" step="0.1" value="1.0" />
+          <span class="val" id="bSVal"></span>
+        </div>
+        <div class="row">
+          <label>Fragility</label>
+          <input id="frag" type="range" min="0.6" max="2.0" step="0.1" value="1.0" />
+          <span class="val" id="fragVal"></span>
+        </div>
+      </div>
+
+      <div id="hud">
+        <span class="chip ok" id="statBlocks">blocks: --</span>
+        <span class="chip" id="statHits">hits: 0</span>
+        <span class="chip" id="statShots">shots: 0</span>
+        <span class="chip" id="statMode">mode: arcade-3D</span>
+      </div>
+    </div>
+
+    <div id="canvasBox">
+      <canvas id="c"></canvas>
+      <div id="touchHint">Drag: rotate • Pinch: zoom • Double tap: fire</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  // ------------------------------------------------------------
+  // Minimal 3D-ish engine (no deps). Canvas + simple projection.
+  // ------------------------------------------------------------
+  const canvas = document.getElementById("c");
+  const box = document.getElementById("canvasBox");
+  const ctx = canvas.getContext("2d");
+
+  // UI
+  const elPower = document.getElementById("power");
+  const elElev  = document.getElementById("elev");
+  const elYaw   = document.getElementById("yaw");
+  const elRadius= document.getElementById("radius");
+  const elWW    = document.getElementById("wW");
+  const elWH    = document.getElementById("wH");
+  const elBS    = document.getElementById("bS");
+  const elFrag  = document.getElementById("frag");
+
+  const vPower = document.getElementById("powerVal");
+  const vElev  = document.getElementById("elevVal");
+  const vYaw   = document.getElementById("yawVal");
+  const vRadius= document.getElementById("radiusVal");
+  const vWW    = document.getElementById("wWVal");
+  const vWH    = document.getElementById("wHVal");
+  const vBS    = document.getElementById("bSVal");
+  const vFrag  = document.getElementById("fragVal");
+
+  const statBlocks = document.getElementById("statBlocks");
+  const statHits = document.getElementById("statHits");
+  const statShots = document.getElementById("statShots");
+
+  const btnFire = document.getElementById("btnFire");
+  const btnReset= document.getElementById("btnReset");
+  const btnSlow = document.getElementById("btnSlow");
+  const btnCam  = document.getElementById("btnCam");
+
+  function syncVals(){
+    vPower.textContent = elPower.value;
+    vElev.textContent  = elElev.value + "°";
+    vYaw.textContent   = elYaw.value + "°";
+    vRadius.textContent= elRadius.value;
+    vWW.textContent    = elWW.value;
+    vWH.textContent    = elWH.value;
+    vBS.textContent    = elBS.value;
+    vFrag.textContent  = elFrag.value;
+  }
+  [elPower,elElev,elYaw,elRadius,elWW,elWH,elBS,elFrag].forEach(e=>e.addEventListener("input", () => {
+    syncVals();
+  }));
+  syncVals();
+
+  // Resize
+  function resize(){
+    const r = box.getBoundingClientRect();
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    canvas.width = Math.floor(r.width * dpr);
+    canvas.height= Math.floor((r.height) * dpr);
+    canvas.style.width = r.width+"px";
+    canvas.style.height= r.height+"px";
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  new ResizeObserver(resize).observe(box);
+  resize();
+
+  // Math helpers
+  const TAU = Math.PI * 2;
+  const clamp = (x,a,b)=>Math.max(a,Math.min(b,x));
+  const lerp = (a,b,t)=>a+(b-a)*t;
+
+  // Camera / view
+  let camMode = "orbit"; // orbit | chase
+  let camYaw = -0.35, camPitch = 0.22;
+  let camDist = 22;
+  let dragging = false;
+  let lastX=0,lastY=0;
+  let pinchDist = 0;
+
+  // World scale units
+  // We'll keep everything small and stable for phone.
+  const G = 9.8; // gravity "units"
+
+  // Entities
+  let blocks = [];
+  let balls = [];
+  let sparks = [];
+  let debris = [];
+
+  let hits = 0;
+  let shots = 0;
+  let slowMo = false;
+
+  // Cannon position & base direction
+  const cannon = {
+    pos: {x:0, y:1.2, z:-14},
+    barrelLen: 2.4
+  };
+
+  // Wall plane around z = 0
+  function buildWall(){
+    blocks = [];
+    const wW = parseInt(elWW.value,10);
+    const wH = parseInt(elWH.value,10);
+    const bS = parseFloat(elBS.value);
+    const gap = bS * 0.06;
+    const startX = -((wW-1) * (bS+gap))/2;
+    const startY = 0.6;
+    const z = 0;
+
+    for(let j=0;j<wH;j++){
+      for(let i=0;i<wW;i++){
+        const x = startX + i*(bS+gap);
+        const y = startY + j*(bS+gap);
+        blocks.push({
+          x,y,z,
+          s:bS,
+          alive:true,
+          wobble: Math.random()*TAU,
+          hp: 1
+        });
+      }
+    }
+    statBlocks.textContent = "blocks: " + blocks.length;
+  }
+
+  buildWall();
+
+  function resetSim(keepStats=false){
+    balls = [];
+    sparks = [];
+    debris = [];
+    if(!keepStats){
+      hits = 0; shots = 0;
+    }
+    statHits.textContent = "hits: " + hits;
+    statShots.textContent = "shots: " + shots;
+  }
+
+  btnReset.addEventListener("click", () => {
+    buildWall();
+    resetSim(false);
+  });
+
+  btnSlow.addEventListener("click", () => {
+    slowMo = !slowMo;
+    btnSlow.textContent = slowMo ? "Slow-Mo: ON" : "Slow-Mo";
+  });
+
+  btnCam.addEventListener("click", () => {
+    camMode = (camMode === "orbit") ? "chase" : "orbit";
+    btnCam.textContent = "Cam: " + (camMode === "orbit" ? "Orbit" : "Chase");
+  });
+
+  function fire(){
+    const power = parseFloat(elPower.value);
+    const elevDeg = parseFloat(elElev.value);
+    const yawDeg = parseFloat(elYaw.value);
+    const r = parseFloat(elRadius.value);
+
+    const elev = elevDeg * Math.PI/180;
+    const yaw = yawDeg * Math.PI/180;
+
+    // Direction vector from angles
+    const dx = Math.sin(yaw) * Math.cos(elev);
+    const dy = Math.sin(elev);
+    const dz = Math.cos(yaw) * Math.cos(elev);
+
+    // Spawn at barrel tip
+    const bx = cannon.pos.x + dx * cannon.barrelLen;
+    const by = cannon.pos.y + dy * cannon.barrelLen;
+    const bz = cannon.pos.z + dz * cannon.barrelLen;
+
+    // Velocity
+    const v = power * 0.12; // tuned for scene scale
+    balls.push({
+      x:bx,y:by,z:bz,
+      vx:dx*v, vy:dy*v, vz:dz*v,
+      r,
+      alive:true,
+      age:0
+    });
+
+    shots++;
+    statShots.textContent = "shots: " + shots;
+
+    // Muzzle spark
+    for(let i=0;i<14;i++){
+      sparks.push({
+        x:bx,y:by,z:bz,
+        vx:(Math.random()-0.5)*0.8 + dx*0.8,
+        vy:(Math.random()-0.5)*0.8 + dy*0.8,
+        vz:(Math.random()-0.5)*0.8 + dz*0.8,
+        life: 0.6 + Math.random()*0.4
+      });
+    }
+  }
+
+  btnFire.addEventListener("click", fire);
+
+  // Touch + mouse controls
+  function pointerDown(e){
+    dragging = true;
+    const p = getPoint(e);
+    lastX = p.x; lastY = p.y;
+  }
+  function pointerMove(e){
+    if(!dragging) return;
+    const p = getPoint(e);
+    const dx = p.x - lastX;
+    const dy = p.y - lastY;
+    lastX = p.x; lastY = p.y;
+
+    camYaw   += dx * 0.005;
+    camPitch += dy * 0.005;
+    camPitch = clamp(camPitch, -0.35, 0.65);
+  }
+  function pointerUp(){
+    dragging = false;
+  }
+  function getPoint(e){
+    if(e.touches && e.touches.length){
+      return {x:e.touches[0].clientX, y:e.touches[0].clientY};
+    }
+    return {x:e.clientX, y:e.clientY};
+  }
+
+  canvas.addEventListener("mousedown", pointerDown);
+  window.addEventListener("mousemove", pointerMove);
+  window.addEventListener("mouseup", pointerUp);
+
+  canvas.addEventListener("touchstart", (e)=>{
+    if(e.touches.length===2){
+      pinchDist = distTouches(e.touches[0], e.touches[1]);
+    }else{
+      pointerDown(e);
+    }
+  }, {passive:true});
+
+  canvas.addEventListener("touchmove", (e)=>{
+    if(e.touches.length===2){
+      const d = distTouches(e.touches[0], e.touches[1]);
+      const dd = d - pinchDist;
+      pinchDist = d;
+      camDist = clamp(camDist - dd*0.02, 10, 40);
+    }else{
+      pointerMove(e);
+    }
+  }, {passive:true});
+
+  canvas.addEventListener("touchend", pointerUp, {passive:true});
+
+  function distTouches(a,b){
+    const dx=a.clientX-b.clientX, dy=a.clientY-b.clientY;
+    return Math.sqrt(dx*dx+dy*dy);
+  }
+
+  // Double tap to fire
+  let lastTap = 0;
+  canvas.addEventListener("touchend", ()=>{
+    const now = performance.now();
+    if(now - lastTap < 260){
+      fire();
+      lastTap = 0;
+    }else{
+      lastTap = now;
+    }
+  }, {passive:true});
+
+  // ------------------------------------------------------------
+  // Projection & rendering
+  // ------------------------------------------------------------
+  function project(x,y,z, cam){
+    // World -> camera space
+    const cx = x - cam.x, cy = y - cam.y, cz = z - cam.z;
+
+    // Rotate around yaw then pitch (camera orientation)
+    const sy = Math.sin(-cam.yaw), cyaw = Math.cos(-cam.yaw);
+    let x1 = cx * cyaw - cz * sy;
+    let z1 = cx * sy + cz * cyaw;
+
+    const sp = Math.sin(-cam.pitch), cp = Math.cos(-cam.pitch);
+    let y2 = cy * cp - z1 * sp;
+    let z2 = cy * sp + z1 * cp;
+
+    // Perspective
+    const f = cam.fov;
+    const s = f / (f + z2);
+    const px = x1 * s;
+    const py = y2 * s;
+
+    return {x:px, y:py, z:z2, s};
+  }
+
+  function getCamera(){
+    if(camMode === "chase" && balls.length){
+      const b = balls[balls.length-1];
+      // behind ball
+      const tx = b.x - b.vx*3;
+      const ty = b.y + 2.5;
+      const tz = b.z - b.vz*3 - 6;
+
+      const yaw = Math.atan2((b.x - tx), (b.z - tz));
+      return {x:tx, y:ty, z:tz, yaw:yaw, pitch:0.12, fov:18};
+    }
+
+    // orbit around wall center
+    const target = {x:0, y:3.2, z:0};
+    const x = target.x + Math.sin(camYaw) * camDist;
+    const z = target.z - Math.cos(camYaw) * camDist;
+    const y = target.y + camPitch * camDist * 0.6;
+
+    return {x,y,z, yaw:camYaw, pitch:camPitch, fov:18};
+  }
+
+  function draw(){
+    const w = canvas.width / (Math.min(2, window.devicePixelRatio||1));
+    const h = canvas.height/ (Math.min(2, window.devicePixelRatio||1));
+
+    ctx.clearRect(0,0,w,h);
+
+    // Soft star-ish dust
+    ctx.fillStyle = "rgba(140,180,255,0.04)";
+    for(let i=0;i<18;i++){
+      const rx = (i*97)%w;
+      const ry = (i*173)%h;
+      ctx.fillRect(rx,ry,1.5,1.5);
+    }
+
+    const cam = getCamera();
+
+    // Center transform
+    ctx.save();
+    ctx.translate(w/2, h*0.56);
+
+    // Ground grid (fake)
+    drawGrid(cam);
+
+    // Collect renderables with depth for painter's sort
+    const items = [];
+
+    // Blocks as cubes
+    for(const bl of blocks){
+      if(!bl.alive) continue;
+      items.push({type:"block", ref:bl});
+    }
+
+    // Balls
+    for(const b of balls){
+      if(!b.alive) continue;
+      items.push({type:"ball", ref:b});
+    }
+
+    // Debris
+    for(const d of debris){
+      items.push({type:"debris", ref:d});
+    }
+
+    // Sparks
+    for(const s of sparks){
+      items.push({type:"spark", ref:s});
+    }
+
+    // Sort by projected z (far to near)
+    items.sort((A,B)=>{
+      const az = getDepth(A, cam);
+      const bz = getDepth(B, cam);
+      return az - bz;
+    });
+
+    for(const it of items){
+      if(it.type==="block") drawBlock(it.ref, cam);
+      else if(it.type==="ball") drawBall(it.ref, cam);
+      else if(it.type==="debris") drawDebris(it.ref, cam);
+      else drawSpark(it.ref, cam);
+    }
+
+    // Cannon overlay
+    drawCannon(cam);
+
+    ctx.restore();
+
+    // Title whisper
+    ctx.save();
+    ctx.globalAlpha = 0.9;
+    ctx.fillStyle = "rgba(200,230,255,0.08)";
+    ctx.fillRect(10, h-34, 140, 22);
+    ctx.fillStyle = "rgba(200,240,255,0.7)";
+    ctx.font = "11px system-ui";
+    ctx.fillText("Drag to orbit • Double tap FIRE", 16, h-19);
+    ctx.restore();
+  }
+
+  function getDepth(item, cam){
+    const r = item.ref;
+    const p = project(r.x||0, r.y||0, r.z||0, cam);
+    return p.z;
+  }
+
+  function drawGrid(cam){
+    const size = 18;
+    const step = 1.5;
+    ctx.lineWidth = 1;
+
+    for(let i=-size;i<=size;i++){
+      const a1 = project(i*step, 0, -size*step, cam);
+      const a2 = project(i*step, 0,  size*step, cam);
+      const b1 = project(-size*step, 0, i*step, cam);
+      const b2 = project( size*step, 0, i*step, cam);
+
+      ctx.strokeStyle = "rgba(124,243,255,0.05)";
+      ctx.beginPath(); ctx.moveTo(a1.x*22, a1.y*22); ctx.lineTo(a2.x*22, a2.y*22); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(b1.x*22, b1.y*22); ctx.lineTo(b2.x*22, b2.y*22); ctx.stroke();
+    }
+  }
+
+  function drawBlock(bl, cam){
+    const s = bl.s;
+    const wob = Math.sin(bl.wobble)*0.02;
+    // cube corners (simple 3D box)
+    const half = s/2;
+
+    // We'll draw 3 faces using projected quads
+    const x=bl.x, y=bl.y, z=bl.z + wob;
+
+    const P = (dx,dy,dz)=>project(x+dx, y+dy, z+dz, cam);
+
+    const p000 = P(-half, -half, -half);
+    const p100 = P( half, -half, -half);
+    const p010 = P(-half,  half, -half);
+    const p110 = P( half,  half, -half);
+    const p001 = P(-half, -half,  half);
+    const p101 = P( half, -half,  half);
+    const p011 = P(-half,  half,  half);
+    const p111 = P( half,  half,  half);
+
+    // scale to screen-ish
+    const S = 22;
+
+    // Face colors (neon stone)
+    const baseA = "rgba(120,160,255,0.10)";
+    const baseB = "rgba(140,255,220,0.10)";
+    const outline = "rgba(160,210,255,0.10)";
+
+    // Determine simple face visibility by z ordering (approx)
+    // We'll draw "front" (+z), "top" (+y), "right" (+x)
+    // This is not perfect, but looks good.
+    // Front face: p001 p101 p111 p011
+    ctx.fillStyle = baseA;
+    quad(p001,p101,p111,p011,S,true);
+
+    // Top face: p011 p111 p110 p010
+    ctx.fillStyle = baseB;
+    quad(p011,p111,p110,p010,S,true);
+
+    // Right face: p101 p100 p110 p111
+    ctx.fillStyle = "rgba(124,243,255,0.08)";
+    quad(p101,p100,p110,p111,S,true);
+
+    // Outline
+    ctx.strokeStyle = outline;
+    ctx.lineWidth = 1;
+    wire(p000,p100,p110,p010,p001,p101,p111,p011,S);
+  }
+
+  function quad(a,b,c,d,S, fill){
+    ctx.beginPath();
+    ctx.moveTo(a.x*S, a.y*S);
+    ctx.lineTo(b.x*S, b.y*S);
+    ctx.lineTo(c.x*S, c.y*S);
+    ctx.lineTo(d.x*S, d.y*S);
+    ctx.closePath();
+    if(fill) ctx.fill();
+  }
+
+  function wire(p000,p100,p110,p010,p001,p101,p111,p011,S){
+    const line = (u,v)=>{
+      ctx.beginPath(); ctx.moveTo(u.x*S,u.y*S); ctx.lineTo(v.x*S,v.y*S); ctx.stroke();
+    };
+    line(p000,p100); line(p100,p110); line(p110,p010); line(p010,p000);
+    line(p001,p101); line(p101,p111); line(p111,p011); line(p011,p001);
+    line(p000,p001); line(p100,p101); line(p110,p111); line(p010,p011);
+  }
+
+  function drawBall(b, cam){
+    const p = project(b.x,b.y,b.z, cam);
+    const S = 22;
+
+    const r = b.r * p.s * S * 1.15;
+
+    // glow
+    const g = ctx.createRadialGradient(p.x*S, p.y*S, 0, p.x*S, p.y*S, r*2.2);
+    g.addColorStop(0, "rgba(156,255,220,0.22)");
+    g.addColorStop(1, "rgba(156,255,220,0)");
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(p.x*S, p.y*S, r*2.2, 0, TAU); ctx.fill();
+
+    // core
+    ctx.fillStyle = "rgba(220,255,250,0.85)";
+    ctx.beginPath(); ctx.arc(p.x*S, p.y*S, r, 0, TAU); ctx.fill();
+
+    ctx.strokeStyle = "rgba(124,243,255,0.35)";
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(p.x*S, p.y*S, r, 0, TAU); ctx.stroke();
+  }
+
+  function drawDebris(d, cam){
+    const p = project(d.x,d.y,d.z, cam);
+    const S = 22;
+    const r = d.size * p.s * S;
+
+    ctx.fillStyle = "rgba(160,200,255,0.25)";
+    ctx.fillRect(p.x*S - r/2, p.y*S - r/2, r, r);
+  }
+
+  function drawSpark(s, cam){
+    const p = project(s.x,s.y,s.z, cam);
+    const S = 22;
+    const r = 0.08 * p.s * S;
+
+    ctx.fillStyle = "rgba(255,180,220,0.55)";
+    ctx.beginPath(); ctx.arc(p.x*S, p.y*S, r, 0, TAU); ctx.fill();
+  }
+
+  function drawCannon(cam){
+    // Simple cannon barrel line in 3D
+    const power = parseFloat(elPower.value);
+    const elev = parseFloat(elElev.value) * Math.PI/180;
+    const yaw  = parseFloat(elYaw.value) * Math.PI/180;
+
+    const dx = Math.sin(yaw) * Math.cos(elev);
+    const dy = Math.sin(elev);
+    const dz = Math.cos(yaw) * Math.cos(elev);
+
+    const x0 = cannon.pos.x, y0 = cannon.pos.y, z0 = cannon.pos.z;
+    const x1 = x0 + dx * cannon.barrelLen;
+    const y1 = y0 + dy * cannon.barrelLen;
+    const z1 = z0 + dz * cannon.barrelLen;
+
+    const p0 = project(x0,y0,z0, cam);
+    const p1 = project(x1,y1,z1, cam);
+    const S = 22;
+
+    // Base glow
+    ctx.strokeStyle = "rgba(124,243,255,0.18)";
+    ctx.lineWidth = 7;
+    ctx.beginPath(); ctx.moveTo(p0.x*S, p0.y*S); ctx.lineTo(p1.x*S, p1.y*S); ctx.stroke();
+
+    // Barrel core
+    ctx.strokeStyle = "rgba(210,240,255,0.75)";
+    ctx.lineWidth = 2.2;
+    ctx.beginPath(); ctx.moveTo(p0.x*S, p0.y*S); ctx.lineTo(p1.x*S, p1.y*S); ctx.stroke();
+
+    // Cannon base marker
+    ctx.fillStyle = "rgba(124,243,255,0.10)";
+    ctx.beginPath(); ctx.arc(p0.x*S, p0.y*S, 6, 0, TAU); ctx.fill();
+
+    // Little power hint text
+    ctx.fillStyle = "rgba(200,240,255,0.55)";
+    ctx.font = "10px system-ui";
+    ctx.fillText("P"+Math.round(power), p0.x*S+8, p0.y*S-6);
+  }
+
+  // ------------------------------------------------------------
+  // Physics + collisions
+  // ------------------------------------------------------------
+  function step(dt){
+    const timeScale = slowMo ? 0.35 : 1.0;
+    dt *= timeScale;
+
+    // Animate block wobble
+    for(const bl of blocks){
+      bl.wobble += dt * 1.2;
+    }
+
+    // Balls
+    for(const b of balls){
+      if(!b.alive) continue;
+      b.age += dt;
+
+      // Integrate
+      b.vy -= G * dt * 0.12; // tuned gravity
+      b.x += b.vx * dt;
+      b.y += b.vy * dt;
+      b.z += b.vz * dt;
+
+      // Floor
+      if(b.y < 0.1){
+        b.y = 0.1;
+        b.vy *= -0.35;
+        b.vx *= 0.92;
+        b.vz *= 0.92;
+        if(Math.abs(b.vy) < 0.08) b.vy = 0;
+      }
+
+      // Cull old balls
+      if(b.age > 12 || Math.abs(b.x) > 40 || b.z > 30 || b.z < -40){
+        b.alive = false;
+      }
+
+      // Collide with blocks
+      for(const bl of blocks){
+        if(!bl.alive) continue;
+
+        // AABB-ish sphere hit
+        const half = bl.s/2;
+        const dx = b.x - bl.x;
+        const dy = b.y - bl.y;
+        const dz = b.z - bl.z;
+
+        const nx = clamp(dx, -half, half);
+        const ny = clamp(dy, -half, half);
+        const nz = clamp(dz, -half, half);
+
+        const cx = bl.x + nx;
+        const cy = bl.y + ny;
+        const cz = bl.z + nz;
+
+        const sx = b.x - cx, sy = b.y - cy, sz = b.z - cz;
+        const dist2 = sx*sx + sy*sy + sz*sz;
+
+        if(dist2 <= b.r*b.r){
+          // Impact energy estimate
+          const speed = Math.sqrt(b.vx*b.vx + b.vy*b.vy + b.vz*b.vz);
+          const frag = parseFloat(elFrag.value);
+
+          // Damage threshold
+          const dmg = speed * b.r * 0.7 / frag;
+
+          bl.hp -= dmg;
+
+          // Bounce a little
+          b.vx *= 0.75;
+          b.vy *= 0.75;
+          b.vz *= -0.55;
+
+          // Hit spark
+          for(let i=0;i<10;i++){
+            sparks.push({
+              x:b.x,y:b.y,z:b.z,
+              vx:(Math.random()-0.5)*1.2,
+              vy:(Math.random())*1.3,
+              vz:(Math.random()-0.5)*1.2,
+              life: 0.35 + Math.random()*0.25
+            });
+          }
+
+          if(bl.hp <= 0){
+            bl.alive = false;
+            hits++;
+            statHits.textContent = "hits: " + hits;
+
+            // Debris burst
+            const chunks = 10 + Math.floor(Math.random()*8);
+            for(let i=0;i<chunks;i++){
+              debris.push({
+                x:bl.x + (Math.random()-0.5)*0.25,
+                y:bl.y + (Math.random()-0.5)*0.25,
+                z:bl.z + (Math.random()-0.5)*0.25,
+                vx:(Math.random()-0.5)*2.2,
+                vy:Math.random()*2.3,
+                vz:(Math.random()-0.5)*2.2,
+                life: 1.8 + Math.random()*1.2,
+                size: bl.s * (0.12 + Math.random()*0.12)
+              });
+            }
+          }
+        }
+      }
+    }
+
+    // Sparks
+    for(const s of sparks){
+      s.life -= dt;
+      s.x += s.vx * dt;
+      s.y += s.vy * dt;
+      s.z += s.vz * dt;
+      s.vy -= G * dt * 0.06;
+    }
+    sparks = sparks.filter(s=>s.life > 0);
+
+    // Debris
+    for(const d of debris){
+      d.life -= dt;
+      d.x += d.vx * dt;
+      d.y += d.vy * dt;
+      d.z += d.vz * dt;
+      d.vy -= G * dt * 0.10;
+
+      if(d.y < 0.05){
+        d.y = 0.05;
+        d.vy *= -0.25;
+        d.vx *= 0.85;
+        d.vz *= 0.85;
+      }
+    }
+    debris = debris.filter(d=>d.life > 0);
+
+    // Update blocks count display (live)
+    const aliveCount = blocks.reduce((a,b)=>a+(b.alive?1:0),0);
+    statBlocks.textContent = "blocks: " + aliveCount;
+  }
+
+  // ------------------------------------------------------------
+  // Loop
+  // ------------------------------------------------------------
+  let lastT = performance.now();
+  function loop(t){
+    const dt = Math.min(0.033, (t-lastT)/1000);
+    lastT = t;
+
+    step(dt);
+    draw();
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+})();
+</script>
+</body>
+</html>

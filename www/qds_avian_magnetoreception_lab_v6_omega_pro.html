@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>QDS Avian Magnetoreception Lab v6 ΩMEGA PRO</title>
+<style>
+  :root{
+    --bg:#05060a; --panel:#0b1124; --ink:#e8ecff; --mut:#aab4de;
+    --hot:#7cf7ff; --lime:#77ff9a; --warn:#ffd36d; --bad:#ff6b88; --good:#88ffb8;
+    --line:#203055; --shadow: 0 10px 30px rgba(0,0,0,.55); --r:18px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 700px at 20% 0%, #101a3a 0%, var(--bg) 55%);
+       color:var(--ink); font:14px/1.35 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;}
+  header{padding:18px 14px 10px; max-width:1160px; margin:0 auto;}
+  h1{margin:0; font-size:18px; letter-spacing:.3px}
+  .sub{color:var(--mut); margin-top:6px}
+  .wrap{max-width:1160px; margin:0 auto; padding:0 14px 26px;}
+  .grid{display:grid; grid-template-columns: 372px 1fr; gap:14px;}
+  @media (max-width: 980px){ .grid{grid-template-columns: 1fr;} }
+
+  .card{background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+        border:1px solid rgba(160,190,255,.18); border-radius:var(--r); box-shadow:var(--shadow); overflow:hidden;}
+  .hd{padding:12px 14px; border-bottom:1px solid rgba(160,190,255,.14); display:flex; gap:10px; align-items:center; justify-content:space-between;}
+  .hd b{font-size:13px; letter-spacing:.3px}
+  .bd{padding:12px 14px;}
+  label{display:block; color:var(--mut); margin:10px 0 6px; font-size:12px}
+  select,input[type=range]{width:100%}
+  .row{display:grid; grid-template-columns: 1fr 92px; gap:10px; align-items:center;}
+  .val{font-variant-numeric: tabular-nums; text-align:right; color:var(--hot); font-family: ui-monospace, Menlo, Consolas, monospace;}
+  .mono{font-family: ui-monospace, Menlo, Consolas, monospace;}
+  .pill{display:inline-flex; gap:8px; align-items:center; padding:7px 10px; border-radius:999px; border:1px solid rgba(160,190,255,.18);
+        background:rgba(0,0,0,.22); color:var(--mut); font-size:12px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--line)}
+  .dot.good{background:var(--good)} .dot.warn{background:var(--warn)} .dot.bad{background:var(--bad)}
+
+  .kpi{display:grid; grid-template-columns: repeat(4, 1fr); gap:10px;}
+  @media (max-width: 980px){ .kpi{grid-template-columns: repeat(2, 1fr);} }
+  .k{padding:10px 12px; border-radius:14px; border:1px solid rgba(160,190,255,.14); background:rgba(0,0,0,.22)}
+  .k .t{color:var(--mut); font-size:12px}
+  .k .n{font-size:18px; margin-top:4px; font-variant-numeric: tabular-nums}
+  .k .n.good{color:var(--good)} .k .n.warn{color:var(--warn)} .k .n.bad{color:var(--bad)}
+
+  .bar{height:10px; border-radius:999px; background:rgba(255,255,255,.08); overflow:hidden; border:1px solid rgba(160,190,255,.14)}
+  .bar > i{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--hot), var(--lime));}
+
+  .btns{display:flex; flex-wrap:wrap; gap:10px; margin-top:12px}
+  button{border:1px solid rgba(160,190,255,.18); background:rgba(0,0,0,.25); color:var(--ink);
+         padding:10px 12px; border-radius:14px; cursor:pointer}
+  button:hover{border-color:rgba(160,190,255,.35)}
+  .small{font-size:12px; color:var(--mut)}
+  .lim{margin-top:10px; padding:10px 12px; border-radius:14px; border:1px solid rgba(160,190,255,.14); background:rgba(0,0,0,.22)}
+  .lim b{color:var(--ink)}
+  .lim ul{margin:8px 0 0; padding-left:18px; color:var(--mut)}
+  .badge{padding:3px 8px; border-radius:999px; border:1px solid rgba(160,190,255,.18); color:var(--mut); font-size:12px}
+
+  .tabs{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px}
+  .tab{padding:8px 10px; border-radius:14px; border:1px solid rgba(160,190,255,.18); background:rgba(0,0,0,.20); color:var(--mut); cursor:pointer}
+  .tab.on{color:var(--ink); border-color:rgba(160,190,255,.35); background:rgba(0,0,0,.30)}
+  .pane{display:none; margin-top:12px}
+  .pane.on{display:block}
+  canvas{width:100%; height:170px; background:rgba(0,0,0,.22); border:1px solid rgba(160,190,255,.14); border-radius:14px}
+
+  .two{display:grid; grid-template-columns: 1fr 1fr; gap:10px}
+  @media (max-width: 980px){ .two{grid-template-columns: 1fr;} }
+
+  textarea{width:100%; min-height:70px; resize:vertical; border-radius:14px; border:1px solid rgba(160,190,255,.18);
+           background:rgba(0,0,0,.20); color:var(--ink); padding:10px; outline:none;}
+  input[type="text"], input[type="number"]{
+    width:100%; border-radius:14px; border:1px solid rgba(160,190,255,.18);
+    background:rgba(0,0,0,.20); color:var(--ink); padding:10px; outline:none;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>🦅 QDS Avian Magnetoreception Lab v6 ΩMEGA PRO</h1>
+  <div class="sub">Confound-aware compass + Factor Breakdown + A/B Compare + Labbook + Sensitivity + Ω Batch Sweep + MC+.</div>
+</header>
+
+<div class="wrap">
+  <div class="grid">
+
+    <!-- LEFT: Controls -->
+    <div class="card">
+      <div class="hd">
+        <b>Forge Controls</b>
+        <span class="badge mono" id="stamp">—</span>
+      </div>
+      <div class="bd">
+
+        <label>Species Mode</label>
+        <select id="species"></select>
+
+        <label>Environment Preset</label>
+        <select id="preset">
+          <option value="quiet">🌲 Quiet Forest</option>
+          <option value="urban">🏙️ Urban EM Noise</option>
+          <option value="storm">⛈️ Magnetic Storm</option>
+          <option value="flare">⚡ Solar Flare / Disturbed</option>
+          <option value="lab">🧪 Perfect Quantum Lab</option>
+          <option value="rfjam">📻 RF Jammer (MHz band)</option>
+        </select>
+
+        <div class="lim">
+          <b>QDS Kernel</b>
+          <div class="row"><label>τc — Coherence Time (µs)</label><div class="val" id="v_tau">—</div><input id="tau" type="range" min="5" max="6000" value="260" step="1"/></div>
+          <div class="row"><label>λc — Spatial Coherence (nm)</label><div class="val" id="v_lam">—</div><input id="lam" type="range" min="0.2" max="3.5" value="1.55" step="0.01"/></div>
+          <div class="row"><label>σ² — Kernel Variance</label><div class="val" id="v_sig">—</div><input id="sig" type="range" min="0.05" max="1.2" value="0.32" step="0.01"/></div>
+          <div class="row"><label>EM Noise Level (broad)</label><div class="val" id="v_em">—</div><input id="em" type="range" min="0" max="1" value="0.55" step="0.01"/></div>
+        </div>
+
+        <div class="lim">
+          <b>Fairness / Confounds</b>
+          <div class="row"><label>Light Wavelength (nm)</label><div class="val" id="v_wl">—</div><input id="wl" type="range" min="360" max="680" value="500" step="1"/></div>
+          <div class="row"><label>Light Intensity (0..1)</label><div class="val" id="v_int">—</div><input id="lint" type="range" min="0" max="1" value="0.55" step="0.01"/></div>
+          <div class="row"><label>RF Disruption (MHz-band, 0..1)</label><div class="val" id="v_rf">—</div><input id="rf" type="range" min="0" max="1" value="0.18" step="0.01"/></div>
+          <div class="row"><label>Calibration (0..1)</label><div class="val" id="v_cal">—</div><input id="cal" type="range" min="0" max="1" value="0.82" step="0.01"/></div>
+          <div class="row"><label>Map Channel Health (0..1)</label><div class="val" id="v_map">—</div><input id="map" type="range" min="0" max="1" value="0.70" step="0.01"/></div>
+          <div class="row"><label>Motivation (0..1)</label><div class="val" id="v_mot">—</div><input id="mot" type="range" min="0" max="1" value="0.78" step="0.01"/></div>
+          <div class="row"><label>Stress (0..1)</label><div class="val" id="v_sts">—</div><input id="sts" type="range" min="0" max="1" value="0.12" step="0.01"/></div>
+          <div class="row"><label>Experience (0..1)</label><div class="val" id="v_exp">—</div><input id="exp" type="range" min="0" max="1" value="0.10" step="0.01"/></div>
+        </div>
+
+        <div class="lim">
+          <b>Geomagnetic Context</b>
+          <div class="row"><label>Field Strength B (µT)</label><div class="val" id="v_B">—</div><input id="B" type="range" min="20" max="70" value="50" step="1"/></div>
+          <div class="row"><label>Inclination (deg)</label><div class="val" id="v_inc">—</div><input id="inc" type="range" min="0" max="85" value="60" step="1"/></div>
+          <div class="row"><label>Anomaly / Disturbance (0..1)</label><div class="val" id="v_anom">—</div><input id="anom" type="range" min="0" max="1" value="0.12" step="0.01"/></div>
+        </div>
+
+        <div class="btns">
+          <button id="run">🧪 Recompute</button>
+          <button id="mc">🎲 MC+ Run</button>
+          <button id="saveA">🅰️ Save A</button>
+          <button id="saveB">🅱️ Save B</button>
+          <button id="logRun">📓 Log Run</button>
+        </div>
+
+        <div class="small" style="margin-top:10px">
+          Ω rule: <span class="mono">Nav = Compass × Light × RF × Cal × Map × Behaviour × Geom</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Output -->
+    <div class="card">
+      <div class="hd">
+        <b>ΩMEGA Output</b>
+        <span class="pill"><span class="dot" id="dot"></span><span id="status">—</span></span>
+      </div>
+      <div class="bd">
+
+        <div class="kpi">
+          <div class="k"><div class="t">K_raw</div><div class="n mono" id="kraw">—</div><div class="small">internal score</div></div>
+          <div class="k"><div class="t">Compass</div><div class="n mono" id="conf">—</div><div class="bar"><i id="bar_conf"></i></div></div>
+          <div class="k"><div class="t">Nav Reliability</div><div class="n mono" id="nav">—</div><div class="bar"><i id="bar_nav"></i></div></div>
+          <div class="k"><div class="t">False-Neg Risk</div><div class="n mono" id="fnr">—</div><div class="small">high if compass high but nav low</div></div>
+        </div>
+
+        <div class="tabs">
+          <div class="tab on" data-tab="overview">Overview</div>
+          <div class="tab" data-tab="compare">A/B Compare</div>
+          <div class="tab" data-tab="sens">Sensitivity</div>
+          <div class="tab" data-tab="mcplus">MC+</div>
+          <div class="tab" data-tab="labbook">Labbook</div>
+          <div class="tab" data-tab="omega">Ω Sweep</div>
+        </div>
+
+        <!-- Overview -->
+        <div class="pane on" id="pane_overview">
+          <div class="two">
+            <div class="lim">
+              <b>Factor Breakdown (multipliers)</b>
+              <ul id="factors"><li>—</li></ul>
+            </div>
+            <div class="lim">
+              <b>Limiter Readout (worst 3)</b>
+              <ul id="limiters"><li>—</li></ul>
+            </div>
+          </div>
+          <div class="lim" style="margin-top:12px">
+            <b class="mono">Paper-Trail (current)</b>
+            <pre class="mono" id="trail" style="white-space:pre-wrap;margin:10px 0 0;color:var(--mut)"></pre>
+          </div>
+        </div>
+
+        <!-- Compare -->
+        <div class="pane" id="pane_compare">
+          <div class="two">
+            <div class="lim">
+              <b>A Snapshot</b>
+              <pre class="mono" id="Abox" style="white-space:pre-wrap;margin:10px 0 0;color:var(--mut)">Empty</pre>
+              <div class="btns">
+                <button id="applyA">⬅ Apply A</button>
+                <button id="exportA">📦 Export A</button>
+              </div>
+            </div>
+            <div class="lim">
+              <b>B Snapshot</b>
+              <pre class="mono" id="Bbox" style="white-space:pre-wrap;margin:10px 0 0;color:var(--mut)">Empty</pre>
+              <div class="btns">
+                <button id="applyB">⬅ Apply B</button>
+                <button id="exportB">📦 Export B</button>
+              </div>
+            </div>
+          </div>
+          <div class="lim" style="margin-top:12px">
+            <b>Δ Delta (B − A)</b>
+            <pre class="mono" id="Delta" style="white-space:pre-wrap;margin:10px 0 0;color:var(--mut)">Save A and B…</pre>
+          </div>
+        </div>
+
+        <!-- Sensitivity -->
+        <div class="pane" id="pane_sens">
+          <div class="lim">
+            <b>Sensitivity / Leverage</b>
+            <div class="small">Ranks “which knob moves nav most” from current baseline. Uses ± step probes (phone-safe).</div>
+            <div class="btns">
+              <button id="runSens">🧠 Run Sensitivity</button>
+            </div>
+            <pre class="mono" id="sensOut" style="white-space:pre-wrap;margin:10px 0 0;color:var(--mut)">Tap “Run Sensitivity”…</pre>
+          </div>
+        </div>
+
+        <!-- MC+ -->
+        <div class="pane" id="pane_mcplus">
+          <div class="two">
+            <div class="lim">
+              <b>MC+ Controls</b>
+              <div class="row"><label>Samples N</label><div class="val" id="v_mcn">—</div><input id="mcn" type="range" min="50" max="1000" value="200" step="10"/></div>
+              <label>Seed (optional)</label>
+              <input id="seed" type="text" placeholder="e.g. 440 or leave blank"/>
+              <div class="row"><label>Jitter Strength (0..1)</label><div class="val" id="v_jit">—</div><input id="jit" type="range" min="0" max="1" value="0.65" step="0.01"/></div>
+              <div class="btns">
+                <button id="mcRun">🎲 Run MC+</button>
+                <button id="mcExport">📦 Export MC JSON</button>
+              </div>
+              <div class="small mono" id="mcstats">Run MC+…</div>
+            </div>
+            <div class="lim">
+              <b>MC Histogram (Nav)</b>
+              <canvas id="plot" width="900" height="260"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Labbook -->
+        <div class="pane" id="pane_labbook">
+          <div class="two">
+            <div class="lim">
+              <b>Log a run (with note)</b>
+              <textarea id="note" placeholder="e.g. Urban test — K high but nav low; RF+behaviour crushed it."></textarea>
+              <div class="btns">
+                <button id="logNow">📓 Save to Labbook</button>
+                <button id="exportBook">📦 Export Labbook</button>
+              </div>
+              <div class="small">Stored locally in your browser (localStorage). Safe for phone workflow.</div>
+            </div>
+            <div class="lim">
+              <b>Import Labbook</b>
+              <input id="importFile" type="file" accept="application/json"/>
+              <div class="btns">
+                <button id="doImport">⬆ Import JSON</button>
+                <button id="clearBook">🧨 Clear Labbook</button>
+              </div>
+              <div class="small">Import merges entries (dedup by stamp+species+preset).</div>
+            </div>
+          </div>
+          <div class="lim" style="margin-top:12px">
+            <b>Entries</b>
+            <pre class="mono" id="bookOut" style="white-space:pre-wrap;margin:10px 0 0;color:var(--mut)">No entries yet.</pre>
+          </div>
+        </div>
+
+        <!-- Ω Sweep -->
+        <div class="pane" id="pane_omega">
+          <div class="lim">
+            <b>Ω Sweep (rank presets)</b>
+            <div class="small">Runs current species across presets and ranks nav. Good for quick “why fail?” demos.</div>
+            <div class="btns">
+              <button id="sweep">Ω Run Sweep</button>
+              <button id="sweepExport">📦 Export Sweep</button>
+            </div>
+            <pre class="mono" id="sweepOut" style="white-space:pre-wrap;margin:10px 0 0;color:var(--mut)">Run Ω Sweep…</pre>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ---------- utils ---------- */
+const $ = id => document.getElementById(id);
+const clamp = (x,a,b)=>Math.max(a,Math.min(b,x));
+const fmt = (x,n=2)=>Number(x).toFixed(n);
+const pct = x => Math.round(100*x)+"%";
+const nowStamp = ()=>new Date().toISOString().replace('T',' ').replace('Z',' UTC');
+
+function dl(name, text, mime="application/json"){
+  const blob = new Blob([text], {type:mime});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 500);
+}
+
+/* ---------- PRNG for seeded MC ---------- */
+function xmur3(str){ let h=1779033703^str.length; for(let i=0;i<str.length;i++){ h=Math.imul(h^str.charCodeAt(i),3432918353); h=(h<<13)|(h>>>19); } return function(){ h=Math.imul(h^(h>>>16),2246822507); h=Math.imul(h^(h>>>13),3266489909); return (h^=h>>>16)>>>0; }; }
+function sfc32(a,b,c,d){ return function(){ a|=0;b|=0;c|=0;d|=0; let t=(a+b|0)+d|0; d=d+1|0; a=b^b>>>9; b=c+(c<<3)|0; c=(c<<21|c>>>11); c=c+t|0; return (t>>>0)/4294967296; }; }
+
+/* ---------- model ---------- */
+const SPECIES = [
+  {id:"robin", name:"European Robin", base:{tau:260, lam:1.55, sig:0.32, em:0.22, wl:500, lint:0.70, rf:0.10, cal:0.82, map:0.70, mot:0.78, sts:0.18, exp:0.55, B:50, inc:60, anom:0.10}},
+  {id:"pigeon", name:"Racing Pigeon", base:{tau:220, lam:1.45, sig:0.36, em:0.28, wl:510, lint:0.75, rf:0.12, cal:0.78, map:0.88, mot:0.72, sts:0.22, exp:0.70, B:50, inc:60, anom:0.10}},
+  {id:"albatross", name:"Wandering Albatross", base:{tau:300, lam:1.65, sig:0.30, em:0.18, wl:520, lint:0.80, rf:0.08, cal:0.86, map:0.92, mot:0.80, sts:0.12, exp:0.75, B:45, inc:55, anom:0.08}},
+  {id:"blackcap", name:"Blackcap Warbler", base:{tau:240, lam:1.50, sig:0.34, em:0.24, wl:490, lint:0.70, rf:0.11, cal:0.80, map:0.68, mot:0.82, sts:0.20, exp:0.50, B:50, inc:60, anom:0.10}},
+  {id:"tern", name:"Arctic Tern", base:{tau:320, lam:1.70, sig:0.28, em:0.20, wl:520, lint:0.85, rf:0.09, cal:0.88, map:0.90, mot:0.86, sts:0.14, exp:0.65, B:48, inc:58, anom:0.08}},
+];
+
+function applyPreset(name){
+  let em=+$("em").value, rf=+$("rf").value, an=+$("anom").value, lint=+$("lint").value;
+  if(name==="quiet"){ em=0.15; rf=0.06; an=0.05; lint=Math.max(lint,0.60); }
+  if(name==="urban"){ em=0.55; rf=0.18; an=0.12; lint=Math.max(lint,0.55); }
+  if(name==="storm"){ em=0.40; rf=0.15; an=0.65; lint=Math.max(lint,0.40); }
+  if(name==="flare"){ em=0.48; rf=0.22; an=0.80; lint=Math.max(lint,0.35); }
+  if(name==="lab"){ em=0.02; rf=0.00; an=0.00; lint=Math.max(lint,0.75); }
+  if(name==="rfjam"){ em=Math.max(em,0.22); rf=0.85; an=Math.max(an,0.10); lint=Math.max(lint,0.55); }
+  $("em").value=em; $("rf").value=rf; $("anom").value=an; $("lint").value=lint;
+}
+
+function lightMultiplier(wl, lint){
+  const mu=505, s=55;
+  const g = Math.exp(-0.5*Math.pow((wl-mu)/s,2));
+  const inten = 1 - Math.exp(-3.0*lint);
+  return clamp(g*inten, 0, 1);
+}
+function rfMultiplier(rf){ return clamp(Math.exp(-3.2*rf), 0, 1); }
+function calMultiplier(cal){ return clamp(0.15 + 0.85*cal, 0, 1); }
+function mapMultiplier(map){ return clamp(0.20 + 0.80*map, 0, 1); }
+function behaviourMultiplier(mot, sts, exp){
+  const drive = 0.35 + 0.65*mot;
+  const stress = Math.exp(-2.4*sts);
+  const learn = 0.55 + 0.45*exp;
+  return clamp(drive*stress*learn, 0, 1);
+}
+function geomFactor(B, inc, anom){
+  const Bref=50, sB=12, incRef=60, sI=18;
+  const gB = Math.exp(-0.5*Math.pow((B-Bref)/sB,2));
+  const gI = Math.exp(-0.5*Math.pow((inc-incRef)/sI,2));
+  const dist = Math.exp(-1.8*anom);
+  return clamp(gB*gI*dist, 0, 1);
+}
+
+function readState(){
+  return {
+    species:$("species").value,
+    preset:$("preset").value,
+    tau:+$("tau").value, lam:+$("lam").value, sig:+$("sig").value, em:+$("em").value,
+    wl:+$("wl").value, lint:+$("lint").value, rf:+$("rf").value, cal:+$("cal").value,
+    map:+$("map").value, mot:+$("mot").value, sts:+$("sts").value, exp:+$("exp").value,
+    B:+$("B").value, inc:+$("inc").value, anom:+$("anom").value
+  };
+}
+
+function compute(p){
+  const tauRef=250, lamRef=1.6;
+  const coh = Math.pow(p.tau/tauRef, 0.62) * Math.pow(p.lam/lamRef, 0.38);
+  const noise = Math.exp(-1.55*p.em) / (0.18 + p.sig);
+  const g = geomFactor(p.B, p.inc, p.anom);
+  let K_raw = 1.25 * coh * noise * (0.35 + 0.65*g);
+  K_raw = clamp(K_raw, 0, 6);
+  const compass = clamp(1 - Math.exp(-K_raw), 0, 1);
+
+  const L = lightMultiplier(p.wl, p.lint);
+  const R = rfMultiplier(p.rf);
+  const C = calMultiplier(p.cal);
+  const M = mapMultiplier(p.map);
+  const Bh = behaviourMultiplier(p.mot, p.sts, p.exp);
+  const G = clamp(0.35 + 0.65*g, 0, 1);
+
+  const nav = clamp(compass * L * R * C * M * Bh * G, 0, 1);
+  const fnr = clamp((compass) * (1 - nav) * (nav < 0.45 ? 1.15 : 0.75), 0, 1);
+
+  const factors = [
+    {k:"Light", v:L, hint:"Wavelength/intensity window."},
+    {k:"RF", v:R, hint:"MHz-band disruption survival."},
+    {k:"Calibration", v:C, hint:"Celestial↔magnetic coherence."},
+    {k:"Map", v:M, hint:"Map channel contribution."},
+    {k:"Behaviour", v:Bh, hint:"Drive×stress×experience."},
+    {k:"Geom", v:G, hint:"Field suitability + disturbance."},
+  ];
+  const limiters = [...factors].sort((a,b)=>a.v-b.v).slice(0,3);
+
+  const trail = {
+    stamp: nowStamp(),
+    species: p.species,
+    preset: p.preset,
+    inputs: p,
+    outputs: {
+      K_raw:+fmt(K_raw,6),
+      compass_confidence:+fmt(compass,6),
+      navigation_reliability:+fmt(nav,6),
+      false_negative_risk:+fmt(fnr,6)
+    },
+    factors: Object.fromEntries(factors.map(x=>[x.k.toLowerCase(), +fmt(x.v,6)]))
+  };
+
+  return {p, K_raw, compass, nav, fnr, factors, limiters, trail};
+}
+
+/* ---------- UI ---------- */
+function dotFor(nav){
+  if(nav>=0.75) return ["good","Stable Navigation — corridor likely coherent."];
+  if(nav>=0.45) return ["warn","Mixed Navigation — borderline / context-sensitive."];
+  return ["bad","Unstable Navigation — confounds dominate or signal weak."];
+}
+function render(res){
+  const {p, K_raw, compass, nav, fnr, factors, limiters, trail} = res;
+  $("stamp").textContent = trail.stamp;
+
+  $("v_tau").textContent = fmt(p.tau,0)+" µs";
+  $("v_lam").textContent = fmt(p.lam,2)+" nm";
+  $("v_sig").textContent = fmt(p.sig,2);
+  $("v_em").textContent  = fmt(p.em,2);
+  $("v_wl").textContent  = fmt(p.wl,0)+" nm";
+  $("v_int").textContent = fmt(p.lint,2);
+  $("v_rf").textContent  = fmt(p.rf,2);
+  $("v_cal").textContent = fmt(p.cal,2);
+  $("v_map").textContent = fmt(p.map,2);
+  $("v_mot").textContent = fmt(p.mot,2);
+  $("v_sts").textContent = fmt(p.sts,2);
+  $("v_exp").textContent = fmt(p.exp,2);
+  $("v_B").textContent   = fmt(p.B,0)+" µT";
+  $("v_inc").textContent = fmt(p.inc,0)+"°";
+  $("v_anom").textContent= fmt(p.anom,2);
+
+  $("kraw").textContent = fmt(K_raw,3);
+  $("conf").textContent = pct(compass);
+  $("nav").textContent  = pct(nav);
+  $("fnr").textContent  = pct(fnr);
+  $("bar_conf").style.width = (100*compass).toFixed(1)+"%";
+  $("bar_nav").style.width  = (100*nav).toFixed(1)+"%";
+
+  const [cls, msg] = dotFor(nav);
+  $("dot").className = "dot "+cls;
+  $("status").textContent = msg;
+
+  $("factors").innerHTML = factors
+    .map(f=>`<li><b>${f.k}</b> = ${pct(f.v)} <span class="small">— ${f.hint}</span></li>`).join("");
+
+  $("limiters").innerHTML = limiters
+    .map(w=>`<li><b>${w.k}</b> = ${pct(w.v)} — ${w.hint}</li>`).join("");
+
+  $("trail").textContent = JSON.stringify(trail, null, 2);
+
+  window.__LAST = res;
+}
+
+function setState(p){
+  $("species").value=p.species; $("preset").value=p.preset;
+  $("tau").value=p.tau; $("lam").value=p.lam; $("sig").value=p.sig; $("em").value=p.em;
+  $("wl").value=p.wl; $("lint").value=p.lint; $("rf").value=p.rf; $("cal").value=p.cal;
+  $("map").value=p.map; $("mot").value=p.mot; $("sts").value=p.sts; $("exp").value=p.exp;
+  $("B").value=p.B; $("inc").value=p.inc; $("anom").value=p.anom;
+}
+
+/* ---------- A/B compare ---------- */
+function brief(res){
+  if(!res) return "Empty";
+  const f = res.trail.factors;
+  return [
+    `stamp: ${res.trail.stamp}`,
+    `species: ${res.p.species}  preset: ${res.p.preset}`,
+    `K_raw: ${fmt(res.K_raw,3)}`,
+    `compass: ${pct(res.compass)}  nav: ${pct(res.nav)}  fnr: ${pct(res.fnr)}`,
+    `factors: L=${pct(f.light)} RF=${pct(f.rf)} Cal=${pct(f.calibration)} Map=${pct(f.map)} Beh=${pct(f.behaviour)} Geom=${pct(f.geom)}`
+  ].join("\n");
+}
+function delta(A,B){
+  if(!A||!B) return "Save A and B…";
+  const d = (x,y)=> (y-x);
+  const fa=A.trail.factors, fb=B.trail.factors;
+  const lines = [
+    `nav: ${pct(A.nav)} → ${pct(B.nav)}   (Δ ${pct(d(A.nav,B.nav))})`,
+    `compass: ${pct(A.compass)} → ${pct(B.compass)} (Δ ${pct(d(A.compass,B.compass))})`,
+    `K_raw: ${fmt(A.K_raw,3)} → ${fmt(B.K_raw,3)} (Δ ${fmt(d(A.K_raw,B.K_raw),3)})`,
+    "",
+    `Light: ${pct(fa.light)} → ${pct(fb.light)} (Δ ${pct(d(fa.light,fb.light))})`,
+    `RF: ${pct(fa.rf)} → ${pct(fb.rf)} (Δ ${pct(d(fa.rf,fb.rf))})`,
+    `Cal: ${pct(fa.calibration)} → ${pct(fb.calibration)} (Δ ${pct(d(fa.calibration,fb.calibration))})`,
+    `Map: ${pct(fa.map)} → ${pct(fb.map)} (Δ ${pct(d(fa.map,fb.map))})`,
+    `Beh: ${pct(fa.behaviour)} → ${pct(fb.behaviour)} (Δ ${pct(d(fa.behaviour,fb.behaviour))})`,
+    `Geom: ${pct(fa.geom)} → ${pct(fb.geom)} (Δ ${pct(d(fa.geom,fb.geom))})`,
+  ];
+  return lines.join("\n");
+}
+
+/* ---------- Sensitivity ---------- */
+function runSensitivity(){
+  const base = window.__LAST;
+  if(!base) return;
+  const p0 = JSON.parse(JSON.stringify(base.p));
+  const probes = [
+    {k:"rf", step:0.06, min:0, max:1},
+    {k:"em", step:0.10, min:0, max:1},
+    {k:"lint", step:0.12, min:0, max:1},
+    {k:"cal", step:0.12, min:0, max:1},
+    {k:"map", step:0.12, min:0, max:1},
+    {k:"sts", step:0.10, min:0, max:1},
+    {k:"exp", step:0.20, min:0, max:1},
+    {k:"mot", step:0.15, min:0, max:1},
+    {k:"anom", step:0.12, min:0, max:1},
+    {k:"wl", step:25, min:360, max:680},
+    {k:"tau", step:80, min:5, max:6000},
+    {k:"sig", step:0.06, min:0.05, max:1.2},
+    {k:"lam", step:0.20, min:0.2, max:3.5},
+  ];
+
+  const out = [];
+  for(const pr of probes){
+    const pA = JSON.parse(JSON.stringify(p0));
+    const pB = JSON.parse(JSON.stringify(p0));
+    pA[pr.k] = clamp(pA[pr.k] - pr.step, pr.min, pr.max);
+    pB[pr.k] = clamp(pB[pr.k] + pr.step, pr.min, pr.max);
+    const A = compute(pA).nav, B = compute(pB).nav;
+    const leverage = Math.abs(B - A);
+    out.push({k:pr.k, A, B, leverage});
+  }
+  out.sort((a,b)=>b.leverage-a.leverage);
+
+  const lines = [
+    `baseline nav = ${pct(base.nav)}`,
+    `Top levers (bigger = more impact):`,
+    ...out.slice(0,10).map(o=>`- ${o.k.padEnd(5)}  Δ≈${pct(o.leverage)}   (down ${pct(o.A)} / up ${pct(o.B)})`)
+  ];
+  $("sensOut").textContent = lines.join("\n");
+}
+
+/* ---------- MC+ ---------- */
+function drawHist(vals){
+  const c = $("plot"), ctx = c.getContext("2d");
+  ctx.clearRect(0,0,c.width,c.height);
+  ctx.globalAlpha = 0.9;
+  ctx.strokeStyle = "rgba(160,190,255,.35)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(40, 20); ctx.lineTo(40, c.height-30); ctx.lineTo(c.width-20, c.height-30);
+  ctx.stroke();
+
+  const bins = 24;
+  const hist = Array.from({length:bins}, ()=>0);
+  for(const v of vals){
+    const b = clamp(Math.floor(v*bins), 0, bins-1);
+    hist[b]++;
+  }
+  const maxH = Math.max(...hist, 1);
+  const W = c.width-60, H = c.height-60;
+  const x0 = 40, y0 = c.height-30;
+  const bw = W/bins;
+
+  for(let i=0;i<bins;i++){
+    const h = hist[i]/maxH;
+    const x = x0 + i*bw + 1;
+    const y = y0 - h*H;
+    const w = bw - 2;
+    const hh = h*H;
+    ctx.fillStyle = "rgba(124,247,255,.35)";
+    ctx.fillRect(x, y, w, hh);
+    ctx.strokeStyle = "rgba(119,255,154,.25)";
+    ctx.strokeRect(x, y, w, hh);
+  }
+
+  ctx.fillStyle = "rgba(232,236,255,.75)";
+  ctx.font = "12px ui-monospace, Menlo, Consolas, monospace";
+  ctx.fillText("0%", 38, c.height-10);
+  ctx.fillText("100%", c.width-52, c.height-10);
+  ctx.fillText("MC+ nav reliability histogram", 40, 14);
+}
+
+function mcPlusRun(){
+  const base = window.__LAST;
+  if(!base) return;
+  const N = +$("mcn").value;
+  const jit = +$("jit").value;
+  $("v_mcn").textContent = N;
+  $("v_jit").textContent = fmt(jit,2);
+
+  // seed
+  let rnd = Math.random;
+  const seedStr = ($("seed").value||"").trim();
+  if(seedStr){
+    const seed = xmur3(seedStr);
+    rnd = sfc32(seed(), seed(), seed(), seed());
+  }
+
+  const sims = [];
+  const p0 = base.p;
+  const j01 = (x, s)=>clamp(x + (rnd()*2-1)*s, 0, 1);
+
+  for(let i=0;i<N;i++){
+    const p = JSON.parse(JSON.stringify(p0));
+    // nuisance channels jitter scaled by jit
+    p.em   = j01(p.em,   0.10*jit);
+    p.rf   = j01(p.rf,   0.14*jit);
+    p.cal  = j01(p.cal,  0.14*jit);
+    p.anom = j01(p.anom, 0.20*jit);
+    p.lint = j01(p.lint, 0.12*jit);
+    // mild kernel jitter
+    p.sig  = clamp(p.sig + (rnd()*2-1)*0.06*jit, 0.05, 1.2);
+    p.tau  = clamp(p.tau + (rnd()*2-1)*90*jit, 5, 6000);
+    const nav = compute(p).nav;
+    sims.push(nav);
+  }
+  sims.sort((a,b)=>a-b);
+  const mean = sims.reduce((a,b)=>a+b,0)/sims.length;
+  const p10 = sims[Math.floor(0.10*(sims.length-1))];
+  const p50 = sims[Math.floor(0.50*(sims.length-1))];
+  const p90 = sims[Math.floor(0.90*(sims.length-1))];
+  drawHist(sims);
+
+  window.__MC = {stamp: nowStamp(), N, jit, seed: seedStr||null, baseline: base.trail, stats:{mean,p10,p50,p90}, sims};
+  $("mcstats").textContent = `MC+(${N}) mean=${pct(mean)} p10=${pct(p10)} median=${pct(p50)} p90=${pct(p90)} spread=${pct(p90-p10)}`;
+}
+
+/* ---------- Labbook ---------- */
+const BOOK_KEY="QDS_AVIAN_LABBOOK_V6";
+function getBook(){
+  try{ return JSON.parse(localStorage.getItem(BOOK_KEY)||"[]"); }catch{ return []; }
+}
+function setBook(arr){ localStorage.setItem(BOOK_KEY, JSON.stringify(arr)); }
+function dedupKey(e){ return (e.stamp||"")+"|"+(e.species||"")+"|"+(e.preset||""); }
+function renderBook(){
+  const b = getBook();
+  if(!b.length){ $("bookOut").textContent="No entries yet."; return; }
+  const lines = b.slice().reverse().slice(0,80).map(e=>{
+    return [
+      `- ${e.stamp}  ${e.species}/${e.preset}`,
+      `  nav=${pct(e.outputs.navigation_reliability)}  compass=${pct(e.outputs.compass_confidence)}  fnr=${pct(e.outputs.false_negative_risk)}`,
+      e.note ? `  note: ${e.note}` : ""
+    ].filter(Boolean).join("\n");
+  });
+  $("bookOut").textContent = lines.join("\n\n");
+}
+function logRun(note){
+  const base = window.__LAST;
+  if(!base) return;
+  const entry = JSON.parse(JSON.stringify(base.trail));
+  entry.note = (note||"").trim() || null;
+
+  const book = getBook();
+  const seen = new Set(book.map(dedupKey));
+  const k = dedupKey(entry);
+  if(!seen.has(k)) book.push(entry);
+  setBook(book);
+  renderBook();
+}
+
+/* ---------- Ω Sweep ---------- */
+function omegaSweep(){
+  const base = window.__LAST;
+  if(!base) return;
+  const presets = ["quiet","urban","storm","flare","lab","rfjam"];
+  const rows = [];
+  for(const pr of presets){
+    const p = JSON.parse(JSON.stringify(base.p));
+    p.preset = pr;
+    // apply preset “as if” (without moving UI): reuse preset logic in a tiny sandbox
+    const tmp = sandboxApplyPreset(p, pr);
+    const r = compute(tmp);
+    rows.push({preset: pr, nav:r.nav, compass:r.compass, fnr:r.fnr, K:r.K_raw, factors:r.trail.factors});
+  }
+  rows.sort((a,b)=>b.nav-a.nav);
+
+  const names = {quiet:"Quiet", urban:"Urban", storm:"Storm", flare:"Flare", lab:"Lab", rfjam:"RF Jam"};
+  const lines = rows.map((r,i)=>{
+    const f=r.factors;
+    return `${String(i+1).padStart(2,"0")}. ${names[r.preset].padEnd(6)}  nav=${pct(r.nav)}  compass=${pct(r.compass)}  fnr=${pct(r.fnr)}  (L ${pct(f.light)} RF ${pct(f.rf)} Beh ${pct(f.behaviour)})`;
+  });
+  window.__SWEEP = {stamp: nowStamp(), baseline: base.trail, rows};
+  $("sweepOut").textContent = lines.join("\n");
+}
+function sandboxApplyPreset(p, name){
+  let em=p.em, rf=p.rf, an=p.anom, lint=p.lint;
+  if(name==="quiet"){ em=0.15; rf=0.06; an=0.05; lint=Math.max(lint,0.60); }
+  if(name==="urban"){ em=0.55; rf=0.18; an=0.12; lint=Math.max(lint,0.55); }
+  if(name==="storm"){ em=0.40; rf=0.15; an=0.65; lint=Math.max(lint,0.40); }
+  if(name==="flare"){ em=0.48; rf=0.22; an=0.80; lint=Math.max(lint,0.35); }
+  if(name==="lab"){ em=0.02; rf=0.00; an=0.00; lint=Math.max(lint,0.75); }
+  if(name==="rfjam"){ em=Math.max(em,0.22); rf=0.85; an=Math.max(an,0.10); lint=Math.max(lint,0.55); }
+  p.em=em; p.rf=rf; p.anom=an; p.lint=lint;
+  return p;
+}
+
+/* ---------- wiring ---------- */
+function fillSpecies(){
+  $("species").innerHTML = SPECIES.map(s=>`<option value="${s.id}">${s.name}</option>`).join("");
+  $("species").value="robin";
+}
+function applySpecies(id){
+  const s = SPECIES.find(x=>x.id===id) || SPECIES[0];
+  setState({species:s.id, preset:$("preset").value, ...s.base});
+}
+function recompute(){
+  const p = readState();
+  const res = compute(p);
+  render(res);
+  updateComparePanels();
+}
+function updateComparePanels(){
+  $("Abox").textContent = brief(window.__A);
+  $("Bbox").textContent = brief(window.__B);
+  $("Delta").textContent = delta(window.__A, window.__B);
+}
+
+function bindTabs(){
+  document.querySelectorAll(".tab").forEach(t=>{
+    t.addEventListener("click", ()=>{
+      document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));
+      document.querySelectorAll(".pane").forEach(x=>x.classList.remove("on"));
+      t.classList.add("on");
+      $("pane_"+t.dataset.tab).classList.add("on");
+    });
+  });
+}
+
+function bind(){
+  const ids = ["tau","lam","sig","em","wl","lint","rf","cal","map","mot","sts","exp","B","inc","anom"];
+  ids.forEach(id=>$(id).addEventListener("input", recompute));
+  $("species").addEventListener("change", e=>{ applySpecies(e.target.value); recompute(); });
+  $("preset").addEventListener("change", e=>{ applyPreset(e.target.value); recompute(); });
+  $("run").addEventListener("click", recompute);
+
+  $("saveA").addEventListener("click", ()=>{ window.__A = JSON.parse(JSON.stringify(window.__LAST)); updateComparePanels(); });
+  $("saveB").addEventListener("click", ()=>{ window.__B = JSON.parse(JSON.stringify(window.__LAST)); updateComparePanels(); });
+  $("applyA").addEventListener("click", ()=>{ if(window.__A){ setState(window.__A.p); recompute(); }});
+  $("applyB").addEventListener("click", ()=>{ if(window.__B){ setState(window.__B.p); recompute(); }});
+  $("exportA").addEventListener("click", ()=>{ if(window.__A) dl("qds_avian_v6_A.json", JSON.stringify(window.__A.trail,null,2)); });
+  $("exportB").addEventListener("click", ()=>{ if(window.__B) dl("qds_avian_v6_B.json", JSON.stringify(window.__B.trail,null,2)); });
+
+  $("runSens").addEventListener("click", runSensitivity);
+
+  $("mcn").addEventListener("input", ()=>$("v_mcn").textContent = +$("mcn").value);
+  $("jit").addEventListener("input", ()=>$("v_jit").textContent = fmt(+$("jit").value,2));
+  $("mc").addEventListener("click", ()=>{ document.querySelector('[data-tab="mcplus"]').click(); mcPlusRun(); });
+  $("mcRun").addEventListener("click", mcPlusRun);
+  $("mcExport").addEventListener("click", ()=>{ if(window.__MC) dl("qds_avian_v6_mcplus.json", JSON.stringify(window.__MC,null,2)); });
+
+  $("logRun").addEventListener("click", ()=>{ document.querySelector('[data-tab="labbook"]').click(); });
+  $("logNow").addEventListener("click", ()=>{ logRun($("note").value); $("note").value=""; });
+
+  $("exportBook").addEventListener("click", ()=> dl("qds_avian_v6_labbook.json", JSON.stringify(getBook(),null,2)));
+  $("clearBook").addEventListener("click", ()=>{ if(confirm("Clear labbook local storage?")){ setBook([]); renderBook(); }});
+  $("doImport").addEventListener("click", async ()=>{
+    const f = $("importFile").files?.[0];
+    if(!f) return alert("Pick a JSON file first.");
+    const txt = await f.text();
+    let incoming=[];
+    try{ incoming = JSON.parse(txt); }catch{ return alert("Invalid JSON."); }
+    if(!Array.isArray(incoming)) return alert("Expected an array of entries.");
+    const book = getBook();
+    const seen = new Set(book.map(dedupKey));
+    for(const e of incoming){
+      const k = dedupKey(e);
+      if(!seen.has(k)){ book.push(e); seen.add(k); }
+    }
+    setBook(book);
+    renderBook();
+    alert("Imported + merged.");
+  });
+
+  $("sweep").addEventListener("click", omegaSweep);
+  $("sweepExport").addEventListener("click", ()=>{ if(window.__SWEEP) dl("qds_avian_v6_omega_sweep.json", JSON.stringify(window.__SWEEP,null,2)); });
+
+  bindTabs();
+}
+
+/* ---------- boot ---------- */
+fillSpecies();
+applySpecies($("species").value);
+applyPreset($("preset").value);
+$("v_mcn").textContent = +$("mcn").value;
+$("v_jit").textContent = fmt(+$("jit").value,2);
+bind();
+recompute();
+renderBook();
+</script>
+</body>
+</html>

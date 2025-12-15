@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>QDS Demo Front Door</title>
+<style>
+:root{
+  --bg:#060b1a; --panel:#0b132b; --panel2:#0a1022;
+  --text:#eef2ff; --muted:#aab3c7;
+  --accent:#5aa7ff; --accent2:#7ad3ff;
+  --stroke:rgba(255,255,255,0.08);
+  --radius:18px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; padding:22px 16px 40px;
+  background: radial-gradient(1200px 800px at 15% 10%, #0d1b3e 0%, transparent 45%),
+              radial-gradient(900px 700px at 85% 20%, #0b2a3b 0%, transparent 50%),
+              var(--bg);
+  color:var(--text);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, sans-serif;
+}
+.wrap{max-width:900px; margin:0 auto;}
+.badges{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;}
+.badge{
+  padding:6px 10px; border:1px solid var(--stroke);
+  background: rgba(255,255,255,0.03);
+  border-radius:999px; font-size:12px; color:var(--muted);
+}
+h1{font-size:36px; line-height:1.1; margin:8px 0 6px;}
+.subtitle{color:var(--muted); margin:0 0 18px;}
+.section{
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+  border:1px solid var(--stroke);
+  border-radius: var(--radius);
+  padding:18px 16px;
+  margin:14px 0;
+}
+.section h2{
+  margin:0 0 10px;
+  font-size:18px; letter-spacing:0.2px;
+}
+.grid{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap:10px;
+}
+@media(min-width:680px){
+  .grid{grid-template-columns: 1fr 1fr;}
+}
+.btn{
+  display:block;
+  text-decoration:none;
+  color:var(--text);
+  padding:14px 14px;
+  border-radius:14px;
+  border:1px solid var(--stroke);
+  background:
+    linear-gradient(90deg, rgba(90,167,255,0.08), rgba(122,211,255,0.04)),
+    rgba(255,255,255,0.02);
+  font-weight:600;
+}
+.btn small{display:block; font-weight:500; color:var(--muted); margin-top:4px;}
+.btn:hover{border-color: rgba(90,167,255,0.35);}
+.latest{
+  display:flex; flex-direction:column; gap:8px;
+}
+.latest a{
+  text-decoration:none; color:var(--text);
+  padding:10px 12px; border-radius:12px;
+  border:1px solid var(--stroke);
+  background: rgba(255,255,255,0.02);
+  font-size:14px;
+}
+.hr{height:1px; background: var(--stroke); margin:16px 0 8px;}
+.footer-note{color:var(--muted); font-size:12px; margin-top:8px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="badges">
+    <span class="badge">Termux-first</span>
+    <span class="badge">Links-only</span>
+    <span class="badge">Proof → Pilot → Claim</span>
+    <span class="badge">Auto-detect v2</span>
+  </div>
+
+  <h1>QDS Demo Front Door</h1>
+  <p class="subtitle">Clean launchpad for Growth + Battery + Compression. No script output — just safe links.</p>
+
+  <div class="section">
+    <h2>Latest 5 builds</h2>
+    <div class="latest">
+    </div>
+    <div class="footer-note">Auto-collected from growthhub*, qds_battery*, qds_compression*.</div>
+  </div>
+
+  <div class="section">
+    <h2>Growth / Revenue</h2>
+    <div class="grid">
+      <a class="btn" href="growthhub_official_top5_demo_front_20251207_172220.html">GrowthHub (latest)
+        <small>growthhub_official_top5_demo_front_20251207_172220.html</small>
+      </a>
+      <a class="btn" href="growthhub_official_top5_demo_front_20251207_172220.html">GrowthHub Top 5
+        <small>growthhub_official_top5_demo_front_20251207_172220.html</small>
+      </a>
+      <a class="btn" href="growthhub_multi_area_stack_v1.html">Multi-Area Stack
+        <small>growthhub_multi_area_stack_v1.html</small>
+      </a>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Batteries</h2>
+    <div class="grid">
+      <a class="btn" href="qds_battery_design_v1.html">Battery (latest)
+        <small>qds_battery_design_v1.html</small>
+      </a>
+      <a class="btn" href="qds_battery_habitat_v1_2_build002.html">qds_battery_habitat_v1_2_build002.html</a>
+      <a class="btn" href="qds_battery_habitat_demo.html">qds_battery_habitat_demo.html</a>
+      <a class="btn" href="qds_battery_design_v1.html">qds_battery_design_v1.html</a>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Compression / Signals</h2>
+    <div class="grid">
+      <a class="btn" href="qds_compression_lab_v1.html">Compression (latest)
+        <small>qds_compression_lab_v1.html</small>
+      </a>
+      <a class="btn" href="qds_compression_lab_v1.html">Compression Lab
+        <small>qds_compression_lab_v1.html</small>
+      </a>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>All pages</h2>
+    <div class="grid">
+      <a class="btn" href="all_pages_index.html">All pages (list)
+        <small>all_pages_index.html</small>
+      </a>
+      <a class="btn" href="all_pages_compact.html">All pages (compact)
+        <small>all_pages_compact.html</small>
+      </a>
+    </div>
+    <div class="footer-note">This page only links — it never injects bash text.</div>
+  </div>
+
+  <div class="hr"></div>
+  <div class="footer-note">Generated 20251207_175245 in /data/data/com.termux/files/home/OMEGA_EMPIRE/UV_QDS/www. Backup: frontdoor_backup_20251207_175245.html</div>
+</div>
+</body>
+</html>

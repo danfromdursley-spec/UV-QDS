@@ -1,0 +1,1119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>QDS Growth Wedge — 5-Year Financial Projection</title>
+  <style>
+    :root{
+      --bg: #0b0f14;
+      --panel: #0f1621;
+      --panel-2: #0c121b;
+      --ink: #e8edf6;
+      --muted: #a7b3c7;
+      --accent: #9ad1ff;
+      --accent-2: #b8ffd6;
+      --warn: #ffd29a;
+      --line: rgba(255,255,255,.08);
+      --good: #a8ffcf;
+      --bad: #ffb3b3;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--ink);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(154,209,255,.08), transparent 60%),
+        radial-gradient(900px 700px at 90% 10%, rgba(184,255,214,.08), transparent 60%),
+        linear-gradient(180deg, #070a0f, var(--bg));
+      letter-spacing:.1px;
+    }
+
+    .wrap{
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 18px 60px;
+    }
+
+    header{
+      display:flex;
+      gap: 18px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 20px;
+      background: linear-gradient(135deg, rgba(154,209,255,.08), rgba(184,255,214,.06));
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+    }
+    .title-block{
+      display:flex;
+      gap: 14px;
+      align-items:center;
+    }
+    .crest{
+      width:44px;height:44px;
+      border-radius: 12px;
+      background:
+        linear-gradient(135deg, rgba(154,209,255,.35), rgba(184,255,214,.35)),
+        linear-gradient(180deg, #0a1420, #0b0f14);
+      border: 1px solid rgba(255,255,255,.18);
+      display:grid;
+      place-items:center;
+      font-weight:700;
+      color:#0b0f14;
+      text-shadow:none;
+    }
+    h1{
+      font-size: 20px;
+      margin:0 0 2px 0;
+      font-weight: 650;
+    }
+    .subtitle{
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .header-actions{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    button, .pill{
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00));
+      color: var(--ink);
+      padding: 9px 12px;
+      cursor: pointer;
+      font-weight: 560;
+      font-size: 12px;
+      transition: .15s ease;
+    }
+    button:hover{
+      transform: translateY(-1px);
+      border-color: rgba(255,255,255,.18);
+    }
+    button:active{
+      transform: translateY(0px);
+      opacity:.9;
+    }
+    .pill{
+      cursor: default;
+      color: var(--muted);
+      font-weight: 520;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 360px 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    @media (max-width: 980px){
+      .grid{grid-template-columns: 1fr}
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00));
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-h{
+      padding: 14px 16px;
+      background: linear-gradient(90deg, rgba(154,209,255,.07), rgba(184,255,214,.05));
+      border-bottom: 1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .card-h h2{
+      font-size: 13px;
+      margin:0;
+      font-weight: 650;
+      letter-spacing:.25px;
+      text-transform: uppercase;
+      color: #dce6f6;
+    }
+    .card-b{
+      padding: 14px 16px 16px;
+    }
+
+    .section-label{
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      margin: 10px 0 8px;
+    }
+
+    .field{
+      display:grid;
+      grid-template-columns: 1fr 120px;
+      gap: 10px;
+      align-items:center;
+      padding: 8px 0;
+      border-bottom: 1px dashed rgba(255,255,255,.06);
+    }
+    .field:last-child{border-bottom: none}
+    label{
+      font-size: 12px;
+      color: var(--ink);
+    }
+    .hint{
+      display:block;
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    input[type="number"], input[type="text"]{
+      width:100%;
+      padding: 8px 9px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(255,255,255,.08);
+      background: var(--panel-2);
+      color: var(--ink);
+      font-size: 12px;
+      outline: none;
+    }
+    input[type="number"]:focus, input[type="text"]:focus{
+      border-color: rgba(154,209,255,.35);
+      box-shadow: 0 0 0 2px rgba(154,209,255,.08);
+    }
+
+    .scenario-toggle{
+      display:flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .scenario-btn{
+      padding: 7px 10px;
+      font-size: 11px;
+    }
+    .scenario-btn.active{
+      border-color: rgba(154,209,255,.45);
+      color: #eef6ff;
+      background:
+        linear-gradient(135deg, rgba(154,209,255,.12), rgba(184,255,214,.08));
+    }
+
+    .mini{
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .kpis{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    @media (max-width: 760px){
+      .kpis{grid-template-columns: repeat(2, 1fr)}
+    }
+
+    .kpi{
+      padding: 12px 12px 10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.02), transparent);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+    }
+    .kpi .k{
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .12em;
+    }
+    .kpi .v{
+      font-size: 18px;
+      font-weight: 700;
+      margin-top: 4px;
+      letter-spacing:.3px;
+    }
+    .kpi .s{
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .good{color: var(--good)}
+    .warn{color: var(--warn)}
+    .bad{color: var(--bad)}
+
+    table{
+      width:100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    th, td{
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+      vertical-align: top;
+    }
+    th{
+      text-align: left;
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      background: rgba(255,255,255,.02);
+    }
+    tr:last-child td{border-bottom:none}
+
+    .right{text-align:right}
+
+    .row-sub{
+      color: var(--muted);
+      font-size: 10px;
+      margin-top: 2px;
+    }
+
+    .tag{
+      display:inline-block;
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.08);
+      font-size: 9px;
+      color: var(--muted);
+      margin-left: 6px;
+    }
+
+    .divider{
+      height:1px;
+      background: var(--line);
+      margin: 10px 0 12px;
+    }
+
+    .note{
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06);
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .posh-quote{
+      font-size: 12px;
+      color: #dce8ff;
+      line-height: 1.4;
+      padding: 12px 14px;
+      background:
+        linear-gradient(135deg, rgba(154,209,255,.06), rgba(184,255,214,.05));
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius-md);
+    }
+
+    .footer{
+      margin-top: 16px;
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .small-btn{
+      padding: 7px 9px;
+      font-size: 10px;
+    }
+
+    /* Print mode */
+    @media print{
+      body{background: #fff; color:#111}
+      .crest{color:#111}
+      header, .card{box-shadow:none}
+      button{display:none}
+      .pill{border-color:#ddd}
+      .card{border-color:#ddd}
+      th{background:#f7f7f7}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title-block">
+        <div class="crest">QDS</div>
+        <div>
+          <h1>Growth Wedge — 5-Year Financial Projection</h1>
+          <div class="subtitle">
+            Batteries • Data/Forecast • Structured Delivery
+            <span class="tag">offline</span>
+            <span class="tag">investor-pack style</span>
+          </div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span class="pill" id="scenarioPill">Scenario: Base</span>
+        <button class="small-btn" id="btnReset">Reset to Defaults</button>
+        <button class="small-btn" id="btnExport">Copy Summary</button>
+        <button class="small-btn" onclick="window.print()">Print</button>
+      </div>
+    </header>
+
+    <div class="grid">
+
+      <!-- LEFT: Controls -->
+      <section class="card">
+        <div class="card-h">
+          <h2>Assumptions & Scenario</h2>
+          <div class="scenario-toggle" id="scenarioToggle">
+            <button class="scenario-btn" data-s="con">Conservative</button>
+            <button class="scenario-btn active" data-s="base">Base</button>
+            <button class="scenario-btn" data-s="opt">Optimistic</button>
+          </div>
+        </div>
+        <div class="card-b">
+          <div class="section-label">Identity</div>
+
+          <div class="field">
+            <label>
+              Venture name
+              <span class="hint">Shown in export summary only</span>
+            </label>
+            <input type="text" id="ventureName" value="QDS Applied Wedge"/>
+          </div>
+
+          <div class="section-label">Funding model</div>
+
+          <div class="field">
+            <label>
+              Proposed investment (£)
+              <span class="hint">Used for runway + allocation notes</span>
+            </label>
+            <input type="number" id="investment" value="150000" min="0" step="1000"/>
+          </div>
+
+          <div class="field">
+            <label>
+              Founder salary Year 1 (£)
+              <span class="hint">Modest, milestone-linked</span>
+            </label>
+            <input type="number" id="founderY1" value="30000" min="0" step="1000"/>
+          </div>
+
+          <div class="field">
+            <label>
+              Salary growth / year (%)
+              <span class="hint">Applies Y2–Y5</span>
+            </label>
+            <input type="number" id="salaryGrow" value="10" min="0" step="1"/>
+          </div>
+
+          <div class="section-label">Operating costs (annual)</div>
+
+          <div class="field">
+            <label>
+              Tools, hosting, devices (£)
+              <span class="hint">Apps, compute, test hardware</span>
+            </label>
+            <input type="number" id="opsTools" value="8000" min="0" step="500"/>
+          </div>
+
+          <div class="field">
+            <label>
+              Legal/IP/insurance (£)
+              <span class="hint">Light but professional</span>
+            </label>
+            <input type="number" id="opsLegal" value="6000" min="0" step="500"/>
+          </div>
+
+          <div class="field">
+            <label>
+              Travel & pilots (£)
+              <span class="hint">Customer discovery + field trials</span>
+            </label>
+            <input type="number" id="opsPilots" value="12000" min="0" step="500"/>
+          </div>
+
+          <div class="field">
+            <label>
+              Contingency reserve (% of total cost)
+              <span class="hint">Safety margin for realism</span>
+            </label>
+            <input type="number" id="contPct" value="12" min="0" step="1"/>
+          </div>
+
+          <div class="section-label">Revenue engines</div>
+
+          <div class="posh-quote">
+            This model assumes a blended revenue stack:
+            <b>pilot packages</b> + <b>lightweight subscriptions</b> +
+            <b>training/structured delivery support</b>.
+            The scenario buttons adjust conversion and pricing growth.
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- PILOT REVENUE -->
+          <div class="section-label">Pillar A — Batteries (Pilots)</div>
+
+          <div class="field">
+            <label>
+              Avg pilot price Year 1 (£)
+              <span class="hint">Battery Lab + test pack + reporting</span>
+            </label>
+            <input type="number" id="pilotPriceY1" value="12000" min="0" step="500"/>
+          </div>
+
+          <div class="field">
+            <label>
+              Pilots in Year 1
+              <span class="hint">Conservative start is healthy</span>
+            </label>
+            <input type="number" id="pilotsY1" value="2" min="0" step="1"/>
+          </div>
+
+          <div class="field">
+            <label>
+              Pilot count growth / year (%)
+              <span class="hint">Volume growth of pilots</span>
+            </label>
+            <input type="number" id="pilotVolGrow" value="60" min="0" step="5"/>
+          </div>
+
+          <div class="field">
+            <label>
+              Pilot price growth / year (%)
+            </label>
+            <input type="number" id="pilotPriceGrow" value="8" min="0" step="1"/>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- SUBS REVENUE -->
+          <div class="section-label">Pillar A — Batteries (Subscriptions)</div>
+
+          <div class="field">
+            <label>
+              Subscription price / client / month (£)
+              <span class="hint">Battery Lab Lite</span>
+            </label>
+            <input type="number" id="subPrice" value="180" min="0" step="10"/>
+          </div>
+
+          <div class="field">
+            <label>
+              Active subscribers by end of Year 1
+            </label>
+            <input type="number" id="subsEndY1" value="6" min="0" step="1"/>
+          </div>
+
+          <div class="field">
+            <label>
+              Subscriber growth / year (%)
+            </label>
+            <input type="number" id="subGrow" value="90" min="0" step="5"/>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- DATA/FORECAST REVENUE -->
+          <div class="section-label">Pillar B — Data/Forecast</div>
+
+          <div class="field">
+            <label>
+              Forecast package price Year 1 (£)
+              <span class="hint">Revenue Floor + Capacity Truth</span>
+            </label>
+            <input type="number" id="forecastPriceY1" value="3500" min="0" step="250"/>
+          </div>
+
+          <div class="field">
+            <label>
+              Packages in Year 1
+            </label>
+            <input type="number" id="forecastCountY1" value="6" min="0" step="1"/>
+          </div>
+
+          <div class="field">
+            <label>
+              Volume growth / year (%)
+            </label>
+            <input type="number" id="forecastVolGrow" value="50" min="0" step="5"/>
+          </div>
+
+          <div class="field">
+            <label>
+              Price growth / year (%)
+            </label>
+            <input type="number" id="forecastPriceGrow" value="6" min="0" step="1"/>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- STRUCTURED DELIVERY REVENUE -->
+          <div class="section-label">Pillar C — Structured Delivery</div>
+
+          <div class="field">
+            <label>
+              Delivery day-rate Year 1 (£)
+              <span class="hint">Documentation, hubs, evidence packs</span>
+            </label>
+            <input type="number" id="dayRateY1" value="420" min="0" step="10"/>
+          </div>
+
+          <div class="field">
+            <label>
+              Billable days in Year 1
+            </label>
+            <input type="number" id="daysY1" value="60" min="0" step="5"/>
+          </div>
+
+          <div class="field">
+            <label>
+              Day volume growth / year (%)
+            </label>
+            <input type="number" id="dayVolGrow" value="35" min="0" step="5"/>
+          </div>
+
+          <div class="field">
+            <label>
+              Day-rate growth / year (%)
+            </label>
+            <input type="number" id="dayRateGrow" value="7" min="0" step="1"/>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="note">
+            <b>Accuracy note:</b> This is a disciplined early-stage model.
+            It avoids fantasy hockey-sticks by separating
+            <i>pilots</i>, <i>subscriptions</i>, and <i>delivery</i>.
+            You can tighten assumptions for a “purely cautious” version
+            just by reducing Y1 volumes and growth rates.
+          </div>
+
+        </div>
+      </section>
+
+      <!-- RIGHT: Output -->
+      <section class="card">
+        <div class="card-h">
+          <h2>Projection Output</h2>
+          <span class="mini" id="asOf"></span>
+        </div>
+        <div class="card-b">
+
+          <div class="kpis" id="kpis"></div>
+
+          <div class="divider"></div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Year</th>
+                <th>Pillar A — Batteries</th>
+                <th>Pillar B — Data/Forecast</th>
+                <th>Pillar C — Structured Delivery</th>
+                <th class="right">Total Revenue</th>
+                <th class="right">Total Costs</th>
+                <th class="right">Net</th>
+              </tr>
+            </thead>
+            <tbody id="projBody"></tbody>
+          </table>
+
+          <div class="divider"></div>
+
+          <div class="card card-inner" style="border-radius: var(--radius-md);">
+            <div class="card-h">
+              <h2>Use of Funds (Suggested)</h2>
+              <span class="mini">Editable by changing investment & cost assumptions</span>
+            </div>
+            <div class="card-b">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Category</th>
+                    <th class="right">Guidance %</th>
+                    <th class="right">Indicative £</th>
+                    <th>Purpose</th>
+                  </tr>
+                </thead>
+                <tbody id="fundsBody"></tbody>
+              </table>
+              <div class="note" style="margin-top:10px;">
+                This allocation is deliberately boring (in the best way).
+                It reads as “adult supervision”: productisation first,
+                pilots second, legal/ops covered, contingency respected.
+              </div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="posh-quote" id="execSummary"></div>
+
+          <div class="footer">
+            <div>
+              <b>Scope discipline:</b> This page models only the 3 commercial pillars,
+              not the broader long-horizon QDS universe.
+            </div>
+            <div>
+              <button class="small-btn" id="btnTighten">One-Tap: Ultra-Conservative</button>
+              <button class="small-btn" id="btnPolishText">Polish Summary Tone</button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </div>
+  </div>
+
+<script>
+(function(){
+  const $ = (id)=>document.getElementById(id);
+
+  const state = {
+    scenario: "base",
+    defaults: {},
+    polishMode: 0
+  };
+
+  const scenarioMultipliers = {
+    con: {
+      pilotVol: 0.75, pilotPrice: 0.95,
+      subGrow: 0.75, subPrice: 0.95,
+      forecastVol: 0.75, forecastPrice: 0.95,
+      dayVol: 0.8, dayRate: 0.95,
+      costInfl: 1.02
+    },
+    base: {
+      pilotVol: 1.0, pilotPrice: 1.0,
+      subGrow: 1.0, subPrice: 1.0,
+      forecastVol: 1.0, forecastPrice: 1.0,
+      dayVol: 1.0, dayRate: 1.0,
+      costInfl: 1.04
+    },
+    opt: {
+      pilotVol: 1.2, pilotPrice: 1.05,
+      subGrow: 1.25, subPrice: 1.05,
+      forecastVol: 1.2, forecastPrice: 1.05,
+      dayVol: 1.2, dayRate: 1.07,
+      costInfl: 1.06
+    }
+  };
+
+  const inputs = [
+    "ventureName","investment",
+    "founderY1","salaryGrow",
+    "opsTools","opsLegal","opsPilots","contPct",
+    "pilotPriceY1","pilotsY1","pilotVolGrow","pilotPriceGrow",
+    "subPrice","subsEndY1","subGrow",
+    "forecastPriceY1","forecastCountY1","forecastVolGrow","forecastPriceGrow",
+    "dayRateY1","daysY1","dayVolGrow","dayRateGrow"
+  ];
+
+  function readNum(id){
+    const el = $(id);
+    const v = Number(el.value);
+    return isFinite(v) ? v : 0;
+  }
+
+  function money(n){
+    const x = Math.round(n);
+    return "£" + x.toLocaleString("en-GB");
+  }
+
+  function pct(n){
+    return (Math.round(n*10)/10).toFixed(1) + "%";
+  }
+
+  function clamp(n, lo, hi){
+    return Math.max(lo, Math.min(hi, n));
+  }
+
+  function snapshotDefaults(){
+    inputs.forEach(id=>{
+      const el = $(id);
+      state.defaults[id] = el.value;
+    });
+  }
+
+  function resetDefaults(){
+    inputs.forEach(id=>{
+      $(id).value = state.defaults[id];
+    });
+    setScenario("base");
+    state.polishMode = 0;
+    render();
+  }
+
+  function setScenario(s){
+    state.scenario = s;
+    document.querySelectorAll(".scenario-btn").forEach(b=>{
+      b.classList.toggle("active", b.dataset.s === s);
+    });
+    $("scenarioPill").textContent = "Scenario: " + (s==="con"?"Conservative":s==="opt"?"Optimistic":"Base");
+    render();
+  }
+
+  function calcYearSeries(){
+    const M = scenarioMultipliers[state.scenario];
+
+    // Base inputs
+    const investment = readNum("investment");
+
+    const founderY1 = readNum("founderY1");
+    const salaryGrow = readNum("salaryGrow")/100;
+
+    const opsTools = readNum("opsTools");
+    const opsLegal = readNum("opsLegal");
+    const opsPilots = readNum("opsPilots");
+    const contPct = readNum("contPct")/100;
+
+    // Pillar A
+    const pilotPriceY1 = readNum("pilotPriceY1") * M.pilotPrice;
+    const pilotsY1 = readNum("pilotsY1");
+    const pilotVolGrow = (readNum("pilotVolGrow")/100) * M.pilotVol;
+    const pilotPriceGrow = (readNum("pilotPriceGrow")/100);
+
+    const subPrice = readNum("subPrice") * M.subPrice;
+    const subsEndY1 = readNum("subsEndY1");
+    const subGrow = (readNum("subGrow")/100) * M.subGrow;
+
+    // Pillar B
+    const forecastPriceY1 = readNum("forecastPriceY1") * M.forecastPrice;
+    const forecastCountY1 = readNum("forecastCountY1");
+    const forecastVolGrow = (readNum("forecastVolGrow")/100) * M.forecastVol;
+    const forecastPriceGrow = (readNum("forecastPriceGrow")/100);
+
+    // Pillar C
+    const dayRateY1 = readNum("dayRateY1") * M.dayRate;
+    const daysY1 = readNum("daysY1");
+    const dayVolGrow = (readNum("dayVolGrow")/100) * M.dayVol;
+    const dayRateGrow = (readNum("dayRateGrow")/100);
+
+    const years = [1,2,3,4,5];
+    let series = [];
+
+    // Helper growth
+    function growVal(y1, g, year){
+      return y1 * Math.pow(1+g, year-1);
+    }
+
+    // Pilot volumes & price
+    // We treat pilot volume as a count-like float; we'll allow decimals for modelling.
+    // Subscriptions: approximate average active subscribers per year
+    // using end-of-year estimate with a simple midpoint rule.
+
+    years.forEach(year=>{
+      const pilotCount = growVal(pilotsY1, pilotVolGrow, year);
+      const pilotPrice = growVal(pilotPriceY1, pilotPriceGrow, year);
+      const pilotRev = pilotCount * pilotPrice;
+
+      const subsEnd = growVal(subsEndY1, subGrow, year);
+      const subsStart = (year===1) ? 0 : growVal(subsEndY1, subGrow, year-1);
+      const subsAvg = (subsStart + subsEnd) / 2;
+      const subRev = subsAvg * subPrice * 12;
+
+      const pillarA = pilotRev + subRev;
+
+      const forecastCount = growVal(forecastCountY1, forecastVolGrow, year);
+      const forecastPrice = growVal(forecastPriceY1, forecastPriceGrow, year);
+      const pillarB = forecastCount * forecastPrice;
+
+      const days = growVal(daysY1, dayVolGrow, year);
+      const dayRate = growVal(dayRateY1, dayRateGrow, year);
+      const pillarC = days * dayRate;
+
+      const revenue = pillarA + pillarB + pillarC;
+
+      // Costs
+      const founderSalary = growVal(founderY1, salaryGrow, year);
+
+      // Baseline ops inflate gently by scenario cost inflation
+      const infl = Math.pow(M.costInfl, year-1);
+      const ops = (opsTools + opsLegal + opsPilots) * infl;
+
+      const baseCost = founderSalary + ops;
+
+      const contingency = baseCost * contPct;
+      const totalCost = baseCost + contingency;
+
+      const net = revenue - totalCost;
+
+      series.push({
+        year,
+        pilotCount, pilotPrice, pilotRev,
+        subsEnd, subsAvg, subPrice, subRev,
+        forecastCount, forecastPrice, pillarB,
+        days, dayRate, pillarC,
+        pillarA,
+        revenue,
+        founderSalary,
+        ops,
+        contingency,
+        totalCost,
+        net,
+        investment
+      });
+    });
+
+    return series;
+  }
+
+  function buildKPIs(series){
+    const y1 = series[0];
+    const y3 = series[2];
+    const y5 = series[4];
+
+    const total5 = series.reduce((a,b)=>a+b.revenue,0);
+    const net5 = series.reduce((a,b)=>a+b.net,0);
+
+    // Rough "breakeven year" estimate
+    let breakeven = "Not within 5 years";
+    for(const s of series){
+      if(s.net > 0){
+        breakeven = "Year " + s.year;
+        break;
+      }
+    }
+
+    const runwayEstimate = (function(){
+      // Super cautious: if Year 1 net negative, estimate runway months based on Y1 cost.
+      const burnY1 = Math.max(0, y1.totalCost - y1.revenue);
+      if(burnY1 <= 0) return "Self-sustaining (Y1)";
+      const months = clamp((y1.investment / burnY1) * 12, 1, 60);
+      return Math.round(months) + " months (est.)";
+    })();
+
+    return [
+      {k:"Year 1 Revenue", v: money(y1.revenue), s:"Early traction model"},
+      {k:"Year 5 Revenue", v: money(y5.revenue), s:"Compounded wedge"},
+      {k:"5-Year Total Revenue", v: money(total5), s:"Cumulative top-line"},
+      {k:"Breakeven", v: breakeven, s:"First positive-year net"},
+      {k:"Runway vs Investment", v: runwayEstimate, s:"Cautious estimate"},
+      {k:"Year 3 Net", v: money(y3.net), s:"Midpoint realism"},
+      {k:"5-Year Net Total", v: money(net5), s:"After costs + contingency"},
+      {k:"Scenario", v: (state.scenario==="con"?"Conservative":state.scenario==="opt"?"Optimistic":"Base"), s:"Volume & price modifiers"}
+    ];
+  }
+
+  function renderKPIs(kpis){
+    const host = $("kpis");
+    host.innerHTML = "";
+    kpis.forEach((x, i)=>{
+      const div = document.createElement("div");
+      div.className = "kpi";
+      let cls = "";
+      if(/Net/.test(x.k) || x.k==="5-Year Net Total"){
+        cls = (x.v.includes("-") ? "bad" : "good");
+      }
+      div.innerHTML = `
+        <div class="k">${x.k}</div>
+        <div class="v ${cls}">${x.v}</div>
+        <div class="s">${x.s}</div>
+      `;
+      host.appendChild(div);
+    });
+  }
+
+  function renderTable(series){
+    const body = $("projBody");
+    body.innerHTML = "";
+
+    series.forEach(s=>{
+      const pilotsLine = `${money(s.pilotRev)} <div class="row-sub">~${s.pilotCount.toFixed(1)} pilots @ ${money(s.pilotPrice)}</div>`;
+      const subsLine = `${money(s.subRev)} <div class="row-sub">~${s.subsAvg.toFixed(1)} avg subs @ ${money(s.subPrice)}/mo</div>`;
+      const pillarALine = `
+        <div><b>Pilots</b>: ${pilotsLine}</div>
+        <div><b>Subs</b>: ${subsLine}</div>
+        <div class="row-sub"><b>Total A</b>: ${money(s.pillarA)}</div>
+      `;
+
+      const pillarBLine = `
+        ${money(s.pillarB)}
+        <div class="row-sub">~${s.forecastCount.toFixed(1)} packs @ ${money(s.forecastPrice)}</div>
+      `;
+
+      const pillarCLine = `
+        ${money(s.pillarC)}
+        <div class="row-sub">~${s.days.toFixed(0)} days @ ${money(s.dayRate)}</div>
+      `;
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><b>Year ${s.year}</b></td>
+        <td>${pillarALine}</td>
+        <td>${pillarBLine}</td>
+        <td>${pillarCLine}</td>
+        <td class="right"><b>${money(s.revenue)}</b></td>
+        <td class="right">${money(s.totalCost)}</td>
+        <td class="right"><b class="${s.net>=0?'good':'bad'}">${money(s.net)}</b></td>
+      `;
+      body.appendChild(tr);
+    });
+  }
+
+  function renderFunds(){
+    const inv = readNum("investment");
+    const rows = [
+      {name:"Productisation", pct: 0.42, purpose:"Battery Lab Lite hardening, QA, packaging, onboarding flows"},
+      {name:"Pilots & Customer Validation", pct: 0.23, purpose:"Paid pilots, SME discovery cycles, outcomes evidence"},
+      {name:"Ops / Tools / Compute", pct: 0.15, purpose:"Devices, hosting, light test equipment, data tooling"},
+      {name:"Legal / IP / Governance", pct: 0.10, purpose:"IP hygiene, contracts, insurance, basic compliance"},
+      {name:"Contingency", pct: 0.10, purpose:"Protects delivery and credibility"}
+    ];
+
+    const body = $("fundsBody");
+    body.innerHTML = "";
+    rows.forEach(r=>{
+      const tr = document.createElement("tr");
+      const amt = inv * r.pct;
+      tr.innerHTML = `
+        <td><b>${r.name}</b></td>
+        <td class="right">${pct(r.pct*100)}</td>
+        <td class="right">${money(amt)}</td>
+        <td>${r.purpose}</td>
+      `;
+      body.appendChild(tr);
+    });
+  }
+
+  function buildExecSummary(series){
+    const name = $("ventureName").value.trim() || "QDS Applied Wedge";
+    const inv = readNum("investment");
+    const y1 = series[0], y5 = series[4];
+
+    const toneA = [
+      `This projection models <b>${name}</b> as a disciplined three-pillar commercial wedge: Batteries, Data/Forecast, and Structured Delivery.`,
+      `It assumes a conservative early Year 1 base of pilots and a gradual shift into recurring subscription revenue.`,
+      `With an indicative investment of <b>${money(inv)}</b>, the plan prioritises productisation and paid pilots, with contingency and governance built in.`
+    ].join(" ");
+
+    const toneB = [
+      `The model is intentionally grounded: pilots validate demand, subscriptions stabilise cashflow, and structured delivery supports immediate revenue while the toolset matures.`,
+      `Year 1 revenue is projected at <b>${money(y1.revenue)}</b> with controlled costs; Year 5 revenue reaches <b>${money(y5.revenue)}</b> under the selected scenario.`,
+      `Scope remains locked to near-term investable outputs; long-horizon QDS research is excluded from this funding case.`
+    ].join(" ");
+
+    const toneC = [
+      `This is a credibility-forward route: small wins compound into a durable applied platform.`,
+      `The purpose of the investment is not speculative scale, but measurable validation, customer outcomes, and a repeatable product-and-pilot engine.`,
+      `If the market pulls, the wedge can expand; if it does not, the business remains lean and defensible.`
+    ].join(" ");
+
+    const modes = [toneA, toneB, toneC];
+    return modes[state.polishMode % modes.length];
+  }
+
+  function copySummary(series){
+    const name = $("ventureName").value.trim() || "QDS Applied Wedge";
+    const inv = readNum("investment");
+    const sc = state.scenario==="con"?"Conservative":state.scenario==="opt"?"Optimistic":"Base";
+
+    const lines = [];
+    lines.push(`${name} — 5-Year Projection Summary (${sc})`);
+    lines.push(`Investment assumption: ${money(inv)}`);
+    lines.push(`Pillars: Batteries (Pilots + Subscriptions), Data/Forecast, Structured Delivery`);
+    lines.push("");
+
+    series.forEach(s=>{
+      lines.push(
+        `Year ${s.year}: Revenue ${money(s.revenue)} | Costs ${money(s.totalCost)} | Net ${money(s.net)}`
+      );
+    });
+
+    const totalRev = series.reduce((a,b)=>a+b.revenue,0);
+    const totalNet = series.reduce((a,b)=>a+b.net,0);
+    lines.push("");
+    lines.push(`5-Year Total Revenue: ${money(totalRev)}`);
+    lines.push(`5-Year Total Net: ${money(totalNet)}`);
+    lines.push("");
+    lines.push(`Notes: This model excludes long-horizon QDS research and focuses on near-term commercial validation.`);
+
+    const text = lines.join("\n");
+    navigator.clipboard?.writeText(text).then(()=>{
+      $("btnExport").textContent = "Copied ✔";
+      setTimeout(()=> $("btnExport").textContent = "Copy Summary", 900);
+    }).catch(()=>{
+      alert("Clipboard not available. You can manually copy from the page.");
+    });
+  }
+
+  function ultraConservativeTap(){
+    // One-tap realism tightening without destroying the structure.
+    $("pilotsY1").value = Math.max(1, readNum("pilotsY1") - 1);
+    $("pilotVolGrow").value = Math.max(20, readNum("pilotVolGrow") - 25);
+    $("subsEndY1").value = Math.max(2, readNum("subsEndY1") - 3);
+    $("subGrow").value = Math.max(30, readNum("subGrow") - 40);
+    $("forecastCountY1").value = Math.max(3, readNum("forecastCountY1") - 2);
+    $("forecastVolGrow").value = Math.max(20, readNum("forecastVolGrow") - 20);
+    $("daysY1").value = Math.max(40, readNum("daysY1") - 15);
+    $("dayVolGrow").value = Math.max(10, readNum("dayVolGrow") - 15);
+    $("contPct").value = Math.min(18, Math.max(12, readNum("contPct")));
+    setScenario("con");
+    render();
+  }
+
+  function polishSummaryTone(){
+    state.polishMode++;
+    render();
+  }
+
+  function render(){
+    $("asOf").textContent = "As of: " + new Date().toLocaleString("en-GB");
+
+    const series = calcYearSeries();
+    const kpis = buildKPIs(series);
+
+    renderKPIs(kpis);
+    renderTable(series);
+    renderFunds();
+
+    $("execSummary").innerHTML = buildExecSummary(series);
+
+    // Soft visual cue on scenario pill
+    $("scenarioPill").style.borderColor = (state.scenario==="con")
+      ? "rgba(255,210,154,.45)"
+      : (state.scenario==="opt")
+        ? "rgba(184,255,214,.45)"
+        : "rgba(154,209,255,.45)";
+
+    // Live export binding
+    $("btnExport").onclick = ()=>copySummary(series);
+  }
+
+  function bind(){
+    // Scenario buttons
+    document.querySelectorAll(".scenario-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=> setScenario(btn.dataset.s));
+    });
+
+    // Inputs re-render
+    inputs.forEach(id=>{
+      const el = $(id);
+      el.addEventListener("input", ()=> render());
+      el.addEventListener("change", ()=> render());
+    });
+
+    $("btnReset").addEventListener("click", resetDefaults);
+    $("btnTighten").addEventListener("click", ultraConservativeTap);
+    $("btnPolishText").addEventListener("click", polishSummaryTone);
+  }
+
+  snapshotDefaults();
+  bind();
+  render();
+})();
+</script>
+</body>
+</html>

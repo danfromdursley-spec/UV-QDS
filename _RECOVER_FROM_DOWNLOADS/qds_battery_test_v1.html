@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>QDS Battery Stability Demo</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root{
+    --bg:#05060a; --card:#111827; --text:#e5ecff; --accent:#7bffcf; --accent2:#86a6ff;
+  }
+  *{box-sizing:border-box;font-family:system-ui,Segoe UI,Roboto,Arial}
+  body{
+    margin:0; background:radial-gradient(circle at 15% 0%,#1e293b 0,#020617 55%,#000 100%);
+    color:var(--text); padding:10px;
+  }
+  .wrap{max-width:900px;margin:0 auto;}
+  h1{font-size:1.2rem;margin:4px 0 8px 0;text-transform:uppercase;letter-spacing:.08em;color:#cbd5ff;}
+  .card{
+    background:var(--card);
+    border-radius:18px;
+    border:1px solid rgba(148,163,255,.3);
+    padding:12px 14px;
+    box-shadow:0 14px 35px rgba(0,0,0,.6);
+  }
+  label{font-size:.85rem;display:block;margin-top:8px;margin-bottom:2px;}
+  input[type=range]{width:100%;}
+  .row{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;}
+  .col{flex:1 1 160px;}
+  #canvasBox{margin-top:10px;border-radius:12px;overflow:hidden;border:1px solid rgba(148,163,255,.3);}
+  #chart{display:block;width:100%;height:260px;background:#020617;}
+  button{
+    margin-top:10px;width:100%;padding:8px 10px;
+    border-radius:999px;border:1px solid rgba(148,163,255,.4);
+    background:linear-gradient(135deg,rgba(134,166,255,.18),rgba(123,255,207,.12));
+    color:var(--text);font-weight:600;font-size:.9rem;
+  }
+  button:active{transform:translateY(1px) scale(.99);}
+  .legend{font-size:.8rem;margin-top:6px;display:flex;gap:10px;flex-wrap:wrap;}
+  .dot{width:10px;height:10px;border-radius:999px;display:inline-block;margin-right:4px;}
+  .dot.normal{background:#f97373;}
+  .dot.qds{background:#4ade80;}
+  .nums{font-size:.8rem;margin-top:6px;opacity:.9;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>QDS Battery Stability Demo</h1>
+    <p style="font-size:.9rem;opacity:.9;margin-top:2px;">
+      Compares a noisy battery vs. a QDS-stabilised one. Both lose the same average capacity,
+      but QDS reduces random swings (correlated noise smoothing).
+    </p>
+
+    <div class="row">
+      <div class="col">
+        <label>Cycles <span id="cyclesVal">500</span></label>
+        <input type="range" id="cycles" min="100" max="2000" step="100" value="500">
+      </div>
+      <div class="col">
+        <label>Noise level (random stress) <span id="noiseVal">0.6</span></label>
+        <input type="range" id="noise" min="0" max="1" step="0.05" value="0.6">
+      </div>
+      <div class="col">
+        <label>QDS stability strength <span id="qdsVal">0.6</span></label>
+        <input type="range" id="qds" min="0" max="1" step="0.05" value="0.6">
+      </div>
+    </div>
+
+    <button id="runBtn">Run battery test</button>
+
+    <div id="canvasBox">
+      <canvas id="chart"></canvas>
+    </div>
+
+    <div class="legend">
+      <span><span class="dot normal"></span> Normal battery (noisy)</span>
+      <span><span class="dot qds"></span> QDS-stabilised (smoothed noise)</span>
+    </div>
+    <div class="nums" id="stats"></div>
+  </div>
+</div>
+
+<script>
+const cyclesEl = document.getElementById("cycles");
+const noiseEl = document.getElementById("noise");
+const qdsEl   = document.getElementById("qds");
+const cyclesVal = document.getElementById("cyclesVal");
+const noiseVal  = document.getElementById("noiseVal");
+const qdsVal    = document.getElementById("qdsVal");
+const statsEl   = document.getElementById("stats");
+const canvas    = document.getElementById("chart");
+const ctx       = canvas.getContext("2d");
+
+function resizeCanvas(){
+  const box = document.getElementById("canvasBox");
+  canvas.width  = box.clientWidth;
+  canvas.height = 260;
+}
+addEventListener("resize", resizeCanvas);
+resizeCanvas();
+
+// simple PRNG (deterministic for repeatability)
+let seed = 1;
+function rnd(){
+  seed = (seed * 1664525 + 1013904223) >>> 0;
+  return seed / 0xffffffff;
+}
+function gauss(){
+  // Box–Muller
+  let u = 0, v = 0;
+  while(u===0) u = rnd();
+  while(v===0) v = rnd();
+  return Math.sqrt(-2*Math.log(u)) * Math.cos(2*Math.PI*v);
+}
+
+function simulateBattery(cycles, noiseLevel, qdsStrength){
+  const baseFadePerCycle = 0.0002; // 0.02% per cycle ~ 20% after 1000 cycles
+  let normal = [], qds = [];
+  let capN = 1.0, capQ = 1.0;
+  let lastNoiseQ = 0;
+
+  for(let i=0;i<=cycles;i++){
+    if(i>0){
+      // normal battery: white noise around base fade
+      let epsN = gauss() * noiseLevel * 0.003; // random stress term
+      capN -= baseFadePerCycle + epsN;
+      // QDS battery: correlated noise, but QDS damps extremes
+      let rawNoise = gauss() * noiseLevel * 0.003;
+      // correlate with previous noise
+      let correlated = 0.6*lastNoiseQ + 0.4*rawNoise;
+      // QDS smoothing factor: pull noise toward 0
+      let smoothed = correlated * (1 - 0.5*qdsStrength);
+      lastNoiseQ = smoothed;
+      capQ -= baseFadePerCycle + smoothed;
+    }
+    capN = Math.max(0, Math.min(1, capN));
+    capQ = Math.max(0, Math.min(1, capQ));
+    normal.push({x:i, y:capN});
+    qds.push({x:i, y:capQ});
+  }
+  return {normal, qds};
+}
+
+function drawSeries(series, color){
+  const w = canvas.width, h = canvas.height;
+  if(series.length < 2) return;
+  const maxX = series[series.length-1].x;
+  const minY = 0, maxY = 1;
+  ctx.beginPath();
+  for(let i=0;i<series.length;i++){
+    const s = series[i];
+    const x = (s.x / maxX) * (w-30) + 20;
+    const y = h - ((s.y - minY)/(maxY-minY)) * (h-30) - 15;
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+}
+
+function drawAxes(){
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle = "#020617";
+  ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle = "#64748b";
+  ctx.lineWidth = 1;
+  // axes
+  ctx.beginPath();
+  ctx.moveTo(20,10);
+  ctx.lineTo(20,h-15);
+  ctx.lineTo(w-5,h-15);
+  ctx.stroke();
+  ctx.fillStyle = "#94a3b8";
+  ctx.font = "10px system-ui";
+  ctx.fillText("Capacity", 4, 12);
+  ctx.fillText("Cycles →", w-60, h-4);
+  // grid lines
+  for(let i=0;i<=5;i++){
+    const y = h-15 - (i/5)*(h-30);
+    ctx.strokeStyle = "rgba(148,163,184,0.25)";
+    ctx.beginPath();
+    ctx.moveTo(20,y);
+    ctx.lineTo(w-5,y);
+    ctx.stroke();
+    ctx.fillStyle = "#6b7280";
+    ctx.fillText((i*20)+"%", 2, y+3);
+  }
+}
+
+function run(){
+  const cycles = parseInt(cyclesEl.value,10);
+  const noise  = parseFloat(noiseEl.value);
+  const qdsK   = parseFloat(qdsEl.value);
+  cyclesVal.textContent = cycles;
+  noiseVal.textContent  = noise.toFixed(2);
+  qdsVal.textContent    = qdsK.toFixed(2);
+
+  seed = 1; // reset RNG for reproducible comparison
+  const {normal, qds} = simulateBattery(cycles, noise, qdsK);
+
+  drawAxes();
+  // normal (red-ish)
+  drawSeries(normal, "#f97373");
+  // QDS (green-ish)
+  drawSeries(qds, "#4ade80");
+
+  const capN = (normal[normal.length-1].y*100).toFixed(1);
+  const capQ = (qds[qds.length-1].y*100).toFixed(1);
+  statsEl.textContent =
+    "Final capacity after "+cycles+" cycles — Normal: "+capN+"%   ·   QDS-stabilised: "+capQ+"% (same average fade, smoother path).";
+}
+
+document.getElementById("runBtn").addEventListener("click", run);
+run(); // initial
+</script>
+</body>
+</html>

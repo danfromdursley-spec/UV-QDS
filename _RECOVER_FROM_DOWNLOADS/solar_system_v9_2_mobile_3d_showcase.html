@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Solar System V7 — MAXIMUM CHAOS MODE</title>
+
+<style>
+    body {
+        background:#000;
+        color:white;
+        margin:0;
+        overflow:hidden;
+        font-family:Arial;
+    }
+
+    #renderCanvas {
+        position:fixed;
+        top:0;
+        left:0;
+        width:100vw;
+        height:100vh;
+        display:block;
+        touch-action:none;
+    }
+
+    #ui {
+        position:fixed;
+        top:10px; left:10px;
+        z-index:10;
+        background:rgba(0,0,0,0.55);
+        padding:14px;
+        border-radius:10px;
+        width:220px;
+    }
+
+    h3 { margin:5px 0; }
+
+    button, input[type=range], select {
+        width:100%;
+        margin:6px 0;
+        font-size:14px;
+        padding:4px;
+    }
+
+    #planetInfo {
+        position:fixed;
+        right:10px; top:10px;
+        width:260px;
+        background:rgba(0,0,0,0.6);
+        padding:12px;
+        border-radius:10px;
+        display:none;
+        z-index:10;
+        font-size:14px;
+        line-height:1.4em;
+    }
+</style>
+</head>
+
+<body>
+
+<div id="ui">
+    <h3>QDS Controls 🎩</h3>
+
+    <label>λc (coherence)</label>
+    <input type="range" id="lambdaSlider" min="0.1" max="8" step="0.1" value="2">
+
+    <label>τc (temporal)</label>
+    <input type="range" id="tauSlider" min="0.1" max="8" step="0.1" value="2">
+
+    <button onclick="fireCME()">💥 Fire CME</button>
+    <button onclick="setChaosMode(true)">🔥 MAX Chaos</button>
+    <button onclick="setChaosMode(false)">💠 Normal Mode</button>
+
+    <button onclick="rideAlong()">🎥 Ride Along</button>
+    <select id="planetSelect"></select>
+
+    <button onclick="toggleInfo()">📘 Planet Info</button>
+</div>
+
+<div id="planetInfo"></div>
+
+<canvas id="renderCanvas"></canvas>
+
+<script src="https://cdn.babylonjs.com/babylon.js"></script>
+<script>// ===============================================================
+//  BLOCK 2 — BABYLON ENGINE + CAMERA + LIGHTS + SHADOWS
+// ===============================================================
+
+const canvas = document.getElementById("renderCanvas");
+const engine = new BABYLON.Engine(canvas, true, {
+    preserveDrawingBuffer: true,
+    stencil: true,
+    disableWebGL2Support: false
+});
+
+const scene = new BABYLON.Scene(engine);
+scene.clearColor = new BABYLON.Color4(0,0,0,1);
+
+// ---------------------------------------------------------------
+//  CAMERA SYSTEM
+// ---------------------------------------------------------------
+
+const camera = new BABYLON.ArcRotateCamera(
+    "cam",
+    Math.PI / 2,
+    Math.PI / 3,
+    160,
+    new BABYLON.Vector3(0,0,0),
+    scene
+);
+camera.attachControl(canvas, true);
+camera.upperBetaLimit = Math.PI / 2.2;
+camera.lowerRadiusLimit = 40;
+camera.maxZ = 20000;
+
+// Camera ride-along variables
+let rideMode = false;
+let rideTarget = null;
+
+// ---------------------------------------------------------------
+//  LIGHTING — FULL CHAOS EDITION
+// ---------------------------------------------------------------
+
+// Main sun light
+const sunLight = new BABYLON.PointLight(
+    "sunLight",
+    new BABYLON.Vector3(0,0,0),
+    scene
+);
+sunLight.intensity = 3.0;
+sunLight.range = 5000;
+
+// Ambient light
+const ambient = new BABYLON.HemisphericLight(
+    "ambient",
+    new BABYLON.Vector3(0,1,0),
+    scene
+);
+ambient.intensity = 0.15;
+
+// Glow layer for solar corona
+const glow = new BABYLON.GlowLayer("glow", scene);
+glow.intensity = 1.0;
+
+// ---------------------------------------------------------------
+// SHADOW GENERATOR
+// ---------------------------------------------------------------
+
+const shadowGen = new BABYLON.ShadowGenerator(2048, sunLight);
+shadowGen.usePoissonSampling = true;
+shadowGen.forceBackFacesOnly = false;
+shadowGen.useExponentialShadowMap = true;
+shadowGen.setDarkness(0.5);
+
+// ---------------------------------------------------------------
+// CHAOS MODE PARAMETERS
+// ---------------------------------------------------------------
+
+let CHAOS = {
+    active: false,
+    asteroidCount: 5000,
+    solarWindRate: 400,
+    gridLayers: 3,
+    cmeLimit: Infinity
+};
+
+function setChaosMode(on) {
+    CHAOS.active = on;
+    if (on) {
+        glow.intensity = 1.4;
+        ambient.intensity = 0.25;
+        sunLight.intensity = 4.0;
+    } else {
+        glow.intensity = 1.0;
+        ambient.intensity = 0.15;
+        sunLight.intensity = 3.0;
+    }
+}
+
+// ---------------------------------------------------------------
+//  PLANET SELECT UI POPULATION (done after planets load)
+// ---------------------------------------------------------------
+
+const planetSelect = document.getElementById("planetSelect");
+
+function populatePlanetMenu(names) {
+    planetSelect.innerHTML = "";
+    names.forEach(n => {
+        const opt = document.createElement("option");
+        opt.value = n;
+        opt.innerText = n;
+        planetSelect.appendChild(opt);
+    });
+}
+
+// ---------------------------------------------------------------
+// CAMERA RIDE ALONG
+// ---------------------------------------------------------------
+
+function rideAlong() {
+    rideMode = true;
+    rideTarget = window.SOLAR.planets.find(
+        p => p.name === planetSelect.value
+    );
+
+    if (!rideTarget) {
+        alert("Select a planet first!");
+        return;
+    }
+}// ===============================================================
+//  BLOCK 3 — SOLAR SYSTEM OBJECTS
+// ===============================================================
+
+window.SOLAR = {
+    planets: [],
+    meshes: [],
+    time: 0
+};
+
+// ---------------------------------------------------------------
+// SUN
+// ---------------------------------------------------------------
+
+const sunMaterial = new BABYLON.StandardMaterial("sunMat", scene);
+sunMaterial.emissiveColor = new BABYLON.Color3(1, 0.8, 0.2);
+sunMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+sunMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+
+const sun = BABYLON.MeshBuilder.CreateSphere("Sun", { diameter: 20 }, scene);
+sun.material = sunMaterial;
+shadowGen.addShadowCaster(sun);
+
+// ---------------------------------------------------------------
+// PLANET DEFINTIONS
+// Distance & size scaled for visibility
+// ---------------------------------------------------------------
+
+const planetData = [
+    { name:"Mercury", size:2,     dist:30,  speed:0.015, rot:0.03, tilt:0.01, texture:"https://raw.githubusercontent.com/babylonjs/resources/master/textures/planets/mercury.jpg" },
+    { name:"Venus",   size:3.5,   dist:40,  speed:0.012, rot:-0.02, tilt:3,   texture:"https://raw.githubusercontent.com/babylonjs/resources/master/textures/planets/venus.jpg" },
+    { name:"Earth",   size:4,     dist:55,  speed:0.01,  rot:0.04, tilt:23.5, texture:"https://raw.githubusercontent.com/babylonjs/resources/master/textures/planets/earth.jpg" },
+    { name:"Mars",    size:3,     dist:70,  speed:0.008, rot:0.04, tilt:25,  texture:"https://raw.githubusercontent.com/babylonjs/resources/master/textures/planets/mars.jpg" },
+    { name:"Jupiter", size:10,    dist:95,  speed:0.004, rot:0.1,  tilt:3,   texture:"https://raw.githubusercontent.com/babylonjs/resources/master/textures/planets/jupiter.jpg" },
+    { name:"Saturn",  size:9,     dist:120, speed:0.003, rot:0.09, tilt:26,  texture:"https://raw.githubusercontent.com/babylonjs/resources/master/textures/planets/saturn.jpg" },
+    { name:"Uranus",  size:7,     dist:150, speed:0.0025,rot:-0.07, tilt:97, texture:"https://raw.githubusercontent.com/babylonjs/resources/master/textures/planets/uranus.jpg" },
+    { name:"Neptune", size:7,     dist:170, speed:0.002, rot:0.06, tilt:28,  texture:"https://raw.githubusercontent.com/babylonjs/resources/master/textures/planets/neptune.jpg" },
+    { name:"Pluto",   size:2.5,   dist:190, speed:0.0015,rot:0.03, tilt:120, texture:"https://raw.githubusercontent.com/babylonjs/resources/master/textures/planets/pluto.jpg" }
+];
+
+// ---------------------------------------------------------------
+// CREATE PLANETS
+// ---------------------------------------------------------------
+
+planetData.forEach(data => {
+    const material = new BABYLON.StandardMaterial(data.name+"Mat", scene);
+    material.diffuseTexture = new BABYLON.Texture(data.texture, scene);
+    material.specularColor = new BABYLON.Color3(0,0,0);
+
+    const mesh = BABYLON.MeshBuilder.CreateSphere(data.name, { diameter: data.size }, scene);
+    mesh.material = material;
+
+    // Tilt
+    mesh.rotation.x = BABYLON.Tools.ToRadians(data.tilt);
+
+    shadowGen.addShadowCaster(mesh);
+    window.SOLAR.meshes.push(mesh);
+
+    window.SOLAR.planets.push({
+        name: data.name,
+        mesh: mesh,
+        dist: data.dist,
+        size: data.size,
+        speed: data.speed,
+        rot: data.rot,
+        angle: Math.random() * Math.PI * 2,
+        tilt: data.tilt
+    });
+});
+
+// ---------------------------------------------------------------
+// SATURN RINGS
+// ---------------------------------------------------------------
+
+const saturn = window.SOLAR.planets.find(p => p.name === "Saturn").mesh;
+
+const ringMat = new BABYLON.StandardMaterial("ringMat", scene);
+ringMat.diffuseTexture = new BABYLON.Texture(
+    "https://raw.githubusercontent.com/babylonjs/resources/master/textures/planets/saturn_ring.png",
+    scene
+);
+ringMat.diffuseTexture.hasAlpha = true;
+ringMat.backFaceCulling = false;
+
+const rings = BABYLON.MeshBuilder.CreateDisc("saturnRings", {
+    radius: 16,
+    tessellation: 80,
+    sideOrientation: BABYLON.Mesh.DOUBLESIDE
+}, scene);
+
+rings.material = ringMat;
+rings.parent = saturn;
+rings.rotation.x = BABYLON.Tools.ToRadians(90);
+
+// ---------------------------------------------------------------
+// POPULATE DROPDOWN
+// ---------------------------------------------------------------
+
+populatePlanetMenu(planetData.map(p => p.name));// ===============================================================
+//  BLOCK 4 — ASTEROID BELT (Procedural, QDS turbulence)
+// ===============================================================
+
+window.SOLAR.asteroids = [];
+
+// ---------------------------------------------------------------
+// ASTEROID SETTINGS
+// ---------------------------------------------------------------
+
+const ASTEROID_COUNT = 5000;
+const INNER_RADIUS = 210;   // inside Mars–Jupiter region
+const OUTER_RADIUS = 260;   // thick belt for visual effect
+const MIN_SIZE = 0.3;
+const MAX_SIZE = 1.8;
+
+// QDS-like turbulence amplitude
+const QDS_TURB = 0.4;
+
+// Texture for rocks
+const rockTexture = new BABYLON.Texture(
+    "https://raw.githubusercontent.com/babylonjs/resources/master/textures/rock.jpg",
+    scene
+);
+
+// Base asteroid material shared by all (GPU efficient)
+const asteroidMat = new BABYLON.StandardMaterial("asteroidMat", scene);
+asteroidMat.diffuseTexture = rockTexture;
+asteroidMat.specularColor = new BABYLON.Color3(0, 0, 0);
+
+// ---------------------------------------------------------------
+// CREATE ASTEROIDS
+// ---------------------------------------------------------------
+
+for (let i = 0; i < ASTEROID_COUNT; i++) {
+
+    // random orbit radius
+    const radius = INNER_RADIUS + Math.random() * (OUTER_RADIUS - INNER_RADIUS);
+
+    // random starting angle
+    const angle = Math.random() * Math.PI * 2;
+
+    // random inclination up to 20 degrees
+    const inclination = (Math.random() - 0.5) * BABYLON.Tools.ToRadians(20);
+
+    // asteroid mesh (low poly sphere)
+    const size = MIN_SIZE + Math.random() * (MAX_SIZE - MIN_SIZE);
+    const asteroid = BABYLON.MeshBuilder.CreateSphere("asteroid_" + i, {
+        diameter: size,
+        segments: 4
+    }, scene);
+
+    asteroid.material = asteroidMat;
+
+    // initial position
+    asteroid.position.x = Math.cos(angle) * radius;
+    asteroid.position.z = Math.sin(angle) * radius;
+    asteroid.position.y = Math.sin(inclination) * 10;
+
+    // save parameters
+    window.SOLAR.asteroids.push({
+        mesh: asteroid,
+        baseRadius: radius,
+        angle: angle,
+        speed: 0.0005 + Math.random() * 0.0015,  // slight variations
+        inclination: inclination,
+        wobblePhase: Math.random() * Math.PI * 2
+    });
+
+    shadowGen.addShadowCaster(asteroid);
+}
+
+// ---------------------------------------------------------------
+// ASTEROID UPDATE FUNCTION (called from main loop)
+// ---------------------------------------------------------------
+
+window.SOLAR.updateAsteroids = function(time) {
+    window.SOLAR.asteroids.forEach(a => {
+
+        // update angle (orbit)
+        a.angle += a.speed;
+
+        // QDS-style spatially coherent wobble
+        const wobble = Math.sin(time * 0.002 + a.wobblePhase) * QDS_TURB;
+
+        // new position
+        const x = Math.cos(a.angle) * (a.baseRadius + wobble * 2);
+        const z = Math.sin(a.angle) * (a.baseRadius + wobble * 2);
+        const y = Math.sin(a.inclination) * (10 + wobble * 4);
+
+        a.mesh.position.set(x, y, z);
+
+        // gentle rotation for visual appeal
+        a.mesh.rotation.x += 0.01;
+        a.mesh.rotation.y += 0.02;
+    });
+};// ===============================================================
+//  BLOCK 5 — COMETS (High-eccentricity + Dual Tails)
+// ===============================================================
+
+window.SOLAR.comets = [];
+
+// ---------------------------------------------------------------
+// SETTINGS
+// ---------------------------------------------------------------
+
+const COMET_COUNT = 6;
+
+const COMET_MIN_DIST = 80;     // closest to sun (perihelion)
+const COMET_MAX_DIST = 500;    // farthest out (aphelion)
+
+const QDS_COMET_WOBBLE = 0.8;  // turbulence intensity
+
+// ---------------------------------------------------------------
+// Create comet material
+// ---------------------------------------------------------------
+
+const cometMat = new BABYLON.StandardMaterial("cometMat", scene);
+cometMat.diffuseColor = new BABYLON.Color3(0.9, 0.9, 1.0);
+cometMat.specularColor = new BABYLON.Color3(0, 0, 0);
+
+// ---------------------------------------------------------------
+// Create particle textures
+// ---------------------------------------------------------------
+
+const tailTex = new BABYLON.Texture(
+    "https://raw.githubusercontent.com/babylonjs/resources/master/textures/flare.png",
+    scene
+);
+
+// ---------------------------------------------------------------
+// Create COMETS
+// ---------------------------------------------------------------
+
+for (let i = 0; i < COMET_COUNT; i++) {
+
+    // base mesh
+    const comet = BABYLON.MeshBuilder.CreateSphere("comet_" + i, {
+        diameter: 2,
+        segments: 6
+    }, scene);
+
+    comet.material = cometMat;
+
+    // random orbital parameters
+    const angle = Math.random() * Math.PI * 2;
+    const eccentricity = 0.65 + Math.random() * 0.25;         // very elongated
+    const inclination = (Math.random() - 0.5) * BABYLON.Tools.ToRadians(35);
+
+    const orbitSpeed = 0.0005 + Math.random() * 0.001;
+
+    // record comet
+    const record = {
+        mesh: comet,
+        angle,
+        ecc: eccentricity,
+        inc: inclination,
+        speed: orbitSpeed,
+        phase: Math.random() * Math.PI * 2
+    };
+
+    // -------------------------
+    // Dust tail
+    // -------------------------
+    const dustTail = new BABYLON.ParticleSystem("dustTail_" + i, 2000, scene);
+    dustTail.particleTexture = tailTex;
+    dustTail.emitter = comet;
+    dustTail.color1 = new BABYLON.Color4(1, 0.8, 0.4, 0.9);
+    dustTail.color2 = new BABYLON.Color4(1, 0.5, 0.2, 0.4);
+    dustTail.minSize = 0.3;
+    dustTail.maxSize = 0.8;
+    dustTail.minLifeTime = 0.4;
+    dustTail.maxLifeTime = 1.2;
+    dustTail.emitRate = 600;
+    dustTail.direction1 = new BABYLON.Vector3(0, 0, 0);
+    dustTail.direction2 = new BABYLON.Vector3(0, 0, 0);
+    dustTail.start();
+
+    record.dust = dustTail;
+
+    // -------------------------
+    // Ion tail (blue)
+    // -------------------------
+    const ionTail = new BABYLON.ParticleSystem("ionTail_" + i, 1500, scene);
+    ionTail.particleTexture = tailTex;
+    ionTail.emitter = comet;
+    ionTail.color1 = new BABYLON.Color4(0.4, 0.6, 1.0, 1.0);
+    ionTail.color2 = new BABYLON.Color4(0.1, 0.4, 1.0, 0.4);
+    ionTail.minSize = 0.2;
+    ionTail.maxSize = 0.6;
+    ionTail.minLifeTime = 0.5;
+    ionTail.maxLifeTime = 1.5;
+    ionTail.emitRate = 900;
+    ionTail.start();
+
+    record.ion = ionTail;
+
+    // store comet
+    window.SOLAR.comets.push(record);
+}
+
+// ---------------------------------------------------------------
+// UPDATE FUNCTION FOR COMETS
+// ---------------------------------------------------------------
+
+window.SOLAR.updateComets = function(time) {
+
+    window.SOLAR.comets.forEach(c => {
+
+        // update orbital angle
+        c.angle += c.speed;
+
+        // eccentric radius calculation
+        const radius = BABYLON.Scalar.Lerp(
+            COMET_MIN_DIST,
+            COMET_MAX_DIST,
+            0.5 * (1 + Math.sin(c.angle))   // 0..1
+        );
+
+        // QDS wobble
+        const wobble = Math.sin(time * 0.001 + c.phase) * QDS_COMET_WOBBLE;
+
+        // position in orbit plane
+        let x = Math.cos(c.angle) * (radius + wobble);
+        let z = Math.sin(c.angle) * (radius + wobble);
+        let y = Math.sin(c.inc) * 10;
+
+        c.mesh.position.set(x, y, z);
+
+        // ---- Tail direction (ALWAYS away from Sun) ----
+        const toSun = c.mesh.position.subtract(BABYLON.Vector3.Zero());
+        const tailDir = toSun.negate().normalize().scale(2.0);
+
+        c.dust.direction1 = tailDir;
+        c.dust.direction2 = tailDir;
+
+        c.ion.direction1 = tailDir.scale(1.4);
+        c.ion.direction2 = tailDir.scale(1.4);
+
+        // rotation for visual effect
+        c.mesh.rotation.y += 0.02;
+        c.mesh.rotation.x += 0.01;
+    });
+};// ===============================================================
+//   BLOCK 6 — INTERSTELLAR VISITORS (Hyperbolic Trajectories)
+// ===============================================================
+
+window.SOLAR.visitors = [];
+
+// ------------------------
+// QDS SETTINGS
+// ------------------------
+
+const QDS_JITTER_AMPLITUDE = 0.15;
+const QDS_JITTER_SPEED = 0.008;
+
+const VISITOR_SPEED = 0.35;        // base velocity
+const VISITOR_COUNT = 2;
+
+// ------------------------
+// SHARED MATERIALS
+// ------------------------
+
+const cigarMat = new BABYLON.StandardMaterial("cigarMat", scene);
+cigarMat.diffuseColor = new BABYLON.Color3(0.8, 0.4, 0.3);
+
+const icyMat = new BABYLON.StandardMaterial("icyMat", scene);
+icyMat.diffuseColor = new BABYLON.Color3(0.6, 0.8, 1.0);
+
+// ------------------------
+// TEXTURE FOR BORISOV TAIL
+// ------------------------
+
+const tailTexture = new BABYLON.Texture(
+    "https://raw.githubusercontent.com/babylonjs/resources/master/textures/flare.png",
+    scene
+);
+
+// ===============================================================
+// CREATE ‘OUMUAMUA ("cigar visitor")
+// ===============================================================
+
+(function createOumuamua() {
+    
+    const mesh = BABYLON.MeshBuilder.CreateBox("oumuamua", {
+        height: 10,
+        width: 1.2,
+        depth: 1.2,
+    }, scene);
+
+    mesh.material = cigarMat;
+
+    mesh.position = new BABYLON.Vector3(-600, 150, -300);
+    const velocity = new BABYLON.Vector3(VISITOR_SPEED, -0.05, VISITOR_SPEED * 0.4);
+
+    window.SOLAR.visitors.push({
+        mesh,
+        velocity,
+        type: "cigar",
+        tumbleX: 0.01 + Math.random() * 0.01,
+        tumbleY: 0.008 + Math.random() * 0.008,
+        jitterPhase: Math.random() * 20
+    });
+
+})();
+
+// ===============================================================
+// CREATE BORISOV-STYLE HYPERBOLIC COMET
+// ===============================================================
+
+(function createBorisov() {
+
+    const mesh = BABYLON.MeshBuilder.CreateSphere("borisov", {
+        diameter: 2
+    }, scene);
+
+    mesh.material = icyMat;
+    mesh.position = new BABYLON.Vector3(700, -250, 500);
+
+    const velocity = new BABYLON.Vector3(-VISITOR_SPEED * 1.2, 0.12, -VISITOR_SPEED * 0.9);
+
+    // ion tail
+    const ionTail = new BABYLON.ParticleSystem("borisovTail", 2000, scene);
+    ionTail.particleTexture = tailTexture;
+    ionTail.emitter = mesh;
+    ionTail.color1 = new BABYLON.Color4(0.4, 0.6, 1.0, 1.0);
+    ionTail.color2 = new BABYLON.Color4(0.1, 0.4, 1.0, 0.4);
+    ionTail.minSize = 0.3;
+    ionTail.maxSize = 0.8;
+    ionTail.emitRate = 800;
+    ionTail.minLifeTime = 0.6;
+    ionTail.maxLifeTime = 1.4;
+    ionTail.start();
+
+    window.SOLAR.visitors.push({
+        mesh,
+        velocity,
+        tail: ionTail,
+        type: "borisov",
+        jitterPhase: Math.random() * 20
+    });
+
+})();
+
+
+// ===============================================================
+// UPDATE FUNCTION — VISITORS
+// ===============================================================
+
+window.SOLAR.updateVisitors = function(time) {
+
+    window.SOLAR.visitors.forEach(v => {
+
+        // QDS jitter effect
+        const jitter =
+            Math.sin(time * QDS_JITTER_SPEED + v.jitterPhase) * QDS_JITTER_AMPLITUDE;
+
+        // apply velocity
+        v.mesh.position.addInPlace(v.velocity);
+        v.mesh.position.x += jitter;
+
+        // tumbling for ‘Oumuamua
+        if (v.type === "cigar") {
+            v.mesh.rotation.x += v.tumbleX;
+            v.mesh.rotation.y += v.tumbleY;
+        }
+
+        // comet tail always points away from Sun
+        if (v.type === "borisov" && v.tail) {
+            const dir = v.mesh.position.negate().normalize().scale(3.0);
+            v.tail.direction1 = dir;
+            v.tail.direction2 = dir;
+        }
+
+        // fade or despawn after leaving system
+        if (v.mesh.position.length() > 1500) {
+            v.mesh.dispose();
+            if (v.tail) v.tail.dispose();
+        }
+    });
+};window.SOLAR.updateVisitors(time);// ====================================================================
+//   BLOCK 7 — Asteroid Belt + Kuiper Belt + Inner Oort Cloud
+// ====================================================================
+
+window.SOLAR.belts = {
+    asteroids: [],
+    kuiper: [],
+    oort: []
+};
+
+// ===============================================================
+// UTILITY — random between -1 and +1
+// ===============================================================
+function randUnit() {
+    return (Math.random() * 2 - 1);
+}
+
+// ===============================================================
+// CREATE ASTEROID BELT (3000 objects)
+// ===============================================================
+
+(function createAsteroids() {
+    const count = 3000;
+
+    for (let i = 0; i < count; i++) {
+
+        const radius = 30 + Math.random() * 20;  // distance from Sun
+        const angle = Math.random() * Math.PI * 2;
+        const height = randUnit() * 0.6;         // slight inclination
+
+        const asteroid = BABYLON.MeshBuilder.CreateSphere("asteroid_" + i, {
+            diameter: 0.4 + Math.random() * 0.4
+        }, scene);
+
+        asteroid.material = new BABYLON.StandardMaterial("astMat", scene);
+        asteroid.material.diffuseColor = new BABYLON.Color3(
+            0.4 + Math.random() * 0.3,
+            0.3 + Math.random() * 0.2,
+            0.2
+        );
+
+        asteroid.position = new BABYLON.Vector3(
+            radius * Math.cos(angle),
+            height,
+            radius * Math.sin(angle)
+        );
+
+        window.SOLAR.belts.asteroids.push({
+            mesh: asteroid,
+            angle: angle,
+            radius: radius,
+            speed: 0.0008 + Math.random() * 0.0004,
+            height: height,
+            qdsPhase: Math.random() * 20
+        });
+    }
+})();
+
+// ===============================================================
+// CREATE KUIPER BELT (1000 icy bodies)
+// ===============================================================
+
+(function createKuiper() {
+    const count = 1000;
+
+    for (let i = 0; i < count; i++) {
+
+        const radius = 80 + Math.random() * 60; // 80–140 AU (scaled)
+        const angle = Math.random() * Math.PI * 2;
+        const height = randUnit() * 2;
+
+        const cube = BABYLON.MeshBuilder.CreateBox("kuiper_" + i, {
+            size: 0.6 + Math.random() * 0.6
+        }, scene);
+
+        cube.material = new BABYLON.StandardMaterial("iceMat", scene);
+        cube.material.diffuseColor = new BABYLON.Color3(
+            0.5 + Math.random() * 0.4,
+            0.7 + Math.random() * 0.2,
+            1.0
+        );
+
+        cube.position = new BABYLON.Vector3(
+            radius * Math.cos(angle),
+            height,
+            radius * Math.sin(angle)
+        );
+
+        window.SOLAR.belts.kuiper.push({
+            mesh: cube,
+            angle,
+            radius,
+            speed: 0.00015 + Math.random() * 0.0001,
+            height,
+            qdsPhase: Math.random() * 40
+        });
+    }
+})();
+
+// ===============================================================
+// CREATE INNER OORT CLOUD (2000 slow bodies)
+// ===============================================================
+
+(function createOortCloud() {
+    const count = 2000;
+
+    for (let i = 0; i < count; i++) {
+
+        const radius = 200 + Math.random() * 200;  // 200–400 AU
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.random() * Math.PI;
+
+        const x = radius * Math.sin(phi) * Math.cos(theta);
+        const y = radius * Math.cos(phi);
+        const z = radius * Math.sin(phi) * Math.sin(theta);
+
+        const dot = BABYLON.MeshBuilder.CreateSphere("oort_" + i, {
+            diameter: 0.4
+        }, scene);
+
+        dot.material = new BABYLON.StandardMaterial("oortMat", scene);
+        dot.material.diffuseColor = new BABYLON.Color3(
+            0.9 + Math.random()*0.1,
+            0.9,
+            1.0
+        );
+
+        dot.position = new BABYLON.Vector3(x, y, z);
+
+        window.SOLAR.belts.oort.push({
+            mesh: dot,
+            theta,
+            phi,
+            radius,
+            speed: 0.00003 + Math.random() * 0.00002,
+            qdsPhase: Math.random() * 100
+        });
+    }
+})();
+
+// ====================================================================
+// UPDATE FUNCTION FOR BELTS
+// ====================================================================
+
+window.SOLAR.updateBelts = function(time) {
+
+    const qdsOsc = Math.sin(time * 0.004) * 0.4;
+
+    // ------------------
+    // ASTEROIDS
+    // ------------------
+    window.SOLAR.belts.asteroids.forEach(a => {
+        a.angle += a.speed;
+        const jitter = Math.sin(time * 0.002 + a.qdsPhase) * 0.3;
+
+        a.mesh.position.x = (a.radius + jitter) * Math.cos(a.angle);
+        a.mesh.position.z = (a.radius + jitter) * Math.sin(a.angle);
+        a.mesh.position.y = a.height;
+    });
+
+    // ------------------
+    // KUIPER BELT
+    // ------------------
+    window.SOLAR.belts.kuiper.forEach(k => {
+        k.angle += k.speed;
+        const jitter = Math.sin(time * 0.001 + k.qdsPhase) * 1.2;
+
+        k.mesh.position.x = (k.radius + jitter) * Math.cos(k.angle);
+        k.mesh.position.z = (k.radius + jitter) * Math.sin(k.angle);
+        k.mesh.position.y = k.height + qdsOsc;
+    });
+
+    // ------------------
+    // OORT CLOUD
+    // ------------------
+    window.SOLAR.belts.oort.forEach(o => {
+        o.theta += o.speed * 0.3;
+        o.phi += o.speed * 0.15;
+
+        const jitter = Math.sin(time * 0.0008 + o.qdsPhase) * 3;
+
+        o.mesh.position.x = (o.radius + jitter) *
+            Math.sin(o.phi) * Math.cos(o.theta);
+        o.mesh.position.y = (o.radius + jitter) *
+            Math.cos(o.phi);
+        o.mesh.position.z = (o.radius + jitter) *
+            Math.sin(o.phi) * Math.sin(o.theta);
+    });
+
+};// ====================================================================
+// BLOCK 8 — GRAVITY ENGINE + COLLISIONS + QDS DEBRIS FIELDS
+// ====================================================================
+
+window.SOLAR.physics = {
+    bodies: [],      // all objects with mass
+    debris: []       // collision debris
+};
+
+// ===============================================================
+// BODY REGISTRATION FUNCTION
+// ===============================================================
+window.SOLAR.registerBody = function(mesh, mass, radius) {
+    window.SOLAR.physics.bodies.push({
+        mesh,
+        mass,
+        radius,
+        velocity: new BABYLON.Vector3(0, 0, 0)
+    });
+};
+
+// ===============================================================
+// SIMPLE GRAVITY CONSTANT (scaled down)
+// ===============================================================
+const G = 0.000002;   // tuned for your visual scale
+
+// QDS turbulence strength
+const QDS_ACCEL = 0.00003;
+
+// ===============================================================
+// GRAVITY STEP
+// ===============================================================
+function applyGravity(dt, time) {
+
+    const bodies = window.SOLAR.physics.bodies;
+
+    for (let i = 0; i < bodies.length; i++) {
+        for (let j = i + 1; j < bodies.length; j++) {
+
+            const A = bodies[i];
+            const B = bodies[j];
+
+            const delta = B.mesh.position.subtract(A.mesh.position);
+            const dist = delta.length();
+
+            if (dist < 0.001) continue;
+
+            const force = (G * A.mass * B.mass) / (dist * dist);
+            const accel = delta.normalize().scale(force);
+
+            // apply symmetrical acceleration
+            A.velocity.addInPlace(accel.scale(1 / A.mass));
+            B.velocity.addInPlace(accel.scale(-1 / B.mass));
+        }
+    }
+
+    // QDS turbulence to all bodies
+    bodies.forEach(b => {
+        const q = Math.sin(time * 0.003 + b.mesh.position.length() * 0.1);
+        const jitter = q * QDS_ACCEL;
+
+        b.velocity.x += jitter * (Math.random() - 0.5);
+        b.velocity.y += jitter * (Math.random() - 0.5);
+        b.velocity.z += jitter * (Math.random() - 0.5);
+    });
+
+    // apply velocity to positions
+    bodies.forEach(b => {
+        b.mesh.position.addInPlace(b.velocity.scale(dt));
+    });
+}
+
+// ===============================================================
+// COLLISION CHECK
+// ===============================================================
+function checkCollisions() {
+
+    const bodies = window.SOLAR.physics.bodies;
+
+    for (let i = 0; i < bodies.length; i++) {
+        for (let j = i + 1; j < bodies.length; j++) {
+
+            const A = bodies[i];
+            const B = bodies[j];
+
+            const dist = BABYLON.Vector3.Distance(A.mesh.position, B.mesh.position);
+
+            if (dist < A.radius + B.radius) {
+                createDebris(A, B);
+            }
+        }
+    }
+}
+
+// ===============================================================
+// DEBRIS FIELD CREATION
+// ===============================================================
+function createDebris(A, B) {
+
+    const pos = A.mesh.position.clone();
+
+    // explosion effect
+    const debrisCount = 120 + Math.floor(Math.random() * 80);
+
+    for (let i = 0; i < debrisCount; i++) {
+
+        const frag = BABYLON.MeshBuilder.CreateSphere("debris", {
+            diameter: 0.3
+        }, scene);
+
+        frag.position = pos.clone();
+
+        const vel = new BABYLON.Vector3(
+            (Math.random() - 0.5) * 1.4,
+            (Math.random() - 0.5) * 1.4,
+            (Math.random() - 0.5) * 1.4
+        );
+
+        window.SOLAR.physics.debris.push({
+            mesh: frag,
+            velocity: vel,
+            life: 600 + Math.random() * 600
+        });
+    }
+
+    // Optional: delete one or both bodies
+    // B.mesh.dispose();  // uncomment for full chaos mode
+}
+
+// ===============================================================
+// DEBRIS UPDATE
+// ===============================================================
+function updateDebris() {
+
+    for (let i = window.SOLAR.physics.debris.length - 1; i >= 0; i--) {
+
+        const d = window.SOLAR.physics.debris[i];
+
+        d.mesh.position.addInPlace(d.velocity);
+        d.velocity.scaleInPlace(0.995);  // slow decay
+        d.life--;
+
+        if (d.life <= 0) {
+            d.mesh.dispose();
+            window.SOLAR.physics.debris.splice(i, 1);
+        }
+    }
+}
+
+// ===============================================================
+// PUBLIC UPDATE FUNCTION
+// ===============================================================
+window.SOLAR.updatePhysics = function(dt, time) {
+    applyGravity(dt, time);
+    checkCollisions();
+    updateDebris();
+};

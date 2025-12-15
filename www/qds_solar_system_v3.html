@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>QDS Solar System V3 – GR vs QDS kernel</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #05060a;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #f5f5f5;
+    }
+    #renderCanvas {
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+      display: block;
+    }
+    #ui-panel {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(5, 6, 10, 0.92);
+      border-radius: 10px;
+      padding: 10px 12px;
+      box-shadow: 0 0 18px rgba(0,0,0,0.7);
+      font-size: 11px;
+      max-width: 260px;
+      z-index: 10;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    #ui-panel h1 {
+      font-size: 13px;
+      margin: 0 0 6px 0;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    #ui-panel h1 span {
+      font-size: 15px;
+    }
+    .slider-row {
+      margin: 4px 0;
+    }
+    .slider-row label {
+      display: block;
+      margin-bottom: 2px;
+    }
+    .slider-row input[type="range"] {
+      width: 100%;
+    }
+    .small-text {
+      font-size: 10px;
+      opacity: 0.8;
+      margin-top: 3px;
+    }
+    .toggle-row {
+      margin-top: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .toggle-row label {
+      font-size: 10px;
+    }
+    select {
+      background: #141622;
+      color: #f5f5f5;
+      border-radius: 6px;
+      border: 1px solid #33374a;
+      padding: 2px 4px;
+      font-size: 10px;
+    }
+  </style>
+</head>
+<body>
+<div id="ui-panel">
+  <h1>QDS Solar System V3 <span>🎩</span></h1>
+  <div class="small-text">
+    Clean Keplerian orbits with a tunable QDS vacuum kernel that gently perturbs them.<br>
+    Pluto included because respect.
+  </div>
+
+  <div class="slider-row">
+    <label for="lambdaSlider">Spatial correlation λ<sub>c</sub></label>
+    <input id="lambdaSlider" type="range" min="0.5" max="3.0" step="0.1" value="2.5">
+  </div>
+
+  <div class="slider-row">
+    <label for="tauSlider">Temporal correlation τ<sub>c</sub></label>
+    <input id="tauSlider" type="range" min="0.5" max="3.0" step="0.1" value="2.5">
+  </div>
+
+  <div class="slider-row">
+    <label for="ampSlider">Field amplitude A</label>
+    <input id="ampSlider" type="range" min="0.0" max="1.5" step="0.05" value="0.4">
+  </div>
+
+  <div class="slider-row">
+    <label for="speedSlider">Orbit speed (sim time)</label>
+    <input id="speedSlider" type="range" min="0.3" max="6.0" step="0.1" value="2.0">
+  </div>
+
+  <div class="toggle-row">
+    <label for="modeSelect">Mode:</label>
+    <select id="modeSelect">
+      <option value="gr">GR only (clean Kepler)</option>
+      <option value="qds" selected>Kepler + QDS kernel</option>
+    </select>
+  </div>
+
+  <div class="toggle-row">
+    <label>
+      <input type="checkbox" id="showTrails" checked>
+      Show orbit lines
+    </label>
+    <label>
+      <input type="checkbox" id="showBelt" checked>
+      Show asteroid belt
+    </label>
+  </div>
+
+  <div class="small-text">
+    Drag to orbit – pinch / scroll to zoom.<br>
+    QDS kernel controls radial &amp; vertical displacement in real time.<br>
+    Higher λ<sub>c</sub> / τ<sub>c</sub> &amp; A ⇒ smoother, correlated wobble; not chaos.
+  </div>
+</div>
+
+<canvas id="renderCanvas"></canvas>
+
+<script src="https://cdn.babylonjs.com/babylon.js"></script>
+<script>
+  const canvas = document.getElementById("renderCanvas");
+  const engine = new BABYLON.Engine(canvas, true, {
+    preserveDrawingBuffer: true,
+    stencil: true,
+  });
+
+  function createScene() {
+    const scene = new BABYLON.Scene(engine);
+    scene.clearColor = new BABYLON.Color4(0.02, 0.03, 0.07, 1.0);
+
+    // Camera
+    const camera = new BABYLON.ArcRotateCamera(
+      "camera",
+      -Math.PI / 2.2,
+      Math.PI / 3,
+      120,
+      BABYLON.Vector3.Zero(),
+      scene
+    );
+    camera.attachControl(canvas, true);
+    camera.lowerRadiusLimit = 40;
+    camera.upperRadiusLimit = 260;
+
+    // Lights
+    const light = new BABYLON.HemisphericLight(
+      "hemi",
+      new BABYLON.Vector3(0, 1, 0),
+      scene
+    );
+    light.intensity = 0.8;
+
+    const sunLight = new BABYLON.PointLight(
+      "sunLight",
+      new BABYLON.Vector3(0, 0, 0),
+      scene
+    );
+    sunLight.intensity = 1.6;
+    sunLight.range = 400;
+
+    // Substrate "grid" – dots in the vacuum field
+    const fieldDots = [];
+    const baseDot = BABYLON.MeshBuilder.CreateSphere("fdot", {
+      diameter: 0.7,
+      segments: 4,
+    }, scene);
+    baseDot.material = new BABYLON.StandardMaterial("fdotMat", scene);
+    baseDot.material.emissiveColor = new BABYLON.Color3(0.1, 0.6, 1.0);
+    baseDot.material.specularColor = new BABYLON.Color3(0, 0, 0);
+    baseDot.isPickable = false;
+
+    const gridRadius = 140;
+    const spacing = 10;
+    for (let x = -gridRadius; x <= gridRadius; x += spacing) {
+      for (let z = -gridRadius; z <= gridRadius; z += spacing) {
+        const d = Math.sqrt(x * x + z * z);
+        if (d > gridRadius) continue;
+        const dot = baseDot.clone("fdot_" + x + "_" + z);
+        dot.position.set(x, -0.4, z);
+        fieldDots.push(dot);
+      }
+    }
+    baseDot.setEnabled(false);
+
+    // Sun
+    const sun = BABYLON.MeshBuilder.CreateSphere("sun", {
+      diameter: 16,
+      segments: 24,
+    }, scene);
+    const sunMat = new BABYLON.StandardMaterial("sunMat", scene);
+    sunMat.emissiveColor = new BABYLON.Color3(1.0, 0.9, 0.4);
+    sunMat.diffuseColor = new BABYLON.Color3(0.9, 0.75, 0.3);
+    sunMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
+    sun.material = sunMat;
+
+    // Planet factory
+    function makePlanet(name, radius, orbitRadius, orbitPeriodYears, color, label) {
+      const mesh = BABYLON.MeshBuilder.CreateSphere(name, {
+        diameter: radius * 2,
+        segments: 16,
+      }, scene);
+      const mat = new BABYLON.StandardMaterial(name + "_mat", scene);
+      mat.diffuseColor = color.clone();
+      mat.emissiveColor = color.scale(0.4);
+      mat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
+      mesh.material = mat;
+
+      const orbitPoints = [];
+      const steps = 160;
+      for (let i = 0; i <= steps; i++) {
+        const a = (i / steps) * Math.PI * 2;
+        orbitPoints.push(new BABYLON.Vector3(
+          Math.cos(a) * orbitRadius,
+          0,
+          Math.sin(a) * orbitRadius
+        ));
+      }
+      const orbitLine = BABYLON.MeshBuilder.CreateLines(
+        name + "_orbit",
+        { points: orbitPoints },
+        scene
+      );
+      orbitLine.color = new BABYLON.Color3(0.3, 0.5, 0.9);
+      orbitLine.alpha = 0.7;
+
+      return {
+        name,
+        label,
+        mesh,
+        orbitRadius,
+        orbitPeriodYears,
+        orbitLine,
+        moons: [],
+        phi0: Math.random() * Math.PI * 2
+      };
+    }
+
+    // Moons
+    function makeMoon(planet, name, radius, distance, periodDays, color) {
+      const mesh = BABYLON.MeshBuilder.CreateSphere(name, {
+        diameter: radius * 2,
+        segments: 10,
+      }, scene);
+      const mat = new BABYLON.StandardMaterial(name + "_mat", scene);
+      mat.diffuseColor = color.clone();
+      mat.emissiveColor = color.scale(0.5);
+      mat.specularColor = new BABYLON.Color3(0.05, 0.05, 0.05);
+      mesh.material = mat;
+
+      const moon = {
+        name,
+        mesh,
+        distance,
+        periodDays,
+        phi0: Math.random() * Math.PI * 2
+      };
+      planet.moons.push(moon);
+      return moon;
+    }
+
+    // Scaled orbits (just relative, not exact)
+    const AU = 12; // 1 AU in scene units
+    const planets = [];
+
+    planets.push(makePlanet("mercury", 0.8, 0.39 * AU, 0.24,
+      new BABYLON.Color3(0.7, 0.7, 0.7), "Mercury"));
+    planets.push(makePlanet("venus", 1.2, 0.72 * AU, 0.62,
+      new BABYLON.Color3(0.9, 0.75, 0.45), "Venus"));
+    const earth = makePlanet("earth", 1.3, 1.0 * AU, 1.0,
+      new BABYLON.Color3(0.2, 0.5, 1.0), "Earth");
+    planets.push(earth);
+    planets.push(makePlanet("mars", 1.0, 1.52 * AU, 1.88,
+      new BABYLON.Color3(0.9, 0.4, 0.25), "Mars"));
+    const jupiter = makePlanet("jupiter", 3.5, 5.2 * AU, 11.86,
+      new BABYLON.Color3(0.9, 0.7, 0.55), "Jupiter");
+    planets.push(jupiter);
+    const saturn = makePlanet("saturn", 3.0, 9.5 * AU, 29.5,
+      new BABYLON.Color3(0.9, 0.8, 0.6), "Saturn");
+    planets.push(saturn);
+    planets.push(makePlanet("uranus", 2.3, 19 * AU, 84,
+      new BABYLON.Color3(0.6, 0.85, 0.95), "Uranus"));
+    planets.push(makePlanet("neptune", 2.2, 30 * AU, 165,
+      new BABYLON.Color3(0.3, 0.55, 0.95), "Neptune"));
+    planets.push(makePlanet("pluto", 0.6, 39.5 * AU, 248,
+      new BABYLON.Color3(0.8, 0.8, 0.9), "Pluto"));
+
+    // Saturn ring (simple disc)
+    const saturnRing = BABYLON.MeshBuilder.CreateDisc("saturnRing", {
+      radius: saturn.orbitRadius * 0.09,
+      tessellation: 64,
+      sideOrientation: BABYLON.Mesh.DOUBLESIDE
+    }, scene);
+    saturnRing.parent = saturn.mesh;
+    saturnRing.rotation.x = Math.PI / 2;
+    const ringMat = new BABYLON.StandardMaterial("ringMat", scene);
+    ringMat.diffuseColor = new BABYLON.Color3(0.8, 0.75, 0.6);
+    ringMat.emissiveColor = new BABYLON.Color3(0.4, 0.35, 0.25);
+    ringMat.alpha = 0.7;
+    ringMat.backFaceCulling = false;
+    saturnRing.material = ringMat;
+
+    // Moons: Earth + Galilean moons
+    makeMoon(earth, "moon", 0.4, 2.5, 27.3, new BABYLON.Color3(0.85, 0.85, 0.9));
+    makeMoon(jupiter, "io", 0.4, 5, 1.77, new BABYLON.Color3(0.9, 0.75, 0.35));
+    makeMoon(jupiter, "europa", 0.35, 6.5, 3.55, new BABYLON.Color3(0.8, 0.85, 0.95));
+    makeMoon(jupiter, "ganymede", 0.5, 8, 7.15, new BABYLON.Color3(0.7, 0.75, 0.8));
+    makeMoon(jupiter, "callisto", 0.45, 10, 16.7, new BABYLON.Color3(0.6, 0.6, 0.65));
+
+    // Asteroid belt: between Mars and Jupiter
+    const beltDots = [];
+    (function createBelt() {
+      const beltCount = 350;
+      const innerR = 2.2 * AU;
+      const outerR = 3.2 * AU;
+      for (let i = 0; i < beltCount; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const r = innerR + (outerR - innerR) * Math.random();
+        const y = (Math.random() - 0.5) * 1.5;
+        const dot = baseDot.clone("belt_" + i);
+        dot.scaling.scaleInPlace(0.7);
+        dot.position.set(Math.cos(a) * r, y, Math.sin(a) * r);
+        beltDots.push(dot);
+      }
+    })();
+
+    // Controls
+    const lambdaSlider = document.getElementById("lambdaSlider");
+    const tauSlider = document.getElementById("tauSlider");
+    const ampSlider = document.getElementById("ampSlider");
+    const speedSlider = document.getElementById("speedSlider");
+    const modeSelect = document.getElementById("modeSelect");
+    const showTrails = document.getElementById("showTrails");
+    const showBelt = document.getElementById("showBelt");
+
+    // Animation loop
+    const t0 = performance.now();
+    scene.onBeforeRenderObservable.add(() => {
+      const now = performance.now();
+      const dtSec = (now - t0) / 1000.0;
+
+      const lambda_c = parseFloat(lambdaSlider.value);
+      const tau_c = parseFloat(tauSlider.value);
+      const amp = parseFloat(ampSlider.value);
+      const speed = parseFloat(speedSlider.value);
+      const mode = modeSelect.value;
+
+      const qdsOn = (mode === "qds");
+      const tau_eff = 0.2 + tau_c; // avoid division by zero & keep sane
+
+      // Update planets
+      planets.forEach((p, index) => {
+        const baseAngularSpeed = (Math.PI * 2) / (p.orbitPeriodYears * 20.0);
+        const angle = dtSec * baseAngularSpeed * speed + p.phi0;
+
+        let r = p.orbitRadius;
+        let y = 0;
+
+        if (qdsOn) {
+          // QDS radial + vertical wobble, decaying with distance
+          const decay = Math.exp(-p.orbitRadius / (lambda_c * 40.0));
+          const radialWobble = amp * 1.2 * decay * Math.sin(angle * lambda_c * 0.8 + index);
+          const verticalWobble = amp * 0.8 * decay * Math.sin(dtSec / tau_eff + p.orbitRadius * 0.05);
+
+          r += radialWobble;
+          y = verticalWobble;
+        }
+
+        const x = Math.cos(angle) * r;
+        const z = Math.sin(angle) * r;
+        p.mesh.position.set(x, y, z);
+
+        // Orbit lines toggle
+        p.orbitLine.isVisible = showTrails.checked;
+
+        // Moons
+        if (p.moons && p.moons.length > 0) {
+          p.moons.forEach((m, mi) => {
+            const moonAngle = dtSec * (Math.PI * 2) / (m.periodDays * 1.8) * speed + m.phi0;
+            const mx = p.mesh.position.x + Math.cos(moonAngle) * m.distance;
+            const mz = p.mesh.position.z + Math.sin(moonAngle) * m.distance;
+            const my = p.mesh.position.y + Math.sin(moonAngle * 1.2) * 0.3;
+            m.mesh.position.set(mx, my, mz);
+          });
+        }
+      });
+
+      // Asteroid belt visibility
+      const beltVisible = showBelt.checked;
+      beltDots.forEach(d => d.setEnabled(beltVisible));
+
+      // Substrate vertical shimmer (very subtle)
+      const lval = parseFloat(lambdaSlider.value);
+      const tval = parseFloat(tauSlider.value);
+      const shimmer = amp * 0.15;
+      if (shimmer > 0.001) {
+        const w = 0.15 + lval * 0.05;
+        const f = 0.3 + tval * 0.1;
+        fieldDots.forEach(d => {
+          const baseY = -0.4;
+          const phase = (d.position.x + d.position.z) * 0.03;
+          d.position.y = baseY + shimmer * Math.sin(dtSec * f + phase);
+        });
+      }
+    });
+
+    return scene;
+  }
+
+  const scene = createScene();
+
+  engine.runRenderLoop(function () {
+    scene.render();
+  });
+
+  window.addEventListener("resize", function () {
+    engine.resize();
+  });
+</script>
+</body>
+</html>

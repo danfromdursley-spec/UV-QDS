@@ -1,0 +1,1 @@
+/data/data/com.termux/files/home/OMEGA_EMPIRE/UV_QDS/www/gh_meeting_go.sh

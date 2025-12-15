@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>UV-QDS – All Pages Index</title>
+<style>
+:root{
+  --bg:#070b12;
+  --panel:#0c1220;
+  --panel2:#0a0f1b;
+  --text:#eef2ff;
+  --muted:#a7b0c5;
+  --accent:#9d7bff;
+  --accent2:#4be3ff;
+  --border:rgba(255,255,255,.06);
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif;
+  background:
+    radial-gradient(1200px 600px at 20% -10%, rgba(157,123,255,.18), transparent),
+    radial-gradient(1000px 700px at 90% 110%, rgba(75,227,255,.14), transparent),
+    var(--bg);
+  color:var(--text);
+}
+header{
+  padding:28px 18px 10px;
+}
+main{
+  max-width:980px;
+  margin:0 auto;
+  padding:0 18px 30px;
+}
+.pill{
+  display:inline-block;
+  font-size:12px;
+  padding:6px 10px;
+  border-radius:999px;
+  background:linear-gradient(90deg, rgba(157,123,255,.18), rgba(75,227,255,.18));
+  border:1px solid var(--border);
+  color:var(--muted);
+  margin-bottom:10px;
+}
+h1{margin:6px 0 4px; font-size:26px; letter-spacing:.02em;}
+p{margin:0 0 16px; color:var(--muted); font-size:14px;}
+
+.controls{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  background:linear-gradient(180deg, rgba(255,255,255,.04), transparent);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:10px 12px;
+}
+input, select, button{
+  background:var(--panel);
+  color:var(--text);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:8px 10px;
+  font-size:14px;
+  outline:none;
+}
+input{flex:1 1 220px; min-width:180px;}
+button{cursor:pointer;}
+button:hover{
+  border-color:var(--accent2);
+  box-shadow:0 0 0 1px rgba(75,227,255,.35);
+}
+
+.grid{
+  margin-top:14px;
+  display:grid;
+  gap:10px;
+  grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
+}
+.card{
+  text-decoration:none;
+  color:inherit;
+  background:linear-gradient(180deg, rgba(255,255,255,.03), transparent);
+  var(--panel2);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:14px 14px 12px;
+  transition:transform .12s ease, border-color .12s ease, background .12s ease;
+}
+.card:hover{
+  transform:translateY(-1px);
+  border-color:rgba(157,123,255,.55);
+  background:linear-gradient(180deg, rgba(157,123,255,.08), rgba(75,227,255,.04));
+}
+.name{
+  font-weight:650;
+  font-size:16px;
+  margin:0 0 4px;
+}
+.path{
+  font-size:11px;
+  color:var(--muted);
+  opacity:.9;
+  word-break:break-all;
+}
+.tag{
+  display:inline-block;
+  margin-top:8px;
+  font-size:10px;
+  padding:3px 7px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  color:var(--muted);
+}
+footer{
+  max-width:980px;
+  margin:0 auto;
+  padding:8px 18px 18px;
+  color:var(--muted);
+  font-size:11px;
+}
+.stats{
+  font-size:11px;
+  opacity:.8;
+  margin-top:6px;
+}
+</style>
+</head>
+<body>
+<header>
+  <span class="pill">Auto-generated master map</span>
+  <h1>UV-QDS – All Pages Index</h1>
+  <p>A single hub linking every local HTML tool/page in this build.</p>
+</header>
+
+<main>
+  <div class="controls">
+    <input id="q" placeholder="Filter pages… (battery, universe, solar, growthhub, h-code, indus…)" />
+    <select id="group">
+      <option value="none">No grouping</option>
+      <option value="category">Group by category</option>
+    </select>
+    <button id="reset">Reset</button>
+  </div>
+  <div class="stats" id="stats"></div>
+  <div id="list" class="grid"></div>
+</main>
+
+<footer>
+  Tip: this file is auto-built. Re-run <code>make_all_pages_index_auto.sh</code> after you add new tools.
+</footer>
+
+<script>
+// ---- data injected below ----
+const PAGES = [
+  { title: "battery skin v2", href: "battery_skin_v2.html" }
+,
+  { title: "battery skin v2 max", href: "battery_skin_v2_max.html" }
+,
+  { title: "cannon side 2d v1", href: "cannon_side_2d_v1.html" }
+,
+  { title: "cannon wall breaker v1", href: "cannon_wall_breaker_v1.html" }
+,
+  { title: "cannon wall breaker v1 1", href: "cannon_wall_breaker_v1_1.html" }
+,
+  { title: "catapult balloon pop v1", href: "catapult_balloon_pop_v1.html" }
+,
+  { title: "ddmelts microsite v1", href: "ddmelts_microsite_v1.html" }
+,
+  { title: "ddmelts microsite v1 1", href: "ddmelts_microsite_v1_1.html" }
+,
+  { title: "ddmelts microsite v1 2 live links", href: "ddmelts_microsite_v1_2_live_links.html" }
+,
+  { title: "ddmelts microsite v1 2 pink hearts", href: "ddmelts_microsite_v1_2_pink_hearts.html" }
+,
+  { title: "dev door space", href: "dev_door_space.html" }
+,
+  { title: "dev hub", href: "dev_hub.html" }
+,
+  { title: "frontdoor", href: "frontdoor.html" }
+,
+  { title: "frontdoor show", href: "frontdoor_show.html" }
+,
+  { title: "frontdoor show fix revenue 20251210 223127", href: "frontdoor_show_fix_revenue_20251210_223127.html" }
+,
+  { title: "growthhub", href: "growthhub.html" }
+,
+  { title: "growthhub allinone v1", href: "growthhub_allinone_v1.html" }
+,
+  { title: "growthhub allinone v1 1", href: "growthhub_allinone_v1_1.html" }
+,
+  { title: "growthhub demo front 20251207 170108", href: "growthhub_demo_front_20251207_170108.html" }
+,
+  { title: "growthhub demo front 20251207 172220", href: "growthhub_demo_front_20251207_172220.html" }
+,
+  { title: "growthhub jargon v1", href: "growthhub_jargon_v1.html" }
+,
+  { title: "growthhub linked 20251207 162635", href: "growthhub_linked_20251207_162635.html" }
+,
+  { title: "growthhub linked 20251207 162917", href: "growthhub_linked_20251207_162917.html" }
+,
+  { title: "growthhub linked 20251207 163105", href: "growthhub_linked_20251207_163105.html" }
+,
+  { title: "growthhub linked 20251207 163119", href: "growthhub_linked_20251207_163119.html" }
+,
+  { title: "growthhub linked 20251207 163619", href: "growthhub_linked_20251207_163619.html" }
+,
+  { title: "growthhub linked 20251207 163635", href: "growthhub_linked_20251207_163635.html" }
+,
+  { title: "growthhub linked 20251207 165546", href: "growthhub_linked_20251207_165546.html" }
+,
+  { title: "growthhub linked 20251207 165600", href: "growthhub_linked_20251207_165600.html" }
+,
+  { title: "growthhub linked 20251207 165721", href: "growthhub_linked_20251207_165721.html" }
+,
+  { title: "growthhub meeting script v1", href: "growthhub_meeting_script_v1.html" }
+,
+  { title: "growthhub multi area stack v1", href: "growthhub_multi_area_stack_v1.html" }
+,
+  { title: "growthhub official top5", href: "growthhub_official_top5.html" }
+,
+  { title: "growthhub official top5 demo front 20251207 170108", href: "growthhub_official_top5_demo_front_20251207_170108.html" }
+,
+  { title: "growthhub official top5 demo front 20251207 172220", href: "growthhub_official_top5_demo_front_20251207_172220.html" }
+,
+  { title: "growthhub official top5 with offer 20251207 165318", href: "growthhub_official_top5_with_offer_20251207_165318.html" }
+,
+  { title: "growthhub official top5 with offer 20251207 165325", href: "growthhub_official_top5_with_offer_20251207_165325.html" }
+,
+  { title: "growthhub official top5 with offer 20251207 165411", href: "growthhub_official_top5_with_offer_20251207_165411.html" }
+,
+  { title: "growthhub official top5 with offer 20251207 165424", href: "growthhub_official_top5_with_offer_20251207_165424.html" }
+,
+  { title: "growthhub official top5 with offer 20251207 165431", href: "growthhub_official_top5_with_offer_20251207_165431.html" }
+,
+  { title: "growthhub official top5 with offer 20251207 165545", href: "growthhub_official_top5_with_offer_20251207_165545.html" }
+,
+  { title: "growthhub official top5 with offer 20251207 165559", href: "growthhub_official_top5_with_offer_20251207_165559.html" }
+,
+  { title: "growthhub official top5 with offer 20251207 165720", href: "growthhub_official_top5_with_offer_20251207_165720.html" }
+,
+  { title: "growthhub stroud demo", href: "growthhub_stroud_demo.html" }
+,
+  { title: "growthhub with offer 20251207 165318", href: "growthhub_with_offer_20251207_165318.html" }
+,
+  { title: "growthhub with offer 20251207 165325", href: "growthhub_with_offer_20251207_165325.html" }
+,
+  { title: "growthhub with offer 20251207 165411", href: "growthhub_with_offer_20251207_165411.html" }
+,
+  { title: "growthhub with offer 20251207 165424", href: "growthhub_with_offer_20251207_165424.html" }
+,
+  { title: "growthhub with offer 20251207 165431", href: "growthhub_with_offer_20251207_165431.html" }
+,
+  { title: "growthhub with offer 20251207 165545", href: "growthhub_with_offer_20251207_165545.html" }
+,
+  { title: "growthhub with offer 20251207 165559", href: "growthhub_with_offer_20251207_165559.html" }
+,
+  { title: "growthhub with offer 20251207 165720", href: "growthhub_with_offer_20251207_165720.html" }
+,
+  { title: "h code warning nodes demo", href: "h_code_warning_nodes_demo.html" }
+,
+  { title: "index", href: "index.html" }
+,
+  { title: "index demo front 20251207 170108", href: "index_demo_front_20251207_170108.html" }
+,
+  { title: "index demo front 20251207 172220", href: "index_demo_front_20251207_172220.html" }
+,
+  { title: "index with offer 20251207 165318", href: "index_with_offer_20251207_165318.html" }
+,
+  { title: "index with offer 20251207 165325", href: "index_with_offer_20251207_165325.html" }
+,
+  { title: "index with offer 20251207 165411", href: "index_with_offer_20251207_165411.html" }
+,
+  { title: "index with offer 20251207 165424", href: "index_with_offer_20251207_165424.html" }
+,
+  { title: "index with offer 20251207 165431", href: "index_with_offer_20251207_165431.html" }
+,
+  { title: "index with offer 20251207 165545", href: "index_with_offer_20251207_165545.html" }
+,
+  { title: "index with offer 20251207 165559", href: "index_with_offer_20251207_165559.html" }
+,
+  { title: "index with offer 20251207 165720", href: "index_with_offer_20251207_165720.html" }
+,
+  { title: "indus atlas v1 qds language lab", href: "indus_atlas_v1_qds_language_lab.html" }
+,
+  { title: "last5days index", href: "last5days_index.html" }
+,
+  { title: "legacy hub v1", href: "legacy_hub_v1.html" }
+,
+  { title: "offer demo suite v1", href: "offer_demo_suite_v1.html" }
+,
+  { title: "offer index v1", href: "offer_index_v1.html" }
+,
+  { title: "offer microsite v1", href: "offer_microsite_v1.html" }
+,
+  { title: "offer showcase hub v1", href: "offer_showcase_hub_v1.html" }
+,
+  { title: "omega os index v1", href: "omega_os_index_v1.html" }
+,
+  { title: "omega os index v2", href: "omega_os_index_v2.html" }
+,
+  { title: "omega qds lab", href: "omega_qds_lab.html" }
+,
+  { title: "phone chatgpt case study", href: "phone_chatgpt_case_study.html" }
+,
+  { title: "portfolio", href: "portfolio.html" }
+,
+  { title: "portfolio market allinone v1", href: "portfolio_market_allinone_v1.html" }
+,
+  { title: "portfolio offer v2", href: "portfolio_offer_v2.html" }
+,
+  { title: "portfolio offer v2 20251206 134821", href: "portfolio_offer_v2_20251206_134821.html" }
+,
+  { title: "portfolio ultimate allinone v1", href: "portfolio_ultimate_allinone_v1.html" }
+,
+  { title: "portfolio v1", href: "portfolio_v1.html" }
+,
+  { title: "proof of ship v1", href: "proof_of_ship_v1.html" }
+,
+  { title: "pyramid pinball v1", href: "pyramid_pinball_v1.html" }
+,
+  { title: "q", href: "q.html" }
+,
+  { title: "qds 5 pillars hub", href: "qds_5_pillars_hub.html" }
+,
+  { title: "qds 5 pillars hub v1", href: "qds_5_pillars_hub_v1.html" }
+,
+  { title: "qds avian lab v2", href: "qds_avian_lab_v2.html" }
+,
+  { title: "qds avian lab v3 pro", href: "qds_avian_lab_v3_pro.html" }
+,
+  { title: "qds avian lab v4 pro", href: "qds_avian_lab_v4_pro.html" }
+,
+  { title: "qds avian navigation lab", href: "qds_avian_navigation_lab.html" }
+,
+  { title: "qds battery coach v3", href: "qds_battery_coach_v3.html" }
+,
+  { title: "qds battery design v1", href: "qds_battery_design_v1.html" }
+,
+  { title: "qds battery habitat demo", href: "qds_battery_habitat_demo.html" }
+,
+  { title: "qds battery habitat v1 1 build 001", href: "qds_battery_habitat_v1_1_build_001.html" }
+,
+  { title: "qds battery habitat v1 2 build002", href: "qds_battery_habitat_v1_2_build002.html" }
+,
+  { title: "qds battery hub v9 1 purple neon", href: "qds_battery_hub_v9_1_purple_neon.html" }
+,
+  { title: "qds battery hub v9 2 purple neon", href: "qds_battery_hub_v9_2_purple_neon.html" }
+,
+  { title: "qds battery hub v9 3 science neon", href: "qds_battery_hub_v9_3_science_neon.html" }
+,
+  { title: "qds battery hub v9 4 science neon plus", href: "qds_battery_hub_v9_4_science_neon_plus.html" }
+,
+  { title: "qds battery hub v9 5 1 science neon", href: "qds_battery_hub_v9_5_1_science_neon.html" }
+,
+  { title: "qds battery hub v9 5 science neon", href: "qds_battery_hub_v9_5_science_neon.html" }
+,
+  { title: "qds battery hub v9 6 science neon", href: "qds_battery_hub_v9_6_science_neon.html" }
+,
+  { title: "qds battery hub v9 7 science neon lab", href: "qds_battery_hub_v9_7_science_neon_lab.html" }
+,
+  { title: "qds battery index v1 neon os", href: "qds_battery_index_v1_neon_os.html" }
+,
+  { title: "qds battery lab", href: "qds_battery_lab.html" }
+,
+  { title: "qds battery lab showcase stress bias v1", href: "qds_battery_lab_showcase_stress_bias_v1.html" }
+,
+  { title: "qds battery lab showcase stress bias v2", href: "qds_battery_lab_showcase_stress_bias_v2.html" }
+,
+  { title: "qds battery lab showcase v1", href: "qds_battery_lab_showcase_v1.html" }
+,
+  { title: "qds battery noise toy v1", href: "qds_battery_noise_toy_v1.html" }
+,
+  { title: "qds battery os index v1", href: "qds_battery_os_index_v1.html" }
+,
+  { title: "qds battery suite v4 showcase", href: "qds_battery_suite_v4_showcase.html" }
+,
+  { title: "qds battery suite v5 boss polish", href: "qds_battery_suite_v5_boss_polish.html" }
+,
+  { title: "qds battery suite v6 realworld", href: "qds_battery_suite_v6_realworld.html" }
+,
+  { title: "qds battery suite v8 1 fairpath", href: "qds_battery_suite_v8_1_fairpath.html" }
+,
+  { title: "qds battery suite v8 2 poster tamed", href: "qds_battery_suite_v8_2_poster_tamed.html" }
+,
+  { title: "qds battery suite v8 3 neon shell", href: "qds_battery_suite_v8_3_neon_shell.html" }
+,
+  { title: "qds battery suite v8 nextlevel", href: "qds_battery_suite_v8_nextlevel.html" }
+,
+  { title: "qds battery whisperer v2", href: "qds_battery_whisperer_v2.html" }
+,
+  { title: "qds binary pulsar lab", href: "qds_binary_pulsar_lab.html" }
+,
+  { title: "qds binary pulsar notes", href: "qds_binary_pulsar_notes.html" }
+,
+  { title: "qds business projection posh v1", href: "qds_business_projection_posh_v1.html" }
+,
+  { title: "qds chips noise v1", href: "qds_chips_noise_v1.html" }
+,
+  { title: "qds compression lab v1", href: "qds_compression_lab_v1.html" }
+,
+  { title: "qds domain map", href: "qds_domain_map.html" }
+,
+  { title: "qds domain map animated v1", href: "qds_domain_map_animated_v1.html" }
+,
+  { title: "qds micro lab", href: "qds_micro_lab.html" }
+,
+  { title: "qds offer bundle v1 20251207 165042", href: "qds_offer_bundle_v1_20251207_165042.html" }
+,
+  { title: "qds offer bundle v1 20251207 165051", href: "qds_offer_bundle_v1_20251207_165051.html" }
+,
+  { title: "qds production dashboard v1", href: "qds_production_dashboard_v1.html" }
+,
+  { title: "qds revenue floor BASE", href: "qds_revenue_floor_BASE.html" }
+,
+  { title: "qds revenue floor STRETCH", href: "qds_revenue_floor_STRETCH.html" }
+,
+  { title: "qds revenue floor v2", href: "qds_revenue_floor_v2.html" }
+,
+  { title: "qds revenue onepager", href: "qds_revenue_onepager.html" }
+,
+  { title: "qds revenue predictor v1", href: "qds_revenue_predictor_v1.html" }
+,
+  { title: "qds rotation lab", href: "qds_rotation_lab.html" }
+,
+  { title: "qds sensors metrology v1", href: "qds_sensors_metrology_v1.html" }
+,
+  { title: "qds shed index v1", href: "qds_shed_index_v1.html" }
+,
+  { title: "qds showcase index v1", href: "qds_showcase_index_v1.html" }
+,
+  { title: "qds showcase index v1 1", href: "qds_showcase_index_v1_1.html" }
+,
+  { title: "qds solar v6 textures", href: "qds_solar_v6_textures.html" }
+,
+  { title: "qds test platform", href: "qds_test_platform.html" }
+,
+  { title: "qds test platformV3", href: "qds_test_platformV3.html" }
+,
+  { title: "qds test task pack v1", href: "qds_test_task_pack_v1.html" }
+,
+  { title: "qds test task pack v1 1 pro", href: "qds_test_task_pack_v1_1_pro.html" }
+,
+  { title: "qds tool atlas v1", href: "qds_tool_atlas_v1.html" }
+,
+  { title: "qds universe v12b mobile", href: "qds_universe_v12b_mobile.html" }
+,
+  { title: "qds universe v9 10 neon planet colours", href: "qds_universe_v9_10_neon_planet_colours.html" }
+,
+  { title: "qds universe v9 2 neon clear planets", href: "qds_universe_v9_2_neon_clear_planets.html" }
+,
+  { title: "qds universe v9 6 turbo pan", href: "qds_universe_v9_6_turbo_pan.html" }
+,
+  { title: "qds variance lab", href: "qds_variance_lab.html" }
+,
+  { title: "solar system v8 offline", href: "solar_system_v8_offline.html" }
+,
+  { title: "solar system v9 2 mobile 3d showcase", href: "solar_system_v9_2_mobile_3d_showcase.html" }
+,
+  { title: "start here 90s v1", href: "start_here_90s_v1.html" }
+,
+  { title: "stinchcombe map", href: "stinchcombe_map.html" }
+];
+
+const categorize = (name) => {
+  const n = name.toLowerCase();
+  if (n.includes("battery")) return "Battery";
+  if (n.includes("universe")) return "Universe";
+  if (n.includes("solar")) return "Solar";
+  if (n.includes("growthhub") || n.includes("offer")) return "Growth / Revenue";
+  if (n.includes("omega") || n.includes("os")) return "Ω / OS";
+  if (n.includes("index")) return "Indexes / Hubs";
+  if (n.includes("indus") || n.includes("language")) return "Language / Indus";
+  if (n.includes("her") || n.includes("stinchcombe")) return "Maps / HER";
+  if (n.includes("h code") || n.includes("h_code")) return "H-Code / Nervous System";
+  if (n.includes("test") || n.includes("lab")) return "Tests / Labs";
+  return "Misc";
+};
+
+const elList  = document.getElementById("list");
+const elQ     = document.getElementById("q");
+const elGroup = document.getElementById("group");
+const elReset = document.getElementById("reset");
+const elStats = document.getElementById("stats");
+
+const FULL = PAGES.map(p => ({
+  ...p,
+  path: p.href,
+  category: categorize(p.title + " " + p.href),
+}));
+
+const renderFlat = (items) => {
+  elList.innerHTML = "";
+  for (const p of items) {
+    const a = document.createElement("a");
+    a.className = "card";
+    a.href = p.href;
+    a.innerHTML = `
+      <div class="name">${p.title}</div>
+      <div class="path">${p.path}</div>
+      <span class="tag">${p.category}</span>
+    `;
+    elList.appendChild(a);
+  }
+};
+
+const renderGrouped = (items) => {
+  elList.innerHTML = "";
+  const groups = {};
+  for (const p of items) {
+    (groups[p.category] ||= []).push(p);
+  }
+  const cats = Object.keys(groups).sort();
+  for (const c of cats) {
+    const header = document.createElement("div");
+    header.style.gridColumn = "1 / -1";
+    header.style.padding = "8px 6px 2px";
+    header.style.color = "#a7b0c5";
+    header.style.fontSize = "12px";
+    header.style.letterSpacing = ".06em";
+    header.textContent = c;
+    elList.appendChild(header);
+
+    for (const p of groups[c]) {
+      const a = document.createElement("a");
+      a.className = "card";
+      a.href = p.href;
+      a.innerHTML = `
+        <div class="name">${p.title}</div>
+        <div class="path">${p.path}</div>
+        <span class="tag">${p.category}</span>
+      `;
+      elList.appendChild(a);
+    }
+  }
+};
+
+const apply = () => {
+  const q = (elQ.value || "").toLowerCase().trim();
+  let items = FULL.filter(p =>
+    !q ||
+    p.title.toLowerCase().includes(q) ||
+    p.path.toLowerCase().includes(q) ||
+    p.category.toLowerCase().includes(q)
+  );
+
+  // update stats
+  elStats.textContent = `${items.length} pages shown · ${FULL.length} total`;
+
+  if (elGroup.value === "category") renderGrouped(items);
+  else renderFlat(items);
+};
+
+elQ.addEventListener("input", apply);
+elGroup.addEventListener("change", apply);
+elReset.addEventListener("click", () => {
+  elQ.value = "";
+  elGroup.value = "none";
+  apply();
+});
+
+// init
+apply();
+</script>
+<div style="padding:10px;margin:10px 0;border:1px solid rgba(120,255,220,.2);border-radius:12px">
+<b>NASA RW3 Battery Report</b> — <a href="nasa_rw3/NASA_RW3_report.html">open</a>
+</div>
+</body>
+</html>

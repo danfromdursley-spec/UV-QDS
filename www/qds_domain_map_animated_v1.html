@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>QDS Domain Map — Animated Neon Edition</title>
+
+<style>
+    body {
+        background: #060606;
+        color: #dff;
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        padding: 20px;
+        margin: 0;
+    }
+
+    h1 {
+        font-size: 2.5em;
+        text-align: center;
+        color: #79f7ff;
+        text-shadow: 0 0 15px #39f7ff;
+        margin-bottom: 10px;
+    }
+
+    h2 {
+        text-align: center;
+        font-weight: 300;
+        color: #9af;
+        margin-top: 0;
+    }
+
+    .domain-box {
+        background: rgba(0, 20, 30, 0.5);
+        padding: 15px 20px;
+        margin: 18px 0;
+        border-radius: 14px;
+        cursor: pointer;
+        border: 2px solid #0ff5;
+        transition: 0.25s;
+        position: relative;
+        overflow: hidden;
+        animation: neonPulse 4s infinite ease-in-out;
+    }
+
+    /* Hover glow */
+    .domain-box:hover {
+        border-color: #4ff;
+        box-shadow: 0 0 20px #3ff, inset 0 0 10px #2ff;
+        transform: translateY(-2px);
+    }
+
+    /* Title row */
+    .domain-title {
+        font-size: 1.4em;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* Dropdown region */
+    .domain-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease-in-out, opacity 0.5s;
+        opacity: 0;
+        margin-top: 10px;
+        padding-left: 5px;
+    }
+
+    .domain-box.active .domain-content {
+        max-height: 500px;
+        opacity: 1;
+    }
+
+    /* List styling */
+    .domain-content ul {
+        margin: 0;
+        padding-left: 20px;
+        color: #cff;
+        font-size: 1.05em;
+    }
+
+    /* Neon pulse animation */
+    @keyframes neonPulse {
+        0%   { box-shadow: 0 0 6px #0ff4; }
+        50%  { box-shadow: 0 0 20px #0ffb; }
+        100% { box-shadow: 0 0 6px #0ff4; }
+    }
+</style>
+</head>
+
+<body>
+
+<h1>🧠 QDS DOMAIN MAP — "Dursley Prime"</h1>
+<h2>Animated Neon Edition • v2025-12-09A</h2>
+
+<!-- REUSABLE FUNCTION FOR EACH DOMAIN -->
+<script>
+function toggleDomain(id) {
+    const box = document.getElementById(id);
+    box.classList.toggle("active");
+}
+</script>
+
+<!-- ===================================== -->
+<!-- 1 — CORE PHYSICS / MATHS -->
+<!-- ===================================== -->
+<div id="dom1" class="domain-box" onclick="toggleDomain('dom1')">
+    <div class="domain-title">🔷 1. Core Physics / Maths</div>
+    <div class="domain-content">
+        <ul>
+            <li>GR + Einstein–Langevin stochastic extension</li>
+            <li>ΛCDM / H₀ variance law (A≈0.017, p≈0.35)</li>
+            <li>UV-finite QFT propagator & damped loops</li>
+            <li>Vacuum energy origin from χ-field</li>
+            <li>Decoherence ↔ Lindblad via QDS kernel</li>
+            <li>Galaxy rotation acceleration law</li>
+            <li>PDE kernel solutions / Green’s functions</li>
+            <li>Information–entropy pack (K, MI, 0.36 entropy)</li>
+        </ul>
+    </div>
+</div>
+
+<!-- ===================================== -->
+<!-- 2 — ASTRO / SPACE SYSTEMS -->
+<!-- ===================================== -->
+<div id="dom2" class="domain-box" onclick="toggleDomain('dom2')">
+    <div class="domain-title">🪐 2. Astro / Space Systems</div>
+    <div class="domain-content">
+        <ul>
+            <li>Orbital-noise correction models</li>
+            <li>Deep-field sensing enhancement</li>
+            <li>QDS Mars rover control logic</li>
+            <li>Non-weaponised rail launcher</li>
+            <li>Radiation noise shielding layer</li>
+        </ul>
+    </div>
+</div>
+
+<!-- ===================================== -->
+<!-- 3 — ENERGY / BATTERIES -->
+<!-- ===================================== -->
+<div id="dom3" class="domain-box" onclick="toggleDomain('dom3')">
+    <div class="domain-title">🔋 3. Energy / Batteries / Grids</div>
+    <div class="domain-content">
+        <ul>
+            <li>Battery stability & noise-smoothing law</li>
+            <li>Projected +10% life gain</li>
+            <li>Heat–stress bias correction model</li>
+            <li>Microgrid Fisher-information boost</li>
+        </ul>
+    </div>
+</div>
+
+<!-- ===================================== -->
+<!-- 4 — HARDWARE / CHIPS / QUANTUM -->
+<!-- ===================================== -->
+<div id="dom4" class="domain-box" onclick="toggleDomain('dom4')">
+    <div class="domain-title">💾 4. Hardware / Chips / Quantum</div>
+    <div class="domain-content">
+        <ul>
+            <li>Timing-jitter mapping → τc</li>
+            <li>Qubit crosstalk mapping → λc</li>
+            <li>Processor-level noise modelling</li>
+            <li>Thermal metastability prediction</li>
+        </ul>
+    </div>
+</div>
+
+<!-- ===================================== -->
+<!-- 5 — ROBOTICS / MATERIALS -->
+<!-- ===================================== -->
+<div id="dom5" class="domain-box" onclick="toggleDomain('dom5')">
+    <div class="domain-title">🤖 5. Robotics & Materials</div>
+    <div class="domain-content">
+        <ul>
+            <li>Carbon–glass composite frames</li>
+            <li>Invisiglass photonic shells</li>
+            <li>Mycelium–TPU damping joints</li>
+            <li>Kernel-adaptive motor control</li>
+        </ul>
+    </div>
+</div>
+
+<!-- ===================================== -->
+<!-- 6 — AERO / FUSION / MAGLEV -->
+<!-- ===================================== -->
+<div id="dom6" class="domain-box" onclick="toggleDomain('dom6')">
+    <div class="domain-title">🚀 6. Aero / Fusion / Maglev / Mechanical</div>
+    <div class="domain-content">
+        <ul>
+            <li>QDS turbulence smoothing</li>
+            <li>Fusion rig edge-noise prediction</li>
+            <li>Maglev coherence control</li>
+            <li>Mechanical NVH noise mapping</li>
+        </ul>
+    </div>
+</div>
+
+<!-- ===================================== -->
+<!-- 7 — LANGUAGE / CULTURE / SYMBOLICS -->
+<!-- ===================================== -->
+<div id="dom7" class="domain-box" onclick="toggleDomain('dom7')">
+    <div class="domain-title">📜 7. Linguistics / Symbolics / Archaeology</div>
+    <div class="domain-content">
+        <ul>
+            <li>Indus proto-lexicon (417 → 168 glyphs)</li>
+            <li>K-based language coherence</li>
+            <li>Music–speech kernel mapping</li>
+            <li>Slow-English → Proto converter</li>
+        </ul>
+    </div>
+</div>
+
+<!-- ===================================== -->
+<!-- 8 — BIO / LIFE-FIRST -->
+<!-- ===================================== -->
+<div id="dom8" class="domain-box" onclick="toggleDomain('dom8')">
+    <div class="domain-title">🧬 8. Bio / Neural / LifeFirst</div>
+    <div class="domain-content">
+        <ul>
+            <li>Neural coherence (non-medical)</li>
+            <li>BIO_HEAL v1.2 harmonic device</li>
+            <li>Tissue-extrusion stabilisation</li>
+        </ul>
+    </div>
+</div>
+
+<!-- ===================================== -->
+<!-- 9 — INFRASTRUCTURE / ADMIN -->
+<!-- ===================================== -->
+<div id="dom9" class="domain-box" onclick="toggleDomain('dom9')">
+    <div class="domain-title">🏛️ 9. Infrastructure / Admin / Outreach</div>
+    <div class="domain-content">
+        <ul>
+            <li>UKRI, Innovate UK, Growth Hub</li>
+            <li>Nature & Research Square threads</li>
+            <li>Oxford / British Museum contacts</li>
+            <li>UAE aviation link + safety proposals</li>
+        </ul>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1642 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+  <title>QDS Binary Pulsar Constraint Lab v2 MAX</title>
+  <style>
+    :root{
+      --bg0:#05070b;
+      --bg1:#080c14;
+      --panel:#0b1220cc;
+      --panel2:#0a111dcc;
+      --text:#d6e2ff;
+      --muted:#8aa0c7;
+      --ok:#39ff88;
+      --edge:#ffd166;
+      --bad:#ff3b6a;
+      --cyan:#2df3ff;
+      --blue:#4aa3ff;
+      --green:#33ff99;
+      --orange:#ff9f1c;
+      --yellow:#ffe66d;
+      --shadow: 0 12px 40px rgba(0,0,0,.55);
+      --glowC: 0 0 18px rgba(45,243,255,.35);
+      --glowG: 0 0 18px rgba(51,255,153,.25);
+      --glowO: 0 0 18px rgba(255,159,28,.25);
+      --radius: 18px;
+      --radius2: 24px;
+      --pad: 16px;
+      --pad2: 18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(900px 500px at 20% 0%, rgba(74,163,255,.18), transparent 60%),
+        radial-gradient(700px 420px at 80% 10%, rgba(51,255,153,.12), transparent 65%),
+        radial-gradient(700px 500px at 50% 100%, rgba(255,159,28,.08), transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg0));
+      overflow-x:hidden;
+    }
+
+    /* Outer frame: subtle black margins + neon border */
+    .frame{
+      width:min(980px, 100%);
+      margin: 0 auto;
+      padding: 14px 10px 28px;
+    }
+    .shell{
+      position:relative;
+      margin: 8px auto 0;
+      padding: 14px;
+      border-radius: var(--radius2);
+      background: linear-gradient(180deg, rgba(10,16,28,.88), rgba(6,9,16,.88));
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,230,109,.18);
+      outline: 2px solid rgba(255,159,28,.10);
+    }
+    .shell:before{
+      content:"";
+      position:absolute; inset:-2px;
+      border-radius: calc(var(--radius2) + 2px);
+      background:
+        linear-gradient(90deg,
+          rgba(255,159,28,.85),
+          rgba(255,230,109,.85),
+          rgba(45,243,255,.65),
+          rgba(51,255,153,.65),
+          rgba(255,159,28,.85)
+        );
+      filter: blur(10px);
+      opacity: .25;
+      z-index:-1;
+    }
+
+    header{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      justify-content:space-between;
+      padding: 6px 2px 10px;
+    }
+    .brand{
+      display:flex; gap:12px; align-items:center;
+    }
+    .logo{
+      width:44px; height:44px; border-radius:14px;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(45,243,255,.75), transparent 60%),
+        radial-gradient(circle at 70% 70%, rgba(51,255,153,.55), transparent 60%),
+        linear-gradient(180deg, rgba(255,159,28,.25), rgba(0,0,0,.35));
+      border:1px solid rgba(255,230,109,.20);
+      box-shadow: var(--glowC), var(--glowO);
+      position:relative;
+    }
+    .logo:after{
+      content:"⟡";
+      position:absolute; inset:0;
+      display:grid; place-items:center;
+      font-weight:800; font-size:22px;
+      color: rgba(214,226,255,.95);
+      text-shadow: 0 0 18px rgba(45,243,255,.4);
+    }
+    h1{
+      margin:0;
+      font-size: 18px;
+      letter-spacing: .2px;
+      line-height:1.25;
+    }
+    .subtitle{
+      margin-top:4px;
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height:1.35;
+      max-width: 54ch;
+    }
+    .pillRow{
+      display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;
+      padding-top:2px;
+    }
+    .pill{
+      font-size: 12px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(5,10,18,.55);
+      border: 1px solid rgba(45,243,255,.15);
+      box-shadow: 0 0 14px rgba(45,243,255,.08);
+      color: rgba(214,226,255,.9);
+      user-select:none;
+      white-space:nowrap;
+    }
+    .pill strong{color:rgba(255,230,109,.92)}
+    .pill .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:middle}
+    .dot.ok{background:var(--ok); box-shadow:0 0 10px rgba(57,255,136,.35)}
+    .dot.edge{background:var(--edge); box-shadow:0 0 10px rgba(255,209,102,.35)}
+    .dot.bad{background:var(--bad); box-shadow:0 0 10px rgba(255,59,106,.35)}
+    .dot.cyan{background:var(--cyan); box-shadow:0 0 10px rgba(45,243,255,.30)}
+
+    .grid{
+      display:grid;
+      gap: 14px;
+      grid-template-columns: 1fr;
+      margin-top: 8px;
+    }
+    @media(min-width: 860px){
+      .grid{ grid-template-columns: 1.15fr .85fr; }
+    }
+
+    .card{
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(10,17,29,.72), rgba(7,12,21,.66));
+      border: 1px solid rgba(74,163,255,.18);
+      box-shadow: 0 0 24px rgba(74,163,255,.06);
+      padding: var(--pad2);
+      overflow:hidden;
+      position:relative;
+    }
+    .card:before{
+      content:"";
+      position:absolute; inset:-1px;
+      border-radius: var(--radius);
+      background: linear-gradient(90deg,
+        rgba(255,159,28,.12), rgba(255,230,109,.08),
+        rgba(45,243,255,.08), rgba(51,255,153,.06)
+      );
+      opacity:.7;
+      pointer-events:none;
+      z-index:0;
+    }
+    .card > *{position:relative; z-index:1}
+
+    .cardTitle{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      margin-bottom: 10px;
+    }
+    .cardTitle h2{
+      margin:0;
+      font-size: 15.5px;
+      letter-spacing:.2px;
+    }
+    .tag{
+      font-size: 11.5px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,230,109,.18);
+      background: rgba(5,10,18,.45);
+      color: rgba(255,230,109,.92);
+      box-shadow: 0 0 16px rgba(255,230,109,.06);
+      user-select:none;
+      white-space:nowrap;
+    }
+
+    .row{
+      display:flex; gap: 10px;
+      flex-wrap:wrap;
+      align-items:flex-end;
+    }
+    .field{
+      flex: 1 1 180px;
+      min-width: 160px;
+    }
+    label{
+      display:block;
+      font-size: 12.5px;
+      color: rgba(214,226,255,.88);
+      margin: 8px 0 6px;
+    }
+    .hint{
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height:1.35;
+    }
+    input[type="text"], input[type="number"], select{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(74,163,255,.22);
+      background: rgba(4,8,15,.65);
+      color: var(--text);
+      outline:none;
+      box-shadow: 0 0 16px rgba(74,163,255,.05);
+      font-size: 14px;
+    }
+    input[type="number"]{ font-family: var(--mono); letter-spacing: .2px; }
+    select{ appearance:none; background-image: linear-gradient(45deg, transparent 50%, rgba(214,226,255,.85) 50%), linear-gradient(135deg, rgba(214,226,255,.85) 50%, transparent 50%); background-position: calc(100% - 18px) calc(50% - 2px), calc(100% - 12px) calc(50% - 2px); background-size: 6px 6px, 6px 6px; background-repeat: no-repeat; }
+
+    .controls{
+      display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px;
+      align-items:center;
+    }
+    .btn{
+      border:none;
+      border-radius: 16px;
+      padding: 12px 14px;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing:.2px;
+      cursor:pointer;
+      background: rgba(6,10,18,.72);
+      color: rgba(214,226,255,.92);
+      border: 1px solid rgba(45,243,255,.18);
+      box-shadow: 0 0 18px rgba(45,243,255,.08);
+      transition: transform .06s ease, filter .12s ease;
+      user-select:none;
+    }
+    .btn:active{ transform: translateY(1px) scale(.99); }
+    .btn.primary{
+      background: linear-gradient(180deg, rgba(45,243,255,.18), rgba(51,255,153,.10));
+      border: 1px solid rgba(51,255,153,.22);
+      box-shadow: var(--glowC), var(--glowG);
+    }
+    .btn.warn{
+      background: linear-gradient(180deg, rgba(255,159,28,.18), rgba(255,230,109,.08));
+      border: 1px solid rgba(255,230,109,.20);
+      box-shadow: var(--glowO);
+      color: rgba(255,230,109,.95);
+    }
+    .btn.bad{
+      background: linear-gradient(180deg, rgba(255,59,106,.18), rgba(255,59,106,.08));
+      border: 1px solid rgba(255,59,106,.22);
+      box-shadow: 0 0 18px rgba(255,59,106,.12);
+      color: rgba(255,210,222,.95);
+    }
+    .btn.small{ padding: 10px 12px; font-size: 12.5px; border-radius: 14px; }
+
+    .toggleRow{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+      padding-top: 6px;
+    }
+    .toggle{
+      display:flex; align-items:center; gap:10px;
+      border-radius: 16px;
+      padding: 10px 12px;
+      border:1px solid rgba(74,163,255,.18);
+      background: rgba(4,8,15,.50);
+    }
+    .toggle input{ width:18px; height:18px; accent-color: var(--cyan); }
+    .toggle span{ font-size: 12.5px; color: rgba(214,226,255,.92); }
+    .toggle .sub{ font-size: 11.5px; color: var(--muted); display:block; margin-top:2px; }
+
+    .sliderWrap{
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(45,243,255,.14);
+      background: rgba(4,8,15,.50);
+    }
+    .sliderHead{
+      display:flex; justify-content:space-between; gap:10px; align-items:baseline;
+    }
+    .sliderHead strong{
+      font-size: 12.8px;
+      color: rgba(214,226,255,.92);
+    }
+    .sliderHead code{
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(45,243,255,.92);
+    }
+
+    /* Neon green/blue sliders */
+    input[type="range"]{
+      width:100%;
+      margin: 10px 0 4px;
+      background: transparent;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    input[type="range"]::-webkit-slider-runnable-track{
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(45,243,255,.85), rgba(51,255,153,.85));
+      box-shadow: 0 0 18px rgba(45,243,255,.14);
+    }
+    input[type="range"]::-webkit-slider-thumb{
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px; height: 22px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,230,109,.95), rgba(255,159,28,.85));
+      border: 1px solid rgba(255,230,109,.35);
+      box-shadow: 0 0 18px rgba(255,159,28,.22), 0 0 16px rgba(45,243,255,.12);
+      margin-top: -7px;
+    }
+
+    .resultBox{
+      padding: 14px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(214,226,255,.12);
+      background: rgba(4,8,15,.42);
+      margin-top: 10px;
+    }
+    .kv{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px 10px;
+      align-items:baseline;
+      font-family: var(--mono);
+      font-size: 12.6px;
+    }
+    .kv .k{ color: rgba(214,226,255,.82); font-family: var(--sans); font-size: 12.5px;}
+    .kv .v{ color: rgba(214,226,255,.95); }
+    .badge{
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      font-weight: 800;
+      letter-spacing: .2px;
+      border: 1px solid rgba(214,226,255,.12);
+      text-shadow: 0 0 18px rgba(0,0,0,.35);
+    }
+    .badge.ok{ background: rgba(57,255,136,.12); border-color: rgba(57,255,136,.22); color: rgba(140,255,190,.98); box-shadow: 0 0 18px rgba(57,255,136,.10);}
+    .badge.edge{ background: rgba(255,209,102,.11); border-color: rgba(255,209,102,.20); color: rgba(255,230,170,.98); box-shadow: 0 0 18px rgba(255,209,102,.10);}
+    .badge.bad{ background: rgba(255,59,106,.11); border-color: rgba(255,59,106,.22); color: rgba(255,190,205,.98); box-shadow: 0 0 18px rgba(255,59,106,.10);}
+
+    .mono{ font-family: var(--mono); }
+    .muted{ color: var(--muted); }
+
+    .split{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    @media(min-width: 860px){
+      .split{ grid-template-columns: 1fr 1fr; }
+    }
+
+    .canvasWrap{
+      margin-top: 10px;
+      border-radius: 18px;
+      border: 1px solid rgba(45,243,255,.14);
+      background: rgba(4,8,15,.50);
+      padding: 10px;
+      overflow:hidden;
+    }
+    canvas{
+      width:100%;
+      height:auto;
+      display:block;
+      border-radius: 14px;
+      background: rgba(3,6,11,.55);
+    }
+    .legend{
+      display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px;
+      font-size: 12px; color: rgba(214,226,255,.86);
+      align-items:center;
+    }
+    .swatch{width:12px;height:12px;border-radius:4px;border:1px solid rgba(214,226,255,.12)}
+    .swOk{background: rgba(57,255,136,.60)}
+    .swEdge{background: rgba(255,209,102,.70)}
+    .swBad{background: rgba(255,59,106,.70)}
+    .swMe{background: rgba(45,243,255,.80)}
+
+    .tiny{
+      font-size: 11.5px;
+      line-height:1.45;
+      color: rgba(214,226,255,.78);
+    }
+    .footer{
+      margin-top: 12px;
+      display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
+      font-size: 11.5px;
+      color: rgba(214,226,255,.58);
+      padding: 0 4px;
+    }
+    .link{
+      color: rgba(45,243,255,.9);
+      text-decoration:none;
+      border-bottom:1px dashed rgba(45,243,255,.35);
+    }
+    .hr{
+      height:1px;
+      background: linear-gradient(90deg, transparent, rgba(255,230,109,.18), rgba(45,243,255,.18), transparent);
+      margin: 12px 0;
+    }
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 14px;
+      transform: translateX(-50%);
+      background: rgba(4,8,15,.92);
+      border: 1px solid rgba(45,243,255,.20);
+      box-shadow: 0 0 22px rgba(45,243,255,.14);
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-size: 12.5px;
+      color: rgba(214,226,255,.95);
+      max-width: min(94vw, 680px);
+      display:none;
+      z-index: 999;
+    }
+    .toast.show{display:block}
+  </style>
+</head>
+
+<body>
+  <div class="frame">
+    <div class="shell">
+      <header>
+        <div class="brand">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <h1>QDS Binary Pulsar Constraint Lab <span class="mono">v2 MAX</span></h1>
+            <div class="subtitle">
+              Phone-first sanity filter. Checks whether a Yukawa-like correction stays within an allowed fractional timing band at orbital separation.<br/>
+              Includes strict acceleration toggle, inverse solvers, heatmap sweep, and a self-test suite.
+            </div>
+          </div>
+        </div>
+        <div class="pillRow">
+          <div class="pill"><span class="dot cyan"></span><strong>Mode:</strong> offline / no deps</div>
+          <div class="pill"><span class="dot ok"></span><strong>PASS</strong> / <span class="dot edge"></span><strong>EDGE</strong> / <span class="dot bad"></span><strong>FAIL</strong></div>
+        </div>
+      </header>
+
+      <div class="grid">
+
+        <!-- LEFT: MAIN -->
+        <section class="card" id="cardMain">
+          <div class="cardTitle">
+            <h2>1) System & QDS parameters</h2>
+            <div class="tag">GR precision • binary pulsars</div>
+          </div>
+
+          <div class="row">
+            <div class="field" style="flex:2 1 240px">
+              <label for="sys">System label</label>
+              <input id="sys" type="text" value="PSR B1913+16 (example)" />
+              <div class="hint">This is a demo label only. You can rename it to your dataset/system ID.</div>
+            </div>
+
+            <div class="field">
+              <label for="unit">Units</label>
+              <select id="unit">
+                <option value="1">Custom units (no conversion)</option>
+                <option value="m">meters (m)</option>
+                <option value="km">kilometers (km)</option>
+                <option value="AU">astronomical units (AU)</option>
+                <option value="ls">light-seconds (c·s)</option>
+              </select>
+              <div class="hint">Used only for display + conversions (optional).</div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="r">Binary separation r</label>
+              <input id="r" type="number" step="any" value="1.0" />
+              <div class="hint">Orbital separation at which you want to check a constraint.</div>
+            </div>
+            <div class="field">
+              <label for="alpha">QDS strength α (dimensionless)</label>
+              <input id="alpha" type="number" step="any" value="0.01" />
+              <div class="hint">Effective Yukawa amplitude parameter (toy).</div>
+            </div>
+            <div class="field">
+              <label for="lam">Coherence length λ (same units as r)</label>
+              <input id="lam" type="number" step="any" value="10.0" />
+              <div class="hint">The scale length of the exponential suppression.</div>
+            </div>
+            <div class="field">
+              <label for="band">Allowed fractional deviation band |Δa/a|<sub>max</sub></label>
+              <input id="band" type="number" step="any" value="0.002" />
+              <div class="hint">Typical demonstration band: 0.002–0.003 (0.2–0.3%).</div>
+            </div>
+          </div>
+
+          <div class="toggleRow">
+            <div class="toggle">
+              <input id="useAccel" type="checkbox" />
+              <div>
+                <span><b>Strict mode:</b> acceleration form</span>
+                <span class="sub">uses f(r,λ) = (1 + r/λ) e<sup>-r/λ</sup> (harder check)</span>
+              </div>
+            </div>
+            <div class="toggle">
+              <input id="useAbs" type="checkbox" checked />
+              <div>
+                <span><b>Use |α·f|</b> (absolute)</span>
+                <span class="sub">recommended for symmetric “magnitude-only” band checks</span>
+              </div>
+            </div>
+            <div class="toggle">
+              <input id="autoRun" type="checkbox" checked />
+              <div>
+                <span><b>Auto-evaluate</b></span>
+                <span class="sub">updates result as you edit values</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sliderWrap">
+            <div class="sliderHead">
+              <strong>EDGE epsilon (borderline detector)</strong>
+              <code id="epsLabel">2.0e-6</code>
+            </div>
+            <input id="eps" type="range" min="-12" max="-2" step="0.1" value="-5.7" />
+            <div class="hint">EDGE if |value − band| ≤ ε. Slider is log10(ε).</div>
+          </div>
+
+          <div class="controls">
+            <button class="btn primary" id="btnEval">Evaluate constraint</button>
+            <button class="btn warn" id="btnShare">Copy share link</button>
+            <button class="btn" id="btnExport">Export report</button>
+            <button class="btn bad" id="btnReset">Reset</button>
+          </div>
+
+          <div class="resultBox" id="resultBox">
+            <div class="kv" id="kvMain">
+              <div class="k">System</div><div class="v muted">—</div>
+              <div class="k">r</div><div class="v muted">—</div>
+              <div class="k">λ</div><div class="v muted">—</div>
+              <div class="k">x = r/λ</div><div class="v muted">—</div>
+              <div class="k">Kernel factor f(r,λ)</div><div class="v muted">—</div>
+              <div class="k">α · f</div><div class="v muted">—</div>
+              <div class="k">|α · f|</div><div class="v muted">—</div>
+              <div class="k">Allowed band</div><div class="v muted">—</div>
+              <div class="k">Mode</div><div class="v muted">—</div>
+            </div>
+            <div class="badge edge" id="badge">EDGE: waiting for evaluation…</div>
+            <div class="hint" style="margin-top:10px">
+              Interpretation: if <span class="mono">|α · f(r,λ)|</span> exceeds the band, this parameter choice is likely <b>ruled out</b> by high-precision binary-pulsar timing at that scale (toy model).
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="cardTitle">
+            <h2>2) Inverse solvers (design mode)</h2>
+            <div class="tag">α<sub>max</sub> • λ<sub>min</sub></div>
+          </div>
+
+          <div class="split">
+            <div class="card" style="margin:0; padding:14px; border-radius:16px;">
+              <div class="cardTitle" style="margin-bottom:6px">
+                <h2 style="font-size:14px;margin:0;">Compute α<sub>max</sub> allowed</h2>
+                <div class="tag" style="font-size:11px">band / f</div>
+              </div>
+              <div class="tiny">Given r, λ, band → α<sub>max</sub> = band / f(r,λ)</div>
+              <div class="controls" style="margin-top:10px">
+                <button class="btn primary small" id="btnAlphaMax">Compute αmax</button>
+                <button class="btn small" id="btnSetAlphaMax">Set α = αmax</button>
+              </div>
+              <div class="resultBox" style="margin-top:10px">
+                <div class="kv" id="kvAlphaMax">
+                  <div class="k">αmax</div><div class="v muted">—</div>
+                  <div class="k">f(r,λ)</div><div class="v muted">—</div>
+                  <div class="k">Note</div><div class="v muted">—</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card" style="margin:0; padding:14px; border-radius:16px;">
+              <div class="cardTitle" style="margin-bottom:6px">
+                <h2 style="font-size:14px;margin:0;">Solve λ<sub>min</sub> required to pass</h2>
+                <div class="tag" style="font-size:11px">bisection</div>
+              </div>
+              <div class="tiny">
+                Given r, α, band → find the smallest λ such that <span class="mono">|α·f(r,λ)| ≤ band</span>.<br/>
+                (If already passing, λmin may be “already ok”.)
+              </div>
+
+              <div class="row">
+                <div class="field">
+                  <label for="lamLo">λ search min</label>
+                  <input id="lamLo" type="number" step="any" value="1e-6" />
+                </div>
+                <div class="field">
+                  <label for="lamHi">λ search max</label>
+                  <input id="lamHi" type="number" step="any" value="1e6" />
+                </div>
+              </div>
+
+              <div class="controls">
+                <button class="btn primary small" id="btnLamMin">Solve λmin</button>
+                <button class="btn small" id="btnSetLamMin">Set λ = λmin</button>
+              </div>
+
+              <div class="resultBox" style="margin-top:10px">
+                <div class="kv" id="kvLamMin">
+                  <div class="k">λmin</div><div class="v muted">—</div>
+                  <div class="k">Iterations</div><div class="v muted">—</div>
+                  <div class="k">Status</div><div class="v muted">—</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- RIGHT: SWEEP + TESTS -->
+        <aside class="card">
+          <div class="cardTitle">
+            <h2>3) Sweep heatmap (α vs λ)</h2>
+            <div class="tag">log-grid</div>
+          </div>
+
+          <div class="tiny">
+            Visual kill-test: if the boundary “looks wrong”, the maths is wrong. Uses log10 ranges for α and λ and shades PASS/EDGE/FAIL.
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="alogLo">log10(α) min</label>
+              <input id="alogLo" type="number" step="any" value="-6" />
+            </div>
+            <div class="field">
+              <label for="alogHi">log10(α) max</label>
+              <input id="alogHi" type="number" step="any" value="0" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="llogLo">log10(λ) min</label>
+              <input id="llogLo" type="number" step="any" value="-3" />
+            </div>
+            <div class="field">
+              <label for="llogHi">log10(λ) max</label>
+              <input id="llogHi" type="number" step="any" value="3" />
+            </div>
+          </div>
+
+          <div class="sliderWrap">
+            <div class="sliderHead">
+              <strong>Grid resolution</strong>
+              <code id="resLabel">80 × 60</code>
+            </div>
+            <input id="res" type="range" min="30" max="140" step="1" value="80" />
+            <div class="hint">Higher = prettier but heavier on phone.</div>
+          </div>
+
+          <div class="controls">
+            <button class="btn primary" id="btnDraw">Draw heatmap</button>
+            <button class="btn" id="btnPick">Pick point → inputs</button>
+          </div>
+
+          <div class="canvasWrap">
+            <canvas id="map" width="800" height="520"></canvas>
+          </div>
+
+          <div class="legend">
+            <span class="swatch swOk"></span> PASS
+            <span class="swatch swEdge"></span> EDGE
+            <span class="swatch swBad"></span> FAIL
+            <span class="swatch swMe"></span> current point
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="cardTitle">
+            <h2>4) Self-test suite</h2>
+            <div class="tag">try to break it</div>
+          </div>
+          <div class="tiny">
+            Runs known boundary cases (including the e<sup>-0.1</sup> line) and edge handling.
+          </div>
+          <div class="controls">
+            <button class="btn primary" id="btnSelf">Run self-tests</button>
+            <button class="btn" id="btnClearTests">Clear</button>
+          </div>
+
+          <div class="resultBox">
+            <div class="kv" id="kvTests">
+              <div class="k">Status</div><div class="v muted">—</div>
+              <div class="k">Pass</div><div class="v muted">—</div>
+              <div class="k">Fail</div><div class="v muted">—</div>
+              <div class="k">Notes</div><div class="v muted">—</div>
+            </div>
+            <div class="tiny mono" id="testLog" style="margin-top:10px; white-space:pre-wrap; opacity:.95;"></div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="cardTitle">
+            <h2>5) Presets</h2>
+            <div class="tag">localStorage</div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="presetName">Preset name</label>
+              <input id="presetName" type="text" value="My Pulsar Check" />
+            </div>
+          </div>
+          <div class="controls">
+            <button class="btn primary small" id="btnSavePreset">Save preset</button>
+            <button class="btn small" id="btnLoadPreset">Load preset</button>
+            <button class="btn bad small" id="btnDelPreset">Delete preset</button>
+          </div>
+          <div class="row" style="margin-top:6px">
+            <div class="field">
+              <label for="presetList">Saved presets</label>
+              <select id="presetList"></select>
+              <div class="hint">Saved on-device only. No network calls.</div>
+            </div>
+          </div>
+
+        </aside>
+
+      </div>
+
+      <div class="footer">
+        <div>Device: <b>Ω-Phone QDS Lab</b> • Build: <span class="mono">Binary Pulsar v2 MAX</span></div>
+        <div><a class="link" href="#" id="backLink">Back to Test Platform</a></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---- Units (optional display conversions) ----
+  const UNITS = {
+    "1": { name:"custom", toBase:x=>x, fromBase:x=>x, suffix:"" },
+    "m": { name:"m", toBase:x=>x, fromBase:x=>x, suffix:" m" },
+    "km": { name:"km", toBase:x=>x*1000, fromBase:x=>x/1000, suffix:" km" },
+    "AU": { name:"AU", toBase:x=>x*149597870700, fromBase:x=>x/149597870700, suffix:" AU" },
+    "ls": { name:"light-second", toBase:x=>x*299792458, fromBase:x=>x/299792458, suffix:" ls" }
+  };
+
+  // ---- DOM ----
+  const $ = (id)=>document.getElementById(id);
+
+  const el = {
+    sys: $("sys"),
+    unit: $("unit"),
+    r: $("r"),
+    alpha: $("alpha"),
+    lam: $("lam"),
+    band: $("band"),
+    useAccel: $("useAccel"),
+    useAbs: $("useAbs"),
+    autoRun: $("autoRun"),
+    eps: $("eps"),
+    epsLabel: $("epsLabel"),
+
+    btnEval: $("btnEval"),
+    btnShare: $("btnShare"),
+    btnExport: $("btnExport"),
+    btnReset: $("btnReset"),
+
+    kvMain: $("kvMain"),
+    badge: $("badge"),
+
+    // inverse
+    btnAlphaMax: $("btnAlphaMax"),
+    btnSetAlphaMax: $("btnSetAlphaMax"),
+    kvAlphaMax: $("kvAlphaMax"),
+
+    lamLo: $("lamLo"),
+    lamHi: $("lamHi"),
+    btnLamMin: $("btnLamMin"),
+    btnSetLamMin: $("btnSetLamMin"),
+    kvLamMin: $("kvLamMin"),
+
+    // sweep
+    alogLo: $("alogLo"),
+    alogHi: $("alogHi"),
+    llogLo: $("llogLo"),
+    llogHi: $("llogHi"),
+    res: $("res"),
+    resLabel: $("resLabel"),
+    btnDraw: $("btnDraw"),
+    btnPick: $("btnPick"),
+    map: $("map"),
+
+    // tests
+    btnSelf: $("btnSelf"),
+    btnClearTests: $("btnClearTests"),
+    kvTests: $("kvTests"),
+    testLog: $("testLog"),
+
+    // presets
+    presetName: $("presetName"),
+    presetList: $("presetList"),
+    btnSavePreset: $("btnSavePreset"),
+    btnLoadPreset: $("btnLoadPreset"),
+    btnDelPreset: $("btnDelPreset"),
+
+    backLink: $("backLink"),
+    toast: $("toast"),
+  };
+
+  // ---- State ----
+  const SKEY = "QDS_PULSAR_V2_MAX_PRESETS";
+  let lastLamMin = null;
+  let lastAlphaMax = null;
+
+  let mapState = {
+    lastImage: null,
+    pickArmed: false,
+    lastParams: null
+  };
+
+  function toast(msg){
+    el.toast.textContent = msg;
+    el.toast.classList.add("show");
+    clearTimeout(toast._t);
+    toast._t = setTimeout(()=>el.toast.classList.remove("show"), 1800);
+  }
+
+  function clamp(x,a,b){ return Math.max(a, Math.min(b, x)); }
+  function isFiniteNum(x){ return typeof x === "number" && Number.isFinite(x); }
+
+  function fmt(x, sig=6){
+    if(!isFiniteNum(x)) return "—";
+    const ax = Math.abs(x);
+    if(ax === 0) return "0";
+    if(ax < 1e-3 || ax >= 1e6) return x.toExponential(3);
+    // trim trailing zeros
+    const s = x.toPrecision(sig);
+    return String(Number(s));
+  }
+
+  function getEps(){
+    // slider is log10(eps)
+    const loge = parseFloat(el.eps.value);
+    const eps = Math.pow(10, loge);
+    return eps;
+  }
+
+  function updateEpsLabel(){
+    const eps = getEps();
+    el.epsLabel.textContent = eps.toExponential(1);
+  }
+
+  // ---- Core physics (toy) ----
+  function kernelFactor(r, lam, useAccel){
+    // protect
+    if(!(r>=0) || !(lam>0)) return NaN;
+    const x = r/lam;
+    const e = Math.exp(-x);
+    if(useAccel){
+      // stricter "acceleration-like" Yukawa correction
+      return (1 + x) * e;
+    }
+    // potential-like
+    return e;
+  }
+
+  function classify(value, band, eps){
+    // using magnitude check outside
+    // EDGE if within eps of boundary
+    const d = Math.abs(value - band);
+    if(d <= eps) return "EDGE";
+    return (value <= band) ? "OK" : "FAIL";
+  }
+
+  function compute(){
+    const sys = (el.sys.value || "").trim() || "—";
+    const unitKey = el.unit.value in UNITS ? el.unit.value : "1";
+    const unit = UNITS[unitKey];
+
+    const r = parseFloat(el.r.value);
+    const alpha = parseFloat(el.alpha.value);
+    const lam = parseFloat(el.lam.value);
+    const band = parseFloat(el.band.value);
+
+    const useAccel = !!el.useAccel.checked;
+    const useAbs = !!el.useAbs.checked;
+
+    // validation
+    const errs = [];
+    if(!isFiniteNum(r) || r < 0) errs.push("r must be a finite number ≥ 0");
+    if(!isFiniteNum(lam) || lam <= 0) errs.push("λ must be a finite number > 0");
+    if(!isFiniteNum(alpha)) errs.push("α must be a finite number");
+    if(!isFiniteNum(band) || band <= 0) errs.push("band must be a finite number > 0");
+
+    const eps = getEps();
+
+    if(errs.length){
+      return {
+        ok:false,
+        sys, unitKey,
+        errs,
+        r, alpha, lam, band,
+        eps,
+        useAccel, useAbs
+      };
+    }
+
+    const f = kernelFactor(r, lam, useAccel);
+    const af = alpha * f;
+    const mag = useAbs ? Math.abs(af) : af;
+    const cls = classify(Math.abs(af), band, eps); // classification uses magnitude by default
+    // if user disabled abs display, still compare magnitude for safety
+    // (this avoids accidental "negative passes" by sign)
+    return {
+      ok:true,
+      sys, unitKey,
+      r, alpha, lam, band,
+      x: r/lam,
+      f, af, magAbs: Math.abs(af),
+      eps,
+      useAccel, useAbs,
+      cls
+    };
+  }
+
+  function setMainKV(res){
+    const rows = el.kvMain.querySelectorAll(".v");
+    // order matches kvMain definitions
+    const mode = res.ok ? (res.useAccel ? "Strict accel: (1+r/λ) e^{-r/λ}" : "Potential: e^{-r/λ}") : "—";
+    const unit = UNITS[res.unitKey || "1"];
+    const suf = unit?.suffix || "";
+
+    const values = [
+      res.sys ?? "—",
+      res.ok ? (fmt(res.r) + suf) : "—",
+      res.ok ? (fmt(res.lam) + suf) : "—",
+      res.ok ? fmt(res.x) : "—",
+      res.ok ? fmt(res.f) : "—",
+      res.ok ? fmt(res.af) : "—",
+      res.ok ? fmt(res.magAbs) : "—",
+      res.ok ? fmt(res.band) : "—",
+      mode
+    ];
+    for(let i=0;i<rows.length && i<values.length;i++){
+      rows[i].textContent = values[i];
+      rows[i].classList.remove("muted");
+      if(!res.ok) rows[i].classList.add("muted");
+    }
+  }
+
+  function setBadge(res){
+    if(!res.ok){
+      el.badge.className = "badge bad";
+      el.badge.textContent = "Input error: " + res.errs[0] + (res.errs.length>1 ? ` (+${res.errs.length-1} more)` : "");
+      return;
+    }
+    if(res.cls === "OK"){
+      el.badge.className = "badge ok";
+      el.badge.textContent = "OK: (α, λ) is inside pulsar timing band at this scale.";
+    }else if(res.cls === "EDGE"){
+      el.badge.className = "badge edge";
+      el.badge.textContent = "EDGE: borderline at the band (within ε). Treat as “needs data-fit”.";
+    }else{
+      el.badge.className = "badge bad";
+      el.badge.textContent = "Ruled out: (α, λ) overshoots pulsar timing limits (toy band).";
+    }
+  }
+
+  function evaluate(){
+    const res = compute();
+    setMainKV(res);
+    setBadge(res);
+    mapState.lastParams = res.ok ? res : null;
+    if(el.autoRun.checked){
+      // keep heatmap marker updated (no auto redraw)
+      drawMarkerOnly();
+    }
+    return res;
+  }
+
+  // ---- Inverse: alpha max ----
+  function computeAlphaMax(){
+    const res = compute();
+    if(!res.ok){
+      setAlphaMaxKV({ok:false, msg: res.errs.join("; ")});
+      return null;
+    }
+    const f = res.f;
+    if(!isFiniteNum(f) || f <= 0){
+      setAlphaMaxKV({ok:false, msg:"invalid kernel factor (check r, λ)"});
+      return null;
+    }
+    const amax = res.band / f;
+    lastAlphaMax = amax;
+    setAlphaMaxKV({ok:true, amax, f, note:"αmax = band / f(r,λ)"});
+    return amax;
+  }
+
+  function setAlphaMaxKV(o){
+    const rows = el.kvAlphaMax.querySelectorAll(".v");
+    if(!o.ok){
+      rows[0].textContent = "—";
+      rows[1].textContent = "—";
+      rows[2].textContent = o.msg || "—";
+      rows[2].classList.remove("muted");
+      return;
+    }
+    rows[0].textContent = fmt(o.amax);
+    rows[1].textContent = fmt(o.f);
+    rows[2].textContent = o.note || "—";
+  }
+
+  // ---- Inverse: lambda min (bisection) ----
+  function solveLamMin(){
+    const res = compute();
+    if(!res.ok){
+      setLamMinKV({ok:false, status: res.errs.join("; ")});
+      return null;
+    }
+
+    const lamLo = parseFloat(el.lamLo.value);
+    const lamHi = parseFloat(el.lamHi.value);
+    if(!isFiniteNum(lamLo) || !isFiniteNum(lamHi) || lamLo <= 0 || lamHi <= 0 || lamLo >= lamHi){
+      setLamMinKV({ok:false, status:"Bad λ bounds: require 0 < λmin < λmax"});
+      return null;
+    }
+
+    const r = res.r;
+    const alpha = res.alpha;
+    const band = res.band;
+    const eps = res.eps;
+    const useAccel = res.useAccel;
+
+    function passAt(lam){
+      const f = kernelFactor(r, lam, useAccel);
+      const mag = Math.abs(alpha * f);
+      return (mag <= band + eps); // allow epsilon cushion as pass
+    }
+
+    // If already passing at current λ, show that and offer “λmin maybe smaller”
+    // But we still solve for minimal within bounds.
+    let lo = lamLo, hi = lamHi;
+
+    // ensure hi passes; if not, no solution within bounds
+    if(!passAt(hi)){
+      setLamMinKV({ok:false, status:"No solution in bounds: even λmax fails. Increase λ search max."});
+      return null;
+    }
+    // ensure lo fails; if it already passes at lo, then λmin is at/below lo
+    if(passAt(lo)){
+      lastLamMin = lo;
+      setLamMinKV({ok:true, lamMin: lo, it: 0, status:"Already OK at λmin bound. λmin ≤ λminBound."});
+      return lo;
+    }
+
+    const MAX_IT = 80;
+    let it = 0;
+    while(it < MAX_IT){
+      const mid = 0.5*(lo+hi);
+      if(passAt(mid)) hi = mid; else lo = mid;
+      // stop when interval is tiny relative to mid
+      const rel = (hi-lo) / Math.max(1e-30, mid);
+      if(rel < 1e-9) break;
+      it++;
+    }
+    lastLamMin = hi;
+    setLamMinKV({ok:true, lamMin: hi, it, status:"Solved λmin (within bounds)."});
+    return hi;
+  }
+
+  function setLamMinKV(o){
+    const rows = el.kvLamMin.querySelectorAll(".v");
+    if(!o.ok){
+      rows[0].textContent = "—";
+      rows[1].textContent = "—";
+      rows[2].textContent = o.status || "—";
+      return;
+    }
+    rows[0].textContent = fmt(o.lamMin);
+    rows[1].textContent = String(o.it ?? "—");
+    rows[2].textContent = o.status || "—";
+  }
+
+  // ---- Heatmap ----
+  const ctx = el.map.getContext("2d");
+
+  function colorFor(cls){
+    // RGBA bytes
+    if(cls === "OK")   return [57,255,136, 170];
+    if(cls === "EDGE") return [255,209,102, 190];
+    return [255,59,106, 190];
+  }
+
+  function drawHeatmap(){
+    const base = compute();
+    if(!base.ok){
+      toast("Fix inputs before drawing heatmap.");
+      return;
+    }
+
+    const al0 = parseFloat(el.alogLo.value);
+    const al1 = parseFloat(el.alogHi.value);
+    const ll0 = parseFloat(el.llogLo.value);
+    const ll1 = parseFloat(el.llogHi.value);
+    if(!isFiniteNum(al0)||!isFiniteNum(al1)||!isFiniteNum(ll0)||!isFiniteNum(ll1)||!(al0<al1)||!(ll0<ll1)){
+      toast("Bad log ranges for α/λ.");
+      return;
+    }
+
+    const w = parseInt(el.res.value, 10);
+    const h = Math.max(24, Math.round(w * 0.75));
+    el.resLabel.textContent = `${w} × ${h}`;
+
+    const img = ctx.createImageData(w, h);
+    const data = img.data;
+
+    const r = base.r;
+    const band = base.band;
+    const eps = base.eps;
+    const useAccel = base.useAccel;
+
+    for(let j=0;j<h;j++){
+      // y: alpha log
+      const tY = j/(h-1);
+      const aLog = al1 + (al0 - al1)*tY; // top = high
+      const a = Math.pow(10, aLog);
+      for(let i=0;i<w;i++){
+        // x: lambda log
+        const tX = i/(w-1);
+        const lLog = ll0 + (ll1-ll0)*tX;
+        const lam = Math.pow(10, lLog);
+
+        const f = kernelFactor(r, lam, useAccel);
+        const mag = Math.abs(a*f);
+        const cls = classify(mag, band, eps);
+        const [R,G,B,A] = colorFor(cls);
+        const idx = 4*(j*w+i);
+        data[idx+0]=R;
+        data[idx+1]=G;
+        data[idx+2]=B;
+        data[idx+3]=A;
+      }
+    }
+
+    // draw scaled image to canvas size
+    ctx.save();
+    ctx.clearRect(0,0,el.map.width, el.map.height);
+
+    // place image into an offscreen canvas to scale nicely
+    const off = document.createElement("canvas");
+    off.width = w; off.height = h;
+    off.getContext("2d").putImageData(img,0,0);
+
+    // nice border margin inside
+    const pad = 10;
+    const drawW = el.map.width - pad*2;
+    const drawH = el.map.height - pad*2;
+
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(off, 0,0,w,h, pad,pad, drawW,drawH);
+
+    // axes + labels
+    ctx.imageSmoothingEnabled = true;
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = "rgba(214,226,255,.35)";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(pad, pad, drawW, drawH);
+
+    ctx.fillStyle = "rgba(214,226,255,.75)";
+    ctx.font = "12px system-ui";
+    ctx.fillText("log10(λ)", pad + 6, pad + drawH + 18);
+    ctx.save();
+    ctx.translate(12, pad + drawH/2);
+    ctx.rotate(-Math.PI/2);
+    ctx.fillText("log10(α)", 0, 0);
+    ctx.restore();
+
+    // markers
+    mapState.lastImage = {w,h, al0,al1,ll0,ll1, pad, drawW, drawH};
+    ctx.restore();
+    drawMarkerOnly();
+    toast("Heatmap drawn.");
+  }
+
+  function drawMarkerOnly(){
+    const meta = mapState.lastImage;
+    const base = mapState.lastParams;
+    if(!meta || !base || !base.ok) return;
+
+    // redraw a small marker without rebuilding entire heatmap:
+    // simplest: draw a ring marker over existing canvas
+    const {al0,al1,ll0,ll1,pad,drawW,drawH} = meta;
+    const a = Math.abs(base.alpha);
+    const lam = base.lam;
+
+    if(!(a>0) || !(lam>0)) return;
+
+    const aLog = Math.log10(a);
+    const lLog = Math.log10(lam);
+
+    const tX = (lLog - ll0)/(ll1-ll0);
+    const tY = (al1 - aLog)/(al1-al0); // because top is al1
+    if(!isFiniteNum(tX)||!isFiniteNum(tY)) return;
+
+    const x = pad + clamp(tX,0,1)*drawW;
+    const y = pad + clamp(tY,0,1)*drawH;
+
+    // draw marker
+    ctx.save();
+    ctx.globalCompositeOperation = "source-over";
+    ctx.strokeStyle = "rgba(45,243,255,.95)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(x,y, 8, 0, Math.PI*2);
+    ctx.stroke();
+    ctx.strokeStyle = "rgba(255,230,109,.75)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(x,y, 12, 0, Math.PI*2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function pickPointToInputs(){
+    if(!mapState.lastImage){
+      toast("Draw heatmap first.");
+      return;
+    }
+    mapState.pickArmed = true;
+    toast("Tap heatmap to pick α, λ.");
+  }
+
+  el.map.addEventListener("click", (ev)=>{
+    if(!mapState.pickArmed) return;
+    const meta = mapState.lastImage;
+    if(!meta) return;
+
+    const rect = el.map.getBoundingClientRect();
+    const cx = (ev.clientX - rect.left) * (el.map.width / rect.width);
+    const cy = (ev.clientY - rect.top)  * (el.map.height/ rect.height);
+
+    const {al0,al1,ll0,ll1,pad,drawW,drawH} = meta;
+    const tx = clamp((cx - pad)/drawW, 0, 1);
+    const ty = clamp((cy - pad)/drawH, 0, 1);
+
+    const lLog = ll0 + (ll1-ll0)*tx;
+    const aLog = al1 + (al0-al1)*ty;
+
+    const lam = Math.pow(10, lLog);
+    const alpha = Math.pow(10, aLog);
+
+    el.lam.value = String(lam);
+    el.alpha.value = String(alpha);
+    mapState.pickArmed = false;
+    evaluate();
+    toast("Picked point → inputs updated.");
+  });
+
+  // ---- Self-tests ----
+  function runSelfTests(){
+    const logs = [];
+    let pass=0, fail=0;
+
+    function expect(name, got, want){
+      const ok = (got === want);
+      if(ok) pass++; else fail++;
+      logs.push(`${ok ? "✅" : "❌"} ${name}: got=${got} want=${want}`);
+      return ok;
+    }
+
+    // Boundary test in potential mode:
+    // r=1, λ=10 => f=e^-0.1
+    // α_threshold = band / f
+    // band=0.002 => α≈0.00221034
+    const band = 0.002;
+    const r=1, lam=10;
+    const f = kernelFactor(r, lam, false);
+    const ath = band / f;
+    const eps = 1e-8;
+
+    // helper classify magnitude
+    function cls(a, r, lam, band, useAccel){
+      const ff = kernelFactor(r, lam, useAccel);
+      const mag = Math.abs(a*ff);
+      return classify(mag, band, eps);
+    }
+
+    expect("factor e^-0.1 approx", Math.abs(f - 0.9048374180) < 1e-6 ? "OK" : "BAD", "OK");
+    expect("at threshold => EDGE", cls(ath, r, lam, band, false), "EDGE");
+    expect("below threshold => OK", cls(ath*0.95, r, lam, band, false), "OK");
+    expect("above threshold => FAIL", cls(ath*1.05, r, lam, band, false), "FAIL");
+
+    // r=0 => f=1 potential, accel also =1
+    expect("r=0 potential α=band => EDGE", cls(band, 0, 10, band, false), "EDGE");
+    expect("r=0 accel α=band => EDGE", cls(band, 0, 10, band, true), "EDGE");
+
+    // large x => tiny factor => OK
+    expect("large r/λ => OK", cls(1, 100, 1, band, false), "OK");
+
+    // strict accel should be harder than potential for same (r,λ)
+    // i.e. f_accel = (1+x)e^-x >= e^-x
+    const fA = kernelFactor(1,10,true);
+    expect("accel factor >= potential", (fA >= f) ? "OK" : "BAD", "OK");
+
+    // input validation check (NaN)
+    const bad = kernelFactor(-1,10,false);
+    expect("kernelFactor negative r -> NaN", Number.isNaN(bad) ? "OK" : "BAD", "OK");
+
+    const status = (fail===0) ? "All tests passed" : "Some tests failed";
+    el.testLog.textContent = logs.join("\n");
+    const rows = el.kvTests.querySelectorAll(".v");
+    rows[0].textContent = status;
+    rows[1].textContent = String(pass);
+    rows[2].textContent = String(fail);
+    rows[3].textContent = (fail===0) ? "Boundary & edge behaviour consistent." : "Check failing lines above.";
+    toast(status);
+  }
+
+  function clearTests(){
+    el.testLog.textContent = "";
+    const rows = el.kvTests.querySelectorAll(".v");
+    rows[0].textContent = "—";
+    rows[1].textContent = "—";
+    rows[2].textContent = "—";
+    rows[3].textContent = "—";
+  }
+
+  // ---- Export / share ----
+  function currentParams(){
+    return {
+      sys: el.sys.value || "",
+      unit: el.unit.value,
+      r: el.r.value,
+      alpha: el.alpha.value,
+      lam: el.lam.value,
+      band: el.band.value,
+      useAccel: el.useAccel.checked ? 1 : 0,
+      useAbs: el.useAbs.checked ? 1 : 0,
+      epsLog: el.eps.value,
+      lamLo: el.lamLo.value,
+      lamHi: el.lamHi.value,
+      alogLo: el.alogLo.value,
+      alogHi: el.alogHi.value,
+      llogLo: el.llogLo.value,
+      llogHi: el.llogHi.value,
+      res: el.res.value
+    };
+  }
+
+  function applyParams(q){
+    // Apply carefully (don't break if missing)
+    if(q.sys!=null) el.sys.value = q.sys;
+    if(q.unit!=null) el.unit.value = q.unit;
+    if(q.r!=null) el.r.value = q.r;
+    if(q.alpha!=null) el.alpha.value = q.alpha;
+    if(q.lam!=null) el.lam.value = q.lam;
+    if(q.band!=null) el.band.value = q.band;
+    if(q.useAccel!=null) el.useAccel.checked = (q.useAccel==="1"||q.useAccel===1);
+    if(q.useAbs!=null) el.useAbs.checked = (q.useAbs==="1"||q.useAbs===1);
+    if(q.epsLog!=null) el.eps.value = q.epsLog;
+
+    if(q.lamLo!=null) el.lamLo.value = q.lamLo;
+    if(q.lamHi!=null) el.lamHi.value = q.lamHi;
+
+    if(q.alogLo!=null) el.alogLo.value = q.alogLo;
+    if(q.alogHi!=null) el.alogHi.value = q.alogHi;
+    if(q.llogLo!=null) el.llogLo.value = q.llogLo;
+    if(q.llogHi!=null) el.llogHi.value = q.llogHi;
+    if(q.res!=null) el.res.value = q.res;
+
+    updateEpsLabel();
+    evaluate();
+  }
+
+  function copyShareLink(){
+    const p = currentParams();
+    const url = new URL(window.location.href);
+    // wipe current query except bust
+    url.search = "";
+    for(const [k,v] of Object.entries(p)){
+      url.searchParams.set(k, String(v));
+    }
+    url.searchParams.set("bust", String(Date.now()));
+    navigator.clipboard.writeText(url.toString()).then(()=>{
+      toast("Share link copied.");
+    }).catch(()=>{
+      toast("Clipboard blocked. Long-press address bar and copy.");
+    });
+  }
+
+  function exportReport(){
+    const res = compute();
+    const dt = new Date();
+    const lines = [];
+    lines.push("QDS Binary Pulsar Constraint Lab v2 MAX");
+    lines.push("======================================");
+    lines.push(`Time: ${dt.toISOString()}`);
+    lines.push("");
+    const p = currentParams();
+    lines.push("Inputs:");
+    for(const k of ["sys","unit","r","alpha","lam","band","useAccel","useAbs","epsLog"]){
+      lines.push(`- ${k}: ${p[k]}`);
+    }
+    lines.push("");
+    if(!res.ok){
+      lines.push("RESULT: INPUT ERROR");
+      lines.push(res.errs.join("\n"));
+    }else{
+      lines.push("Derived:");
+      lines.push(`- x=r/λ: ${res.x}`);
+      lines.push(`- f(r,λ): ${res.f}`);
+      lines.push(`- α·f: ${res.af}`);
+      lines.push(`- |α·f|: ${res.magAbs}`);
+      lines.push(`- band: ${res.band}`);
+      lines.push(`- eps: ${res.eps}`);
+      lines.push(`- mode: ${res.useAccel ? "acceleration (1+r/λ)e^-r/λ" : "potential e^-r/λ"}`);
+      lines.push("");
+      lines.push(`Classification: ${res.cls}`);
+      if(lastAlphaMax!=null) lines.push(`αmax(last): ${lastAlphaMax}`);
+      if(lastLamMin!=null) lines.push(`λmin(last): ${lastLamMin}`);
+      lines.push("");
+      lines.push("Notes:");
+      lines.push("- Demo sanity-filter only; not a full timing data analysis.");
+      lines.push("- Compare across real pulsar systems requires proper post-Keplerian fits.");
+    }
+
+    const blob = new Blob([lines.join("\n")], {type:"text/plain;charset=utf-8"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `qds_pulsar_report_${dt.toISOString().replace(/[:.]/g,"-")}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 250);
+    toast("Report exported.");
+  }
+
+  // ---- Presets ----
+  function loadPresetStore(){
+    try{
+      const raw = localStorage.getItem(SKEY);
+      if(!raw) return {};
+      const obj = JSON.parse(raw);
+      return (obj && typeof obj === "object") ? obj : {};
+    }catch(e){
+      return {};
+    }
+  }
+  function savePresetStore(obj){
+    localStorage.setItem(SKEY, JSON.stringify(obj));
+  }
+  function refreshPresetList(){
+    const store = loadPresetStore();
+    const keys = Object.keys(store).sort((a,b)=>a.localeCompare(b));
+    el.presetList.innerHTML = "";
+    if(keys.length===0){
+      const opt = document.createElement("option");
+      opt.value = "";
+      opt.textContent = "(no presets yet)";
+      el.presetList.appendChild(opt);
+      return;
+    }
+    for(const k of keys){
+      const opt = document.createElement("option");
+      opt.value = k;
+      opt.textContent = k;
+      el.presetList.appendChild(opt);
+    }
+  }
+  function savePreset(){
+    const name = (el.presetName.value || "").trim();
+    if(!name){ toast("Give the preset a name."); return; }
+    const store = loadPresetStore();
+    store[name] = currentParams();
+    savePresetStore(store);
+    refreshPresetList();
+    el.presetList.value = name;
+    toast("Preset saved.");
+  }
+  function loadPreset(){
+    const name = el.presetList.value;
+    const store = loadPresetStore();
+    if(!name || !store[name]){ toast("No preset selected."); return; }
+    applyParams(store[name]);
+    toast("Preset loaded.");
+  }
+  function delPreset(){
+    const name = el.presetList.value;
+    const store = loadPresetStore();
+    if(!name || !store[name]){ toast("No preset selected."); return; }
+    delete store[name];
+    savePresetStore(store);
+    refreshPresetList();
+    toast("Preset deleted.");
+  }
+
+  // ---- Reset ----
+  function resetAll(){
+    el.sys.value = "PSR B1913+16 (example)";
+    el.unit.value = "1";
+    el.r.value = "1.0";
+    el.alpha.value = "0.01";
+    el.lam.value = "10.0";
+    el.band.value = "0.002";
+    el.useAccel.checked = false;
+    el.useAbs.checked = true;
+    el.autoRun.checked = true;
+    el.eps.value = "-5.7";
+
+    el.lamLo.value = "1e-6";
+    el.lamHi.value = "1e6";
+
+    el.alogLo.value = "-6";
+    el.alogHi.value = "0";
+    el.llogLo.value = "-3";
+    el.llogHi.value = "3";
+    el.res.value = "80";
+
+    lastLamMin = null;
+    lastAlphaMax = null;
+    mapState.lastImage = null;
+    mapState.pickArmed = false;
+    clearTests();
+    updateEpsLabel();
+    evaluate();
+    toast("Reset.");
+  }
+
+  // ---- Back link (best-effort) ----
+  function setBackLink(){
+    // try common platform filenames you use
+    const candidates = [
+      "qds_test_platformV3.html",
+      "all_pages_index.html",
+      "index.html"
+    ];
+    // if referrer exists and looks local, prefer it
+    try{
+      const ref = document.referrer || "";
+      if(ref.includes("127.0.0.1") || ref.includes("localhost")){
+        el.backLink.href = ref;
+        return;
+      }
+    }catch(e){}
+    el.backLink.href = candidates[0];
+  }
+
+  // ---- Events ----
+  function wireAuto(){
+    const inputs = [el.sys, el.unit, el.r, el.alpha, el.lam, el.band, el.useAccel, el.useAbs, el.eps];
+    inputs.forEach(x=>{
+      x.addEventListener("input", ()=>{ updateEpsLabel(); if(el.autoRun.checked) evaluate(); });
+      x.addEventListener("change", ()=>{ updateEpsLabel(); if(el.autoRun.checked) evaluate(); });
+    });
+  }
+
+  el.btnEval.addEventListener("click", ()=>evaluate());
+  el.btnShare.addEventListener("click", copyShareLink);
+  el.btnExport.addEventListener("click", exportReport);
+  el.btnReset.addEventListener("click", resetAll);
+
+  el.btnAlphaMax.addEventListener("click", ()=>computeAlphaMax());
+  el.btnSetAlphaMax.addEventListener("click", ()=>{
+    if(lastAlphaMax==null){ computeAlphaMax(); }
+    if(lastAlphaMax!=null){
+      el.alpha.value = String(lastAlphaMax);
+      evaluate();
+      toast("α set to αmax.");
+    }
+  });
+
+  el.btnLamMin.addEventListener("click", ()=>solveLamMin());
+  el.btnSetLamMin.addEventListener("click", ()=>{
+    if(lastLamMin==null){ solveLamMin(); }
+    if(lastLamMin!=null){
+      el.lam.value = String(lastLamMin);
+      evaluate();
+      toast("λ set to λmin.");
+    }
+  });
+
+  el.btnDraw.addEventListener("click", drawHeatmap);
+  el.btnPick.addEventListener("click", pickPointToInputs);
+
+  el.btnSelf.addEventListener("click", runSelfTests);
+  el.btnClearTests.addEventListener("click", clearTests);
+
+  el.btnSavePreset.addEventListener("click", savePreset);
+  el.btnLoadPreset.addEventListener("click", loadPreset);
+  el.btnDelPreset.addEventListener("click", delPreset);
+
+  // ---- Boot ----
+  function boot(){
+    updateEpsLabel();
+    refreshPresetList();
+    setBackLink();
+
+    // Apply query params if present
+    const url = new URL(window.location.href);
+    const q = {};
+    for(const [k,v] of url.searchParams.entries()){
+      q[k]=v;
+    }
+    if(Object.keys(q).some(k=>k in currentParams())){
+      applyParams(q);
+      toast("Loaded from link params.");
+    }else{
+      evaluate();
+    }
+
+    wireAuto();
+  }
+
+  boot();
+
+})();
+</script>
+</body>
+</html>

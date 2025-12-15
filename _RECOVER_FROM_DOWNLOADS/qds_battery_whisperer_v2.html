@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<title>QDS Battery Whisperer v2</title>
+<style>
+  :root {
+    --bg: #05060a;
+    --panel: rgba(13,18,35,0.9);
+    --edge: rgba(140,170,255,0.3);
+    --text: #e9eeff;
+    --accent: #86a6ff;
+    --accent2: #7bffcf;
+    --bad: #ff7b7b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background: radial-gradient(1200px 800px at 10% 0%, #101633 0%, var(--bg) 45%, #010104 100%);
+    color: var(--text);
+  }
+  header {
+    padding: 10px 12px 4px;
+  }
+  h1 {
+    margin: 0;
+    font-size: 16px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #cfd7ff;
+  }
+  h2 {
+    font-size: 13px;
+    margin: 12px 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #b7c5ff;
+  }
+  #app {
+    padding: 0 10px 10px;
+  }
+  .card {
+    background: var(--panel);
+    border-radius: 14px;
+    border: 1px solid var(--edge);
+    padding: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+  }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .row label {
+    font-size: 11px;
+    opacity: 0.9;
+  }
+  .row span.val {
+    font-size: 11px;
+    color: var(--accent2);
+    min-width: 30px;
+    text-align: right;
+  }
+  .slider-row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 6px;
+  }
+  input[type="range"] {
+    width: 100%;
+  }
+  button {
+    background: linear-gradient(135deg, rgba(134,166,255,0.2), rgba(123,255,207,0.15));
+    border-radius: 10px;
+    border: 1px solid var(--edge);
+    color: var(--text);
+    padding: 7px 10px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  button:active {
+    transform: translateY(1px) scale(0.99);
+  }
+  button.alt {
+    background: rgba(10,14,30,0.9);
+  }
+  .mode-toggle {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+  .mode-toggle button {
+    flex: 1;
+  }
+  .mode-toggle button.selected {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px rgba(123,255,207,0.5);
+  }
+  textarea {
+    width: 100%;
+    min-height: 80px;
+    background: rgba(5,7,16,0.9);
+    border-radius: 10px;
+    border: 1px solid var(--edge);
+    color: var(--text);
+    font-size: 11px;
+    padding: 6px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  }
+  #stats {
+    font-size: 11px;
+    line-height: 1.5;
+  }
+  #stats b {
+    color: var(--accent2);
+  }
+  #stats .warn {
+    color: var(--bad);
+  }
+  canvas {
+    width: 100% !important;
+    max-height: 280px;
+  }
+  small {
+    font-size: 10px;
+    opacity: 0.75;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>QDS Battery Whisperer v2</h1>
+  <small>Simulate + inspect battery time series · built for chaos testing 🎩</small>
+</header>
+
+<div id="app">
+  <div class="card">
+    <h2>Mode</h2>
+    <div class="mode-toggle">
+      <button id="modeSim" class="selected">Simulation</button>
+      <button id="modeLog">Paste Log</button>
+    </div>
+    <small id="modeHint">Simulation: generate synthetic battery data to try and break the model.</small>
+  </div>
+
+  <div class="card" id="simPanel">
+    <h2>Simulation controls</h2>
+
+    <div class="slider-row">
+      <div class="row">
+        <label>Duration</label><span class="val"><span id="durVal">24</span> h</span>
+      </div>
+      <input type="range" id="dur" min="1" max="72" step="1" value="24" />
+    </div>
+
+    <div class="slider-row">
+      <div class="row">
+        <label>Average drain rate</label><span class="val"><span id="drainVal">4</span>%/h</span>
+      </div>
+      <input type="range" id="drain" min="0.5" max="20" step="0.5" value="4" />
+    </div>
+
+    <div class="slider-row">
+      <div class="row">
+        <label>Noise level</label><span class="val"><span id="noiseVal">1.0</span> (σ)</span>
+      </div>
+      <input type="range" id="noise" min="0" max="5" step="0.1" value="1.0" />
+    </div>
+
+    <div class="slider-row">
+      <div class="row">
+        <label>QDS-style correlation time τ<sub>c</sub></label>
+        <span class="val"><span id="tauVal">30</span> min</span>
+      </div>
+      <input type="range" id="tau" min="1" max="240" step="1" value="30" />
+    </div>
+
+    <div class="slider-row">
+      <div class="row">
+        <label>Resolution</label><span class="val"><span id="dtVal">5</span> min/step</span>
+      </div>
+      <input type="range" id="dt" min="1" max="30" step="1" value="5" />
+    </div>
+
+    <div class="row">
+      <button id="runSim">Generate simulation</button>
+      <button id="simExtreme" class="alt">Extreme chaos</button>
+    </div>
+  </div>
+
+  <div class="card" id="logPanel" style="display:none;">
+    <h2>Paste log data</h2>
+    <small>Format: one value per line (battery %) or "time,battery". Time can be minutes, seconds or sample index.</small>
+    <textarea id="logInput" placeholder="Example:
+0,100
+10,97
+20,94
+30,90
+..."></textarea>
+    <div class="row" style="margin-top:6px;">
+      <button id="plotLog">Plot log</button>
+      <button id="clearLog" class="alt">Clear</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Battery curve</h2>
+    <canvas id="chart"></canvas>
+  </div>
+
+  <div class="card">
+    <h2>Stats</h2>
+    <div id="stats">
+      <small>No data yet. Run a simulation or paste a log.</small>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // --- Helpers ---
+  function $(id){ return document.getElementById(id); }
+
+  function randn() {
+    // Box-Muller
+    let u = 0, v = 0;
+    while(u === 0) u = Math.random();
+    while(v === 0) v = Math.random();
+    return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+  }
+
+  function linFit(x, y) {
+    const n = x.length;
+    if(n < 2) return {m:0,b:y[0]||0};
+    let sx=0, sy=0, sxx=0, sxy=0;
+    for(let i=0;i<n;i++){
+      sx += x[i];
+      sy += y[i];
+      sxx += x[i]*x[i];
+      sxy += x[i]*y[i];
+    }
+    const denom = n*sxx - sx*sx;
+    if(denom === 0) return {m:0,b:sy/n};
+    const m = (n*sxy - sx*sy)/denom;
+    const b = (sy - m*sx)/n;
+    return {m,b};
+  }
+
+  function statsFromSeries(tHours, vals) {
+    const n = vals.length;
+    if(n < 3) return { summary: "Not enough data.", ok:false };
+
+    const t0 = tHours[0];
+    const t1 = tHours[n-1];
+    const v0 = vals[0];
+    const v1 = vals[n-1];
+
+    const totalDrop = v0 - v1;
+    const duration = t1 - t0;
+    const avgDrain = duration > 0 ? totalDrop / duration : 0;
+
+    // Fit line and get residuals
+    const fit = linFit(tHours, vals);
+    const residuals = [];
+    for(let i=0;i<n;i++){
+      const yhat = fit.m * tHours[i] + fit.b;
+      residuals.push(vals[i] - yhat);
+    }
+
+    // RMS of residuals
+    let ss = 0;
+    for(const r of residuals) ss += r*r;
+    const rms = Math.sqrt(ss / n);
+
+    // Lag-1 autocorrelation of residuals as crude "K"
+    let num = 0, den = 0;
+    const meanRes = residuals.reduce((a,b)=>a+b,0) / n;
+    for(let i=0;i<n;i++){
+      const d = residuals[i] - meanRes;
+      den += d*d;
+    }
+    for(let i=0;i<n-1;i++){
+      const d1 = residuals[i]   - meanRes;
+      const d2 = residuals[i+1] - meanRes;
+      num += d1*d2;
+    }
+    const K = den > 0 ? num / den : 0;
+
+    let verdict = "Looks like a fairly clean, smooth drain.";
+    let flags = [];
+    if(avgDrain < 0.1) flags.push("very low drain (device mostly idle or charging)");
+    if(avgDrain > 10) flags.push("very fast drain (heavy use or bad cell)");
+    if(rms > 3) flags.push("high noise in residuals");
+    if(Math.abs(K) > 0.4) flags.push("strong correlation in noise (structured behaviour)");
+
+    if(flags.length > 0) {
+      verdict = "Noticeable structure: " + flags.join("; ") + ".";
+    }
+
+    const summary = `
+<b>Duration:</b> ${duration.toFixed(2)} h  
+<b>Start → End:</b> ${v0.toFixed(1)}% → ${v1.toFixed(1)}% (Δ ${totalDrop.toFixed(1)}%)  
+<b>Average drain:</b> ${avgDrain.toFixed(2)} %/h  
+<b>Residual RMS:</b> ${rms.toFixed(2)} %  
+<b>QDS-style K (lag-1 corr):</b> ${K.toFixed(3)}  
+<br/>
+<span class="${flags.length ? 'warn' : ''}">${verdict}</span>
+`.trim();
+
+    return { summary, ok:true };
+  }
+
+  function simulateBattery(params) {
+    const { durationH, dtMin, drainPerH, noiseSigma, tauMin } = params;
+    const dtH = dtMin / 60;
+    const steps = Math.max(3, Math.round(durationH / dtH));
+    const times = new Array(steps);
+    const vals  = new Array(steps);
+    let level = 100;
+
+    const tau = Math.max(0.1, tauMin);
+    const alpha = Math.exp(-dtMin / tau); // correlation factor
+
+    let corrNoise = 0;
+    for(let i=0;i<steps;i++){
+      const t = i * dtH;
+      // deterministic drain
+      const idealDrop = drainPerH * dtH;
+      // correlated noise
+      const eps = randn() * noiseSigma;
+      corrNoise = alpha * corrNoise + Math.sqrt(1 - alpha*alpha) * eps;
+
+      level -= idealDrop + corrNoise * 0.1; // scale noise effect
+      if(level < 0) level = 0;
+      if(level > 120) level = 120;
+
+      times[i] = t;
+      vals[i]  = level;
+    }
+    return { times, vals };
+  }
+
+  // --- UI wiring ---
+  const dur    = $("dur");
+  const drain  = $("drain");
+  const noise  = $("noise");
+  const tau    = $("tau");
+  const dt     = $("dt");
+  const durVal   = $("durVal");
+  const drainVal = $("drainVal");
+  const noiseVal = $("noiseVal");
+  const tauVal   = $("tauVal");
+  const dtVal    = $("dtVal");
+
+  dur.oninput   = ()=> durVal.textContent   = dur.value;
+  drain.oninput = ()=> drainVal.textContent = drain.value;
+  noise.oninput = ()=> noiseVal.textContent = noise.value;
+  tau.oninput   = ()=> tauVal.textContent   = tau.value;
+  dt.oninput    = ()=> dtVal.textContent    = dt.value;
+
+  const modeSimBtn = $("modeSim");
+  const modeLogBtn = $("modeLog");
+  const simPanel   = $("simPanel");
+  const logPanel   = $("logPanel");
+  const modeHint   = $("modeHint");
+
+  modeSimBtn.onclick = ()=>{
+    modeSimBtn.classList.add("selected");
+    modeLogBtn.classList.remove("selected");
+    simPanel.style.display = "block";
+    logPanel.style.display = "none";
+    modeHint.textContent = "Simulation: generate synthetic battery data to try and break the model.";
+  };
+  modeLogBtn.onclick = ()=>{
+    modeLogBtn.classList.add("selected");
+    modeSimBtn.classList.remove("selected");
+    simPanel.style.display = "none";
+    logPanel.style.display = "block";
+    modeHint.textContent = "Paste a real battery log to inspect drain and noise structure.";
+  };
+
+  const ctx = $("chart").getContext("2d");
+  let chart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: [],
+      datasets: [{
+        label: "Battery %",
+        data: [],
+        fill: false,
+        tension: 0.1,
+        borderWidth: 2,
+        pointRadius: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          title: { display: true, text: "Time (hours)" },
+          ticks: { maxTicksLimit: 8 }
+        },
+        y: {
+          title: { display: true, text: "Battery (%)" },
+          suggestedMin: 0,
+          suggestedMax: 105
+        }
+      },
+      plugins: {
+        legend: { display: false }
+      }
+    }
+  });
+
+  function updateChart(times, vals) {
+    chart.data.labels = times.map(t=>t.toFixed(2));
+    chart.data.datasets[0].data = vals;
+    chart.update();
+  }
+
+  const statsDiv = $("stats");
+
+  function showStats(times, vals){
+    const s = statsFromSeries(times, vals);
+    if(!s.ok){
+      statsDiv.innerHTML = "<small>" + s.summary + "</small>";
+    } else {
+      statsDiv.innerHTML = s.summary;
+    }
+  }
+
+  $("runSim").onclick = ()=>{
+    const params = {
+      durationH: parseFloat(dur.value),
+      dtMin:     parseFloat(dt.value),
+      drainPerH: parseFloat(drain.value),
+      noiseSigma:parseFloat(noise.value),
+      tauMin:    parseFloat(tau.value)
+    };
+    const sim = simulateBattery(params);
+    updateChart(sim.times, sim.vals);
+    showStats(sim.times, sim.vals);
+  };
+
+  $("simExtreme").onclick = ()=>{
+    dur.value = 48; durVal.textContent = "48";
+    drain.value = 12; drainVal.textContent = "12";
+    noise.value = 4; noiseVal.textContent = "4.0";
+    tau.value = 120; tauVal.textContent = "120";
+    dt.value = 2; dtVal.textContent = "2";
+    const params = {
+      durationH: 48,
+      dtMin: 2,
+      drainPerH: 12,
+      noiseSigma: 4,
+      tauMin: 120
+    };
+    const sim = simulateBattery(params);
+    updateChart(sim.times, sim.vals);
+    showStats(sim.times, sim.vals);
+  };
+
+  $("plotLog").onclick = ()=>{
+    const raw = $("logInput").value.trim();
+    if(!raw){
+      alert("Paste some values first.");
+      return;
+    }
+    const lines = raw.split(/\r?\n/);
+    const times = [];
+    const vals  = [];
+    let idx = 0;
+    for(const line of lines){
+      const t = line.trim();
+      if(!t) continue;
+      const parts = t.split(/[,;\s]+/).filter(Boolean);
+      let tt, vv;
+      if(parts.length === 1){
+        tt = idx;
+        vv = parseFloat(parts[0]);
+      } else {
+        tt = parseFloat(parts[0]);
+        vv = parseFloat(parts[1]);
+      }
+      if(isNaN(tt) || isNaN(vv)) continue;
+      times.push(tt/60); // assume minutes → hours
+      vals.push(vv);
+      idx++;
+    }
+    if(times.length < 3){
+      alert("Not enough valid lines to plot.");
+      return;
+    }
+    updateChart(times, vals);
+    showStats(times, vals);
+  };
+
+  $("clearLog").onclick = ()=>{
+    $("logInput").value = "";
+  };
+
+  // Initial tiny sim so chart isn't empty
+  (function init(){
+    const params = {
+      durationH: 6,
+      dtMin: 5,
+      drainPerH: 5,
+      noiseSigma: 0.8,
+      tauMin: 20
+    };
+    const sim = simulateBattery(params);
+    updateChart(sim.times, sim.vals);
+    showStats(sim.times, sim.vals);
+  })();
+</script>
+</body>
+</html>

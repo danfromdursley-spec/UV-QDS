@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Stroud District Council • GrowthHub Impact Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      /* Stroud-ish teal palette */
+      --bg: #020b0e;
+      --bg-soft: #041419;
+      --bg-softer: #062027;
+      --accent: #009d84;         /* main Stroud green/teal */
+      --accent-soft: rgba(0,157,132,0.2);
+      --accent-soft-2: rgba(0,157,132,0.08);
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --border: #10212a;
+      --good: #22c55e;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 1.5rem;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, #063941 0, #02070a 55%);
+      color: var(--text);
+    }
+
+    .shell {
+      max-width: 960px;
+      margin: 0 auto 3rem auto;
+    }
+
+    h1, h2, h3 {
+      margin: 0 0 0.6rem 0;
+      line-height: 1.1;
+    }
+
+    h1 { font-size: 1.9rem; }
+    h2 { font-size: 1.25rem; margin-top: 1.7rem; }
+    h3 { font-size: 1rem; text-transform: uppercase; letter-spacing: 0.08em; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.2rem 0.8rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      background: var(--accent-soft-2);
+      color: var(--accent);
+      border: 1px solid rgba(0,157,132,0.5);
+      margin-bottom: 0.75rem;
+    }
+
+    .card {
+      background: radial-gradient(circle at top left,
+                 rgba(0,157,132,0.18), var(--bg-softer));
+      border-radius: 1.1rem;
+      border: 1px solid var(--border);
+      padding: 1.1rem 1.2rem;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.7);
+      margin-top: 1rem;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 0.4rem;
+      align-items: baseline;
+    }
+
+    .chip {
+      font-size: 0.7rem;
+      padding: 0.18rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      color: var(--muted);
+      background: #020b0e;
+    }
+
+    .muted { color: var(--muted); font-size: 0.85rem; }
+    .accent { color: var(--accent); }
+    .good { color: var(--good); }
+
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 0.9rem;
+      margin-top: 0.7rem;
+    }
+
+    .kpi {
+      padding: 0.75rem 0.8rem;
+      border-radius: 0.9rem;
+      border: 1px solid rgba(15,55,70,0.9);
+      background:
+        linear-gradient(135deg,
+          rgba(0,157,132,0.22),
+          rgba(6,24,35,0.95));
+    }
+
+    .kpi-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 0.2rem;
+    }
+
+    .kpi-value {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    ul {
+      padding-left: 1.1rem;
+      margin: 0.35rem 0 0.6rem 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    li + li { margin-top: 0.25rem; }
+
+    .tagline {
+      font-size: 0.95rem;
+      color: var(--muted);
+      max-width: 40rem;
+    }
+
+    .board-line {
+      margin-top: 0.7rem;
+      padding: 0.75rem 0.8rem;
+      border-radius: 0.8rem;
+      background: rgba(2,11,14,0.9);
+      border: 1px dashed rgba(148,163,184,0.65);
+      font-size: 0.86rem;
+      color: var(--muted);
+      font-family: "JetBrains Mono", "SF Mono", ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      white-space: pre-wrap;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.3rem;
+    }
+
+    .pill-small {
+      font-size: 0.7rem;
+      padding: 0.28rem 0.65rem;
+      border-radius: 999px;
+      background: rgba(3,22,26,0.98);
+      border: 1px solid rgba(12,68,60,0.9);
+      color: var(--accent);
+    }
+
+    .note {
+      margin-top: 0.7rem;
+      font-size: 0.76rem;
+      color: #6b7280;
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 1.1rem; }
+      h1 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <span class="pill">Demo • Not official forecast</span>
+    <h1>Stroud District Council<br>GrowthHub Impact Demo</h1>
+    <p class="tagline">
+      Mock example showing how the <strong>GrowthHub Revenue Floor</strong> tool can help Stroud District Council
+      support local founders with clear, honest numbers – and give the council simple evidence of impact.
+    </p>
+
+    <!-- 1. Founder snapshot -->
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <h3>Founder Snapshot</h3>
+          <div class="muted">
+            Example: <strong>Quantum Design Systems</strong> (Dursley-based deep-tech &amp; applied R&amp;D)
+          </div>
+        </div>
+        <span class="chip">Scenario: Conservative / Capacity-truth</span>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi">
+          <div class="kpi-label">Monthly revenue potential</div>
+          <div class="kpi-value">£3,734 / mo</div>
+          <div class="muted">Sprints + pilots + new retainers</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Run-rate after 12 months</div>
+          <div class="kpi-value">£44,806 / yr</div>
+          <div class="muted">Assuming current capacity and pricing</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">MRR at 12 months</div>
+          <div class="kpi-value">£1,310</div>
+          <div class="muted">Recurring retainer revenue</div>
+        </div>
+      </div>
+
+      <ul>
+        <li>Inputs are intentionally modest: ~6 leads / month, realistic conversion rates (around <strong>35%</strong> at each stage).</li>
+        <li>Capacity is capped (e.g. max 6 sprints and 3 pilots per month) to reflect a small but serious founder.</li>
+        <li>All numbers can be tuned live in the meeting; this is a <em>starting floor</em>, not hype.</li>
+      </ul>
+    </section>
+
+    <!-- 2. What the council gets -->
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <h3>What Stroud District Council Gains</h3>
+          <div class="muted">Why tools like this matter for GrowthHub support and reporting.</div>
+        </div>
+      </div>
+
+      <ul>
+        <li><strong>Clear view of pipeline strength</strong> – leads, conversions, and capacity are all visible, not hand-waved.</li>
+        <li><strong>Evidence for funding decisions</strong> – the council can see whether assumptions are realistic before committing support.</li>
+        <li><strong>Simple impact reporting</strong> – uplift in revenue, recurring income and jobs can be tracked per business or cohort.</li>
+        <li><strong>Replicable framework</strong> – once calibrated for one founder, the same sheet can be used with other local businesses.</li>
+      </ul>
+
+      <div class="board-line">
+Revenue floor model (capacity-truthed):
+  • 6 leads / month, q = 0.35, s = 0.35
+  • £2.5k sprints, £6k pilots, £1.5k retainers
+  → ≈£3.7k / month in revenue and ≈£1.3k / month in recurring retainers after 12 months.
+      </div>
+
+      <p class="note">
+        <strong>In the room:</strong> “These are realistic, not salesman-on-coke numbers. If anything, they’re a floor –
+        if we execute well or demand is higher, the upside belongs to Stroud too.”
+      </p>
+    </section>
+
+    <!-- 3. Example council view across multiple businesses -->
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <h3>Cohort View (Example)</h3>
+          <div class="muted">How this could look across multiple supported businesses.</div>
+        </div>
+        <span class="chip good">Illustrative only</span>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi">
+          <div class="kpi-label">Businesses using the tool</div>
+          <div class="kpi-value">10 founders</div>
+          <div class="muted">Stroud / Dursley / Berkeley Vale area</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Aggregate yearly uplift</div>
+          <div class="kpi-value good">≈£300k / yr</div>
+          <div class="muted">If each founder reaches a similar revenue floor</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Est. jobs supported</div>
+          <div class="kpi-value">15–25 roles</div>
+          <div class="muted">Founders + local hires across the cohort</div>
+        </div>
+      </div>
+
+      <p class="note">
+        These figures are placeholders for demo purposes, but they show the kind of <strong>evidence story</strong> the council
+        can take to internal boards or central government: “Here’s what this GrowthHub support unlocked locally.”
+      </p>
+    </section>
+
+    <!-- 4. How it fits the three pillars -->
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <h3>Where This Sits in the GrowthHub Stack</h3>
+          <div class="muted">The three practical pillars behind Quantum Design Systems.</div>
+        </div>
+      </div>
+
+      <div class="pill-row">
+        <span class="pill-small"><strong>Pillar A:</strong> Revenue Floor + Capacity Truth</span>
+        <span class="pill-small"><strong>Pillar B:</strong> Battery Habitat &amp; Reliability Lab</span>
+        <span class="pill-small"><strong>Pillar C:</strong> QDS-SAVE Compression &amp; Data Efficiency</span>
+      </div>
+
+      <ul>
+        <li><strong>Pillar A</strong> (this page) is the board-safe business engine – demand → conversion → capacity → revenue.</li>
+        <li><strong>Pillar B</strong> targets real-world energy waste problems (battery life, reliability, thermal management).</li>
+        <li><strong>Pillar C</strong> focuses on storing and moving data more efficiently, aligned with the QDS physics work.</li>
+      </ul>
+
+      <p class="note">
+        Together, they form a <strong>pragmatic, revenue-first stack</strong>: immediate value for local businesses and councils now,
+        with deeper tech upside as the physics and engineering work matures.
+      </p>
+    </section>
+
+    <p class="note">
+      © Quantum Design Systems – Demo page for Stroud District Council GrowthHub discussion. All figures illustrative but grounded in a
+      conservative scenario as of Dec 2025.
+    </p>
+  </div>
+</body>
+</html>

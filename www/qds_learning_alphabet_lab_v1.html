@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>QDS • Learning Alphabet Lab v1</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #050816;
+      color: #e5f6ff;
+    }
+    .page {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 1rem 1rem 2.5rem;
+    }
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid #233143;
+      padding-bottom: 0.75rem;
+    }
+    header h1 {
+      font-size: 1.5rem;
+      margin: 0;
+    }
+    header p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #9fb4d1;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+    .controls label {
+      font-size: 0.9rem;
+      color: #c3ddff;
+    }
+    select {
+      background: #0b1220;
+      color: #e5f6ff;
+      border: 1px solid #233143;
+      border-radius: 0.5rem;
+      padding: 0.35rem 0.6rem;
+      font-size: 0.9rem;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.1rem 0.4rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      margin-right: 0.25rem;
+      margin-bottom: 0.15rem;
+      background: #111827;
+      border: 1px solid #1e293b;
+      color: #c3ddff;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+      gap: 1rem;
+    }
+    @media (max-width: 800px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+    .panel {
+      background: radial-gradient(circle at top, #0b1120, #020617);
+      border-radius: 0.9rem;
+      padding: 0.75rem 0.85rem 0.9rem;
+      border: 1px solid #1f2937;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+      min-height: 120px;
+    }
+    .panel h2 {
+      font-size: 1rem;
+      margin: 0 0 0.4rem 0;
+      color: #f9fafb;
+    }
+    .panel-sub {
+      font-size: 0.8rem;
+      margin: 0 0 0.5rem 0;
+      color: #94a3b8;
+    }
+    .phoneme-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .phoneme-card {
+      border-radius: 0.7rem;
+      padding: 0.4rem 0.5rem;
+      min-width: 72px;
+      background: #020617;
+      border: 1px solid #1e293b;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+      font-size: 0.75rem;
+    }
+    .phoneme-label {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 0.15rem;
+    }
+    .phoneme-example {
+      font-size: 0.7rem;
+      color: #cbd5f5;
+      margin-bottom: 0.25rem;
+    }
+    .phoneme-feature {
+      font-size: 0.7rem;
+      color: #a5b4fc;
+      margin-bottom: 0.15rem;
+    }
+    .phoneme-gesture {
+      font-size: 0.7rem;
+      color: #fbbf24;
+    }
+
+    /* mode styling tweaks */
+    .mode-visual .phoneme-card {
+      border-width: 2px;
+    }
+    .mode-classic .phoneme-card {
+      background: #020617;
+    }
+    .mode-logic .phoneme-card {
+      background: #020617;
+      border-style: dashed;
+    }
+    .mode-movement .phoneme-card {
+      background: #011627;
+    }
+
+    .words-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .word-card {
+      border-radius: 0.7rem;
+      padding: 0.4rem 0.55rem;
+      background: #020617;
+      border: 1px solid #1e293b;
+      font-size: 0.8rem;
+    }
+    .word-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.25rem;
+      gap: 0.5rem;
+    }
+    .word-text {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    .word-spelling {
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+    }
+    .chip {
+      padding: 0.15rem 0.4rem;
+      border-radius: 999px;
+      border: 1px solid #1f2937;
+      font-size: 0.7rem;
+      background: #020617;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .chip-dot {
+      width: 0.6rem;
+      height: 0.6rem;
+      border-radius: 999px;
+      background: #38bdf8;
+    }
+    .chip-note {
+      font-size: 0.65rem;
+      color: #eab308;
+    }
+
+    footer {
+      margin-top: 1.4rem;
+      font-size: 0.75rem;
+      color: #64748b;
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h1>QDS • Learning Alphabet Lab v1</h1>
+      <p>
+        One phoneme kernel, many views. Switch mode to see different “alphabets” for the same sounds.
+      </p>
+      <div class="controls">
+        <label for="modeSelect">View mode:</label>
+        <select id="modeSelect">
+          <option value="classic">Classic (phonics baseline)</option>
+          <option value="visual">Visual chunks (colour + cards)</option>
+          <option value="logic">Logic grid (features & rules)</option>
+          <option value="movement">Movement (gestures & rhythm)</option>
+        </select>
+        <span class="badge" id="modeHint"></span>
+      </div>
+    </header>
+
+    <div class="layout">
+      <section class="panel" id="phonemePanel">
+        <h2>Phoneme kernel</h2>
+        <p class="panel-sub" id="phonemeSub">
+          Shared sound set for all learners.
+        </p>
+        <div class="phoneme-grid" id="phonemeGrid"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Words built from kernel</h2>
+        <p class="panel-sub">
+          Same words, different “alphabet skin” depending on mode.
+        </p>
+        <div class="words-list" id="wordsList"></div>
+      </section>
+    </div>
+
+    <footer>
+      <div>
+        Modes are just interfaces – the underlying phoneme kernel stays the same.
+      </div>
+      <div>
+        v1 • prototype only – extend with more sounds, languages, and learner profiles.
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // --- Proto-phoneme kernel ---
+    const PHONEMES = [
+      // consonants
+      {
+        id: "m",
+        label: "m",
+        example: "m-at",
+        type: "consonant",
+        place: "lips",
+        manner: "nasal",
+        voiced: true,
+        color: "#22c55e",
+        gesture: "tap chest once"
+      },
+      {
+        id: "n",
+        label: "n",
+        example: "n-et",
+        type: "consonant",
+        place: "front",
+        manner: "nasal",
+        voiced: true,
+        color: "#22c55e",
+        gesture: "touch nose"
+      },
+      {
+        id: "p",
+        label: "p",
+        example: "p-at",
+        type: "consonant",
+        place: "lips",
+        manner: "stop",
+        voiced: false,
+        color: "#38bdf8",
+        gesture: "small finger pop"
+      },
+      {
+        id: "t",
+        label: "t",
+        example: "t-ap",
+        type: "consonant",
+        place: "front",
+        manner: "stop",
+        voiced: false,
+        color: "#38bdf8",
+        gesture: "tap finger on table"
+      },
+      {
+        id: "k",
+        label: "k",
+        example: "k-it",
+        type: "consonant",
+        place: "back",
+        manner: "stop",
+        voiced: false,
+        color: "#38bdf8",
+        gesture: "small head nod"
+      },
+      {
+        id: "s",
+        label: "s",
+        example: "s-un",
+        type: "consonant",
+        place: "front",
+        manner: "fricative",
+        voiced: false,
+        color: "#f97316",
+        gesture: "snake hand wiggle"
+      },
+      {
+        id: "sh",
+        label: "sh",
+        example: "sh-ip",
+        type: "consonant",
+        place: "middle",
+        manner: "fricative",
+        voiced: false,
+        color: "#a855f7",
+        gesture: "finger to lips 🤫"
+      },
+      {
+        id: "ch",
+        label: "ch",
+        example: "ch-ip",
+        type: "consonant",
+        place: "front",
+        manner: "affricate",
+        voiced: false,
+        color: "#ec4899",
+        gesture: "two-finger tap"
+      },
+      {
+        id: "th",
+        label: "th",
+        example: "th-in",
+        type: "consonant",
+        place: "front",
+        manner: "fricative",
+        voiced: "mixed",
+        color: "#f97316",
+        gesture: "thumb on chin"
+      },
+
+      // vowels / chunks
+      {
+        id: "a",
+        label: "a",
+        example: "c-a-t",
+        type: "vowel",
+        place: "front",
+        manner: "short",
+        voiced: true,
+        color: "#facc15",
+        gesture: "open hand forward"
+      },
+      {
+        id: "e",
+        label: "e",
+        example: "b-e-d",
+        type: "vowel",
+        place: "front",
+        manner: "short",
+        voiced: true,
+        color: "#facc15",
+        gesture: "small step"
+      },
+      {
+        id: "i",
+        label: "i",
+        example: "f-i-sh",
+        type: "vowel",
+        place: "front",
+        manner: "short",
+        voiced: true,
+        color: "#facc15",
+        gesture: "point up"
+      },
+      {
+        id: "o",
+        label: "o",
+        example: "h-o-t",
+        type: "vowel",
+        place: "back",
+        manner: "short",
+        voiced: true,
+        color: "#facc15",
+        gesture: "small circle in air"
+      },
+      {
+        id: "ai",
+        label: "ai",
+        example: "r-ai-n",
+        type: "vowel",
+        place: "front",
+        manner: "long",
+        voiced: true,
+        color: "#fbbf24",
+        gesture: "two steps forward"
+      },
+      {
+        id: "ee",
+        label: "ee",
+        example: "s-ee",
+        type: "vowel",
+        place: "front",
+        manner: "long",
+        voiced: true,
+        color: "#fbbf24",
+        gesture: "big smile"
+      },
+      {
+        id: "oo",
+        label: "oo",
+        example: "m-oo-n",
+        type: "vowel",
+        place: "back",
+        manner: "long",
+        voiced: true,
+        color: "#fbbf24",
+        gesture: "hands make circle"
+      }
+    ];
+
+    // Mini word bank that uses the same kernel
+    const WORDS = [
+      {
+        text: "ship",
+        spelling: "ship",
+        phonemes: ["sh", "i", "p"],
+        note: "Shows chunk [sh] instead of s+h."
+      },
+      {
+        text: "math",
+        spelling: "math",
+        phonemes: ["m", "a", "th"],
+        note: "Simple front-mouth consonants + short vowel."
+      },
+      {
+        text: "tree",
+        spelling: "tree",
+        phonemes: ["t", "r?", "ee"],
+        note: "Prototype: r? could be a later-stage add-on."
+      },
+      {
+        text: "book",
+        spelling: "book",
+        phonemes: ["b?", "oo", "k"],
+        note: "Focus on [oo] as a stable vowel chunk."
+      },
+      {
+        text: "night",
+        spelling: "night",
+        phonemes: ["n", "ai", "t"],
+        note: "Classic tricky spelling, clean phoneme path."
+      }
+    ];
+
+    const modeDescriptions = {
+      classic: "Plain phonics view – label, example, basic type.",
+      visual: "Colour-coded chunks, good for visual pattern brains.",
+      logic: "Feature grid: place / manner / voice. For rule-brains.",
+      movement: "Gestures & rhythm notes – sound as motion."
+    };
+
+    const modeSelect = document.getElementById("modeSelect");
+    const modeHint = document.getElementById("modeHint");
+    const phonemeGrid = document.getElementById("phonemeGrid");
+    const phonemePanel = document.getElementById("phonemePanel");
+    const phonemeSub = document.getElementById("phonemeSub");
+    const wordsList = document.getElementById("wordsList");
+
+    function renderPhonemes(mode) {
+      phonemeGrid.innerHTML = "";
+      phonemePanel.classList.remove("mode-classic", "mode-visual", "mode-logic", "mode-movement");
+      phonemePanel.classList.add("mode-" + mode);
+
+      phonemeSub.textContent = modeDescriptions[mode] || "Shared sound set for all learners.";
+
+      PHONEMES.forEach(p => {
+        const card = document.createElement("div");
+        card.className = "phoneme-card";
+
+        // visual mode: add accent border
+        if (mode === "visual" && p.color) {
+          card.style.borderColor = p.color;
+        }
+
+        const label = document.createElement("div");
+        label.className = "phoneme-label";
+        label.textContent = p.label;
+        card.appendChild(label);
+
+        const ex = document.createElement("div");
+        ex.className = "phoneme-example";
+        ex.textContent = p.example || "";
+        card.appendChild(ex);
+
+        if (mode === "classic") {
+          const feature = document.createElement("div");
+          feature.className = "phoneme-feature";
+          feature.textContent = `${p.type} sound`;
+          card.appendChild(feature);
+        } else if (mode === "visual") {
+          const feature = document.createElement("div");
+          feature.className = "phoneme-feature";
+          feature.textContent = p.type === "vowel" ? "vowel chunk" : "consonant chunk";
+          card.appendChild(feature);
+        } else if (mode === "logic") {
+          const feature = document.createElement("div");
+          feature.className = "phoneme-feature";
+          feature.textContent = `place: ${p.place}, manner: ${p.manner}, voice: ${p.voiced}`;
+          card.appendChild(feature);
+        } else if (mode === "movement") {
+          const feature = document.createElement("div");
+          feature.className = "phoneme-feature";
+          feature.textContent = p.type === "vowel" ? "voice / breath shape" : "mouth action";
+          card.appendChild(feature);
+
+          const gest = document.createElement("div");
+          gest.className = "phoneme-gesture";
+          gest.textContent = p.gesture || "";
+          card.appendChild(gest);
+        }
+
+        phonemeGrid.appendChild(card);
+      });
+    }
+
+    function getPhonemeById(id) {
+      return PHONEMES.find(p => p.id === id) || null;
+    }
+
+    function renderWords(mode) {
+      wordsList.innerHTML = "";
+
+      WORDS.forEach(w => {
+        const card = document.createElement("div");
+        card.className = "word-card";
+
+        const head = document.createElement("div");
+        head.className = "word-head";
+
+        const left = document.createElement("div");
+        const wordText = document.createElement("div");
+        wordText.className = "word-text";
+        wordText.textContent = w.text;
+
+        const wordSpell = document.createElement("div");
+        wordSpell.className = "word-spelling";
+        wordSpell.textContent = `spelling: ${w.spelling}`;
+
+        left.appendChild(wordText);
+        left.appendChild(wordSpell);
+
+        const right = document.createElement("div");
+        right.className = "word-spelling";
+        right.textContent = `${w.phonemes.join(" • ")}`;
+
+        head.appendChild(left);
+        head.appendChild(right);
+        card.appendChild(head);
+
+        const chips = document.createElement("div");
+        chips.className = "chips";
+
+        w.phonemes.forEach(pid => {
+          const chip = document.createElement("div");
+          chip.className = "chip";
+
+          const p = getPhonemeById(pid.replace("?", ""));
+          const dot = document.createElement("span");
+          dot.className = "chip-dot";
+
+          if (p && p.color && mode === "visual") {
+            dot.style.background = p.color;
+          } else if (mode === "logic") {
+            dot.style.background = "#38bdf8";
+          } else if (mode === "movement") {
+            dot.style.background = "#facc15";
+          }
+
+          chip.appendChild(dot);
+
+          const label = document.createElement("span");
+          label.textContent = pid;
+          chip.appendChild(label);
+
+          if (mode === "movement" && p && p.gesture) {
+            const gest = document.createElement("span");
+            gest.className = "chip-note";
+            gest.textContent = p.gesture;
+            chip.appendChild(gest);
+          }
+
+          chips.appendChild(chip);
+        });
+
+        card.appendChild(chips);
+
+        if (w.note) {
+          const note = document.createElement("div");
+          note.className = "chip-note";
+          note.style.marginTop = "0.2rem";
+          note.textContent = w.note;
+          card.appendChild(note);
+        }
+
+        wordsList.appendChild(card);
+      });
+    }
+
+    function setMode(mode) {
+      modeHint.textContent = modeDescriptions[mode] || "";
+      renderPhonemes(mode);
+      renderWords(mode);
+    }
+
+    modeSelect.addEventListener("change", () => setMode(modeSelect.value));
+
+    // boot
+    setMode("visual");
+    modeSelect.value = "visual";
+  </script>
+</body>
+</html>

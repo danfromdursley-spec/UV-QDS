@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>QDS Avian Magnetoreception Lab v5 FAIR+</title>
+<style>
+  :root{
+    --bg:#06070b; --panel:#0c1020; --ink:#e8ecff; --mut:#a7b0d6; --hot:#7cf7ff; --lime:#77ff9a;
+    --warn:#ffd36d; --bad:#ff6b88; --good:#88ffb8; --line:#203055; --shadow: 0 10px 30px rgba(0,0,0,.55);
+    --r:18px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 700px at 20% 0%, #101a3a 0%, var(--bg) 55%);
+       color:var(--ink); font:14px/1.35 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;}
+  header{padding:18px 14px 10px; max-width:1100px; margin:0 auto;}
+  h1{margin:0; font-size:18px; letter-spacing:.3px}
+  .sub{color:var(--mut); margin-top:6px}
+  .wrap{max-width:1100px; margin:0 auto; padding:0 14px 24px;}
+  .grid{display:grid; grid-template-columns: 360px 1fr; gap:14px;}
+  @media (max-width: 980px){ .grid{grid-template-columns: 1fr;} }
+
+  .card{background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+        border:1px solid rgba(160,190,255,.18); border-radius:var(--r); box-shadow:var(--shadow); overflow:hidden;}
+  .card .hd{padding:12px 14px; border-bottom:1px solid rgba(160,190,255,.14); display:flex; gap:10px; align-items:center; justify-content:space-between;}
+  .card .hd b{font-size:13px; letter-spacing:.3px}
+  .card .bd{padding:12px 14px;}
+
+  label{display:block; color:var(--mut); margin:10px 0 6px; font-size:12px}
+  select,input[type=range]{width:100%}
+  .row{display:grid; grid-template-columns: 1fr 88px; gap:10px; align-items:center;}
+  .val{font-variant-numeric: tabular-nums; text-align:right; color:var(--hot)}
+  .pill{display:inline-flex; gap:8px; align-items:center; padding:7px 10px; border-radius:999px; border:1px solid rgba(160,190,255,.18);
+        background:rgba(0,0,0,.22); color:var(--mut); font-size:12px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--line)}
+  .dot.good{background:var(--good)} .dot.warn{background:var(--warn)} .dot.bad{background:var(--bad)}
+
+  .kpi{display:grid; grid-template-columns: repeat(4, 1fr); gap:10px;}
+  @media (max-width: 980px){ .kpi{grid-template-columns: repeat(2, 1fr);} }
+  .k{padding:10px 12px; border-radius:14px; border:1px solid rgba(160,190,255,.14); background:rgba(0,0,0,.22)}
+  .k .t{color:var(--mut); font-size:12px}
+  .k .n{font-size:18px; margin-top:4px; font-variant-numeric: tabular-nums}
+  .k .n.good{color:var(--good)} .k .n.warn{color:var(--warn)} .k .n.bad{color:var(--bad)}
+
+  .bar{height:10px; border-radius:999px; background:rgba(255,255,255,.08); overflow:hidden; border:1px solid rgba(160,190,255,.14)}
+  .bar > i{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--hot), var(--lime));}
+
+  .btns{display:flex; flex-wrap:wrap; gap:10px; margin-top:12px}
+  button{border:1px solid rgba(160,190,255,.18); background:rgba(0,0,0,.25); color:var(--ink);
+         padding:10px 12px; border-radius:14px; cursor:pointer}
+  button:hover{border-color:rgba(160,190,255,.35)}
+  .small{font-size:12px; color:var(--mut)}
+  .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace}
+  canvas{width:100%; height:160px; background:rgba(0,0,0,.22); border:1px solid rgba(160,190,255,.14); border-radius:14px}
+  .lim{margin-top:10px; padding:10px 12px; border-radius:14px; border:1px solid rgba(160,190,255,.14); background:rgba(0,0,0,.22)}
+  .lim b{color:var(--ink)}
+  .lim ul{margin:8px 0 0; padding-left:18px; color:var(--mut)}
+  .badge{padding:3px 8px; border-radius:999px; border:1px solid rgba(160,190,255,.18); color:var(--mut); font-size:12px}
+  .note{margin-top:12px; color:var(--mut); font-size:12px}
+</style>
+</head>
+<body>
+<header>
+  <h1>🦅 QDS Avian Magnetoreception Lab v5 FAIR+ (Toy, but “confound-aware”)</h1>
+  <div class="sub">Cryptochrome-like compass under a QDS kernel + fairness knobs (light/RF/calibration/map/behaviour) + Monte-Carlo uncertainty + paper-trail export.</div>
+</header>
+
+<div class="wrap">
+  <div class="grid">
+
+    <!-- LEFT: Controls -->
+    <div class="card">
+      <div class="hd">
+        <b>Forge Controls</b>
+        <span class="badge mono" id="stamp">—</span>
+      </div>
+      <div class="bd">
+
+        <label>Species Mode</label>
+        <select id="species"></select>
+
+        <label>Environment Preset</label>
+        <select id="preset">
+          <option value="quiet">🌲 Quiet Forest</option>
+          <option value="urban">🏙️ Urban EM Noise</option>
+          <option value="storm">⛈️ Magnetic Storm</option>
+          <option value="flare">⚡ Solar Flare / Disturbed</option>
+          <option value="lab">🧪 Perfect Quantum Lab</option>
+          <option value="rfjam">📻 RF Jammer (MHz band)</option>
+        </select>
+
+        <div class="lim">
+          <b>QDS Kernel</b>
+          <div class="row">
+            <label>τc — Coherence Time (µs)</label><div class="val mono" id="v_tau">—</div>
+            <input id="tau" type="range" min="5" max="6000" value="280" step="1"/>
+          </div>
+
+          <div class="row">
+            <label>λc — Spatial Coherence (nm)</label><div class="val mono" id="v_lam">—</div>
+            <input id="lam" type="range" min="0.2" max="3.5" value="1.7" step="0.01"/>
+          </div>
+
+          <div class="row">
+            <label>σ² — Kernel Variance (noise floor)</label><div class="val mono" id="v_sig">—</div>
+            <input id="sig" type="range" min="0.05" max="1.2" value="0.32" step="0.01"/>
+          </div>
+
+          <div class="row">
+            <label>EM Noise Level (broad)</label><div class="val mono" id="v_em">—</div>
+            <input id="em" type="range" min="0" max="1" value="0.30" step="0.01"/>
+          </div>
+        </div>
+
+        <div class="lim">
+          <b>Fairness / Confounds</b>
+
+          <div class="row">
+            <label>Light Wavelength (nm)</label><div class="val mono" id="v_wl">—</div>
+            <input id="wl" type="range" min="360" max="680" value="500" step="1"/>
+          </div>
+
+          <div class="row">
+            <label>Light Intensity (0..1)</label><div class="val mono" id="v_int">—</div>
+            <input id="lint" type="range" min="0" max="1" value="0.75" step="0.01"/>
+          </div>
+
+          <div class="row">
+            <label>RF Disruption Strength (MHz-band, 0..1)</label><div class="val mono" id="v_rf">—</div>
+            <input id="rf" type="range" min="0" max="1" value="0.10" step="0.01"/>
+          </div>
+
+          <div class="row">
+            <label>Calibration State (celestial ↔ magnetic, 0..1)</label><div class="val mono" id="v_cal">—</div>
+            <input id="cal" type="range" min="0" max="1" value="0.80" step="0.01"/>
+          </div>
+
+          <div class="row">
+            <label>Map Channel Health (magnetite/trigeminal-ish, 0..1)</label><div class="val mono" id="v_map">—</div>
+            <input id="map" type="range" min="0" max="1" value="0.85" step="0.01"/>
+          </div>
+
+          <div class="row">
+            <label>Motivation / Migratory Drive (0..1)</label><div class="val mono" id="v_mot">—</div>
+            <input id="mot" type="range" min="0" max="1" value="0.75" step="0.01"/>
+          </div>
+
+          <div class="row">
+            <label>Stress / Distraction (0..1)</label><div class="val mono" id="v_sts">—</div>
+            <input id="sts" type="range" min="0" max="1" value="0.20" step="0.01"/>
+          </div>
+
+          <div class="row">
+            <label>Experience (juvenile→adult, 0..1)</label><div class="val mono" id="v_exp">—</div>
+            <input id="exp" type="range" min="0" max="1" value="0.60" step="0.01"/>
+          </div>
+        </div>
+
+        <div class="lim">
+          <b>Geomagnetic Context</b>
+          <div class="row">
+            <label>Field Strength B (µT)</label><div class="val mono" id="v_B">—</div>
+            <input id="B" type="range" min="20" max="70" value="50" step="1"/>
+          </div>
+
+          <div class="row">
+            <label>Inclination (deg)</label><div class="val mono" id="v_inc">—</div>
+            <input id="inc" type="range" min="0" max="85" value="60" step="1"/>
+          </div>
+
+          <div class="row">
+            <label>Field Disturbance / Anomaly (0..1)</label><div class="val mono" id="v_anom">—</div>
+            <input id="anom" type="range" min="0" max="1" value="0.10" step="0.01"/>
+          </div>
+        </div>
+
+        <div class="btns">
+          <button id="run">🧪 Recompute</button>
+          <button id="mc">🎲 Monte-Carlo x200</button>
+          <button id="expjson">📦 Export JSON</button>
+          <button id="copy">📋 Copy Summary</button>
+          <button id="snap">📸 Snapshot PNG</button>
+        </div>
+
+        <div class="note">
+          <b>Fairness idea:</b> final navigation = (cryptochrome confidence) × (light) × (RF) × (calibration) × (map) × (behaviour).
+          This prevents “false negatives” where the compass is fine but the test conditions are not.
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Output -->
+    <div class="card">
+      <div class="hd">
+        <b>Hybrid Output</b>
+        <span class="pill"><span class="dot" id="dot"></span><span id="status">—</span></span>
+      </div>
+      <div class="bd">
+        <div class="kpi">
+          <div class="k">
+            <div class="t">K_raw (internal)</div>
+            <div class="n mono" id="kraw">—</div>
+            <div class="small">raw score (can exceed 1)</div>
+          </div>
+          <div class="k">
+            <div class="t">Compass Confidence</div>
+            <div class="n mono" id="conf">—</div>
+            <div class="bar"><i id="bar_conf"></i></div>
+          </div>
+          <div class="k">
+            <div class="t">Navigation Reliability</div>
+            <div class="n mono" id="nav">—</div>
+            <div class="bar"><i id="bar_nav"></i></div>
+          </div>
+          <div class="k">
+            <div class="t">False-Negative Risk</div>
+            <div class="n mono" id="fnr">—</div>
+            <div class="small">high if K_raw high but nav low</div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px" class="lim">
+          <b>Limiter Readout</b>
+          <ul id="limiters"><li>—</li></ul>
+        </div>
+
+        <div style="margin-top:12px" class="lim">
+          <b>Uncertainty (Monte-Carlo)</b>
+          <div class="small">Mean ± spread from randomised nuisance noise (EM/RF/calibration/anomaly).</div>
+          <canvas id="plot" width="900" height="260"></canvas>
+          <div class="small mono" id="mcstats">Run MC to populate…</div>
+        </div>
+
+        <div style="margin-top:12px" class="lim">
+          <b class="mono">Paper-Trail</b>
+          <div class="small">Everything is exportable. Timestamped and reproducible.</div>
+          <pre class="mono" id="trail" style="white-space:pre-wrap;margin:10px 0 0;color:var(--mut)"></pre>
+        </div>
+
+        <div class="note">
+          Educational toy: not a full biophysics simulator. But it’s now “fair” to the experimenter:
+          low performance can come from light/RF/calibration/map/behaviour — not just τc/λc/σ².
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ---------- tiny utils ---------- */
+const $ = id => document.getElementById(id);
+const clamp = (x,a,b)=>Math.max(a,Math.min(b,x));
+const lerp = (a,b,t)=>a+(b-a)*t;
+const fmt = (x,n=2)=>Number(x).toFixed(n);
+const nowStamp = ()=>new Date().toISOString().replace('T',' ').replace('Z',' UTC');
+function dl(name, text, mime="application/json"){
+  const blob = new Blob([text], {type:mime});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 500);
+}
+
+/* ---------- species presets (toy-level) ---------- */
+const SPECIES = [
+  {id:"robin", name:"European Robin", base:{tau:260, lam:1.55, sig:0.32, em:0.22, wl:500, lint:0.70, rf:0.10, cal:0.82, map:0.70, mot:0.78, sts:0.18, exp:0.55, B:50, inc:60, anom:0.10}},
+  {id:"pigeon", name:"Racing Pigeon", base:{tau:220, lam:1.45, sig:0.36, em:0.28, wl:510, lint:0.75, rf:0.12, cal:0.78, map:0.88, mot:0.72, sts:0.22, exp:0.70, B:50, inc:60, anom:0.10}},
+  {id:"albatross", name:"Wandering Albatross", base:{tau:300, lam:1.65, sig:0.30, em:0.18, wl:520, lint:0.80, rf:0.08, cal:0.86, map:0.92, mot:0.80, sts:0.12, exp:0.75, B:45, inc:55, anom:0.08}},
+  {id:"blackcap", name:"Blackcap Warbler", base:{tau:240, lam:1.50, sig:0.34, em:0.24, wl:490, lint:0.70, rf:0.11, cal:0.80, map:0.68, mot:0.82, sts:0.20, exp:0.50, B:50, inc:60, anom:0.10}},
+  {id:"tern", name:"Arctic Tern", base:{tau:320, lam:1.70, sig:0.28, em:0.20, wl:520, lint:0.85, rf:0.09, cal:0.88, map:0.90, mot:0.86, sts:0.14, exp:0.65, B:48, inc:58, anom:0.08}},
+];
+
+/* ---------- environment presets (apply deltas) ---------- */
+function applyPreset(name){
+  // start from current sliders, then nudge.
+  let em = +$("em").value, rf=+$("rf").value, an=+$("anom").value, lint=+$("lint").value;
+  if(name==="quiet"){ em=0.15; rf=0.06; an=0.05; lint=Math.max(lint,0.60); }
+  if(name==="urban"){ em=0.55; rf=0.18; an=0.12; lint=Math.max(lint,0.55); }
+  if(name==="storm"){ em=0.40; rf=0.15; an=0.65; lint=Math.max(lint,0.40); }
+  if(name==="flare"){ em=0.48; rf=0.22; an=0.80; lint=Math.max(lint,0.35); }
+  if(name==="lab"){ em=0.02; rf=0.00; an=0.00; lint=Math.max(lint,0.75); }
+  if(name==="rfjam"){ em=Math.max(em,0.22); rf=0.85; an=Math.max(an,0.10); lint=Math.max(lint,0.55); }
+  $("em").value=em; $("rf").value=rf; $("anom").value=an; $("lint").value=lint;
+}
+
+/* ---------- core model (toy, but confound-aware) ---------- */
+function lightMultiplier(wl, lint){
+  // “window” around blue-green (toy): peak ~505nm, width ~55nm
+  const mu=505, s=55;
+  const g = Math.exp(-0.5*Math.pow((wl-mu)/s,2));
+  const inten = 1 - Math.exp(-3.0*lint); // saturating intensity
+  return clamp(g*inten, 0, 1);
+}
+function rfMultiplier(rf){
+  // rf is 0..1 disruption strength; convert to survival factor
+  return clamp(Math.exp(-3.2*rf), 0, 1);
+}
+function calMultiplier(cal){
+  // calibration state 0..1
+  return clamp(0.15 + 0.85*cal, 0, 1);
+}
+function mapMultiplier(map){
+  // map channel helps overall nav; if low, nav suffers even if compass is fine
+  return clamp(0.20 + 0.80*map, 0, 1);
+}
+function behaviourMultiplier(mot, sts, exp){
+  // motivation helps, stress hurts, experience helps
+  const drive = 0.35 + 0.65*mot;
+  const stress = Math.exp(-2.4*sts);
+  const learn = 0.55 + 0.45*exp;
+  return clamp(drive*stress*learn, 0, 1);
+}
+function geomFactor(B, inc, anom){
+  // toy Gaussian preference around typical mid-latitude field & inclination + disturbance penalty
+  const Bref=50, sB=12;
+  const incRef=60, sI=18;
+  const gB = Math.exp(-0.5*Math.pow((B-Bref)/sB,2));
+  const gI = Math.exp(-0.5*Math.pow((inc-incRef)/sI,2));
+  const dist = Math.exp(-1.8*anom);
+  return clamp(gB*gI*dist, 0, 1);
+}
+function compute(){
+  const p = {
+    species: $("species").value,
+    preset: $("preset").value,
+    tau: +$("tau").value,      // µs
+    lam: +$("lam").value,      // nm
+    sig: +$("sig").value,      // variance
+    em:  +$("em").value,       // 0..1
+    wl:  +$("wl").value,       // nm
+    lint:+$("lint").value,     // 0..1
+    rf:  +$("rf").value,       // 0..1
+    cal: +$("cal").value,      // 0..1
+    map: +$("map").value,      // 0..1
+    mot: +$("mot").value,      // 0..1
+    sts: +$("sts").value,      // 0..1
+    exp: +$("exp").value,      // 0..1
+    B:   +$("B").value,        // µT
+    inc: +$("inc").value,      // deg
+    anom:+$("anom").value      // 0..1
+  };
+
+  // K_raw: coherence & spatial coherence help; σ² & EM noise hurt; geom helps; anomaly hurts
+  const tauRef=250, lamRef=1.6;
+  const coh = Math.pow(p.tau/tauRef, 0.62) * Math.pow(p.lam/lamRef, 0.38);
+  const noise = Math.exp(-1.55*p.em) / (0.18 + p.sig);
+  const g = geomFactor(p.B, p.inc, p.anom);
+  let K_raw = 1.25 * coh * noise * (0.35 + 0.65*g);
+  K_raw = clamp(K_raw, 0, 6);
+
+  // Map to 0..1 “compass confidence”
+  const compass = clamp(1 - Math.exp(-K_raw), 0, 1);
+
+  // Fairness multipliers
+  const L = lightMultiplier(p.wl, p.lint);
+  const R = rfMultiplier(p.rf);
+  const C = calMultiplier(p.cal);
+  const M = mapMultiplier(p.map);
+  const Bf = behaviourMultiplier(p.mot, p.sts, p.exp);
+
+  const nav = clamp(compass * L * R * C * M * Bf, 0, 1);
+
+  // false negative risk: K high but nav low => confounds likely
+  const fnr = clamp((K_raw/2.2) * (1 - nav) * (nav < 0.45 ? 1.1 : 0.7), 0, 1);
+
+  // Limiter ranking
+  const factors = [
+    {k:"Light", v:L, hint:"Try blue/green (~480–540nm) and adequate intensity."},
+    {k:"RF", v:R, hint:"MHz-band disruption can kill orientation even if K_raw is fine."},
+    {k:"Calibration", v:C, hint:"Low calibration makes behaviour look like “no compass”."},
+    {k:"Map channel", v:M, hint:"If map is weak, navigation suffers despite good compass."},
+    {k:"Behaviour", v:Bf, hint:"Low drive / high stress / low experience can mask sensing."},
+    {k:"Geom/stability", v:(0.35+0.65*g), hint:"Disturbance/anomaly can dominate field cues."},
+  ].sort((a,b)=>a.v-b.v);
+
+  return {p, K_raw, compass, nav, fnr, L,R,C,M,Bf,g, limiters:factors};
+}
+
+/* ---------- UI render ---------- */
+function dotFor(x){
+  if(x>=0.75) return ["good","Stable Navigation — corridor likely coherent."];
+  if(x>=0.45) return ["warn","Mixed Navigation — borderline / context-sensitive."];
+  return ["bad","Unstable Navigation — confounds dominate or signal weak."];
+}
+function pct(x){ return Math.round(100*x)+"%"; }
+
+function render(res){
+  const {p, K_raw, compass, nav, fnr, limiters} = res;
+  $("stamp").textContent = nowStamp();
+
+  $("v_tau").textContent = fmt(p.tau,0)+" µs";
+  $("v_lam").textContent = fmt(p.lam,2)+" nm";
+  $("v_sig").textContent = fmt(p.sig,2);
+  $("v_em").textContent  = fmt(p.em,2);
+
+  $("v_wl").textContent  = fmt(p.wl,0)+" nm";
+  $("v_int").textContent = fmt(p.lint,2);
+  $("v_rf").textContent  = fmt(p.rf,2);
+  $("v_cal").textContent = fmt(p.cal,2);
+  $("v_map").textContent = fmt(p.map,2);
+  $("v_mot").textContent = fmt(p.mot,2);
+  $("v_sts").textContent = fmt(p.sts,2);
+  $("v_exp").textContent = fmt(p.exp,2);
+  $("v_B").textContent   = fmt(p.B,0)+" µT";
+  $("v_inc").textContent = fmt(p.inc,0)+"°";
+  $("v_anom").textContent= fmt(p.anom,2);
+
+  $("kraw").textContent = fmt(K_raw,3);
+  $("conf").textContent = pct(compass);
+  $("nav").textContent  = pct(nav);
+  $("fnr").textContent  = pct(fnr);
+
+  $("bar_conf").style.width = (100*compass).toFixed(1)+"%";
+  $("bar_nav").style.width  = (100*nav).toFixed(1)+"%";
+
+  const [cls, msg] = dotFor(nav);
+  $("dot").className = "dot "+cls;
+  $("status").textContent = msg;
+
+  // limiters: show bottom 3 (worst)
+  const worst = limiters.slice(0,3);
+  $("limiters").innerHTML = worst.map(w=>`<li><b>${w.k}</b> = ${pct(w.v)} — ${w.hint}</li>`).join("");
+
+  const trail = {
+    stamp: nowStamp(),
+    species: p.species,
+    preset: p.preset,
+    inputs: p,
+    outputs: {
+      K_raw: +fmt(K_raw,6),
+      compass_confidence: +fmt(compass,6),
+      navigation_reliability: +fmt(nav,6),
+      false_negative_risk: +fmt(fnr,6)
+    }
+  };
+  $("trail").textContent = JSON.stringify(trail, null, 2);
+  window.__QDS_LAST = trail;
+}
+
+/* ---------- Monte Carlo ---------- */
+function mcRun(N=200){
+  const base = compute();
+  const sims = [];
+  for(let i=0;i<N;i++){
+    // jitter nuisance channels more than kernel itself
+    const j = (x, s)=>clamp(x + (Math.random()*2-1)*s, 0, 1);
+    const pj = JSON.parse(JSON.stringify(base.p));
+    pj.em   = j(pj.em, 0.10);
+    pj.rf   = j(pj.rf, 0.12);
+    pj.cal  = j(pj.cal,0.12);
+    pj.anom = j(pj.anom,0.18);
+    pj.lint = j(pj.lint,0.10);
+    // slight jitter on kernel too (smaller)
+    pj.sig  = clamp(pj.sig + (Math.random()*2-1)*0.05, 0.05, 1.2);
+    pj.tau  = clamp(pj.tau + (Math.random()*2-1)*25, 5, 6000);
+
+    // temporarily set sliders? no — compute inline by mapping to DOM-free compute
+    const tmp = domlessCompute(pj);
+    sims.push(tmp.nav);
+  }
+  sims.sort((a,b)=>a-b);
+  const mean = sims.reduce((a,b)=>a+b,0)/sims.length;
+  const p10 = sims[Math.floor(0.10*(sims.length-1))];
+  const p50 = sims[Math.floor(0.50*(sims.length-1))];
+  const p90 = sims[Math.floor(0.90*(sims.length-1))];
+
+  drawHist(sims);
+  $("mcstats").textContent =
+    `MC(${N})  mean=${pct(mean)}  p10=${pct(p10)}  median=${pct(p50)}  p90=${pct(p90)}  (spread=${pct(p90-p10)})`;
+}
+
+function domlessCompute(p){
+  const tauRef=250, lamRef=1.6;
+  const coh = Math.pow(p.tau/tauRef, 0.62) * Math.pow(p.lam/lamRef, 0.38);
+  const noise = Math.exp(-1.55*p.em) / (0.18 + p.sig);
+  const g = geomFactor(p.B, p.inc, p.anom);
+  let K_raw = 1.25 * coh * noise * (0.35 + 0.65*g);
+  K_raw = clamp(K_raw, 0, 6);
+  const compass = clamp(1 - Math.exp(-K_raw), 0, 1);
+  const L = lightMultiplier(p.wl, p.lint);
+  const R = rfMultiplier(p.rf);
+  const C = calMultiplier(p.cal);
+  const M = mapMultiplier(p.map);
+  const Bf= behaviourMultiplier(p.mot, p.sts, p.exp);
+  const nav = clamp(compass * L * R * C * M * Bf, 0, 1);
+  return {K_raw, compass, nav};
+}
+
+function drawHist(vals){
+  const c = $("plot");
+  const ctx = c.getContext("2d");
+  ctx.clearRect(0,0,c.width,c.height);
+
+  // axes
+  ctx.globalAlpha = 0.9;
+  ctx.strokeStyle = "rgba(160,190,255,.35)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(40, 20); ctx.lineTo(40, c.height-30); ctx.lineTo(c.width-20, c.height-30);
+  ctx.stroke();
+
+  // bins
+  const bins = 24;
+  const hist = Array.from({length:bins}, ()=>0);
+  for(const v of vals){
+    const b = clamp(Math.floor(v*bins), 0, bins-1);
+    hist[b]++;
+  }
+  const maxH = Math.max(...hist, 1);
+
+  const W = c.width-60, H = c.height-60;
+  const x0 = 40, y0 = c.height-30;
+  const bw = W/bins;
+
+  for(let i=0;i<bins;i++){
+    const h = hist[i]/maxH;
+    const x = x0 + i*bw + 1;
+    const y = y0 - h*H;
+    const w = bw - 2;
+    const hh = h*H;
+    ctx.fillStyle = "rgba(124,247,255,.35)";
+    ctx.fillRect(x, y, w, hh);
+    ctx.strokeStyle = "rgba(119,255,154,.25)";
+    ctx.strokeRect(x, y, w, hh);
+  }
+
+  // labels
+  ctx.fillStyle = "rgba(232,236,255,.75)";
+  ctx.font = "12px ui-monospace, Menlo, Consolas, monospace";
+  ctx.fillText("0%", 38, c.height-10);
+  ctx.fillText("100%", c.width-52, c.height-10);
+  ctx.fillText("MC nav reliability histogram", 40, 14);
+}
+
+/* ---------- wiring ---------- */
+function fillSpecies(){
+  $("species").innerHTML = SPECIES.map(s=>`<option value="${s.id}">${s.name}</option>`).join("");
+  $("species").value = "robin";
+}
+function applySpecies(id){
+  const s = SPECIES.find(x=>x.id===id) || SPECIES[0];
+  const b = s.base;
+  $("tau").value=b.tau; $("lam").value=b.lam; $("sig").value=b.sig; $("em").value=b.em;
+  $("wl").value=b.wl; $("lint").value=b.lint; $("rf").value=b.rf; $("cal").value=b.cal; $("map").value=b.map;
+  $("mot").value=b.mot; $("sts").value=b.sts; $("exp").value=b.exp;
+  $("B").value=b.B; $("inc").value=b.inc; $("anom").value=b.anom;
+}
+function recompute(){
+  const res = compute();
+  render(res);
+}
+function copySummary(){
+  const t = window.__QDS_LAST || {};
+  const out = [
+    "QDS Avian Magnetoreception Lab v5 FAIR+",
+    `stamp: ${t.stamp||"—"}`,
+    `species: ${t.species||"—"}  preset: ${t.preset||"—"}`,
+    `K_raw: ${t.outputs?.K_raw ?? "—"}`,
+    `compass_confidence: ${(t.outputs?.compass_confidence ?? 0)*100 | 0}%`,
+    `navigation_reliability: ${(t.outputs?.navigation_reliability ?? 0)*100 | 0}%`,
+    `false_negative_risk: ${(t.outputs?.false_negative_risk ?? 0)*100 | 0}%`
+  ].join("\n");
+  navigator.clipboard?.writeText(out);
+  alert("Copied summary to clipboard.");
+}
+function exportJSON(){
+  const t = window.__QDS_LAST || {};
+  const name = "qds_avian_lab_v5_fairplus_"+new Date().toISOString().slice(0,10)+".json";
+  dl(name, JSON.stringify(t, null, 2), "application/json");
+}
+function snapshotPNG(){
+  // draw a small “receipt” to a canvas, export PNG
+  const t = window.__QDS_LAST || {};
+  const c = document.createElement("canvas");
+  c.width = 1200; c.height = 700;
+  const ctx = c.getContext("2d");
+
+  ctx.fillStyle = "#06070b"; ctx.fillRect(0,0,c.width,c.height);
+  ctx.fillStyle = "rgba(124,247,255,.15)";
+  ctx.fillRect(40,40,1120,620);
+
+  ctx.fillStyle="#e8ecff";
+  ctx.font="34px ui-monospace, Menlo, Consolas, monospace";
+  ctx.fillText("QDS Avian Magnetoreception Lab v5 FAIR+ Snapshot", 60, 100);
+
+  ctx.font="24px ui-monospace, Menlo, Consolas, monospace";
+  const lines = [
+    `stamp: ${t.stamp||"—"}`,
+    `species: ${t.species||"—"}  preset: ${t.preset||"—"}`,
+    `K_raw: ${t.outputs?.K_raw ?? "—"}`,
+    `compass_confidence: ${Math.round((t.outputs?.compass_confidence ?? 0)*100)}%`,
+    `navigation_reliability: ${Math.round((t.outputs?.navigation_reliability ?? 0)*100)}%`,
+    `false_negative_risk: ${Math.round((t.outputs?.false_negative_risk ?? 0)*100)}%`,
+    "",
+    "inputs:",
+    JSON.stringify(t.inputs||{}, null, 2)
+  ];
+
+  let y=150;
+  ctx.fillStyle="rgba(232,236,255,.9)";
+  ctx.font="20px ui-monospace, Menlo, Consolas, monospace";
+  for(const L of lines){
+    const chunks = (""+L).split("\n");
+    for(const ch of chunks){
+      if(y>640) break;
+      ctx.fillText(ch.slice(0,120), 60, y);
+      y += 26;
+    }
+    if(y>640) break;
+  }
+
+  const url = c.toDataURL("image/png");
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "qds_avian_lab_v5_snapshot_"+new Date().toISOString().slice(0,10)+".png";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+function bind(){
+  const ids = ["tau","lam","sig","em","wl","lint","rf","cal","map","mot","sts","exp","B","inc","anom"];
+  ids.forEach(id=>$(id).addEventListener("input", recompute));
+  $("species").addEventListener("change", e=>{ applySpecies(e.target.value); recompute(); });
+  $("preset").addEventListener("change", e=>{ applyPreset(e.target.value); recompute(); });
+  $("run").addEventListener("click", recompute);
+  $("mc").addEventListener("click", ()=>mcRun(200));
+  $("expjson").addEventListener("click", exportJSON);
+  $("copy").addEventListener("click", copySummary);
+  $("snap").addEventListener("click", snapshotPNG);
+}
+
+/* ---------- boot ---------- */
+fillSpecies();
+applySpecies($("species").value);
+applyPreset($("preset").value);
+bind();
+recompute();
+</script>
+</body>
+</html>

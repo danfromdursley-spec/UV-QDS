@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>QDS Battery Habitat v1 — Demo Onepager</title>
+<style>
+  :root{
+    --bg:#0f1115;
+    --panel:#151a22;
+    --panel-2:#0f141c;
+    --text:#eef2f7;
+    --muted:#a9b3c1;
+    --accent:#7bdcff;
+    --accent-2:#8bffb0;
+    --warn:#ffbf6b;
+    --danger:#ff7b8a;
+    --line:#253042;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:linear-gradient(180deg, #0b0e13, var(--bg));
+    color:var(--text);
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    line-height:1.35;
+  }
+  header{
+    padding:24px 18px 8px;
+    max-width:1100px;
+    margin:0 auto;
+  }
+  .title{
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+  }
+  .badge{
+    font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+    padding:4px 8px; border-radius:999px;
+    background:rgba(123,220,255,.12); color:var(--accent);
+    border:1px solid rgba(123,220,255,.25);
+  }
+  h1{font-size:24px; margin:0}
+  .subtitle{color:var(--muted); margin:6px 0 0; font-size:13.5px}
+
+  main{
+    max-width:1100px;
+    margin:0 auto;
+    padding:10px 14px 28px;
+    display:grid;
+    grid-template-columns: 1.05fr .95fr;
+    gap:14px;
+  }
+  @media (max-width: 980px){
+    main{grid-template-columns:1fr}
+  }
+
+  .card{
+    background:linear-gradient(180deg, var(--panel), var(--panel-2));
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:16px;
+    box-shadow: 0 8px 22px rgba(0,0,0,.25);
+  }
+  .card h2{
+    font-size:16px; margin:0 0 10px;
+  }
+  .muted{color:var(--muted)}
+  .row{
+    display:grid; grid-template-columns: 1fr 1fr; gap:10px;
+  }
+  @media (max-width: 560px){
+    .row{grid-template-columns:1fr}
+  }
+
+  label{font-size:12px; color:var(--muted)}
+  input[type="number"], input[type="text"], select{
+    width:100%;
+    padding:10px 10px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    background:#0c1018;
+    color:var(--text);
+    outline:none;
+  }
+  input[type="number"]:focus, input[type="text"]:focus, select:focus{
+    border-color:rgba(123,220,255,.55);
+    box-shadow:0 0 0 2px rgba(123,220,255,.15);
+  }
+
+  .toggle{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 12px; border:1px solid var(--line);
+    background:rgba(255,255,255,.02);
+    border-radius:12px;
+    margin-bottom:8px;
+  }
+  .toggle strong{font-size:13px}
+  .toggle small{color:var(--muted); font-size:11px}
+  .toggle .left{
+    display:flex; flex-direction:column; gap:2px; padding-right:8px;
+  }
+
+  .switch{
+    position:relative; width:44px; height:24px; flex:0 0 auto;
+  }
+  .switch input{display:none}
+  .slider{
+    position:absolute; inset:0;
+    background:#222a38; border:1px solid #2e3b52;
+    border-radius:999px; cursor:pointer;
+    transition:.18s ease;
+  }
+  .slider:before{
+    content:"";
+    position:absolute; width:18px; height:18px; left:3px; top:2px;
+    background:#cfd6e4; border-radius:50%;
+    transition:.18s ease;
+  }
+  .switch input:checked + .slider{
+    background:rgba(139,255,176,.18);
+    border-color:rgba(139,255,176,.5);
+  }
+  .switch input:checked + .slider:before{
+    transform:translateX(20px);
+    background:var(--accent-2);
+  }
+
+  .pill{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:8px 10px; border-radius:12px;
+    border:1px solid var(--line);
+    background:rgba(255,255,255,.02);
+    font-size:12px;
+  }
+  .metric{
+    display:grid; grid-template-columns: 1fr auto; gap:8px;
+    padding:10px 12px; border-radius:12px;
+    border:1px solid var(--line);
+    background:rgba(255,255,255,.02);
+    margin-bottom:8px;
+  }
+  .metric .big{
+    font-size:18px; font-weight:700;
+  }
+
+  .chart{
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:12px;
+    background:rgba(255,255,255,.02);
+  }
+  .barrow{
+    display:grid; grid-template-columns: 90px 1fr 60px;
+    align-items:center; gap:8px; margin:8px 0;
+    font-size:11.5px;
+  }
+  .bar{
+    height:10px; border-radius:999px;
+    background:#1f2836; border:1px solid #2a3549; overflow:hidden;
+  }
+  .bar > span{
+    display:block; height:100%;
+    background:linear-gradient(90deg, rgba(123,220,255,.25), rgba(139,255,176,.55));
+    width:0%;
+    transition:width .25s ease;
+  }
+
+  pre{
+    white-space:pre; overflow:auto;
+    background:#0b0f17;
+    border:1px solid var(--line);
+    padding:12px;
+    border-radius:12px;
+    font-size:11px;
+    line-height:1.25;
+  }
+
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center;
+    padding:10px 12px; border-radius:12px;
+    background:rgba(123,220,255,.12);
+    color:var(--text);
+    border:1px solid rgba(123,220,255,.35);
+    cursor:pointer; font-weight:600; font-size:12px;
+  }
+  .btn:hover{filter:brightness(1.07)}
+  .btn.secondary{
+    background:rgba(255,255,255,.03);
+    border:1px solid var(--line);
+  }
+
+  .note{
+    font-size:11.5px; color:var(--muted);
+    border-left:3px solid rgba(123,220,255,.45);
+    padding-left:10px; margin-top:8px;
+  }
+  .warn{
+    border-left-color: rgba(255,191,107,.6);
+  }
+  .danger{
+    border-left-color: rgba(255,123,138,.6);
+  }
+  .footer{
+    max-width:1100px; margin:0 auto; padding:0 18px 30px;
+    color:var(--muted); font-size:11px;
+  }
+</style>
+</head>
+
+<body>
+<header>
+  <div class="title">
+    <span class="badge">Battery Habitat v1</span>
+    <span class="badge">No cell chemistry changes</span>
+    <span class="badge">Demo model</span>
+    <h1>QDS Hybrid Battery Life Uplift — AI + Casing + Honeycomb</h1>
+  </div>
+  <div class="subtitle">
+    A practical onepager to demonstrate how environmental & control-layer upgrades could
+    extend effective battery life and reduce stress events.
+  </div>
+</header>
+
+<main>
+
+  <!-- LEFT COLUMN -->
+  <section class="card">
+    <h2>1) Feature Stack (toggle your architecture)</h2>
+
+    <div class="toggle">
+      <div class="left">
+        <strong>AI Stewardship</strong>
+        <small>Thermal gate, dynamic SoC ceilings, stress event logic</small>
+      </div>
+      <label class="switch">
+        <input id="togAI" type="checkbox" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="toggle">
+      <div class="left">
+        <strong>Graphite/Carbon Thermal Case</strong>
+        <small>Heat spreading, better uniformity, lightweight structure</small>
+      </div>
+      <label class="switch">
+        <input id="togThermalCase" type="checkbox" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="toggle">
+      <div class="left">
+        <strong>3D-Printed Micro-Airflow Core</strong>
+        <small>Gentle convection paths to flatten hotspots</small>
+      </div>
+      <label class="switch">
+        <input id="togAir" type="checkbox" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="toggle">
+      <div class="left">
+        <strong>Honeycomb Module/Cell Cradle</strong>
+        <small>Uniform compression + isolation + propagation control</small>
+      </div>
+      <label class="switch">
+        <input id="togHoney" type="checkbox" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="toggle">
+      <div class="left">
+        <strong>Module-Level Damping</strong>
+        <small>Elastomer / foam / myco-style lattice for vibration reduction</small>
+      </div>
+      <label class="switch">
+        <input id="togDamp" type="checkbox" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="toggle">
+      <div class="left">
+        <strong>Solar Maintenance “Guardian”</strong>
+        <small>Trickle top-ups to avoid damaging storage drift</small>
+      </div>
+      <label class="switch">
+        <input id="togSolar" type="checkbox">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <hr style="border:none;border-top:1px solid var(--line); margin:14px 0;">
+
+    <h2>2) Use Context</h2>
+    <div class="row">
+
+      <div>
+        <label>Primary Use Case</label>
+        <select id="useCase">
+          <option value="ev_light">EV — light mixed use</option>
+          <option value="ev_fleet" selected>EV — fleet / courier (high duty)</option>
+          <option value="stationary">Stationary storage</option>
+          <option value="remote">Remote / harsh environment</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Operational Discipline</label>
+        <select id="discipline">
+          <option value="low">Low (humans do chaos)</option>
+          <option value="med" selected>Medium</option>
+          <option value="high">High (rules enforced)</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Average Ambient Temp (°C)</label>
+        <input id="ambient" type="number" value="18" step="1">
+      </div>
+
+      <div>
+        <label>Rough Vibration Harshness</label>
+        <select id="vibe">
+          <option value="low">Low</option>
+          <option value="med" selected>Medium</option>
+          <option value="high">High (rough roads/industrial)</option>
+        </select>
+      </div>
+
+    </div>
+
+    <div class="note warn">
+      This is a <b>demo estimator</b>. It’s meant for pattern sense and pitch framing,
+      not lab-grade claims. The honest win in real life is usually “effective battery value”
+      (life + downtime + predictability).
+    </div>
+
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
+      <button class="btn" id="btnPresetFleet">Fleet Preset</button>
+      <button class="btn secondary" id="btnPresetLight">Light EV Preset</button>
+      <button class="btn secondary" id="btnPresetStationary">Stationary Preset</button>
+      <button class="btn secondary" id="btnReset">Reset Toggles</button>
+    </div>
+
+  </section>
+
+  <!-- RIGHT COLUMN -->
+  <section class="card">
+    <h2>3) Estimated Impact</h2>
+
+    <div class="metric">
+      <div>
+        <div class="muted">Projected Effective Life Uplift</div>
+        <div class="big" id="lifeUplift">—</div>
+      </div>
+      <div class="pill" id="confidenceTag">—</div>
+    </div>
+
+    <div class="metric">
+      <div>
+        <div class="muted">Likely Driver Breakdown (relative)</div>
+        <div class="big" id="drivers">—</div>
+      </div>
+      <div class="pill">Demo mix</div>
+    </div>
+
+    <div class="chart">
+      <div class="muted" style="font-size:11px;">Component contribution bars (demo-weighted)</div>
+
+      <div class="barrow">
+        <div>AI rules</div>
+        <div class="bar"><span id="barAI"></span></div>
+        <div id="barAITxt">0%</div>
+      </div>
+
+      <div class="barrow">
+        <div>Thermal case</div>
+        <div class="bar"><span id="barCase"></span></div>
+        <div id="barCaseTxt">0%</div>
+      </div>
+
+      <div class="barrow">
+        <div>Micro-airflow</div>
+        <div class="bar"><span id="barAir"></span></div>
+        <div id="barAirTxt">0%</div>
+      </div>
+
+      <div class="barrow">
+        <div>Honeycomb</div>
+        <div class="bar"><span id="barHoney"></span></div>
+        <div id="barHoneyTxt">0%</div>
+      </div>
+
+      <div class="barrow">
+        <div>Damping</div>
+        <div class="bar"><span id="barDamp"></span></div>
+        <div id="barDampTxt">0%</div>
+      </div>
+
+      <div class="barrow">
+        <div>Solar maintenance</div>
+        <div class="bar"><span id="barSolar"></span></div>
+        <div id="barSolarTxt">0%</div>
+      </div>
+    </div>
+
+    <div class="note">
+      Rule of thumb: improvements overlap.
+      The stack wins by <b>reducing stress exposure consistently</b>,
+      not by one magical feature.
+    </div>
+
+  </section>
+
+  <!-- LEFT COLUMN CONTINUED -->
+  <section class="card">
+    <h2>4) ASCII Design Diagram (dimensioned placeholders)</h2>
+
+<pre id="asciiDiagram">
+PACK TOP VIEW (concept)
+     <------------------------  L_pack  ------------------------>
+┌───────────────────────────────────────────────────────────────┐
+│                                                               │
+│   ┌───────────────────────────────────────────────────────┐   │
+│   │   HONEYCOMB MODULE BAY BLOCKS                          │   │
+│   │                                                       │   │
+│   │   ┌───────────────┐   ┌───────────────┐               │   │
+│   │   │   BAY A       │   │   BAY B       │               │   │
+│   │   │  (hex array)  │   │  (hex array)  │               │   │
+│   │   └───────────────┘   └───────────────┘               │   │
+│   │                                                       │   │
+│   │   ┌───────────────┐   ┌───────────────┐               │   │
+│   │   │   BAY C       │   │   BAY D       │               │   │
+│   │   │  (hex array)  │   │  (hex array)  │               │   │
+│   │   └───────────────┘   └───────────────┘               │   │
+│   └───────────────────────────────────────────────────────┘   │
+│                                                               │
+│  Service edge: connectors, fuses, BMS, vent routing           │
+└───────────────────────────────────────────────────────────────┘
+     <------------------------  W_pack  ------------------------>
+
+CROSS-SECTION STACK (concept)
+┌──────────────────────────────────────────────────────────────┐
+│ [A] Outer Sacrificial Skin     t_A                            │
+├──────────────────────────────────────────────────────────────┤
+│ [B] Damping/Impact Layer       t_B                            │
+├──────────────────────────────────────────────────────────────┤
+│ [C] Thermal + Micro-Airflow    t_C   (channels d_air)         │
+├──────────────────────────────────────────────────────────────┤
+│ [D] Honeycomb Cradle           h_hex (walls t_hex, pads t_pad)│
+├──────────────────────────────────────────────────────────────┤
+│ [E] Structural Inner Tray      t_E                            │
+├──────────────────────────────────────────────────────────────┤
+│ [F] Service Zone               h_srv                          │
+└──────────────────────────────────────────────────────────────┘
+</pre>
+
+    <div class="row">
+      <div>
+        <label>Example L_pack (mm)</label>
+        <input id="L_pack" type="number" value="1200">
+      </div>
+      <div>
+        <label>Example W_pack (mm)</label>
+        <input id="W_pack" type="number" value="800">
+      </div>
+      <div>
+        <label>Example H_pack (mm)</label>
+        <input id="H_pack" type="number" value="140">
+      </div>
+      <div>
+        <label>Honeycomb pitch P_hex (mm)</label>
+        <input id="P_hex" type="number" value="55">
+      </div>
+    </div>
+
+    <div class="note">
+      The diagram text is a concept map. These numbers help you keep the story “engineer-clean”
+      in meetings without overcommitting to one vehicle platform.
+    </div>
+
+  </section>
+
+  <!-- RIGHT COLUMN CONTINUED -->
+  <section class="card">
+    <h2>5) Assumption Audit (mini)</h2>
+
+    <div class="row">
+      <div>
+        <label>Baseline life expectation (years)</label>
+        <input id="baseLife" type="number" value="8" step="0.5">
+      </div>
+      <div>
+        <label>Baseline annual battery-related cost (£)</label>
+        <input id="baseCost" type="number" value="20000" step="500">
+      </div>
+    </div>
+
+    <div class="metric" style="margin-top:10px;">
+      <div>
+        <div class="muted">Projected Life (with stack)</div>
+        <div class="big" id="projLife">—</div>
+      </div>
+      <div class="pill" id="savingsTag">—</div>
+    </div>
+
+    <div class="metric">
+      <div>
+        <div class="muted">Rough Annual Value Uplift (£)</div>
+        <div class="big" id="annualValue">—</div>
+      </div>
+      <div class="pill">Demo estimate</div>
+    </div>
+
+    <div class="note warn">
+      This value estimate assumes your uplift translates into reduced replacements and downtime.
+      Real pilots should measure: degradation slope, temp uniformity, and stress-event frequency.
+    </div>
+
+  </section>
+
+</main>
+
+<div class="footer">
+  QDS Battery Habitat v1 demo — architecture-level concept.  
+  Focus: thermal uniformity, vibration isolation, compartmentalised safety, and AI stewardship.  
+  This is a pitch + pattern tool, not a lab certificate.
+</div>
+
+<script>
+/* ---------------------------
+   QDS Battery Habitat v1 Demo
+   Offline, dependency-free
+---------------------------- */
+
+const $ = (id) => document.getElementById(id);
+
+// Toggles
+const togAI = $("togAI");
+const togThermalCase = $("togThermalCase");
+const togAir = $("togAir");
+const togHoney = $("togHoney");
+const togDamp = $("togDamp");
+const togSolar = $("togSolar");
+
+// Context inputs
+const useCase = $("useCase");
+const discipline = $("discipline");
+const ambient = $("ambient");
+const vibe = $("vibe");
+
+// Audit inputs
+const baseLife = $("baseLife");
+const baseCost = $("baseCost");
+
+// Diagram inputs (light usage only)
+const L_pack = $("L_pack");
+const W_pack = $("W_pack");
+const H_pack = $("H_pack");
+const P_hex = $("P_hex");
+
+// Outputs
+const lifeUplift = $("lifeUplift");
+const confidenceTag = $("confidenceTag");
+const drivers = $("drivers");
+
+const projLife = $("projLife");
+const savingsTag = $("savingsTag");
+const annualValue = $("annualValue");
+
+// Bars
+const barAI = $("barAI"), barAITxt = $("barAITxt");
+const barCase = $("barCase"), barCaseTxt = $("barCaseTxt");
+const barAir = $("barAir"), barAirTxt = $("barAirTxt");
+const barHoney = $("barHoney"), barHoneyTxt = $("barHoneyTxt");
+const barDamp = $("barDamp"), barDampTxt = $("barDampTxt");
+const barSolar = $("barSolar"), barSolarTxt = $("barSolarTxt");
+
+function clamp(n, lo, hi){ return Math.max(lo, Math.min(hi, n)); }
+
+function getContextMultipliers(){
+  // Use case baseline opportunity
+  let uc = useCase.value;
+  let ucMult = 1.0;
+  if(uc === "ev_fleet") ucMult = 1.15;      // high duty = more upside
+  if(uc === "ev_light") ucMult = 1.0;
+  if(uc === "stationary") ucMult = 0.9;    // calmer cycles
+  if(uc === "remote") ucMult = 1.05;
+
+  // Discipline effect
+  let d = discipline.value;
+  let dMult = (d === "low") ? 0.75 : (d === "med") ? 1.0 : 1.18;
+
+  // Ambient temperature stress factor (rough)
+  let T = parseFloat(ambient.value || "18");
+  let heatPenalty = 1.0;
+  if(T >= 30) heatPenalty = 0.92;
+  if(T >= 38) heatPenalty = 0.86;
+  if(T <= 0)  heatPenalty = 0.92;
+
+  // Vibration harshness upside for damping/honeycomb
+  let v = vibe.value;
+  let vibeMult = (v === "low") ? 0.9 : (v === "med") ? 1.0 : 1.12;
+
+  return { ucMult, dMult, heatPenalty, vibeMult };
+}
+
+function estimateUplift(){
+  // Base component ranges (percent points)
+  // These are deliberately modest + overlapping-aware.
+  const components = {
+    ai:     togAI.checked ?  [5, 10]  : [0,0],
+    tcase:  togThermalCase.checked ? [3, 7]  : [0,0],
+    air:    togAir.checked ? [2, 5]  : [0,0],
+    honey:  togHoney.checked ? [2, 6] : [0,0],
+    damp:   togDamp.checked ? [1, 4]  : [0,0],
+    solar:  togSolar.checked ? [0.5, 2] : [0,0],
+  };
+
+  // Raw sum of mins/maxes
+  let minSum = 0, maxSum = 0;
+  for(const k in components){
+    minSum += components[k][0];
+    maxSum += components[k][1];
+  }
+
+  // Overlap penalty: more features => diminishing returns
+  const featureCount =
+    (togAI.checked?1:0) +
+    (togThermalCase.checked?1:0) +
+    (togAir.checked?1:0) +
+    (togHoney.checked?1:0) +
+    (togDamp.checked?1:0) +
+    (togSolar.checked?1:0);
+
+  // Penalty factor tuned to keep sane ranges
+  let overlapFactor = 1.0;
+  if(featureCount >= 3) overlapFactor -= 0.08;
+  if(featureCount >= 4) overlapFactor -= 0.08;
+  if(featureCount >= 5) overlapFactor -= 0.07;
+  if(featureCount >= 6) overlapFactor -= 0.05;
+  overlapFactor = clamp(overlapFactor, 0.7, 1.0);
+
+  // Context multipliers
+  const { ucMult, dMult, heatPenalty, vibeMult } = getContextMultipliers();
+
+  // Apply multipliers
+  let minAdj = minSum * overlapFactor * ucMult * dMult * heatPenalty;
+  let maxAdj = maxSum * overlapFactor * ucMult * dMult * heatPenalty;
+
+  // Slightly boost mechanical-related uplift in high vibration environments
+  if(vibeMult > 1.0){
+    const mechBoost =
+      (togHoney.checked?1:0) + (togDamp.checked?1:0);
+    if(mechBoost > 0){
+      minAdj *= 1.0 + 0.03 * mechBoost;
+      maxAdj *= 1.0 + 0.04 * mechBoost;
+    }
+  }
+
+  // Clamp to sensible public-facing demo bounds
+  minAdj = clamp(minAdj, 0, 28);
+  maxAdj = clamp(maxAdj, 0, 35);
+
+  // Ensure ordering
+  if(maxAdj < minAdj) maxAdj = minAdj;
+
+  return { minAdj, maxAdj, components, featureCount };
+}
+
+function contributionBars(components){
+  // Produce relative weights based on midpoints for display
+  const mids = {
+    ai: (components.ai[0]+components.ai[1])/2,
+    tcase: (components.tcase[0]+components.tcase[1])/2,
+    air: (components.air[0]+components.air[1])/2,
+    honey: (components.honey[0]+components.honey[1])/2,
+    damp: (components.damp[0]+components.damp[1])/2,
+    solar: (components.solar[0]+components.solar[1])/2,
+  };
+  const total = Object.values(mids).reduce((a,b)=>a+b,0) || 1;
+  const pct = {};
+  for(const k in mids){
+    pct[k] = Math.round((mids[k]/total)*100);
+  }
+  return pct;
+}
+
+function setBar(el, txtEl, value){
+  const v = clamp(value, 0, 100);
+  el.style.width = v + "%";
+  txtEl.textContent = v + "%";
+}
+
+function render(){
+  const { minAdj, maxAdj, components, featureCount } = estimateUplift();
+
+  // Confidence tag is a narrative hint, not a scientific grade
+  let conf = "Concept-only";
+  if(featureCount >= 2) conf = "Early prototype";
+  if(featureCount >= 4) conf = "Pilot-ready framing";
+  if(featureCount >= 5 && discipline.value !== "low") conf = "Strong claim pathway";
+
+  confidenceTag.textContent = conf;
+
+  // Display uplift
+  lifeUplift.textContent =
+    `${minAdj.toFixed(1)}% to ${maxAdj.toFixed(1)}%`;
+
+  // Drivers text
+  const active = [];
+  if(togAI.checked) active.push("AI stress rules");
+  if(togThermalCase.checked) active.push("thermal uniformity");
+  if(togAir.checked) active.push("micro-airflow");
+  if(togHoney.checked) active.push("honeycomb isolation");
+  if(togDamp.checked) active.push("vibration damping");
+  if(togSolar.checked) active.push("maintenance trickle");
+  drivers.textContent = active.length ? active.join(" • ") : "No features selected";
+
+  // Bars
+  const pct = contributionBars(components);
+  setBar(barAI, barAITxt, pct.ai || 0);
+  setBar(barCase, barCaseTxt, pct.tcase || 0);
+  setBar(barAir, barAirTxt, pct.air || 0);
+  setBar(barHoney, barHoneyTxt, pct.honey || 0);
+  setBar(barDamp, barDampTxt, pct.damp || 0);
+  setBar(barSolar, barSolarTxt, pct.solar || 0);
+
+  // Assumption audit
+  const baseLifeVal = parseFloat(baseLife.value || "0");
+  const baseCostVal = parseFloat(baseCost.value || "0");
+
+  // Use midpoint uplift for projection
+  const mid = (minAdj + maxAdj)/2 / 100;
+  const projectedLife = baseLifeVal * (1 + mid);
+
+  projLife.textContent = isFinite(projectedLife)
+    ? `${projectedLife.toFixed(1)} years (baseline ${baseLifeVal}y)`
+    : "—";
+
+  // Rough annual value uplift range based on cost
+  const annualMin = baseCostVal * (minAdj/100);
+  const annualMax = baseCostVal * (maxAdj/100);
+  annualValue.textContent = isFinite(annualMin)
+    ? `£${Math.round(annualMin).toLocaleString()} to £${Math.round(annualMax).toLocaleString()}`
+    : "—";
+
+  savingsTag.textContent = baseCostVal
+    ? `Against ~£${Math.round(baseCostVal).toLocaleString()}/yr baseline`
+    : "Set baseline cost";
+
+  // Diagram label refresh (light, just to keep story coherent)
+  // We won't rewrite the ASCII art every keystroke; just keep inputs available.
+}
+
+// Presets
+$("btnPresetFleet").addEventListener("click", () => {
+  useCase.value = "ev_fleet";
+  discipline.value = "med";
+  ambient.value = 18;
+  vibe.value = "high";
+  togAI.checked = true;
+  togThermalCase.checked = true;
+  togAir.checked = true;
+  togHoney.checked = true;
+  togDamp.checked = true;
+  togSolar.checked = false;
+  render();
+});
+
+$("btnPresetLight").addEventListener("click", () => {
+  useCase.value = "ev_light";
+  discipline.value = "med";
+  ambient.value = 15;
+  vibe.value = "med";
+  togAI.checked = true;
+  togThermalCase.checked = true;
+  togAir.checked = false;
+  togHoney.checked = true;
+  togDamp.checked = true;
+  togSolar.checked = false;
+  render();
+});
+
+$("btnPresetStationary").addEventListener("click", () => {
+  useCase.value = "stationary";
+  discipline.value = "high";
+  ambient.value = 20;
+  vibe.value = "low";
+  togAI.checked = true;
+  togThermalCase.checked = true;
+  togAir.checked = false;
+  togHoney.checked = false;
+  togDamp.checked = false;
+  togSolar.checked = false;
+  render();
+});
+
+$("btnReset").addEventListener("click", () => {
+  togAI.checked = true;
+  togThermalCase.checked = true;
+  togAir.checked = true;
+  togHoney.checked = true;
+  togDamp.checked = true;
+  togSolar.checked = false;
+  discipline.value = "med";
+  useCase.value = "ev_fleet";
+  vibe.value = "med";
+  ambient.value = 18;
+  baseLife.value = 8;
+  baseCost.value = 20000;
+  render();
+});
+
+// Re-render on any input change
+[
+  togAI, togThermalCase, togAir, togHoney, togDamp, togSolar,
+  useCase, discipline, ambient, vibe,
+  baseLife, baseCost,
+  L_pack, W_pack, H_pack, P_hex
+].forEach(el => el.addEventListener("input", render));
+
+// Ensure first paint updates numbers
+document.addEventListener("DOMContentLoaded", render);
+render();
+</script>
+
+</body>
+</html>

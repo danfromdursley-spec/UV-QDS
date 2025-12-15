@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>QDS Solar System — MAX Chaos Edition</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #000;
+      color: #fff;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    #renderCanvas {
+      width: 100vw;
+      height: 100vh;
+      touch-action: none;
+      display: block;
+    }
+    #ui {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      max-width: 320px;
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.15);
+      padding: 14px 16px;
+      z-index: 10;
+      box-shadow: 0 12px 35px rgba(0,0,0,0.8);
+      backdrop-filter: blur(10px);
+    }
+    #ui h2 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    #ui h2 span {
+      font-size: 20px;
+    }
+    .label {
+      margin-top: 6px;
+      font-size: 12px;
+      opacity: 0.85;
+    }
+    input[type=range] {
+      width: 100%;
+    }
+    .btn {
+      width: 100%;
+      margin-top: 6px;
+      padding: 6px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: linear-gradient(135deg, #222, #111);
+      color: #fff;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn:hover {
+      background: linear-gradient(135deg, #333, #111);
+      cursor: pointer;
+    }
+    select {
+      width: 100%;
+      margin-top: 6px;
+      padding: 6px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: #000;
+      color: #fff;
+      font-size: 13px;
+    }
+    #infoBox {
+      margin-top: 8px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(10,10,15,0.85);
+      font-size: 11px;
+      line-height: 1.4;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+    a {
+      color: #7fd4ff;
+    }
+  </style>
+</head>
+<body>
+  <div id="ui">
+    <h2>QDS Controls <span>🎩</span></h2>
+    <div class="label">λ<sub>c</sub> (spatial coherence)</div>
+    <input id="lambdaSlider" type="range" min="0.5" max="5" step="0.1" value="2.0" />
+    <div class="label">τ<sub>c</sub> (temporal coherence)</div>
+    <input id="tauSlider" type="range" min="0.5" max="5" step="0.1" value="2.0" />
+
+    <button class="btn" id="fireCME">💥 Fire CME</button>
+    <button class="btn" id="maxChaos">🔥 MAX Chaos</button>
+    <button class="btn" id="normalMode">💎 Normal Mode</button>
+    <button class="btn" id="rideAlong">🛸 Ride Along</button>
+
+    <select id="planetSelect">
+      <option value="">Select Planet</option>
+      <option value="mercury">Mercury</option>
+      <option value="venus">Venus</option>
+      <option value="earth">Earth</option>
+      <option value="mars">Mars</option>
+      <option value="jupiter">Jupiter</option>
+      <option value="saturn">Saturn</option>
+      <option value="uranus">Uranus</option>
+      <option value="neptune">Neptune</option>
+      <option value="pluto">Pluto (we still love you)</option>
+    </select>
+
+    <div id="infoBox">
+      Tap a planet and hit <b>Planet Info</b> below.
+    </div>
+  </div>
+
+  <canvas id="renderCanvas"></canvas>
+
+  <script src="https://cdn.babylonjs.com/babylon.js"></script>
+  <script>
+    // ================================================================
+    //  QDS SOLAR SYSTEM — MAX CHAOS EDITION
+    //  Keplerian orbits + QDS warp grid + CME waves + ride-along camera
+    // ================================================================
+
+    const canvas = document.getElementById("renderCanvas");
+    const engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true });
+    const scene  = new BABYLON.Scene(engine);
+    scene.clearColor = new BABYLON.Color3(0, 0, 0);
+
+    // Camera
+    const camera = new BABYLON.ArcRotateCamera("cam", -Math.PI/2.2, Math.PI/3, 220, new BABYLON.Vector3(0,0,0), scene);
+    camera.attachControl(canvas, true);
+    camera.lowerRadiusLimit = 60;
+    camera.upperRadiusLimit = 500;
+
+    // Lights
+    const light = new BABYLON.PointLight("sunLight", new BABYLON.Vector3(0,0,0), scene);
+    light.intensity = 2.5;
+    const hemi = new BABYLON.HemisphericLight("hemi", new BABYLON.Vector3(0,1,0), scene);
+    hemi.intensity = 0.2;
+
+    // Global QDS params
+    const QDS = {
+      lambda: 2.0,
+      tau: 2.0,
+      chaos: 0.0
+    };
+
+    // Textures (remote; must be online)
+    const TEX = {
+      sun:    "https://upload.wikimedia.org/wikipedia/commons/4/4c/Solar_system_with_text.jpg",
+      mercury:"https://www.solarsystemscope.com/textures/download/2k_mercury.jpg",
+      venus:  "https://www.solarsystemscope.com/textures/download/2k_venus_surface.jpg",
+      earth:  "https://www.solarsystemscope.com/textures/download/2k_earth_daymap.jpg",
+      mars:   "https://www.solarsystemscope.com/textures/download/2k_mars.jpg",
+      jupiter:"https://www.solarsystemscope.com/textures/download/2k_jupiter.jpg",
+      saturn: "https://www.solarsystemscope.com/textures/download/2k_saturn.jpg",
+      uranus: "https://www.solarsystemscope.com/textures/download/2k_uranus.jpg",
+      neptune:"https://www.solarsystemscope.com/textures/download/2k_neptune.jpg",
+      pluto:  "https://www.solarsystemscope.com/textures/download/pluto.jpg",
+      rings:  "https://upload.wikimedia.org/wikipedia/commons/0/06/Saturn_rings_composite.jpg"
+    };
+
+    // Planet metadata
+    const PLANET_META = {
+      mercury: "Mercury — tiny, fast, zero chill. Orbits the Sun in ~88 days.",
+      venus:   "Venus — runaway greenhouse, thick atmosphere, spins backwards.",
+      earth:   "Earth — home. Liquid water, plate tectonics, questionable Wi‑Fi.",
+      mars:    "Mars — dusty, cold, lots of real‑estate. Two tiny moons.",
+      jupiter: "Jupiter — gas giant, gravity boss, protects inner system from many comets.",
+      saturn:  "Saturn — rings for days. Least dense planet (it could float in a giant ocean).",
+      uranus:  "Uranus — spins on its side like a rolling ball. We all giggle at the name.",
+      neptune: "Neptune — deep blue, supersonic winds, outer ice giant.",
+      pluto:   "Pluto — demoted but not forgotten. Icy, weird heart‑shaped plain."
+    };
+
+    // Create planet helper
+    function createPlanet(name, size, distance, speed) {
+      const mesh = BABYLON.MeshBuilder.CreateSphere(name, { diameter: size }, scene);
+      const mat  = new BABYLON.StandardMaterial(name + "_mat", scene);
+      if (TEX[name]) {
+        mat.diffuseTexture = new BABYLON.Texture(TEX[name], scene);
+      } else {
+        mat.diffuseColor = new BABYLON.Color3(0.8, 0.8, 0.8);
+      }
+      mesh.material = mat;
+      mesh.position.x = distance;
+      return {
+        name,
+        mesh,
+        distance,
+        speed,
+        angle: Math.random() * Math.PI * 2
+      };
+    }
+
+    // Build Solar System
+    const SOLAR = {};
+    SOLAR.planets = [];
+
+    // Sun
+    SOLAR.sun = BABYLON.MeshBuilder.CreateSphere("sun", { diameter: 20 }, scene);
+    const sunMat = new BABYLON.StandardMaterial("sunMat", scene);
+    sunMat.emissiveColor = new BABYLON.Color3(1.0, 0.8, 0.2);
+    SOLAR.sun.material = sunMat;
+
+    // Planets (sizes & distances are not to scale, just pretty)
+    SOLAR.planets.push(createPlanet("mercury", 2.5, 30, 0.03));
+    SOLAR.planets.push(createPlanet("venus",   4.0, 40, 0.022));
+    SOLAR.planets.push(createPlanet("earth",   4.2, 52, 0.02));
+    SOLAR.planets.push(createPlanet("mars",    3.2, 64, 0.017));
+    SOLAR.planets.push(createPlanet("jupiter", 9.0, 90, 0.010));
+    SOLAR.planets.push(createPlanet("saturn",  8.0, 120, 0.009));
+    SOLAR.planets.push(createPlanet("uranus",  6.0, 150, 0.007));
+    SOLAR.planets.push(createPlanet("neptune", 6.0, 180, 0.006));
+    SOLAR.planets.push(createPlanet("pluto",   2.0, 210, 0.004));
+
+    // Saturn rings
+    const saturn = SOLAR.planets.find(p => p.name === "saturn");
+    if (saturn) {
+      const rings = BABYLON.MeshBuilder.CreateDisc("rings", {
+        radius: 18,
+        tessellation: 90,
+        sideOrientation: BABYLON.Mesh.DOUBLESIDE
+      }, scene);
+      const ringMat = new BABYLON.StandardMaterial("ringMat", scene);
+      ringMat.diffuseTexture = new BABYLON.Texture(TEX.rings, scene);
+      ringMat.diffuseTexture.hasAlpha = true;
+      ringMat.backFaceCulling = false;
+      rings.material = ringMat;
+      rings.rotation.x = Math.PI/2;
+      rings.parent = saturn.mesh;
+    }
+
+    // Orbit lines
+    SOLAR.planets.forEach(p => {
+      const points = [];
+      const steps = 128;
+      for (let i=0;i<=steps;i++) {
+        const a = i/steps * Math.PI*2;
+        points.push(new BABYLON.Vector3(
+          Math.cos(a) * p.distance,
+          0,
+          Math.sin(a) * p.distance
+        ));
+      }
+      const orbit = BABYLON.MeshBuilder.CreateLines("orbit_"+p.name, { points }, scene);
+      orbit.color = new BABYLON.Color3(0.2,0.5,0.9);
+    });
+
+    // QDS warp grid
+    const grid = BABYLON.MeshBuilder.CreateGround("qdsGrid", {
+      width: 600,
+      height: 600,
+      subdivisions: 120
+    }, scene);
+    const gridMat = new BABYLON.StandardMaterial("gridMat", scene);
+    gridMat.wireframe = true;
+    gridMat.emissiveColor = new BABYLON.Color3(0.2, 0.8, 1.0);
+    grid.material = gridMat;
+    grid.position.y = -10;
+
+    // Store base positions for warp
+    let basePositions = null;
+    grid.convertToFlatShadedMesh();
+    grid.refreshBoundingInfo();
+
+    const vertexData = BABYLON.VertexData.ExtractFromMesh(grid);
+    basePositions = vertexData.positions.slice(0);
+
+    // CME shockwaves
+    let cmeWaves = [];
+    function fireCME(intensity = 1.0) {
+      const ring = BABYLON.MeshBuilder.CreateTorus("cme", {
+        diameter: 40,
+        thickness: 1.5
+      }, scene);
+      const mat = new BABYLON.StandardMaterial("cmeMat", scene);
+      mat.emissiveColor = new BABYLON.Color3(1.0, 0.6, 0.1);
+      mat.alpha = 0.9;
+      ring.material = mat;
+      ring.rotation.x = Math.PI/2;
+      cmeWaves.push({
+        mesh: ring,
+        size: 40,
+        intensity
+      });
+    }
+    window.fireCME = fireCME;
+
+    // Auto chaos firing
+    let autoChaos = false;
+    let chaosTimer = 0;
+
+    // Ride along
+    let rideTarget = null;
+    let rideOffset = new BABYLON.Vector3(0, 12, -26);
+
+    // Planet lookup
+    function getPlanet(name) {
+      return SOLAR.planets.find(p => p.name === name);
+    }
+
+    // UI wiring
+    const lambdaSlider = document.getElementById("lambdaSlider");
+    const tauSlider = document.getElementById("tauSlider");
+    const infoBox = document.getElementById("infoBox");
+    const planetSelect = document.getElementById("planetSelect");
+
+    lambdaSlider.addEventListener("input", e => {
+      QDS.lambda = parseFloat(e.target.value);
+    });
+    tauSlider.addEventListener("input", e => {
+      QDS.tau = parseFloat(e.target.value);
+    });
+
+    document.getElementById("fireCME").onclick = () => {
+      fireCME(1.0 + QDS.chaos*0.5);
+    };
+
+    document.getElementById("maxChaos").onclick = () => {
+      QDS.chaos = 1.0;
+      autoChaos = true;
+      infoBox.innerHTML = "🔥 MAX Chaos engaged. CME storms & QDS waves cranked up. Hold onto your hat.";
+    };
+
+    document.getElementById("normalMode").onclick = () => {
+      QDS.chaos = 0.0;
+      autoChaos = false;
+      infoBox.innerHTML = "💎 Normal mode restored. Calm-ish vacuum, gentle QDS ripples.";
+    };
+
+    document.getElementById("rideAlong").onclick = () => {
+      const name = planetSelect.value || "earth";
+      const p = getPlanet(name);
+      if (p) {
+        rideTarget = p.mesh;
+        infoBox.innerHTML = "🛸 Riding along with <b>" + name.toUpperCase() + "</b>. Use pinch/zoom to adjust.";
+      } else {
+        infoBox.innerHTML = "Select a planet first, then hit 🛸 Ride Along.";
+      }
+    };
+
+    planetSelect.addEventListener("change", e => {
+      const name = e.target.value;
+      if (!name) return;
+      const meta = PLANET_META[name] || "No data, just vibes.";
+      infoBox.innerHTML = "<b>" + name.toUpperCase() + "</b><br>" + meta;
+      const p = getPlanet(name);
+      if (p) {
+        // quick camera focus
+        camera.target = p.mesh.position.clone();
+      }
+    });
+
+    // Animation loop
+    let t0 = performance.now();
+    scene.onBeforeRenderObservable.add(() => {
+      const now = performance.now();
+      const dt = (now - t0) * 0.001; // seconds-ish
+      t0 = now;
+
+      // Animate planets
+      SOLAR.planets.forEach(p => {
+        const speedBoost = 1 + QDS.chaos * 1.5;
+        p.angle += p.speed * speedBoost;
+        p.mesh.position.x = Math.cos(p.angle) * p.distance;
+        p.mesh.position.z = Math.sin(p.angle) * p.distance;
+      });
+
+      // QDS warp grid
+      const lambda = QDS.lambda;
+      const tau    = QDS.tau;
+      const chaos  = QDS.chaos;
+      const time   = now * 0.001;
+
+      const positions = grid.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+      for (let i=0;i<positions.length;i+=3) {
+        const x0 = basePositions[i];
+        const y0 = basePositions[i+1];
+        const z0 = basePositions[i+2];
+        const r  = Math.sqrt(x0*x0 + z0*z0);
+        const phase = r*0.07*lambda - time*(0.8+0.6*tau);
+        const amp   = 0.6 + chaos*1.2;
+        const yWarp = Math.sin(phase) * amp;
+        positions[i]   = x0;
+        positions[i+1] = y0 + yWarp;
+        positions[i+2] = z0;
+      }
+      grid.updateVerticesData(BABYLON.VertexBuffer.PositionKind, positions);
+
+      // CME propagation
+      if (cmeWaves.length > 0) {
+        cmeWaves.forEach(w => {
+          w.size += dt * (35 + 40*QDS.chaos);
+          const s = w.size/40;
+          w.mesh.scaling.set(s, s, s);
+          const fade = Math.max(0, 1 - w.size/260);
+          w.mesh.material.alpha = fade;
+
+          // Simple interaction: when wave crosses planet orbit, nudge its angle
+          SOLAR.planets.forEach(p => {
+            const diff = Math.abs(w.size - p.distance);
+            if (diff < 2.0) {
+              p.angle += (Math.random()-0.5) * 0.12 * (1+QDS.chaos);
+            }
+          });
+        });
+        cmeWaves = cmeWaves.filter(w => w.size < 260);
+      }
+
+      // Auto chaos CME
+      if (autoChaos) {
+        chaosTimer += dt;
+        const interval = 1.8 - QDS.chaos; // faster with more chaos
+        if (chaosTimer > interval) {
+          chaosTimer = 0;
+          fireCME(1.0 + Math.random()*0.7);
+        }
+      }
+
+      // Ride along camera
+      if (rideTarget) {
+        const targetPos = rideTarget.position;
+        const desired = targetPos.add(rideOffset);
+        camera.target = BABYLON.Vector3.Lerp(camera.target, targetPos, 0.05);
+        camera.alpha += 0.0005; // slow spin
+      }
+    });
+
+    engine.runRenderLoop(() => {
+      scene.render();
+    });
+
+    window.addEventListener("resize", () => {
+      engine.resize();
+    });
+  </script>
+</body>
+</html>

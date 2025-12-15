@@ -1,0 +1,1186 @@
+test,curve,x,y
+"Microphysics Kernel","Kt_over_sig2",-1.75,0.006737946999085467
+"Microphysics Kernel","Kt_over_sig2",-1.7325,0.0070834089290521185
+"Microphysics Kernel","Kt_over_sig2",-1.715,0.007446583070924338
+"Microphysics Kernel","Kt_over_sig2",-1.6975,0.007828377549225767
+"Microphysics Kernel","Kt_over_sig2",-1.68,0.00822974704902003
+"Microphysics Kernel","Kt_over_sig2",-1.6625,0.008651695203120627
+"Microphysics Kernel","Kt_over_sig2",-1.645,0.009095277101695816
+"Microphysics Kernel","Kt_over_sig2",-1.6275,0.009561601930543505
+"Microphysics Kernel","Kt_over_sig2",-1.6099999999999999,0.010051835744633586
+"Microphysics Kernel","Kt_over_sig2",-1.5925,0.010567204383852646
+"Microphysics Kernel","Kt_over_sig2",-1.575,0.011108996538242306
+"Microphysics Kernel","Kt_over_sig2",-1.5575,0.011678566970395442
+"Microphysics Kernel","Kt_over_sig2",-1.54,0.012277339903068438
+"Microphysics Kernel","Kt_over_sig2",-1.5225,0.012906812580479862
+"Microphysics Kernel","Kt_over_sig2",-1.505,0.013568559012200934
+"Microphysics Kernel","Kt_over_sig2",-1.4875,0.014264233908999256
+"Microphysics Kernel","Kt_over_sig2",-1.47,0.014995576820477703
+"Microphysics Kernel","Kt_over_sig2",-1.4525,0.015764416484854486
+"Microphysics Kernel","Kt_over_sig2",-1.435,0.016572675401761237
+"Microphysics Kernel","Kt_over_sig2",-1.4175,0.017422374639493515
+"Microphysics Kernel","Kt_over_sig2",-1.4,0.01831563888873418
+"Microphysics Kernel","Kt_over_sig2",-1.3825,0.019254701775386913
+"Microphysics Kernel","Kt_over_sig2",-1.365,0.02024191144580438
+"Microphysics Kernel","Kt_over_sig2",-1.3475,0.02127973643837717
+"Microphysics Kernel","Kt_over_sig2",-1.33,0.02237077185616559
+"Microphysics Kernel","Kt_over_sig2",-1.3125,0.023517745856009097
+"Microphysics Kernel","Kt_over_sig2",-1.295,0.024723526470339388
+"Microphysics Kernel","Kt_over_sig2",-1.2774999999999999,0.025991128778755347
+"Microphysics Kernel","Kt_over_sig2",-1.26,0.02732372244729256
+"Microphysics Kernel","Kt_over_sig2",-1.2425000000000002,0.02872463965423941
+"Microphysics Kernel","Kt_over_sig2",-1.225,0.030197383422318487
+"Microphysics Kernel","Kt_over_sig2",-1.2075,0.03174563637806794
+"Microphysics Kernel","Kt_over_sig2",-1.19,0.03337326996032608
+"Microphysics Kernel","Kt_over_sig2",-1.1724999999999999,0.03508435410084504
+"Microphysics Kernel","Kt_over_sig2",-1.1549999999999998,0.036883167401240015
+"Microphysics Kernel","Kt_over_sig2",-1.1375000000000002,0.038774207831721974
+"Microphysics Kernel","Kt_over_sig2",-1.12,0.04076220397836619
+"Microphysics Kernel","Kt_over_sig2",-1.1025,0.042852126867040166
+"Microphysics Kernel","Kt_over_sig2",-1.085,0.0450492023935578
+"Microphysics Kernel","Kt_over_sig2",-1.0675,0.04735892439114093
+"Microphysics Kernel","Kt_over_sig2",-1.0499999999999998,0.049787068367863965
+"Microphysics Kernel","Kt_over_sig2",-1.0325000000000002,0.05233970594843236
+"Microphysics Kernel","Kt_over_sig2",-1.0150000000000001,0.05502322005640721
+"Microphysics Kernel","Kt_over_sig2",-0.9975,0.05784432087483843
+"Microphysics Kernel","Kt_over_sig2",-0.98,0.06081006262521795
+"Microphysics Kernel","Kt_over_sig2",-0.9625,0.06392786120670754
+"Microphysics Kernel","Kt_over_sig2",-0.945,0.06720551273974976
+"Microphysics Kernel","Kt_over_sig2",-0.9275,0.07065121306042957
+"Microphysics Kernel","Kt_over_sig2",-0.91,0.07427357821433388
+"Microphysics Kernel","Kt_over_sig2",-0.8925000000000001,0.07808166600115313
+"Microphysics Kernel","Kt_over_sig2",-0.875,0.0820849986238988
+"Microphysics Kernel","Kt_over_sig2",-0.8574999999999999,0.08629358649937054
+"Microphysics Kernel","Kt_over_sig2",-0.84,0.09071795328941251
+"Microphysics Kernel","Kt_over_sig2",-0.8225,0.09536916221554961
+"Microphysics Kernel","Kt_over_sig2",-0.8049999999999999,0.10025884372280375
+"Microphysics Kernel","Kt_over_sig2",-0.7874999999999999,0.10539922456186439
+"Microphysics Kernel","Kt_over_sig2",-0.7699999999999999,0.11080315836233391
+"Microphysics Kernel","Kt_over_sig2",-0.7525000000000001,0.11648415777349691
+"Microphysics Kernel","Kt_over_sig2",-0.7350000000000001,0.12245642825298185
+"Microphysics Kernel","Kt_over_sig2",-0.7175,0.12873490358780418
+"Microphysics Kernel","Kt_over_sig2",-0.7,0.1353352832366127
+"Microphysics Kernel","Kt_over_sig2",-0.6825000000000001,0.1422740715865135
+"Microphysics Kernel","Kt_over_sig2",-0.665,0.14956861922263504
+"Microphysics Kernel","Kt_over_sig2",-0.6475,0.1572371663136276
+"Microphysics Kernel","Kt_over_sig2",-0.6299999999999999,0.16529888822158656
+"Microphysics Kernel","Kt_over_sig2",-0.6125,0.17377394345044508
+"Microphysics Kernel","Kt_over_sig2",-0.595,0.18268352405273466
+"Microphysics Kernel","Kt_over_sig2",-0.5774999999999999,0.19204990862075413
+"Microphysics Kernel","Kt_over_sig2",-0.5599999999999998,0.20189651799465547
+"Microphysics Kernel","Kt_over_sig2",-0.5425,0.21224797382674304
+"Microphysics Kernel","Kt_over_sig2",-0.5250000000000001,0.22313016014842973
+"Microphysics Kernel","Kt_over_sig2",-0.5075000000000001,0.23457028809379762
+"Microphysics Kernel","Kt_over_sig2",-0.49,0.24659696394160643
+"Microphysics Kernel","Kt_over_sig2",-0.47250000000000014,0.2592402606458914
+"Microphysics Kernel","Kt_over_sig2",-0.45500000000000007,0.27253179303401254
+"Microphysics Kernel","Kt_over_sig2",-0.4375,0.2865047968601901
+"Microphysics Kernel","Kt_over_sig2",-0.41999999999999993,0.3011942119122021
+"Microphysics Kernel","Kt_over_sig2",-0.40249999999999986,0.31663676937905333
+"Microphysics Kernel","Kt_over_sig2",-0.385,0.3328710836980795
+"Microphysics Kernel","Kt_over_sig2",-0.36749999999999994,0.3499377491111554
+"Microphysics Kernel","Kt_over_sig2",-0.34999999999999987,0.36787944117144245
+"Microphysics Kernel","Kt_over_sig2",-0.3325,0.3867410234545012
+"Microphysics Kernel","Kt_over_sig2",-0.31500000000000017,0.4065696597405989
+"Microphysics Kernel","Kt_over_sig2",-0.2975000000000001,0.42741493194872654
+"Microphysics Kernel","Kt_over_sig2",-0.28,0.4493289641172215
+"Microphysics Kernel","Kt_over_sig2",-0.26249999999999996,0.47236655274101474
+"Microphysics Kernel","Kt_over_sig2",-0.2450000000000001,0.4965853037914093
+"Microphysics Kernel","Kt_over_sig2",-0.22750000000000004,0.5220457767610159
+"Microphysics Kernel","Kt_over_sig2",-0.20999999999999996,0.5488116360940265
+"Microphysics Kernel","Kt_over_sig2",-0.1924999999999999,0.5769498103804869
+"Microphysics Kernel","Kt_over_sig2",-0.17500000000000004,0.6065306597126333
+"Microphysics Kernel","Kt_over_sig2",-0.15749999999999997,0.6376281516217733
+"Microphysics Kernel","Kt_over_sig2",-0.1399999999999999,0.6703200460356394
+"Microphysics Kernel","Kt_over_sig2",-0.12249999999999983,0.7046880897187138
+"Microphysics Kernel","Kt_over_sig2",-0.10499999999999998,0.7408182206817179
+"Microphysics Kernel","Kt_over_sig2",-0.08750000000000013,0.7788007830714045
+"Microphysics Kernel","Kt_over_sig2",-0.07000000000000006,0.8187307530779817
+"Microphysics Kernel","Kt_over_sig2",-0.05249999999999999,0.8607079764250578
+"Microphysics Kernel","Kt_over_sig2",-0.03500000000000014,0.9048374180359592
+"Microphysics Kernel","Kt_over_sig2",-0.01750000000000007,0.9512294245007138
+"Microphysics Kernel","Kt_over_sig2",0,1
+"Microphysics Kernel","Kt_over_sig2",0.01750000000000007,0.9512294245007138
+"Microphysics Kernel","Kt_over_sig2",0.03500000000000014,0.9048374180359592
+"Microphysics Kernel","Kt_over_sig2",0.05249999999999999,0.8607079764250578
+"Microphysics Kernel","Kt_over_sig2",0.07000000000000006,0.8187307530779817
+"Microphysics Kernel","Kt_over_sig2",0.08750000000000013,0.7788007830714045
+"Microphysics Kernel","Kt_over_sig2",0.10499999999999998,0.7408182206817179
+"Microphysics Kernel","Kt_over_sig2",0.12250000000000005,0.7046880897187133
+"Microphysics Kernel","Kt_over_sig2",0.14000000000000012,0.6703200460356391
+"Microphysics Kernel","Kt_over_sig2",0.1575000000000002,0.637628151621773
+"Microphysics Kernel","Kt_over_sig2",0.17500000000000027,0.606530659712633
+"Microphysics Kernel","Kt_over_sig2",0.19250000000000012,0.5769498103804864
+"Microphysics Kernel","Kt_over_sig2",0.2100000000000002,0.5488116360940262
+"Microphysics Kernel","Kt_over_sig2",0.2274999999999998,0.5220457767610164
+"Microphysics Kernel","Kt_over_sig2",0.24499999999999988,0.49658530379140964
+"Microphysics Kernel","Kt_over_sig2",0.26249999999999973,0.472366552741015
+"Microphysics Kernel","Kt_over_sig2",0.2799999999999998,0.44932896411722184
+"Microphysics Kernel","Kt_over_sig2",0.2974999999999999,0.4274149319487268
+"Microphysics Kernel","Kt_over_sig2",0.31499999999999995,0.40656965974059917
+"Microphysics Kernel","Kt_over_sig2",0.3325,0.3867410234545012
+"Microphysics Kernel","Kt_over_sig2",0.3500000000000001,0.3678794411714422
+"Microphysics Kernel","Kt_over_sig2",0.3674999999999997,0.34993774911115566
+"Microphysics Kernel","Kt_over_sig2",0.3849999999999998,0.3328710836980797
+"Microphysics Kernel","Kt_over_sig2",0.40249999999999986,0.31663676937905333
+"Microphysics Kernel","Kt_over_sig2",0.41999999999999993,0.3011942119122021
+"Microphysics Kernel","Kt_over_sig2",0.4375,0.2865047968601901
+"Microphysics Kernel","Kt_over_sig2",0.45500000000000007,0.27253179303401254
+"Microphysics Kernel","Kt_over_sig2",0.47250000000000014,0.2592402606458914
+"Microphysics Kernel","Kt_over_sig2",0.4900000000000002,0.24659696394160627
+"Microphysics Kernel","Kt_over_sig2",0.5075000000000003,0.23457028809379746
+"Microphysics Kernel","Kt_over_sig2",0.5249999999999999,0.22313016014842987
+"Microphysics Kernel","Kt_over_sig2",0.5425,0.21224797382674304
+"Microphysics Kernel","Kt_over_sig2",0.56,0.20189651799465536
+"Microphysics Kernel","Kt_over_sig2",0.5775000000000001,0.19204990862075405
+"Microphysics Kernel","Kt_over_sig2",0.5950000000000002,0.18268352405273452
+"Microphysics Kernel","Kt_over_sig2",0.6125000000000003,0.17377394345044497
+"Microphysics Kernel","Kt_over_sig2",0.6300000000000003,0.16529888822158634
+"Microphysics Kernel","Kt_over_sig2",0.6475,0.1572371663136276
+"Microphysics Kernel","Kt_over_sig2",0.665,0.14956861922263504
+"Microphysics Kernel","Kt_over_sig2",0.6824999999999997,0.1422740715865137
+"Microphysics Kernel","Kt_over_sig2",0.6999999999999997,0.13533528323661279
+"Microphysics Kernel","Kt_over_sig2",0.7174999999999998,0.1287349035878043
+"Microphysics Kernel","Kt_over_sig2",0.7349999999999999,0.12245642825298195
+"Microphysics Kernel","Kt_over_sig2",0.7525,0.11648415777349697
+"Microphysics Kernel","Kt_over_sig2",0.77,0.11080315836233387
+"Microphysics Kernel","Kt_over_sig2",0.7875000000000001,0.10539922456186429
+"Microphysics Kernel","Kt_over_sig2",0.8049999999999997,0.1002588437228038
+"Microphysics Kernel","Kt_over_sig2",0.8224999999999998,0.09536916221554965
+"Microphysics Kernel","Kt_over_sig2",0.8399999999999999,0.09071795328941251
+"Microphysics Kernel","Kt_over_sig2",0.8574999999999999,0.08629358649937054
+"Microphysics Kernel","Kt_over_sig2",0.875,0.0820849986238988
+"Microphysics Kernel","Kt_over_sig2",0.8925000000000001,0.07808166600115313
+"Microphysics Kernel","Kt_over_sig2",0.9100000000000001,0.07427357821433384
+"Microphysics Kernel","Kt_over_sig2",0.9275000000000002,0.07065121306042953
+"Microphysics Kernel","Kt_over_sig2",0.9450000000000003,0.06720551273974969
+"Microphysics Kernel","Kt_over_sig2",0.9624999999999999,0.06392786120670757
+"Microphysics Kernel","Kt_over_sig2",0.98,0.06081006262521795
+"Microphysics Kernel","Kt_over_sig2",0.9975,0.05784432087483843
+"Microphysics Kernel","Kt_over_sig2",1.0150000000000001,0.05502322005640721
+"Microphysics Kernel","Kt_over_sig2",1.0325000000000002,0.05233970594843236
+"Microphysics Kernel","Kt_over_sig2",1.0500000000000003,0.049787068367863896
+"Microphysics Kernel","Kt_over_sig2",1.0675000000000003,0.047358924391140866
+"Microphysics Kernel","Kt_over_sig2",1.085,0.0450492023935578
+"Microphysics Kernel","Kt_over_sig2",1.1025,0.042852126867040166
+"Microphysics Kernel","Kt_over_sig2",1.1199999999999997,0.040762203978366246
+"Microphysics Kernel","Kt_over_sig2",1.1374999999999997,0.03877420783172203
+"Microphysics Kernel","Kt_over_sig2",1.1549999999999998,0.036883167401240015
+"Microphysics Kernel","Kt_over_sig2",1.1724999999999999,0.03508435410084504
+"Microphysics Kernel","Kt_over_sig2",1.19,0.03337326996032608
+"Microphysics Kernel","Kt_over_sig2",1.2075,0.03174563637806794
+"Microphysics Kernel","Kt_over_sig2",1.225,0.030197383422318487
+"Microphysics Kernel","Kt_over_sig2",1.2424999999999997,0.028724639654239447
+"Microphysics Kernel","Kt_over_sig2",1.2599999999999998,0.027323722447292573
+"Microphysics Kernel","Kt_over_sig2",1.2774999999999999,0.025991128778755347
+"Microphysics Kernel","Kt_over_sig2",1.295,0.024723526470339388
+"Microphysics Kernel","Kt_over_sig2",1.3125,0.023517745856009097
+"Microphysics Kernel","Kt_over_sig2",1.33,0.02237077185616559
+"Microphysics Kernel","Kt_over_sig2",1.3475000000000001,0.021279736438377158
+"Microphysics Kernel","Kt_over_sig2",1.3650000000000002,0.020241911445804374
+"Microphysics Kernel","Kt_over_sig2",1.3825000000000003,0.019254701775386903
+"Microphysics Kernel","Kt_over_sig2",1.4,0.01831563888873418
+"Microphysics Kernel","Kt_over_sig2",1.4175,0.017422374639493515
+"Microphysics Kernel","Kt_over_sig2",1.435,0.016572675401761237
+"Microphysics Kernel","Kt_over_sig2",1.4525000000000001,0.015764416484854486
+"Microphysics Kernel","Kt_over_sig2",1.4700000000000002,0.01499557682047769
+"Microphysics Kernel","Kt_over_sig2",1.4875000000000003,0.014264233908999242
+"Microphysics Kernel","Kt_over_sig2",1.5050000000000003,0.01356855901220091
+"Microphysics Kernel","Kt_over_sig2",1.5225,0.012906812580479862
+"Microphysics Kernel","Kt_over_sig2",1.54,0.012277339903068438
+"Microphysics Kernel","Kt_over_sig2",1.5574999999999997,0.011678566970395453
+"Microphysics Kernel","Kt_over_sig2",1.5749999999999997,0.011108996538242316
+"Microphysics Kernel","Kt_over_sig2",1.5924999999999998,0.010567204383852655
+"Microphysics Kernel","Kt_over_sig2",1.6099999999999999,0.010051835744633586
+"Microphysics Kernel","Kt_over_sig2",1.6275,0.009561601930543505
+"Microphysics Kernel","Kt_over_sig2",1.645,0.009095277101695816
+"Microphysics Kernel","Kt_over_sig2",1.6625,0.008651695203120627
+"Microphysics Kernel","Kt_over_sig2",1.6799999999999997,0.00822974704902003
+"Microphysics Kernel","Kt_over_sig2",1.6974999999999998,0.007828377549225773
+"Microphysics Kernel","Kt_over_sig2",1.7149999999999999,0.007446583070924344
+"Microphysics Kernel","Kt_over_sig2",1.7325,0.0070834089290521185
+"Microphysics Kernel","Kt_over_sig2",1.75,0.006737946999085467
+"Microphysics Kernel","Kr_over_sig2",0,1
+"Microphysics Kernel","Kr_over_sig2",0.048,0.9998000199986667
+"Microphysics Kernel","Kr_over_sig2",0.096,0.9992003199146837
+"Microphysics Kernel","Kr_over_sig2",0.144,0.9982016190284373
+"Microphysics Kernel","Kr_over_sig2",0.192,0.9968051145430329
+"Microphysics Kernel","Kr_over_sig2",0.24,0.9950124791926823
+"Microphysics Kernel","Kr_over_sig2",0.288,0.9928258579038134
+"Microphysics Kernel","Kr_over_sig2",0.336,0.9902478635182347
+"Microphysics Kernel","Kr_over_sig2",0.384,0.9872815715902905
+"Microphysics Kernel","Kr_over_sig2",0.432,0.9839305142725083
+"Microphysics Kernel","Kr_over_sig2",0.48,0.9801986733067553
+"Microphysics Kernel","Kr_over_sig2",0.528,0.9760904721403703
+"Microphysics Kernel","Kr_over_sig2",0.576,0.9716107671891228
+"Microphysics Kernel","Kr_over_sig2",0.624,0.9667648382711531
+"Microphysics Kernel","Kr_over_sig2",0.672,0.9615583782382694
+"Microphysics Kernel","Kr_over_sig2",0.72,0.9559974818331
+"Microphysics Kernel","Kr_over_sig2",0.768,0.9500886338026269
+"Microphysics Kernel","Kr_over_sig2",0.8160000000000001,0.9438386963005431
+"Microphysics Kernel","Kr_over_sig2",0.864,0.9372548956126776
+"Microphysics Kernel","Kr_over_sig2",0.9119999999999999,0.9303448082414207
+"Microphysics Kernel","Kr_over_sig2",0.96,0.9231163463866358
+"Microphysics Kernel","Kr_over_sig2",1.008,0.9155777428619776
+"Microphysics Kernel","Kr_over_sig2",1.056,0.9077375354868296
+"Microphysics Kernel","Kr_over_sig2",1.104,0.8996045509952315
+"Microphysics Kernel","Kr_over_sig2",1.152,0.8911878885041844
+"Microphysics Kernel","Kr_over_sig2",1.2,0.8824969025845955
+"Microphysics Kernel","Kr_over_sig2",1.248,0.8735411859788501
+"Microphysics Kernel","Kr_over_sig2",1.296,0.864330552009586
+"Microphysics Kernel","Kr_over_sig2",1.344,0.8548750167246695
+"Microphysics Kernel","Kr_over_sig2",1.392,0.8451847808236714
+"Microphysics Kernel","Kr_over_sig2",1.44,0.835270211411272
+"Microphysics Kernel","Kr_over_sig2",1.488,0.825141823623021
+"Microphysics Kernel","Kr_over_sig2",1.536,0.8148102621687294
+"Microphysics Kernel","Kr_over_sig2",1.584,0.804286282838474
+"Microphysics Kernel","Kr_over_sig2",1.6320000000000001,0.7935807340157668
+"Microphysics Kernel","Kr_over_sig2",1.68,0.7827045382418683
+"Microphysics Kernel","Kr_over_sig2",1.728,0.7716686738745262
+"Microphysics Kernel","Kr_over_sig2",1.776,0.7604841568835895
+"Microphysics Kernel","Kr_over_sig2",1.8239999999999998,0.7491620228249928
+"Microphysics Kernel","Kr_over_sig2",1.8719999999999999,0.7377133090335346
+"Microphysics Kernel","Kr_over_sig2",1.92,0.7261490370736909
+"Microphysics Kernel","Kr_over_sig2",1.9679999999999997,0.7144801954864035
+"Microphysics Kernel","Kr_over_sig2",2.016,0.7027177228683976
+"Microphysics Kernel","Kr_over_sig2",2.064,0.6908724913190898
+"Microphysics Kernel","Kr_over_sig2",2.112,0.6789552902885679
+"Microphysics Kernel","Kr_over_sig2",2.16,0.6669768108584744
+"Microphysics Kernel","Kr_over_sig2",2.208,0.6549476304858831
+"Microphysics Kernel","Kr_over_sig2",2.256,0.6428781982384721
+"Microphysics Kernel","Kr_over_sig2",2.304,0.6307788205474283
+"Microphysics Kernel","Kr_over_sig2",2.352,0.6186596475026225
+"Microphysics Kernel","Kr_over_sig2",2.4,0.6065306597126334
+"Microphysics Kernel","Kr_over_sig2",2.448,0.5944016557502186
+"Microphysics Kernel","Kr_over_sig2",2.496,0.5822822402018133
+"Microphysics Kernel","Kr_over_sig2",2.544,0.570181812337605
+"Microphysics Kernel","Kr_over_sig2",2.592,0.5581095554166826
+"Microphysics Kernel","Kr_over_sig2",2.64,0.5460744266397094
+"Microphysics Kernel","Kr_over_sig2",2.688,0.534085147759517
+"Microphysics Kernel","Kr_over_sig2",2.7359999999999998,0.5221501963579799
+"Microphysics Kernel","Kr_over_sig2",2.784,0.5102777977955038
+"Microphysics Kernel","Kr_over_sig2",2.832,0.49847591783746603
+"Microphysics Kernel","Kr_over_sig2",2.88,0.4867522559599717
+"Microphysics Kernel","Kr_over_sig2",2.928,0.4751142393353591
+"Microphysics Kernel","Kr_over_sig2",2.976,0.4635690174959985
+"Microphysics Kernel","Kr_over_sig2",3.024,0.4521234576730829
+"Microphysics Kernel","Kr_over_sig2",3.072,0.4407841408053245
+"Microphysics Kernel","Kr_over_sig2",3.12,0.4295573582107391
+"Microphysics Kernel","Kr_over_sig2",3.168,0.4184491089130354
+"Microphysics Kernel","Kr_over_sig2",3.216,0.4074650976125276
+"Microphysics Kernel","Kr_over_sig2",3.2640000000000002,0.3966107332899649
+"Microphysics Kernel","Kr_over_sig2",3.312,0.38589112843021894
+"Microphysics Kernel","Kr_over_sig2",3.36,0.37531109885139957
+"Microphysics Kernel","Kr_over_sig2",3.408,0.3648751641236792
+"Microphysics Kernel","Kr_over_sig2",3.456,0.354587548560899
+"Microphysics Kernel","Kr_over_sig2",3.504,0.3444521827669091
+"Microphysics Kernel","Kr_over_sig2",3.552,0.33447270571756393
+"Microphysics Kernel","Kr_over_sig2",3.5999999999999996,0.3246524673583498
+"Microphysics Kernel","Kr_over_sig2",3.6479999999999997,0.3149945316967634
+"Microphysics Kernel","Kr_over_sig2",3.6959999999999997,0.3055016803678051
+"Microphysics Kernel","Kr_over_sig2",3.7439999999999998,0.2961764166502668
+"Microphysics Kernel","Kr_over_sig2",3.792,0.2870209699109174
+"Microphysics Kernel","Kr_over_sig2",3.84,0.27803730045319414
+"Microphysics Kernel","Kr_over_sig2",3.888,0.26922710474659955
+"Microphysics Kernel","Kr_over_sig2",3.9359999999999995,0.26059182101268924
+"Microphysics Kernel","Kr_over_sig2",3.9839999999999995,0.2521326351433002
+"Microphysics Kernel","Kr_over_sig2",4.032,0.24385048692652458
+"Microphysics Kernel","Kr_over_sig2",4.08,0.23574607655586352
+"Microphysics Kernel","Kr_over_sig2",4.128,0.22781987139800902
+"Microphysics Kernel","Kr_over_sig2",4.176,0.22007211299479584
+"Microphysics Kernel","Kr_over_sig2",4.224,0.21250282427502204
+"Microphysics Kernel","Kr_over_sig2",4.272,0.20511181695207686
+"Microphysics Kernel","Kr_over_sig2",4.32,0.19789869908361465
+"Microphysics Kernel","Kr_over_sig2",4.368,0.19086288276988012
+"Microphysics Kernel","Kr_over_sig2",4.416,0.18400359196771976
+"Microphysics Kernel","Kr_over_sig2",4.464,0.1773198703977963
+"Microphysics Kernel","Kr_over_sig2",4.512,0.17081058952306494
+"Microphysics Kernel","Kr_over_sig2",4.56,0.1644744565771549
+"Microphysics Kernel","Kr_over_sig2",4.608,0.15831002262193877
+"Microphysics Kernel","Kr_over_sig2",4.656,0.15231569061424194
+"Microphysics Kernel","Kr_over_sig2",4.704,0.1464897234623658
+"Microphysics Kernel","Kr_over_sig2",4.752,0.14083025205384142
+"Microphysics Kernel","Kr_over_sig2",4.8,0.1353352832366127
+"Microphysics Kernel","Kr_over_sig2",4.848,0.1300027077366511
+"Microphysics Kernel","Kr_over_sig2",4.896,0.12483030799583289
+"Microphysics Kernel","Kr_over_sig2",4.944,0.11981576591475605
+"Microphysics Kernel","Kr_over_sig2",4.992,0.11495667048603503
+"Microphysics Kernel","Kr_over_sig2",5.04,0.11025052530448522
+"Microphysics Kernel","Kr_over_sig2",5.088,0.10569475594148853
+"Microphysics Kernel","Kr_over_sig2",5.136,0.10128671717171844
+"Microphysics Kernel","Kr_over_sig2",5.184,0.09702370004128698
+"Microphysics Kernel","Kr_over_sig2",5.232,0.09290293876726276
+"Microphysics Kernel","Kr_over_sig2",5.28,0.0889216174593863
+"Microphysics Kernel","Kr_over_sig2",5.328,0.08507687665568198
+"Microphysics Kernel","Kr_over_sig2",5.376,0.08136581966452526
+"Microphysics Kernel","Kr_over_sig2",5.4239999999999995,0.07778551870657231
+"Microphysics Kernel","Kr_over_sig2",5.4719999999999995,0.07433302085078967
+"Microphysics Kernel","Kr_over_sig2",5.52,0.07100535373963701
+"Microphysics Kernel","Kr_over_sig2",5.568,0.06779953109924783
+"Microphysics Kernel","Kr_over_sig2",5.616,0.06471255803122683
+"Microphysics Kernel","Kr_over_sig2",5.664,0.0617414360834291
+"Microphysics Kernel","Kr_over_sig2",5.712,0.05888316809781038
+"Microphysics Kernel","Kr_over_sig2",5.76,0.056134762834133725
+"Microphysics Kernel","Kr_over_sig2",5.808,0.05349323936898553
+"Microphysics Kernel","Kr_over_sig2",5.856,0.05095563127019423
+"Microphysics Kernel","Kr_over_sig2",5.904,0.04851899054735398
+"Microphysics Kernel","Kr_over_sig2",5.952,0.04618039137973475
+"Microphysics Kernel","Kr_over_sig2",6,0.04393693362340742
+"Microphysics Kernel","Kr_over_sig2",6.048,0.04178574609992927
+"Microphysics Kernel","Kr_over_sig2",6.096,0.0397239896694186
+"Microphysics Kernel","Kr_over_sig2",6.144,0.03774886009129898
+"Microphysics Kernel","Kr_over_sig2",6.192,0.035857590676413836
+"Microphysics Kernel","Kr_over_sig2",6.24,0.03404745473459933
+"Microphysics Kernel","Kr_over_sig2",6.288,0.03231576782215888
+"Microphysics Kernel","Kr_over_sig2",6.336,0.030659889794007515
+"Microphysics Kernel","Kr_over_sig2",6.384,0.029077226665546733
+"Microphysics Kernel","Kr_over_sig2",6.432,0.027565232289593337
+"Microphysics Kernel","Kr_over_sig2",6.48,0.026121409853918212
+"Microphysics Kernel","Kr_over_sig2",6.5280000000000005,0.02474331320515428
+"Microphysics Kernel","Kr_over_sig2",6.5760000000000005,0.023428548005007887
+"Microphysics Kernel","Kr_over_sig2",6.624,0.022174772724855196
+"Microphysics Kernel","Kr_over_sig2",6.672,0.020979699484925722
+"Microphysics Kernel","Kr_over_sig2",6.72,0.019841094744370298
+"Microphysics Kernel","Kr_over_sig2",6.768,0.01875677984858105
+"Microphysics Kernel","Kr_over_sig2",6.816,0.017724631440177767
+"Microphysics Kernel","Kr_over_sig2",6.864,0.016742581740099346
+"Microphysics Kernel","Kr_over_sig2",6.912,0.015808618705241848
+"Microphysics Kernel","Kr_over_sig2",6.96,0.014920786069067842
+"Microphysics Kernel","Kr_over_sig2",7.008,0.014077183271574843
+"Microphysics Kernel","Kr_over_sig2",7.056,0.013275965284957033
+"Microphysics Kernel","Kr_over_sig2",7.104,0.012515342341223657
+"Microphysics Kernel","Kr_over_sig2",7.152,0.011793579567950649
+"Microphysics Kernel","Kr_over_sig2",7.199999999999999,0.011108996538242316
+"Microphysics Kernel","Kr_over_sig2",7.247999999999999,0.010459966740865344
+"Microphysics Kernel","Kr_over_sig2",7.295999999999999,0.009844916976392452
+"Microphysics Kernel","Kr_over_sig2",7.343999999999999,0.009262326685055377
+"Microphysics Kernel","Kr_over_sig2",7.3919999999999995,0.008710727211861743
+"Microphysics Kernel","Kr_over_sig2",7.4399999999999995,0.008188701014374083
+"Microphysics Kernel","Kr_over_sig2",7.4879999999999995,0.007694880818387478
+"Microphysics Kernel","Kr_over_sig2",7.536,0.0072279487265724356
+"Microphysics Kernel","Kr_over_sig2",7.584,0.006786635284974872
+"Microphysics Kernel","Kr_over_sig2",7.632,0.006369718512085283
+"Microphysics Kernel","Kr_over_sig2",7.68,0.005976022895005943
+"Microphysics Kernel","Kr_over_sig2",7.728,0.005604418357058429
+"Microphysics Kernel","Kr_over_sig2",7.776,0.005253819200985388
+"Microphysics Kernel","Kr_over_sig2",7.823999999999999,0.00492318303171088
+"Microphysics Kernel","Kr_over_sig2",7.871999999999999,0.004611509662433047
+"Microphysics Kernel","Kr_over_sig2",7.919999999999999,0.004317840007633086
+"Microphysics Kernel","Kr_over_sig2",7.967999999999999,0.004041254966394723
+"Microphysics Kernel","Kr_over_sig2",8.016,0.0037808742992408344
+"Microphysics Kernel","Kr_over_sig2",8.064,0.0035358555015075725
+"Microphysics Kernel","Kr_over_sig2",8.112,0.0033053926760930104
+"Microphysics Kernel","Kr_over_sig2",8.16,0.0030887154082367687
+"Microphysics Kernel","Kr_over_sig2",8.208,0.002885087644809958
+"Microphysics Kernel","Kr_over_sig2",8.256,0.0026938065804214904
+"Microphysics Kernel","Kr_over_sig2",8.304,0.0025142015524776034
+"Microphysics Kernel","Kr_over_sig2",8.352,0.0023456329471668582
+"Microphysics Kernel","Kr_over_sig2",8.4,0.002187491118182885
+"Microphysics Kernel","Kr_over_sig2",8.448,0.002039195319842279
+"Microphysics Kernel","Kr_over_sig2",8.496,0.0019001926561053163
+"Microphysics Kernel","Kr_over_sig2",8.544,0.0017699570468628118
+"Microphysics Kernel","Kr_over_sig2",8.592,0.0016479882127136776
+"Microphysics Kernel","Kr_over_sig2",8.64,0.001533810679324463
+"Microphysics Kernel","Kr_over_sig2",8.688,0.0014269728023347601
+"Microphysics Kernel","Kr_over_sig2",8.736,0.001327045813650573
+"Microphysics Kernel","Kr_over_sig2",8.784,0.0012336228898518265
+"Microphysics Kernel","Kr_over_sig2",8.832,0.0011463182433300546
+"Microphysics Kernel","Kr_over_sig2",8.88,0.0010647662366679187
+"Microphysics Kernel","Kr_over_sig2",8.928,0.0009886205206735452
+"Microphysics Kernel","Kr_over_sig2",8.976,0.0009175531963897104
+"Microphysics Kernel","Kr_over_sig2",9.024,0.0008512540013105002
+"Microphysics Kernel","Kr_over_sig2",9.072,0.0007894295199561677
+"Microphysics Kernel","Kr_over_sig2",9.12,0.0007318024188804728
+"Microphysics Kernel","Kr_over_sig2",9.168,0.0006781107061134394
+"Microphysics Kernel","Kr_over_sig2",9.216,0.0006281070149764976
+"Microphysics Kernel","Kr_over_sig2",9.264,0.0005815579121458027
+"Microphysics Kernel","Kr_over_sig2",9.312,0.0005382432297832624
+"Microphysics Kernel","Kr_over_sig2",9.36,0.0004979554215032744
+"Microphysics Kernel","Kr_over_sig2",9.408,0.00046049894189605014
+"Microphysics Kernel","Kr_over_sig2",9.456,0.0004256896492857513
+"Microphysics Kernel","Kr_over_sig2",9.504,0.0003933542313630609
+"Microphysics Kernel","Kr_over_sig2",9.552,0.000363329653297311
+"Microphysics Kernel","Kr_over_sig2",9.6,0.00033546262790251185
+"UV Finiteness","I_of_k",33.334316666666666,1668.8567781312045
+"UV Finiteness","I_of_k",66.66763333333334,1669.071547210963
+"UV Finiteness","I_of_k",100.00095000000002,1669.1250420497324
+"UV Finiteness","I_of_k",133.33426666666668,1669.1414005268746
+"UV Finiteness","I_of_k",166.66758333333334,1669.1468899304955
+"UV Finiteness","I_of_k",200.00090000000003,1669.1488335797567
+"UV Finiteness","I_of_k",233.3342166666667,1669.149546354443
+"UV Finiteness","I_of_k",266.6675333333333,1669.1498143011515
+"UV Finiteness","I_of_k",300.00084999999996,1669.1499169029728
+"UV Finiteness","I_of_k",333.33416666666665,1669.1499567558055
+"UV Finiteness","I_of_k",366.6674833333333,1669.1499724125724
+"UV Finiteness","I_of_k",400.0008,1669.1499786208888
+"UV Finiteness","I_of_k",433.33411666666666,1669.1499811017081
+"UV Finiteness","I_of_k",466.66743333333335,1669.1499820995127
+"UV Finiteness","I_of_k",500.00075,1669.149982503081
+"UV Finiteness","I_of_k",533.3340666666667,1669.1499826670963
+"UV Finiteness","I_of_k",566.6673833333333,1669.1499827340363
+"UV Finiteness","I_of_k",600.0006999999999,1669.1499827614584
+"UV Finiteness","I_of_k",633.3340166666666,1669.149982772729
+"UV Finiteness","I_of_k",666.6673333333333,1669.1499827773748
+"UV Finiteness","I_of_k",700.00065,1669.1499827792954
+"UV Finiteness","I_of_k",733.3339666666666,1669.1499827800908
+"UV Finiteness","I_of_k",766.6672833333333,1669.1499827804212
+"UV Finiteness","I_of_k",800.0006000000001,1669.1499827805585
+"UV Finiteness","I_of_k",833.3339166666667,1669.1499827806156
+"UV Finiteness","I_of_k",866.6672333333333,1669.14998278064
+"UV Finiteness","I_of_k",900.00055,1669.1499827806497
+"UV Finiteness","I_of_k",933.3338666666667,1669.1499827806538
+"UV Finiteness","I_of_k",966.6671833333334,1669.149982780656
+"UV Finiteness","I_of_k",1000.0005,1669.149982780656
+"UV Finiteness","I_of_k",1033.3338166666667,1669.149982780656
+"UV Finiteness","I_of_k",1066.6671333333334,1669.149982780656
+"UV Finiteness","I_of_k",1100.00045,1669.149982780656
+"UV Finiteness","I_of_k",1133.3337666666666,1669.149982780656
+"UV Finiteness","I_of_k",1166.6670833333335,1669.149982780656
+"UV Finiteness","I_of_k",1200.0004,1669.149982780656
+"UV Finiteness","I_of_k",1233.3337166666668,1669.149982780656
+"UV Finiteness","I_of_k",1266.6670333333332,1669.149982780656
+"UV Finiteness","I_of_k",1300.00035,1669.149982780656
+"UV Finiteness","I_of_k",1333.3336666666667,1669.149982780656
+"UV Finiteness","I_of_k",1366.6669833333333,1669.149982780656
+"UV Finiteness","I_of_k",1400.0003,1669.149982780656
+"UV Finiteness","I_of_k",1433.3336166666668,1669.149982780656
+"UV Finiteness","I_of_k",1466.6669333333332,1669.149982780656
+"UV Finiteness","I_of_k",1500.00025,1669.149982780656
+"UV Finiteness","I_of_k",1533.3335666666667,1669.149982780656
+"UV Finiteness","I_of_k",1566.6668833333333,1669.149982780656
+"UV Finiteness","I_of_k",1600.0002000000002,1669.149982780656
+"UV Finiteness","I_of_k",1633.3335166666666,1669.149982780656
+"UV Finiteness","I_of_k",1666.6668333333334,1669.149982780656
+"UV Finiteness","I_of_k",1700.0001499999998,1669.149982780656
+"UV Finiteness","I_of_k",1733.3334666666667,1669.149982780656
+"UV Finiteness","I_of_k",1766.6667833333333,1669.149982780656
+"UV Finiteness","I_of_k",1800.0001,1669.149982780656
+"UV Finiteness","I_of_k",1833.3334166666666,1669.149982780656
+"UV Finiteness","I_of_k",1866.6667333333335,1669.149982780656
+"UV Finiteness","I_of_k",1900.0000499999999,1669.149982780656
+"UV Finiteness","I_of_k",1933.3333666666667,1669.149982780656
+"UV Finiteness","I_of_k",1966.6666833333331,1669.149982780656
+"UV Finiteness","I_of_k",2000,1669.149982780656
+"H0 Variance","pred",5,0.009678530430227601
+"H0 Variance","pred",10,0.007593621066566374
+"H0 Variance","pred",20,0.005957834334281741
+"H0 Variance","pred",50,0.004323240739316472
+"H0 Variance","pred",100,0.0033919459354470956
+"H0 Variance","obs",5,0.011
+"H0 Variance","obs",10,0.009
+"H0 Variance","obs",20,0.007
+"H0 Variance","obs",50,0.005
+"H0 Variance","obs",100,0.004
+"Rotation Curves","newton",2,90
+"Rotation Curves","newton",5,120
+"Rotation Curves","newton",10,150
+"Rotation Curves","newton",15,160
+"Rotation Curves","newton",25,165
+"Rotation Curves","qds",2,115.7815843731002
+"Rotation Curves","qds",5,146.24374584880388
+"Rotation Curves","qds",10,170.65119378746215
+"Rotation Curves","qds",15,173.69428798852266
+"Rotation Curves","qds",25,170.33147468987792
+"Binary/Pulsar Constraint Proxy","envelope",-3,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-2.9568345323741005,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-2.9136690647482015,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-2.870503597122302,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-2.827338129496403,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-2.7841726618705036,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-2.741007194244604,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-2.697841726618705,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-2.6546762589928057,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-2.6115107913669062,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-2.568345323741007,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-2.525179856115108,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-2.4820143884892087,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-2.4388489208633093,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-2.3956834532374103,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-2.352517985611511,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-2.3093525179856114,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-2.2661870503597124,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-2.223021582733813,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-2.1798561151079134,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-2.1366906474820144,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-2.093525179856115,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-2.050359712230216,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-2.0071942446043165,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-1.9640287769784173,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-1.920863309352518,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-1.8776978417266186,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-1.8345323741007193,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","envelope",-1.79136690647482,2.4991777202724643
+"Binary/Pulsar Constraint Proxy","envelope",-1.7482014388489209,1.9042067385544863
+"Binary/Pulsar Constraint Proxy","envelope",-1.7050359712230216,1.3690843217211282
+"Binary/Pulsar Constraint Proxy","envelope",-1.6618705035971222,0.888098948317533
+"Binary/Pulsar Constraint Proxy","envelope",-1.618705035971223,0.45607552059722023
+"Binary/Pulsar Constraint Proxy","envelope",-1.5755395683453237,0.06832441364703483
+"Binary/Pulsar Constraint Proxy","envelope",-1.5323741007194245,-0.2794046410883309
+"Binary/Pulsar Constraint Proxy","envelope",-1.4892086330935252,-0.5909642896992333
+"Binary/Pulsar Constraint Proxy","envelope",-1.4460431654676258,-0.8698473155304005
+"Binary/Pulsar Constraint Proxy","envelope",-1.4028776978417266,-1.1192207939032621
+"Binary/Pulsar Constraint Proxy","envelope",-1.3597122302158273,-1.3419569756147396
+"Binary/Pulsar Constraint Proxy","envelope",-1.3165467625899283,-1.540661201106482
+"Binary/Pulsar Constraint Proxy","envelope",-1.2733812949640289,-1.7176971185723218
+"Binary/Pulsar Constraint Proxy","envelope",-1.2302158273381294,-1.8752094536561958
+"Binary/Pulsar Constraint Proxy","envelope",-1.1870503597122302,-2.0151445555668674
+"Binary/Pulsar Constraint Proxy","envelope",-1.143884892086331,-2.1392689241904086
+"Binary/Pulsar Constraint Proxy","envelope",-1.100719424460432,-2.2491859049118172
+"Binary/Pulsar Constraint Proxy","envelope",-1.0575539568345325,-2.3463507221530784
+"Binary/Pulsar Constraint Proxy","envelope",-1.014388489208633,-2.4320840088733617
+"Binary/Pulsar Constraint Proxy","envelope",-0.971223021582734,-2.5075839772157584
+"Binary/Pulsar Constraint Proxy","envelope",-0.9280575539568345,-2.573937364859936
+"Binary/Pulsar Constraint Proxy","envelope",-0.8848920863309355,-2.632129282167236
+"Binary/Pulsar Constraint Proxy","envelope",-0.8417266187050361,-2.683052076586577
+"Binary/Pulsar Constraint Proxy","envelope",-0.7985611510791366,-2.7275133227275745
+"Binary/Pulsar Constraint Proxy","envelope",-0.7553956834532372,-2.7662430387197143
+"Binary/Pulsar Constraint Proxy","envelope",-0.7122302158273381,-2.79990022171789
+"Binary/Pulsar Constraint Proxy","envelope",-0.6690647482014387,-2.8290787874980445
+"Binary/Pulsar Constraint Proxy","envelope",-0.6258992805755397,-2.8543129909009264
+"Binary/Pulsar Constraint Proxy","envelope",-0.5827338129496402,-2.8760823954042958
+"Binary/Pulsar Constraint Proxy","envelope",-0.5395683453237412,-2.894816451402662
+"Binary/Pulsar Constraint Proxy","envelope",-0.49640287769784175,-2.9108987340004964
+"Binary/Pulsar Constraint Proxy","envelope",-0.4532374100719423,-2.9246708824963132
+"Binary/Pulsar Constraint Proxy","envelope",-0.4100719424460433,-2.9364362755053923
+"Binary/Pulsar Constraint Proxy","envelope",-0.3669064748201438,-2.9464634680982287
+"Binary/Pulsar Constraint Proxy","envelope",-0.32374100719424437,-2.9549894106537864
+"Binary/Pulsar Constraint Proxy","envelope",-0.28057553956834536,-2.962222463520951
+"Binary/Pulsar Constraint Proxy","envelope",-0.2374100719424459,-2.9683452171545075
+"Binary/Pulsar Constraint Proxy","envelope",-0.1942446043165469,-2.973517124167774
+"Binary/Pulsar Constraint Proxy","envelope",-0.15107913669064743,-2.977876947667097
+"Binary/Pulsar Constraint Proxy","envelope",-0.10791366906474842,-2.981545029179938
+"Binary/Pulsar Constraint Proxy","envelope",-0.06474820143884896,-2.98462537928469
+"Binary/Pulsar Constraint Proxy","envelope",-0.021582733812949506,-2.9872075944947722
+"Binary/Pulsar Constraint Proxy","envelope",0.021582733812949506,-2.9893686048332997
+"Binary/Pulsar Constraint Proxy","envelope",0.0647482014388494,-2.9911742576608424
+"Binary/Pulsar Constraint Proxy","envelope",0.10791366906474842,-2.992680744516362
+"Binary/Pulsar Constraint Proxy","envelope",0.15107913669064743,-2.9939358788635646
+"Binary/Pulsar Constraint Proxy","envelope",0.1942446043165469,-2.9949802336026403
+"Binary/Pulsar Constraint Proxy","envelope",0.2374100719424459,-2.995848147948514
+"Binary/Pulsar Constraint Proxy","envelope",0.28057553956834536,-2.996568613761864
+"Binary/Pulsar Constraint Proxy","envelope",0.32374100719424437,-2.997166051645551
+"Binary/Pulsar Constraint Proxy","envelope",0.3669064748201434,-2.9976609871039024
+"Binary/Pulsar Constraint Proxy","envelope",0.4100719424460433,-2.9980706368360472
+"Binary/Pulsar Constraint Proxy","envelope",0.4532374100719423,-2.9984094148349447
+"Binary/Pulsar Constraint Proxy","envelope",0.4964028776978422,-2.9986893674314095
+"Binary/Pulsar Constraint Proxy","envelope",0.5395683453237412,-2.9989205457965813
+"Binary/Pulsar Constraint Proxy","envelope",0.5827338129496402,-2.999111323732912
+"Binary/Pulsar Constraint Proxy","envelope",0.6258992805755397,-2.9992686678737273
+"Binary/Pulsar Constraint Proxy","envelope",0.6690647482014387,-2.999398366700245
+"Binary/Pulsar Constraint Proxy","envelope",0.7122302158273381,-2.999505224092392
+"Binary/Pulsar Constraint Proxy","envelope",0.7553956834532372,-2.9995932224704283
+"Binary/Pulsar Constraint Proxy","envelope",0.7985611510791362,-2.999665659968295
+"Binary/Pulsar Constraint Proxy","envelope",0.8417266187050361,-2.999725265512739
+"Binary/Pulsar Constraint Proxy","envelope",0.8848920863309351,-2.999774295167667
+"Binary/Pulsar Constraint Proxy","envelope",0.928057553956835,-2.99981461264123
+"Binary/Pulsar Constraint Proxy","envelope",0.971223021582734,-2.9998477564426222
+"Binary/Pulsar Constraint Proxy","envelope",1.014388489208633,-2.9998749958138475
+"Binary/Pulsar Constraint Proxy","envelope",1.057553956834532,-2.999897377245386
+"Binary/Pulsar Constraint Proxy","envelope",1.100719424460431,-2.9999157631099864
+"Binary/Pulsar Constraint Proxy","envelope",1.143884892086331,-2.999930863711569
+"Binary/Pulsar Constraint Proxy","envelope",1.18705035971223,-2.9999432638424697
+"Binary/Pulsar Constraint Proxy","envelope",1.230215827338129,-2.9999534447681016
+"Binary/Pulsar Constraint Proxy","envelope",1.2733812949640289,-2.9999618024098105
+"Binary/Pulsar Constraint Proxy","envelope",1.3165467625899279,-2.999968662370949
+"Binary/Pulsar Constraint Proxy","envelope",1.3597122302158278,-2.9999742923449193
+"Binary/Pulsar Constraint Proxy","envelope",1.4028776978417268,-2.999978912354322
+"Binary/Pulsar Constraint Proxy","envelope",1.4460431654676258,-2.9999827031951067
+"Binary/Pulsar Constraint Proxy","envelope",1.4892086330935257,-2.999985813396467
+"Binary/Pulsar Constraint Proxy","envelope",1.5323741007194247,-2.9999883649544477
+"Binary/Pulsar Constraint Proxy","envelope",1.5755395683453237,-2.999990458053129
+"Binary/Pulsar Constraint Proxy","envelope",1.6187050359712227,-2.9999921749505285
+"Binary/Pulsar Constraint Proxy","envelope",1.6618705035971226,-2.999993583175772
+"Binary/Pulsar Constraint Proxy","envelope",1.7050359712230216,-2.999994738158694
+"Binary/Pulsar Constraint Proxy","envelope",1.7482014388489207,-2.9999956853919456
+"Binary/Pulsar Constraint Proxy","envelope",1.7913669064748206,-2.9999964622082103
+"Binary/Pulsar Constraint Proxy","envelope",1.8345323741007196,-2.9999970992406726
+"Binary/Pulsar Constraint Proxy","envelope",1.8776978417266186,-2.9999976216229056
+"Binary/Pulsar Constraint Proxy","envelope",1.9208633093525176,-2.9999980499744665
+"Binary/Pulsar Constraint Proxy","envelope",1.9640287769784166,-2.9999984012103122
+"Binary/Pulsar Constraint Proxy","envelope",2.0071942446043165,-2.999998689205412
+"Binary/Pulsar Constraint Proxy","envelope",2.0503597122302155,-2.9999989253403796
+"Binary/Pulsar Constraint Proxy","envelope",2.0935251798561154,-2.9999991189493564
+"Binary/Pulsar Constraint Proxy","envelope",2.1366906474820144,-2.9999992776876105
+"Binary/Pulsar Constraint Proxy","envelope",2.1798561151079134,-2.99999940783321
+"Binary/Pulsar Constraint Proxy","envelope",2.2230215827338133,-2.9999995145345646
+"Binary/Pulsar Constraint Proxy","envelope",2.2661870503597124,-2.999999602013529
+"Binary/Pulsar Constraint Proxy","envelope",2.3093525179856123,-2.999999673732034
+"Binary/Pulsar Constraint Proxy","envelope",2.3525179856115113,-2.9999997325287797
+"Binary/Pulsar Constraint Proxy","envelope",2.3956834532374103,-2.9999997807313665
+"Binary/Pulsar Constraint Proxy","envelope",2.4388489208633093,-2.9999998202482656
+"Binary/Pulsar Constraint Proxy","envelope",2.4820143884892083,-2.9999998526442573
+"Binary/Pulsar Constraint Proxy","envelope",2.525179856115108,-2.9999998792022935
+"Binary/Pulsar Constraint Proxy","envelope",2.568345323741007,-2.9999999009742417
+"Binary/Pulsar Constraint Proxy","envelope",2.6115107913669062,-2.999999918822488
+"Binary/Pulsar Constraint Proxy","envelope",2.654676258992806,-2.9999999334540632
+"Binary/Pulsar Constraint Proxy","envelope",2.697841726618705,-2.9999999454486166
+"Binary/Pulsar Constraint Proxy","envelope",2.741007194244604,-2.9999999552813628
+"Binary/Pulsar Constraint Proxy","envelope",2.784172661870503,-2.9999999633418915
+"Binary/Pulsar Constraint Proxy","envelope",2.827338129496402,-2.999999969949592
+"Binary/Pulsar Constraint Proxy","envelope",2.870503597122302,-2.9999999753663014
+"Binary/Pulsar Constraint Proxy","envelope",2.913669064748201,-2.999999979806671
+"Binary/Pulsar Constraint Proxy","envelope",2.956834532374101,-2.9999999834466715
+"Binary/Pulsar Constraint Proxy","envelope",3,-2.999999986430559
+"Binary/Pulsar Constraint Proxy","sys_0",-3,3
+"Binary/Pulsar Constraint Proxy","sys_0",-2.9568345323741005,3
+"Binary/Pulsar Constraint Proxy","sys_0",-2.9136690647482015,3
+"Binary/Pulsar Constraint Proxy","sys_0",-2.870503597122302,3
+"Binary/Pulsar Constraint Proxy","sys_0",-2.827338129496403,3
+"Binary/Pulsar Constraint Proxy","sys_0",-2.7841726618705036,3
+"Binary/Pulsar Constraint Proxy","sys_0",-2.741007194244604,3
+"Binary/Pulsar Constraint Proxy","sys_0",-2.697841726618705,3
+"Binary/Pulsar Constraint Proxy","sys_0",-2.6546762589928057,3
+"Binary/Pulsar Constraint Proxy","sys_0",-2.6115107913669062,3
+"Binary/Pulsar Constraint Proxy","sys_0",-2.568345323741007,3
+"Binary/Pulsar Constraint Proxy","sys_0",-2.525179856115108,3
+"Binary/Pulsar Constraint Proxy","sys_0",-2.4820143884892087,3
+"Binary/Pulsar Constraint Proxy","sys_0",-2.4388489208633093,3
+"Binary/Pulsar Constraint Proxy","sys_0",-2.3956834532374103,3
+"Binary/Pulsar Constraint Proxy","sys_0",-2.352517985611511,3
+"Binary/Pulsar Constraint Proxy","sys_0",-2.3093525179856114,3
+"Binary/Pulsar Constraint Proxy","sys_0",-2.2661870503597124,3
+"Binary/Pulsar Constraint Proxy","sys_0",-2.223021582733813,3
+"Binary/Pulsar Constraint Proxy","sys_0",-2.1798561151079134,3
+"Binary/Pulsar Constraint Proxy","sys_0",-2.1366906474820144,3
+"Binary/Pulsar Constraint Proxy","sys_0",-2.093525179856115,3
+"Binary/Pulsar Constraint Proxy","sys_0",-2.050359712230216,3
+"Binary/Pulsar Constraint Proxy","sys_0",-2.0071942446043165,3
+"Binary/Pulsar Constraint Proxy","sys_0",-1.9640287769784173,3
+"Binary/Pulsar Constraint Proxy","sys_0",-1.920863309352518,3
+"Binary/Pulsar Constraint Proxy","sys_0",-1.8776978417266186,3
+"Binary/Pulsar Constraint Proxy","sys_0",-1.8345323741007193,3
+"Binary/Pulsar Constraint Proxy","sys_0",-1.79136690647482,3
+"Binary/Pulsar Constraint Proxy","sys_0",-1.7482014388489209,3
+"Binary/Pulsar Constraint Proxy","sys_0",-1.7050359712230216,3
+"Binary/Pulsar Constraint Proxy","sys_0",-1.6618705035971222,3
+"Binary/Pulsar Constraint Proxy","sys_0",-1.618705035971223,3
+"Binary/Pulsar Constraint Proxy","sys_0",-1.5755395683453237,3
+"Binary/Pulsar Constraint Proxy","sys_0",-1.5323741007194245,3
+"Binary/Pulsar Constraint Proxy","sys_0",-1.4892086330935252,3
+"Binary/Pulsar Constraint Proxy","sys_0",-1.4460431654676258,3
+"Binary/Pulsar Constraint Proxy","sys_0",-1.4028776978417266,3
+"Binary/Pulsar Constraint Proxy","sys_0",-1.3597122302158273,3
+"Binary/Pulsar Constraint Proxy","sys_0",-1.3165467625899283,3
+"Binary/Pulsar Constraint Proxy","sys_0",-1.2733812949640289,3
+"Binary/Pulsar Constraint Proxy","sys_0",-1.2302158273381294,3
+"Binary/Pulsar Constraint Proxy","sys_0",-1.1870503597122302,2.7675231947334535
+"Binary/Pulsar Constraint Proxy","sys_0",-1.143884892086331,2.17583167452606
+"Binary/Pulsar Constraint Proxy","sys_0",-1.100719424460432,1.6436759691324472
+"Binary/Pulsar Constraint Proxy","sys_0",-1.0575539568345325,1.1653739453514496
+"Binary/Pulsar Constraint Proxy","sys_0",-1.014388489208633,0.7357771025573219
+"Binary/Pulsar Constraint Proxy","sys_0",-0.971223021582734,0.35021988649555585
+"Binary/Pulsar Constraint Proxy","sys_0",-0.9280575539568345,0.004473812711710276
+"Binary/Pulsar Constraint Proxy","sys_0",-0.8848920863309355,-0.3052940498249177
+"Binary/Pulsar Constraint Proxy","sys_0",-0.8417266187050361,-0.5825586411607133
+"Binary/Pulsar Constraint Proxy","sys_0",-0.7985611510791366,-0.8304708860939098
+"Binary/Pulsar Constraint Proxy","sys_0",-0.7553956834532372,-1.0518884152296704
+"Binary/Pulsar Constraint Proxy","sys_0",-0.7122302158273381,-1.24940333167319
+"Binary/Pulsar Constraint Proxy","sys_0",-0.6690647482014387,-1.4253672952168912
+"Binary/Pulsar Constraint Proxy","sys_0",-0.6258992805755397,-1.5819141704134583
+"Binary/Pulsar Constraint Proxy","sys_0",-0.5827338129496402,-1.720980462240535
+"Binary/Pulsar Constraint Proxy","sys_0",-0.5395683453237412,-1.8443237429467958
+"Binary/Pulsar Constraint Proxy","sys_0",-0.49640287769784175,-1.9535392559180742
+"Binary/Pulsar Constraint Proxy","sys_0",-0.4532374100719423,-2.0500748668052893
+"Binary/Pulsar Constraint Proxy","sys_0",-0.4100719424460433,-2.135244518489461
+"Binary/Pulsar Constraint Proxy","sys_0",-0.3669064748201438,-2.210240334479555
+"Binary/Pulsar Constraint Proxy","sys_0",-0.32374100719424437,-2.2761435047813388
+"Binary/Pulsar Constraint Proxy","sys_0",-0.28057553956834536,-2.333934078854701
+"Binary/Pulsar Constraint Proxy","sys_0",-0.2374100719424459,-2.384499781695084
+"Binary/Pulsar Constraint Proxy","sys_0",-0.1942446043165469,-2.4286439610338926
+"Binary/Pulsar Constraint Proxy","sys_0",-0.15107913669064743,-2.46709276587229
+"Binary/Pulsar Constraint Proxy","sys_0",-0.10791366906474842,-2.5005016488000744
+"Binary/Pulsar Constraint Proxy","sys_0",-0.06474820143884896,-2.5294612766227087
+"Binary/Pulsar Constraint Proxy","sys_0",-0.021582733812949506,-2.5545029256183374
+"Binary/Pulsar Constraint Proxy","sys_0",0.021582733812949506,-2.5761034292548124
+"Binary/Pulsar Constraint Proxy","sys_0",0.0647482014388494,-2.594689737487303
+"Binary/Pulsar Constraint Proxy","sys_0",0.10791366906474842,-2.610643137985675
+"Binary/Pulsar Constraint Proxy","sys_0",0.15107913669064743,-2.6243031810266464
+"Binary/Pulsar Constraint Proxy","sys_0",0.1942446043165469,-2.6359713415841926
+"Binary/Pulsar Constraint Proxy","sys_0",0.2374100719424459,-2.6459144446222393
+"Binary/Pulsar Constraint Proxy","sys_0",0.28057553956834536,-2.6543678729678577
+"Binary/Pulsar Constraint Proxy","sys_0",0.32374100719424437,-2.66153857159715
+"Binary/Pulsar Constraint Proxy","sys_0",0.3669064748201434,-2.6676078578019724
+"Binary/Pulsar Constraint Proxy","sys_0",0.4100719424460433,-2.6727340435434463
+"Binary/Pulsar Constraint Proxy","sys_0",0.4532374100719423,-2.6770548742783604
+"Binary/Pulsar Constraint Proxy","sys_0",0.4964028776978422,-2.680689787540179
+"Binary/Pulsar Constraint Proxy","sys_0",0.5395683453237412,-2.6837419943917973
+"Binary/Pulsar Constraint Proxy","sys_0",0.5827338129496402,-2.6863003873396893
+"Binary/Pulsar Constraint Proxy","sys_0",0.6258992805755397,-2.6884412792002363
+"Binary/Pulsar Constraint Proxy","sys_0",0.6690647482014387,-2.6902299785429236
+"Binary/Pulsar Constraint Proxy","sys_0",0.7122302158273381,-2.691722208532333
+"Binary/Pulsar Constraint Proxy","sys_0",0.7553956834532372,-2.692965377116515
+"Binary/Pulsar Constraint Proxy","sys_0",0.7985611510791362,-2.693999707466454
+"Binary/Pulsar Constraint Proxy","sys_0",0.8417266187050361,-2.6948592382995846
+"Binary/Pulsar Constraint Proxy","sys_0",0.8848920863309351,-2.695572704191783
+"Binary/Pulsar Constraint Proxy","sys_0",0.928057553956835,-2.696164306195437
+"Binary/Pulsar Constraint Proxy","sys_0",0.971223021582734,-2.6966543830541485
+"Binary/Pulsar Constraint Proxy","sys_0",1.014388489208633,-2.6970599930683052
+"Binary/Pulsar Constraint Proxy","sys_0",1.057553956834532,-2.697395416258291
+"Binary/Pulsar Constraint Proxy","sys_0",1.100719424460431,-2.697672585933887
+"Binary/Pulsar Constraint Proxy","sys_0",1.143884892086331,-2.6979014581487384
+"Binary/Pulsar Constraint Proxy","sys_0",1.18705035971223,-2.698090326833245
+"Binary/Pulsar Constraint Proxy","sys_0",1.230215827338129,-2.698246091688596
+"Binary/Pulsar Constraint Proxy","sys_0",1.2733812949640289,-2.6983744852140092
+"Binary/Pulsar Constraint Proxy","sys_0",1.3165467625899279,-2.698480264548128
+"Binary/Pulsar Constraint Proxy","sys_0",1.3597122302158278,-2.6985673731482387
+"Binary/Pulsar Constraint Proxy","sys_0",1.4028776978417268,-2.6986390767173263
+"Binary/Pulsar Constraint Proxy","sys_0",1.4460431654676258,-2.6986980772248206
+"Binary/Pulsar Constraint Proxy","sys_0",1.4892086330935257,-2.698746608355031
+"Binary/Pulsar Constraint Proxy","sys_0",1.5323741007194247,-2.6987865152580572
+"Binary/Pulsar Constraint Proxy","sys_0",1.5755395683453237,-2.6988193210700664
+"Binary/Pulsar Constraint Proxy","sys_0",1.6187050359712227,-2.6988462823105577
+"Binary/Pulsar Constraint Proxy","sys_0",1.6618705035971226,-2.698868434950199
+"Binary/Pulsar Constraint Proxy","sys_0",1.7050359712230216,-2.6988866326701597
+"Binary/Pulsar Constraint Proxy","sys_0",1.7482014388489207,-2.698901578598471
+"Binary/Pulsar Constraint Proxy","sys_0",1.7913669064748206,-2.6989138516068616
+"Binary/Pulsar Constraint Proxy","sys_0",1.8345323741007196,-2.698923928078756
+"Binary/Pulsar Constraint Proxy","sys_0",1.8776978417266186,-2.6989321999121283
+"Binary/Pulsar Constraint Proxy","sys_0",1.9208633093525176,-2.6989389893962126
+"Binary/Pulsar Constraint Proxy","sys_0",1.9640287769784166,-2.698944561495745
+"Binary/Pulsar Constraint Proxy","sys_0",2.0071942446043165,-2.6989491339876137
+"Binary/Pulsar Constraint Proxy","sys_0",2.0503597122302155,-2.6989528858202156
+"Binary/Pulsar Constraint Proxy","sys_0",2.0935251798561154,-2.6989559640032743
+"Binary/Pulsar Constraint Proxy","sys_0",2.1366906474820144,-2.6989584892835685
+"Binary/Pulsar Constraint Proxy","sys_0",2.1798561151079134,-2.698960560818356
+"Binary/Pulsar Constraint Proxy","sys_0",2.2230215827338133,-2.698962260021877
+"Binary/Pulsar Constraint Proxy","sys_0",2.2661870503597124,-2.6989636537300563
+"Binary/Pulsar Constraint Proxy","sys_0",2.3093525179856123,-2.6989647968033506
+"Binary/Pulsar Constraint Proxy","sys_0",2.3525179856115113,-2.698965734266825
+"Binary/Pulsar Constraint Proxy","sys_0",2.3956834532374103,-2.6989665030692396
+"Binary/Pulsar Constraint Proxy","sys_0",2.4388489208633093,-2.698967133528595
+"Binary/Pulsar Constraint Proxy","sys_0",2.4820143884892083,-2.698967650519749
+"Binary/Pulsar Constraint Proxy","sys_0",2.525179856115108,-2.6989680744499243
+"Binary/Pulsar Constraint Proxy","sys_0",2.568345323741007,-2.698968422059827
+"Binary/Pulsar Constraint Proxy","sys_0",2.6115107913669062,-2.6989687070814443
+"Binary/Pulsar Constraint Proxy","sys_0",2.654676258992806,-2.698968940778079
+"Binary/Pulsar Constraint Proxy","sys_0",2.697841726618705,-2.6989691323876266
+"Binary/Pulsar Constraint Proxy","sys_0",2.741007194244604,-2.698969289486404
+"Binary/Pulsar Constraint Proxy","sys_0",2.784172661870503,-2.6989694182877164
+"Binary/Pulsar Constraint Proxy","sys_0",2.827338129496402,-2.6989695238868516
+"Binary/Pulsar Constraint Proxy","sys_0",2.870503597122302,-2.6989696104620964
+"Binary/Pulsar Constraint Proxy","sys_0",2.913669064748201,-2.6989696814396487
+"Binary/Pulsar Constraint Proxy","sys_0",2.956834532374101,-2.698969739628905
+"Binary/Pulsar Constraint Proxy","sys_0",3,-2.698969787333434
+"Binary/Pulsar Constraint Proxy","sys_1",-3,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-2.9568345323741005,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-2.9136690647482015,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-2.870503597122302,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-2.827338129496403,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-2.7841726618705036,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-2.741007194244604,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-2.697841726618705,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-2.6546762589928057,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-2.6115107913669062,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-2.568345323741007,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-2.525179856115108,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-2.4820143884892087,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-2.4388489208633093,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-2.3956834532374103,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-2.352517985611511,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-2.3093525179856114,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-2.2661870503597124,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-2.223021582733813,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-2.1798561151079134,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-2.1366906474820144,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-2.093525179856115,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-2.050359712230216,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-2.0071942446043165,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-1.9640287769784173,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-1.920863309352518,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-1.8776978417266186,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-1.8345323741007193,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-1.79136690647482,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-1.7482014388489209,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-1.7050359712230216,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-1.6618705035971222,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-1.618705035971223,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-1.5755395683453237,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-1.5323741007194245,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-1.4892086330935252,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-1.4460431654676258,2.8750612633917
+"Binary/Pulsar Constraint Proxy","sys_1",-1.4028776978417266,2.556245760918835
+"Binary/Pulsar Constraint Proxy","sys_1",-1.3597122302158273,1.9732216022528963
+"Binary/Pulsar Constraint Proxy","sys_1",-1.3165467625899283,1.4489065709053452
+"Binary/Pulsar Constraint Proxy","sys_1",-1.2733812949640289,0.9776962073563794
+"Binary/Pulsar Constraint Proxy","sys_1",-1.2302158273381294,0.5545123075006044
+"Binary/Pulsar Constraint Proxy","sys_1",-1.1870503597122302,0.1747529360678401
+"Binary/Pulsar Constraint Proxy","sys_1",-1.143884892086331,-0.16575281577428763
+"Binary/Pulsar Constraint Proxy","sys_1",-1.100719424460432,-0.4707857717872638
+"Binary/Pulsar Constraint Proxy","sys_1",-1.0575539568345325,-0.7437737115710955
+"Binary/Pulsar Constraint Proxy","sys_1",-1.014388489208633,-0.9878248731165808
+"Binary/Pulsar Constraint Proxy","sys_1",-0.971223021582734,-1.2057582443960044
+"Binary/Pulsar Constraint Proxy","sys_1",-0.9280575539568345,-1.4001309401522026
+"Binary/Pulsar Constraint Proxy","sys_1",-0.8848920863309355,-1.573262932015099
+"Binary/Pulsar Constraint Proxy","sys_1",-0.8417266187050361,-1.7272593750110088
+"Binary/Pulsar Constraint Proxy","sys_1",-0.7985611510791366,-1.864030751214754
+"Binary/Pulsar Constraint Proxy","sys_1",-0.7553956834532372,-1.9853110315209601
+"Binary/Pulsar Constraint Proxy","sys_1",-0.7122302158273381,-2.0926740390730685
+"Binary/Pulsar Constraint Proxy","sys_1",-0.6690647482014387,-2.1875481825749072
+"Binary/Pulsar Constraint Proxy","sys_1",-0.6258992805755397,-2.2712297142935287
+"Binary/Pulsar Constraint Proxy","sys_1",-0.5827338129496402,-2.344894655797321
+"Binary/Pulsar Constraint Proxy","sys_1",-0.5395683453237412,-2.4096095240918562
+"Binary/Pulsar Constraint Proxy","sys_1",-0.49640287769784175,-2.4663409815303354
+"Binary/Pulsar Constraint Proxy","sys_1",-0.4532374100719423,-2.515964524386806
+"Binary/Pulsar Constraint Proxy","sys_1",-0.4100719424460433,-2.5592723169920903
+"Binary/Pulsar Constraint Proxy","sys_1",-0.3669064748201438,-2.596980270567799
+"Binary/Pulsar Constraint Proxy","sys_1",-0.32374100719424437,-2.62973445811739
+"Binary/Pulsar Constraint Proxy","sys_1",-0.28057553956834536,-2.658116948771051
+"Binary/Pulsar Constraint Proxy","sys_1",-0.2374100719424459,-2.6826511367383965
+"Binary/Pulsar Constraint Proxy","sys_1",-0.1942446043165469,-2.7038066314943805
+"Binary/Pulsar Constraint Proxy","sys_1",-0.15107913669064743,-2.7220037670947277
+"Binary/Pulsar Constraint Proxy","sys_1",-0.10791366906474842,-2.7376177797534003
+"Binary/Pulsar Constraint Proxy","sys_1",-0.06474820143884896,-2.7509826942422393
+"Binary/Pulsar Constraint Proxy","sys_1",-0.021582733812949506,-2.7623949515498776
+"Binary/Pulsar Constraint Proxy","sys_1",0.021582733812949506,-2.7721168028207455
+"Binary/Pulsar Constraint Proxy","sys_1",0.0647482014388494,-2.780379488110747
+"Binary/Pulsar Constraint Proxy","sys_1",0.10791366906474842,-2.7873862131107545
+"Binary/Pulsar Constraint Proxy","sys_1",0.15107913669064743,-2.793314932793375
+"Binary/Pulsar Constraint Proxy","sys_1",0.1942446043165469,-2.798320947940863
+"Binary/Pulsar Constraint Proxy","sys_1",0.2374100719424459,-2.8025393186428174
+"Binary/Pulsar Constraint Proxy","sys_1",0.28057553956834536,-2.806087097976445
+"Binary/Pulsar Constraint Proxy","sys_1",0.32374100719424437,-2.8090653890189947
+"Binary/Pulsar Constraint Proxy","sys_1",0.3669064748201434,-2.811561228886655
+"Binary/Pulsar Constraint Proxy","sys_1",0.4100719424460433,-2.8136493044391075
+"Binary/Pulsar Constraint Proxy","sys_1",0.4532374100719423,-2.8153935054410906
+"Binary/Pulsar Constraint Proxy","sys_1",0.4964028776978422,-2.8168483221668446
+"Binary/Pulsar Constraint Proxy","sys_1",0.5395683453237412,-2.8180600955403974
+"Binary/Pulsar Constraint Proxy","sys_1",0.5827338129496402,-2.819068128832687
+"Binary/Pulsar Constraint Proxy","sys_1",0.6258992805755397,-2.819905670629946
+"Binary/Pulsar Constraint Proxy","sys_1",0.6690647482014387,-2.8206007792227634
+"Binary/Pulsar Constraint Proxy","sys_1",0.7122302158273381,-2.821177078743488
+"Binary/Pulsar Constraint Proxy","sys_1",0.7553956834532372,-2.8216544173213016
+"Binary/Pulsar Constraint Proxy","sys_1",0.7985611510791362,-2.822049437261706
+"Binary/Pulsar Constraint Proxy","sys_1",0.8417266187050361,-2.822376066829055
+"Binary/Pulsar Constraint Proxy","sys_1",0.8848920863309351,-2.8226459426574637
+"Binary/Pulsar Constraint Proxy","sys_1",0.928057553956835,-2.8228687711759495
+"Binary/Pulsar Constraint Proxy","sys_1",0.971223021582734,-2.8230526367428945
+"Binary/Pulsar Constraint Proxy","sys_1",1.014388489208633,-2.8232042634729204
+"Binary/Pulsar Constraint Proxy","sys_1",1.057553956834532,-2.82332923703028
+"Binary/Pulsar Constraint Proxy","sys_1",1.100719424460431,-2.823432191975721
+"Binary/Pulsar Constraint Proxy","sys_1",1.143884892086331,-2.823516969602102
+"Binary/Pulsar Constraint Proxy","sys_1",1.18705035971223,-2.823586750587011
+"Binary/Pulsar Constraint Proxy","sys_1",1.230215827338129,-2.823644166233675
+"Binary/Pulsar Constraint Proxy","sys_1",1.2733812949640289,-2.8236913915669386
+"Binary/Pulsar Constraint Proxy","sys_1",1.3165467625899279,-2.823730223099192
+"Binary/Pulsar Constraint Proxy","sys_1",1.3597122302158278,-2.823762143680154
+"Binary/Pulsar Constraint Proxy","sys_1",1.4028776978417268,-2.8237883764917098
+"Binary/Pulsar Constraint Proxy","sys_1",1.4460431654676258,-2.82380992994095
+"Binary/Pulsar Constraint Proxy","sys_1",1.4892086330935257,-2.8238276349373597
+"Binary/Pulsar Constraint Proxy","sys_1",1.5323741007194247,-2.823842175809595
+"Binary/Pulsar Constraint Proxy","sys_1",1.5755395683453237,-2.823854115919511
+"Binary/Pulsar Constraint Proxy","sys_1",1.6187050359712227,-2.8238639188621706
+"Binary/Pulsar Constraint Proxy","sys_1",1.6618705035971226,-2.8238719659968488
+"Binary/Pulsar Constraint Proxy","sys_1",1.7050359712230216,-2.8238785709322687
+"Binary/Pulsar Constraint Proxy","sys_1",1.7482014388489207,-2.8238839914863973
+"Binary/Pulsar Constraint Proxy","sys_1",1.7913669064748206,-2.8238884395544943
+"Binary/Pulsar Constraint Proxy","sys_1",1.8345323741007196,-2.8238920892462915
+"Binary/Pulsar Constraint Proxy","sys_1",1.8776978417266186,-2.823895083592204
+"Binary/Pulsar Constraint Proxy","sys_1",1.9208633093525176,-2.8238975400674278
+"Binary/Pulsar Constraint Proxy","sys_1",1.9640287769784166,-2.8238995551402355
+"Binary/Pulsar Constraint Proxy","sys_1",2.0071942446043165,-2.8239012080152874
+"Binary/Pulsar Constraint Proxy","sys_1",2.0503597122302155,-2.8239025637132738
+"Binary/Pulsar Constraint Proxy","sys_1",2.0935251798561154,-2.8239036756036904
+"Binary/Pulsar Constraint Proxy","sys_1",2.1366906474820144,-2.8239045874872177
+"Binary/Pulsar Constraint Proxy","sys_1",2.1798561151079134,-2.823905335307312
+"Binary/Pulsar Constraint Proxy","sys_1",2.2230215827338133,-2.8239059485566793
+"Binary/Pulsar Constraint Proxy","sys_1",2.2661870503597124,-2.8239064514327548
+"Binary/Pulsar Constraint Proxy","sys_1",2.3093525179856123,-2.8239068637867835
+"Binary/Pulsar Constraint Proxy","sys_1",2.3525179856115113,-2.82390720190322
+"Binary/Pulsar Constraint Proxy","sys_1",2.3956834532374103,-2.823907479139679
+"Binary/Pulsar Constraint Proxy","sys_1",2.4388489208633093,-2.8239077064523
+"Binary/Pulsar Constraint Proxy","sys_1",2.4820143884892083,-2.823907892826986
+"Binary/Pulsar Constraint Proxy","sys_1",2.525179856115108,-2.823908045633333
+"Binary/Pulsar Constraint Proxy","sys_1",2.568345323741007,-2.8239081709150793
+"Binary/Pulsar Constraint Proxy","sys_1",2.6115107913669062,-2.8239082736284296
+"Binary/Pulsar Constraint Proxy","sys_1",2.654676258992806,-2.823908357837598
+"Binary/Pulsar Constraint Proxy","sys_1",2.697841726618705,-2.823908426875227
+"Binary/Pulsar Constraint Proxy","sys_1",2.741007194244604,-2.823908483473989
+"Binary/Pulsar Constraint Proxy","sys_1",2.784172661870503,-2.823908529874534
+"Binary/Pulsar Constraint Proxy","sys_1",2.827338129496402,-2.8239085679140326
+"Binary/Pulsar Constraint Proxy","sys_1",2.870503597122302,-2.8239085990987953
+"Binary/Pulsar Constraint Proxy","sys_1",2.913669064748201,-2.823908624663835
+"Binary/Pulsar Constraint Proxy","sys_1",2.956834532374101,-2.823908645621707
+"Binary/Pulsar Constraint Proxy","sys_1",3,-2.823908662802567
+"Binary/Pulsar Constraint Proxy","sys_2",-3,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-2.9568345323741005,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-2.9136690647482015,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-2.870503597122302,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-2.827338129496403,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-2.7841726618705036,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-2.741007194244604,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-2.697841726618705,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-2.6546762589928057,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-2.6115107913669062,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-2.568345323741007,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-2.525179856115108,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-2.4820143884892087,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-2.4388489208633093,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-2.3956834532374103,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-2.352517985611511,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-2.3093525179856114,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-2.2661870503597124,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-2.223021582733813,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-2.1798561151079134,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-2.1366906474820144,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-2.093525179856115,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-2.050359712230216,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-2.0071942446043165,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-1.9640287769784173,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-1.920863309352518,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-1.8776978417266186,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-1.8345323741007193,2.6989700043360187
+"Binary/Pulsar Constraint Proxy","sys_2",-1.79136690647482,2.4991777202724643
+"Binary/Pulsar Constraint Proxy","sys_2",-1.7482014388489209,1.9042067385544863
+"Binary/Pulsar Constraint Proxy","sys_2",-1.7050359712230216,1.3690843217211282
+"Binary/Pulsar Constraint Proxy","sys_2",-1.6618705035971222,0.888098948317533
+"Binary/Pulsar Constraint Proxy","sys_2",-1.618705035971223,0.45607552059722023
+"Binary/Pulsar Constraint Proxy","sys_2",-1.5755395683453237,0.06832441364703483
+"Binary/Pulsar Constraint Proxy","sys_2",-1.5323741007194245,-0.2794046410883309
+"Binary/Pulsar Constraint Proxy","sys_2",-1.4892086330935252,-0.5909642896992333
+"Binary/Pulsar Constraint Proxy","sys_2",-1.4460431654676258,-0.8698473155304005
+"Binary/Pulsar Constraint Proxy","sys_2",-1.4028776978417266,-1.1192207939032621
+"Binary/Pulsar Constraint Proxy","sys_2",-1.3597122302158273,-1.3419569756147396
+"Binary/Pulsar Constraint Proxy","sys_2",-1.3165467625899283,-1.540661201106482
+"Binary/Pulsar Constraint Proxy","sys_2",-1.2733812949640289,-1.7176971185723218
+"Binary/Pulsar Constraint Proxy","sys_2",-1.2302158273381294,-1.8752094536561958
+"Binary/Pulsar Constraint Proxy","sys_2",-1.1870503597122302,-2.0151445555668674
+"Binary/Pulsar Constraint Proxy","sys_2",-1.143884892086331,-2.1392689241904086
+"Binary/Pulsar Constraint Proxy","sys_2",-1.100719424460432,-2.2491859049118172
+"Binary/Pulsar Constraint Proxy","sys_2",-1.0575539568345325,-2.3463507221530784
+"Binary/Pulsar Constraint Proxy","sys_2",-1.014388489208633,-2.4320840088733617
+"Binary/Pulsar Constraint Proxy","sys_2",-0.971223021582734,-2.5075839772157584
+"Binary/Pulsar Constraint Proxy","sys_2",-0.9280575539568345,-2.573937364859936
+"Binary/Pulsar Constraint Proxy","sys_2",-0.8848920863309355,-2.632129282167236
+"Binary/Pulsar Constraint Proxy","sys_2",-0.8417266187050361,-2.683052076586577
+"Binary/Pulsar Constraint Proxy","sys_2",-0.7985611510791366,-2.7275133227275745
+"Binary/Pulsar Constraint Proxy","sys_2",-0.7553956834532372,-2.7662430387197143
+"Binary/Pulsar Constraint Proxy","sys_2",-0.7122302158273381,-2.79990022171789
+"Binary/Pulsar Constraint Proxy","sys_2",-0.6690647482014387,-2.8290787874980445
+"Binary/Pulsar Constraint Proxy","sys_2",-0.6258992805755397,-2.8543129909009264
+"Binary/Pulsar Constraint Proxy","sys_2",-0.5827338129496402,-2.8760823954042958
+"Binary/Pulsar Constraint Proxy","sys_2",-0.5395683453237412,-2.894816451402662
+"Binary/Pulsar Constraint Proxy","sys_2",-0.49640287769784175,-2.9108987340004964
+"Binary/Pulsar Constraint Proxy","sys_2",-0.4532374100719423,-2.9246708824963132
+"Binary/Pulsar Constraint Proxy","sys_2",-0.4100719424460433,-2.9364362755053923
+"Binary/Pulsar Constraint Proxy","sys_2",-0.3669064748201438,-2.9464634680982287
+"Binary/Pulsar Constraint Proxy","sys_2",-0.32374100719424437,-2.9549894106537864
+"Binary/Pulsar Constraint Proxy","sys_2",-0.28057553956834536,-2.962222463520951
+"Binary/Pulsar Constraint Proxy","sys_2",-0.2374100719424459,-2.9683452171545075
+"Binary/Pulsar Constraint Proxy","sys_2",-0.1942446043165469,-2.973517124167774
+"Binary/Pulsar Constraint Proxy","sys_2",-0.15107913669064743,-2.977876947667097
+"Binary/Pulsar Constraint Proxy","sys_2",-0.10791366906474842,-2.981545029179938
+"Binary/Pulsar Constraint Proxy","sys_2",-0.06474820143884896,-2.98462537928469
+"Binary/Pulsar Constraint Proxy","sys_2",-0.021582733812949506,-2.9872075944947722
+"Binary/Pulsar Constraint Proxy","sys_2",0.021582733812949506,-2.9893686048332997
+"Binary/Pulsar Constraint Proxy","sys_2",0.0647482014388494,-2.9911742576608424
+"Binary/Pulsar Constraint Proxy","sys_2",0.10791366906474842,-2.992680744516362
+"Binary/Pulsar Constraint Proxy","sys_2",0.15107913669064743,-2.9939358788635646
+"Binary/Pulsar Constraint Proxy","sys_2",0.1942446043165469,-2.9949802336026403
+"Binary/Pulsar Constraint Proxy","sys_2",0.2374100719424459,-2.995848147948514
+"Binary/Pulsar Constraint Proxy","sys_2",0.28057553956834536,-2.996568613761864
+"Binary/Pulsar Constraint Proxy","sys_2",0.32374100719424437,-2.997166051645551
+"Binary/Pulsar Constraint Proxy","sys_2",0.3669064748201434,-2.9976609871039024
+"Binary/Pulsar Constraint Proxy","sys_2",0.4100719424460433,-2.9980706368360472
+"Binary/Pulsar Constraint Proxy","sys_2",0.4532374100719423,-2.9984094148349447
+"Binary/Pulsar Constraint Proxy","sys_2",0.4964028776978422,-2.9986893674314095
+"Binary/Pulsar Constraint Proxy","sys_2",0.5395683453237412,-2.9989205457965813
+"Binary/Pulsar Constraint Proxy","sys_2",0.5827338129496402,-2.999111323732912
+"Binary/Pulsar Constraint Proxy","sys_2",0.6258992805755397,-2.9992686678737273
+"Binary/Pulsar Constraint Proxy","sys_2",0.6690647482014387,-2.999398366700245
+"Binary/Pulsar Constraint Proxy","sys_2",0.7122302158273381,-2.999505224092392
+"Binary/Pulsar Constraint Proxy","sys_2",0.7553956834532372,-2.9995932224704283
+"Binary/Pulsar Constraint Proxy","sys_2",0.7985611510791362,-2.999665659968295
+"Binary/Pulsar Constraint Proxy","sys_2",0.8417266187050361,-2.999725265512739
+"Binary/Pulsar Constraint Proxy","sys_2",0.8848920863309351,-2.999774295167667
+"Binary/Pulsar Constraint Proxy","sys_2",0.928057553956835,-2.99981461264123
+"Binary/Pulsar Constraint Proxy","sys_2",0.971223021582734,-2.9998477564426222
+"Binary/Pulsar Constraint Proxy","sys_2",1.014388489208633,-2.9998749958138475
+"Binary/Pulsar Constraint Proxy","sys_2",1.057553956834532,-2.999897377245386
+"Binary/Pulsar Constraint Proxy","sys_2",1.100719424460431,-2.9999157631099864
+"Binary/Pulsar Constraint Proxy","sys_2",1.143884892086331,-2.999930863711569
+"Binary/Pulsar Constraint Proxy","sys_2",1.18705035971223,-2.9999432638424697
+"Binary/Pulsar Constraint Proxy","sys_2",1.230215827338129,-2.9999534447681016
+"Binary/Pulsar Constraint Proxy","sys_2",1.2733812949640289,-2.9999618024098105
+"Binary/Pulsar Constraint Proxy","sys_2",1.3165467625899279,-2.999968662370949
+"Binary/Pulsar Constraint Proxy","sys_2",1.3597122302158278,-2.9999742923449193
+"Binary/Pulsar Constraint Proxy","sys_2",1.4028776978417268,-2.999978912354322
+"Binary/Pulsar Constraint Proxy","sys_2",1.4460431654676258,-2.9999827031951067
+"Binary/Pulsar Constraint Proxy","sys_2",1.4892086330935257,-2.999985813396467
+"Binary/Pulsar Constraint Proxy","sys_2",1.5323741007194247,-2.9999883649544477
+"Binary/Pulsar Constraint Proxy","sys_2",1.5755395683453237,-2.999990458053129
+"Binary/Pulsar Constraint Proxy","sys_2",1.6187050359712227,-2.9999921749505285
+"Binary/Pulsar Constraint Proxy","sys_2",1.6618705035971226,-2.999993583175772
+"Binary/Pulsar Constraint Proxy","sys_2",1.7050359712230216,-2.999994738158694
+"Binary/Pulsar Constraint Proxy","sys_2",1.7482014388489207,-2.9999956853919456
+"Binary/Pulsar Constraint Proxy","sys_2",1.7913669064748206,-2.9999964622082103
+"Binary/Pulsar Constraint Proxy","sys_2",1.8345323741007196,-2.9999970992406726
+"Binary/Pulsar Constraint Proxy","sys_2",1.8776978417266186,-2.9999976216229056
+"Binary/Pulsar Constraint Proxy","sys_2",1.9208633093525176,-2.9999980499744665
+"Binary/Pulsar Constraint Proxy","sys_2",1.9640287769784166,-2.9999984012103122
+"Binary/Pulsar Constraint Proxy","sys_2",2.0071942446043165,-2.999998689205412
+"Binary/Pulsar Constraint Proxy","sys_2",2.0503597122302155,-2.9999989253403796
+"Binary/Pulsar Constraint Proxy","sys_2",2.0935251798561154,-2.9999991189493564
+"Binary/Pulsar Constraint Proxy","sys_2",2.1366906474820144,-2.9999992776876105
+"Binary/Pulsar Constraint Proxy","sys_2",2.1798561151079134,-2.99999940783321
+"Binary/Pulsar Constraint Proxy","sys_2",2.2230215827338133,-2.9999995145345646
+"Binary/Pulsar Constraint Proxy","sys_2",2.2661870503597124,-2.999999602013529
+"Binary/Pulsar Constraint Proxy","sys_2",2.3093525179856123,-2.999999673732034
+"Binary/Pulsar Constraint Proxy","sys_2",2.3525179856115113,-2.9999997325287797
+"Binary/Pulsar Constraint Proxy","sys_2",2.3956834532374103,-2.9999997807313665
+"Binary/Pulsar Constraint Proxy","sys_2",2.4388489208633093,-2.9999998202482656
+"Binary/Pulsar Constraint Proxy","sys_2",2.4820143884892083,-2.9999998526442573
+"Binary/Pulsar Constraint Proxy","sys_2",2.525179856115108,-2.9999998792022935
+"Binary/Pulsar Constraint Proxy","sys_2",2.568345323741007,-2.9999999009742417
+"Binary/Pulsar Constraint Proxy","sys_2",2.6115107913669062,-2.999999918822488
+"Binary/Pulsar Constraint Proxy","sys_2",2.654676258992806,-2.9999999334540632
+"Binary/Pulsar Constraint Proxy","sys_2",2.697841726618705,-2.9999999454486166
+"Binary/Pulsar Constraint Proxy","sys_2",2.741007194244604,-2.9999999552813628
+"Binary/Pulsar Constraint Proxy","sys_2",2.784172661870503,-2.9999999633418915
+"Binary/Pulsar Constraint Proxy","sys_2",2.827338129496402,-2.999999969949592
+"Binary/Pulsar Constraint Proxy","sys_2",2.870503597122302,-2.9999999753663014
+"Binary/Pulsar Constraint Proxy","sys_2",2.913669064748201,-2.999999979806671
+"Binary/Pulsar Constraint Proxy","sys_2",2.956834532374101,-2.9999999834466715
+"Binary/Pulsar Constraint Proxy","sys_2",3,-2.999999986430559
+"Binary/Pulsar Constraint Proxy","sys_3",-3,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-2.9568345323741005,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-2.9136690647482015,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-2.870503597122302,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-2.827338129496403,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-2.7841726618705036,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-2.741007194244604,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-2.697841726618705,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-2.6546762589928057,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-2.6115107913669062,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-2.568345323741007,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-2.525179856115108,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-2.4820143884892087,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-2.4388489208633093,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-2.3956834532374103,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-2.352517985611511,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-2.3093525179856114,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-2.2661870503597124,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-2.223021582733813,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-2.1798561151079134,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-2.1366906474820144,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-2.093525179856115,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-2.050359712230216,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-2.0071942446043165,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-1.9640287769784173,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-1.920863309352518,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-1.8776978417266186,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-1.8345323741007193,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-1.79136690647482,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-1.7482014388489209,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-1.7050359712230216,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-1.6618705035971222,2.7781512503836434
+"Binary/Pulsar Constraint Proxy","sys_3",-1.618705035971223,2.205211595888716
+"Binary/Pulsar Constraint Proxy","sys_3",-1.5755395683453237,1.647737036005915
+"Binary/Pulsar Constraint Proxy","sys_3",-1.5323741007194245,1.1465336870253533
+"Binary/Pulsar Constraint Proxy","sys_3",-1.4892086330935252,0.6962260812413681
+"Binary/Pulsar Constraint Proxy","sys_3",-1.4460431654676258,0.2919432564085473
+"Binary/Pulsar Constraint Proxy","sys_3",-1.4028776978417266,-0.0707291674022112
+"Binary/Pulsar Constraint Proxy","sys_3",-1.3597122302158273,-0.39579235966128384
+"Binary/Pulsar Constraint Proxy","sys_3",-1.3165467625899283,-0.686873524570718
+"Binary/Pulsar Constraint Proxy","sys_3",-1.2733812949640289,-0.9472614034088802
+"Binary/Pulsar Constraint Proxy","sys_3",-1.2302158273381294,-1.1799383810103774
+"Binary/Pulsar Constraint Proxy","sys_3",-1.1870503597122302,-1.3876095101591155
+"Binary/Pulsar Constraint Proxy","sys_3",-1.143884892086331,-1.5727287378226318
+"Binary/Pulsar Constraint Proxy","sys_3",-1.100719424460432,-1.7375225904075398
+"Binary/Pulsar Constraint Proxy","sys_3",-1.0575539568345325,-1.8840115513403919
+"Binary/Pulsar Constraint Proxy","sys_3",-1.014388489208633,-2.014029343062867
+"Binary/Pulsar Constraint Proxy","sys_3",-0.971223021582734,-2.1292403067696815
+"Binary/Pulsar Constraint Proxy","sys_3",-0.9280575539568345,-2.231155056704683
+"Binary/Pulsar Constraint Proxy","sys_3",-0.8848920863309355,-2.321144571348091
+"Binary/Pulsar Constraint Proxy","sys_3",-0.8417266187050361,-2.400452871141511
+"Binary/Pulsar Constraint Proxy","sys_3",-0.7985611510791366,-2.470208421251514
+"Binary/Pulsar Constraint Proxy","sys_3",-0.7553956834532372,-2.5314343879905743
+"Binary/Pulsar Constraint Proxy","sys_3",-0.7122302158273381,-2.5850578686022367
+"Binary/Pulsar Constraint Proxy","sys_3",-0.6690647482014387,-2.631918205875898
+"Binary/Pulsar Constraint Proxy","sys_3",-0.6258992805755397,-2.672774491194782
+"Binary/Pulsar Constraint Proxy","sys_3",-0.5827338129496402,-2.7083123518767818
+"Binary/Pulsar Constraint Proxy","sys_3",-0.5395683453237412,-2.739150110829797
+"Binary/Pulsar Constraint Proxy","sys_3",-0.49640287769784175,-2.7658443984689156
+"Binary/Pulsar Constraint Proxy","sys_3",-0.4532374100719423,-2.78889528847438
+"Binary/Pulsar Constraint Proxy","sys_3",-0.4100719424460433,-2.808751020340511
+"Binary/Pulsar Constraint Proxy","sys_3",-0.3669064748201438,-2.8258123628976657
+"Binary/Pulsar Constraint Proxy","sys_3",-0.32374100719424437,-2.840436664276355
+"Binary/Pulsar Constraint Proxy","sys_3",-0.28057553956834536,-2.8529416253680857
+"Binary/Pulsar Constraint Proxy","sys_3",-0.2374100719424459,-2.8636088259831354
+"Binary/Pulsar Constraint Proxy","sys_3",-0.1942446043165469,-2.872687025858743
+"Binary/Pulsar Constraint Proxy","sys_3",-0.15107913669064743,-2.88039525663545
+"Binary/Pulsar Constraint Proxy","sys_3",-0.10791366906474842,-2.8869257160306985
+"Binary/Pulsar Constraint Proxy","sys_3",-0.06474820143884896,-2.8924464717535496
+"Binary/Pulsar Constraint Proxy","sys_3",-0.021582733812949506,-2.897103980196659
+"Binary/Pulsar Constraint Proxy","sys_3",0.021582733812949506,-2.9010254235121633
+"Binary/Pulsar Constraint Proxy","sys_3",0.0647482014388494,-2.904320868169914
+"Binary/Pulsar Constraint Proxy","sys_3",0.10791366906474842,-2.907085248316013
+"Binary/Pulsar Constraint Proxy","sys_3",0.15107913669064743,-2.909400177988414
+"Binary/Pulsar Constraint Proxy","sys_3",0.1942446043165469,-2.9113355973010524
+"Binary/Pulsar Constraint Proxy","sys_3",0.2374100719424459,-2.9129512588962614
+"Binary/Pulsar Constraint Proxy","sys_3",0.28057553956834536,-2.9142980621363845
+"Binary/Pulsar Constraint Proxy","sys_3",0.32374100719424437,-2.915419243545911
+"Binary/Pulsar Constraint Proxy","sys_3",0.3669064748201434,-2.9163514328490443
+"Binary/Pulsar Constraint Proxy","sys_3",0.4100719424460433,-2.917125584533061
+"Binary/Pulsar Constraint Proxy","sys_3",0.4532374100719423,-2.9177677951927694
+"Binary/Pulsar Constraint Proxy","sys_3",0.4964028776978422,-2.9183000169862563
+"Binary/Pulsar Constraint Proxy","sys_3",0.5395683453237412,-2.9187406773829867
+"Binary/Pulsar Constraint Proxy","sys_3",0.5827338129496402,-2.919105215047787
+"Binary/Pulsar Constraint Proxy","sys_3",0.6258992805755397,-2.9194065412182963
+"Binary/Pulsar Constraint Proxy","sys_3",0.6690647482014387,-2.9196554353391546
+"Binary/Pulsar Constraint Proxy","sys_3",0.7122302158273381,-2.919860883051033
+"Binary/Pulsar Constraint Proxy","sys_3",0.7553956834532372,-2.9200303639295355
+"Binary/Pulsar Constraint Proxy","sys_3",0.7985611510791362,-2.92017009565562
+"Binary/Pulsar Constraint Proxy","sys_3",0.8417266187050361,-2.920285240597479
+"Binary/Pulsar Constraint Proxy","sys_3",0.8848920863309351,-2.9203800801102586
+"Binary/Pulsar Constraint Proxy","sys_3",0.928057553956835,-2.920458161226332
+"Binary/Pulsar Constraint Proxy","sys_3",0.971223021582734,-2.920522419822516
+"Binary/Pulsar Constraint Proxy","sys_3",1.014388489208633,-2.9205752838156847
+"Binary/Pulsar Constraint Proxy","sys_3",1.057553956834532,-2.9206187594560955
+"Binary/Pulsar Constraint Proxy","sys_3",1.100719424460431,-2.9206545033576323
+"Binary/Pulsar Constraint Proxy","sys_3",1.143884892086331,-2.9206838825240125
+"Binary/Pulsar Constraint Proxy","sys_3",1.18705035971223,-2.920708024296637
+"Binary/Pulsar Constraint Proxy","sys_3",1.230215827338129,-2.920727857859483
+"Binary/Pulsar Constraint Proxy","sys_3",1.2733812949640289,-2.9207441486852463
+"Binary/Pulsar Constraint Proxy","sys_3",1.3165467625899279,-2.9207575270907697
+"Binary/Pulsar Constraint Proxy","sys_3",1.3597122302158278,-2.920768511884661
+"Binary/Pulsar Constraint Proxy","sys_3",1.4028776978417268,-2.920777529932181
+"Binary/Pulsar Constraint Proxy","sys_3",1.4460431654676258,-2.920784932328411
+"Binary/Pulsar Constraint Proxy","sys_3",1.4892086330935257,-2.9207910077572716
+"Binary/Pulsar Constraint Proxy","sys_3",1.5323741007194247,-2.920795993518243
+"Binary/Pulsar Constraint Proxy","sys_3",1.5755395683453237,-2.920800084622123
+"Binary/Pulsar Constraint Proxy","sys_3",1.6187050359712227,-2.920803441289577
+"Binary/Pulsar Constraint Proxy","sys_3",1.6618705035971226,-2.9208061951296704
+"Binary/Pulsar Constraint Proxy","sys_3",1.7050359712230216,-2.9208084542283017
+"Binary/Pulsar Constraint Proxy","sys_3",1.7482014388489207,-2.920810307337035
+"Binary/Pulsar Constraint Proxy","sys_3",1.7913669064748206,-2.920811827320004
+"Binary/Pulsar Constraint Proxy","sys_3",1.8345323741007196,-2.9208130739892826
+"Binary/Pulsar Constraint Proxy","sys_3",1.8776978417266186,-2.920814096436448
+"Binary/Pulsar Constraint Proxy","sys_3",1.9208633093525176,-2.9208149349493
+"Binary/Pulsar Constraint Proxy","sys_3",1.9640287769784166,-2.920815622587109
+"Binary/Pulsar Constraint Proxy","sys_3",2.0071942446043165,-2.9208161864749345
+"Binary/Pulsar Constraint Proxy","sys_3",2.0503597122302155,-2.9208166488668508
+"Binary/Pulsar Constraint Proxy","sys_3",2.0935251798561154,-2.9208170280191963
+"Binary/Pulsar Constraint Proxy","sys_3",2.1366906474820144,-2.9208173389076384
+"Binary/Pulsar Constraint Proxy","sys_3",2.1798561151079134,-2.9208175938159022
+"Binary/Pulsar Constraint Proxy","sys_3",2.2230215827338133,-2.920817802819058
+"Binary/Pulsar Constraint Proxy","sys_3",2.2661870503597124,-2.9208179741801987
+"Binary/Pulsar Constraint Proxy","sys_3",2.3093525179856123,-2.920818114675987
+"Binary/Pulsar Constraint Proxy","sys_3",2.3525179856115113,-2.9208182298637997
+"Binary/Pulsar Constraint Proxy","sys_3",2.3956834532374103,-2.9208183243009236
+"Binary/Pulsar Constraint Proxy","sys_3",2.4388489208633093,-2.9208184017243926
+"Binary/Pulsar Constraint Proxy","sys_3",2.4820143884892083,-2.9208184651985225
+"Binary/Pulsar Constraint Proxy","sys_3",2.525179856115108,-2.9208185172359333
+"Binary/Pulsar Constraint Proxy","sys_3",2.568345323741007,-2.920818559896822
+"Binary/Pulsar Constraint Proxy","sys_3",2.6115107913669062,-2.9208185948703815
+"Binary/Pulsar Constraint Proxy","sys_3",2.654676258992806,-2.9208186235415847
+"Binary/Pulsar Constraint Proxy","sys_3",2.697841726618705,-2.920818647045949
+"Binary/Pulsar Constraint Proxy","sys_3",2.741007194244604,-2.920818666314449
+"Binary/Pulsar Constraint Proxy","sys_3",2.784172661870503,-2.9208186821103523
+"Binary/Pulsar Constraint Proxy","sys_3",2.827338129496402,-2.920818695059417
+"Binary/Pulsar Constraint Proxy","sys_3",2.870503597122302,-2.920818705674661
+"Binary/Pulsar Constraint Proxy","sys_3",2.913669064748201,-2.9208187143766686
+"Binary/Pulsar Constraint Proxy","sys_3",2.956834532374101,-2.9208187215102397
+"Binary/Pulsar Constraint Proxy","sys_3",3,-2.9208187273580433
+"Bird Migration Coherence","corrByCohort",0,1
+"Bird Migration Coherence","corrByCohort",1,0.9987460183174571
+"Bird Migration Coherence","corrByCohort",2,0.9989438008384958

@@ -1,0 +1,797 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QDS Battery Habitat v1.2 — Build 002</title>
+  <style>
+    :root{
+      --bg:#070b12;
+      --bg2:#0b1220;
+      --panel:#0e1628;
+      --panel2:#0b1426;
+      --line:#1d2a44;
+      --soft:#9fb0c9;
+      --text:#f5f7ff;
+      --accent:#8dd3ff;
+      --accent2:#b8ffdf;
+      --warn:#ffd08d;
+      --good:#b9ffb3;
+      --muted:#8b9ab4;
+      --chip:#111c33;
+      --glow:0 0 0 1px rgba(141,211,255,.12), 0 10px 30px rgba(0,0,0,.35);
+      --radius:16px;
+      --radius2:12px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(141,211,255,.08), transparent 60%),
+        radial-gradient(1000px 600px at 90% 10%, rgba(184,255,223,.06), transparent 60%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+      min-height:100vh;
+      padding:20px 14px 40px;
+    }
+
+    .wrap{max-width:980px;margin:0 auto;display:grid;gap:14px}
+
+    .titlebar{
+      display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+      padding:14px 16px;border:1px solid var(--line);background:linear-gradient(180deg,var(--panel),var(--panel2));
+      border-radius:var(--radius);box-shadow:var(--glow);
+    }
+    .title-left{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .pill{
+      padding:6px 10px;border-radius:999px;background:var(--chip);
+      border:1px solid rgba(141,211,255,.18);font-size:11px;letter-spacing:.4px;text-transform:uppercase;
+      color:var(--soft);
+    }
+    h1{
+      font-size:22px;margin:0;letter-spacing:.2px;
+    }
+    .sub{
+      color:var(--muted);font-size:12.5px;margin-top:2px
+    }
+
+    .grid{
+      display:grid;gap:14px;
+      grid-template-columns: 1fr;
+    }
+    @media(min-width:860px){
+      .grid{grid-template-columns: 1.05fr .95fr}
+    }
+
+    .card{
+      padding:16px;border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+      border-radius:var(--radius);box-shadow:var(--glow);
+    }
+    .card h2{
+      font-size:16px;margin:0 0 10px 0;color:#dfe8ff
+    }
+    .card h3{
+      font-size:13.5px;margin:14px 0 8px 0;color:#d8e7ff
+    }
+
+    .row{
+      display:grid;gap:10px;
+      grid-template-columns: 1fr;
+    }
+    @media(min-width:520px){
+      .row.two{grid-template-columns: 1fr 1fr}
+      .row.three{grid-template-columns: 1fr 1fr 1fr}
+    }
+
+    label{
+      display:block;font-size:11.5px;color:var(--muted);margin-bottom:6px
+    }
+    input[type="number"], select{
+      width:100%;padding:10px 11px;border-radius:10px;
+      border:1px solid var(--line);
+      background:rgba(7,12,24,.55);
+      color:var(--text);
+      outline:none;
+    }
+    input[type="number"]:focus, select:focus{
+      border-color:rgba(141,211,255,.45);
+      box-shadow:0 0 0 3px rgba(141,211,255,.12);
+    }
+
+    .toggle{
+      display:flex;align-items:center;justify-content:space-between;
+      gap:12px;padding:10px 12px;border:1px solid var(--line);
+      border-radius:var(--radius2);
+      background:rgba(255,255,255,.02);
+    }
+    .toggle strong{font-size:13px}
+    .toggle small{color:var(--muted);font-size:11.5px}
+    .toggle .left{display:grid;gap:2px}
+    .toggle input{
+      width:44px;height:24px;appearance:none;position:relative;cursor:pointer;
+      background:#101a30;border:1px solid #22355a;border-radius:999px;transition:.18s;
+    }
+    .toggle input:checked{
+      background:linear-gradient(90deg, rgba(141,211,255,.35), rgba(184,255,223,.35));
+      border-color:rgba(141,211,255,.55);
+    }
+    .toggle input::after{
+      content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;
+      background:#dbe8ff;transition:.18s;
+      box-shadow:0 2px 6px rgba(0,0,0,.4);
+    }
+    .toggle input:checked::after{left:22px}
+
+    .btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    button{
+      padding:9px 11px;border-radius:12px;border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      color:var(--text);cursor:pointer;font-size:11.5px;
+    }
+    button:hover{border-color:rgba(141,211,255,.35)}
+
+    .note{
+      padding:10px 11px;border-radius:12px;border:1px dashed rgba(141,211,255,.25);
+      background:rgba(141,211,255,.05);color:var(--soft);font-size:11.5px;line-height:1.35
+    }
+
+    .legend{
+      display:flex;gap:6px;flex-wrap:wrap
+    }
+    .badge{
+      padding:5px 8px;border-radius:999px;font-size:10px;
+      border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);
+      color:var(--muted);cursor:pointer;user-select:none;
+    }
+    .badge.active{
+      color:#0b0f18;background:linear-gradient(90deg,var(--accent),var(--accent2));
+      border-color:transparent;font-weight:600;
+    }
+
+    .impactBox{
+      border:1px solid var(--line);border-radius:var(--radius);
+      padding:14px;background:linear-gradient(180deg, rgba(141,211,255,.05), rgba(255,255,255,.01));
+    }
+    .impactTop{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+    }
+    .big{
+      font-size:26px;font-weight:700;letter-spacing:.3px
+    }
+    .big small{
+      font-size:11px;color:var(--muted);font-weight:500;margin-left:6px
+    }
+    .takeaway{
+      margin-top:10px;padding:10px 11px;border-radius:12px;
+      background:rgba(255,255,255,.03);border:1px solid rgba(141,211,255,.15);
+      font-size:12px;color:#eaf2ff;
+    }
+
+    .bars{display:grid;gap:8px;margin-top:10px}
+    .barrow{display:grid;grid-template-columns: 120px 1fr 48px;gap:8px;align-items:center}
+    .barlabel{font-size:11px;color:var(--muted)}
+    .track{
+      height:10px;border-radius:999px;background:rgba(255,255,255,.06);
+      overflow:hidden;border:1px solid rgba(255,255,255,.05);
+    }
+    .fill{
+      height:100%;width:0%;
+      background:linear-gradient(90deg, rgba(141,211,255,.2), rgba(184,255,223,.45));
+      transition:width .2s;
+    }
+    .barpct{font-size:10.5px;color:var(--soft);text-align:right}
+
+    .ascii{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size:11px;line-height:1.25;color:#d9e7ff;
+      white-space:pre;overflow:auto;
+      padding:12px;border-radius:12px;border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+    }
+
+    .roi{
+      display:grid;gap:8px;
+      padding:12px;border-radius:12px;border:1px solid rgba(184,255,223,.18);
+      background:rgba(184,255,223,.06);
+      font-size:11.5px;color:#eafff5;
+    }
+    .roi strong{font-size:13px}
+
+    .muteline{color:var(--muted);font-size:11px}
+
+    .foot{
+      color:var(--muted);font-size:10.5px;text-align:center;margin-top:4px
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <div class="titlebar">
+      <div class="title-left">
+        <span class="pill">Battery Habitat v1.2</span>
+        <span class="pill">Build 002</span>
+        <span class="pill">No cell chemistry changes</span>
+        <span class="pill">Demo model</span>
+        <div>
+          <h1>QDS Hybrid Battery Life Uplift — AI + Casing + Honeycomb</h1>
+          <div class="sub">
+            Architecture-level estimator for pitch + pilot framing.
+            Focus: stress-event reduction, thermal uniformity, safer modular isolation.
+          </div>
+        </div>
+      </div>
+      <div class="legend" id="rangeLegend">
+        <span class="badge active" data-level="concept">concept-only</span>
+        <span class="badge" data-level="early">early prototype</span>
+        <span class="badge" data-level="strong">strong claim pathway</span>
+      </div>
+    </div>
+
+    <div class="grid">
+
+      <!-- LEFT COLUMN -->
+      <div class="card">
+        <h2>1) Feature Stack (toggle your architecture)</h2>
+
+        <div class="toggle">
+          <div class="left">
+            <strong>AI Stewardship</strong>
+            <small>Thermal gate, dynamic SoC ceilings, stress-event logic</small>
+          </div>
+          <input id="f_ai" type="checkbox" checked />
+        </div>
+
+        <div class="toggle">
+          <div class="left">
+            <strong>Graphite/Carbon Thermal Case</strong>
+            <small>Heat spreading, better uniformity, lightweight structure</small>
+          </div>
+          <input id="f_case" type="checkbox" checked />
+        </div>
+
+        <div class="toggle">
+          <div class="left">
+            <strong>3D-Printed Micro-Airflow Core</strong>
+            <small>Gentle convection paths to flatten hotspots</small>
+          </div>
+          <input id="f_air" type="checkbox" checked />
+        </div>
+
+        <div class="toggle">
+          <div class="left">
+            <strong>Honeycomb Module/Cell Cradle</strong>
+            <small>Uniform compression + isolation + propagation control</small>
+          </div>
+          <input id="f_hex" type="checkbox" checked />
+        </div>
+
+        <div class="toggle">
+          <div class="left">
+            <strong>Module-Level Damping</strong>
+            <small>Elastomer / foam / myco-style lattice for vibration reduction</small>
+          </div>
+          <input id="f_damp" type="checkbox" />
+        </div>
+
+        <div class="toggle">
+          <div class="left">
+            <strong>Solar Maintenance “Guardian”</strong>
+            <small>Trickle top-ups to avoid damaging storage drift</small>
+          </div>
+          <input id="f_solar" type="checkbox" />
+        </div>
+
+        <div class="note" id="solarNote" style="margin-top:10px; display:none;">
+          Best for long-idle storage, remote assets, or stationary packs.
+          In high-duty EV use, this feature is typically irrelevant.
+        </div>
+
+        <div class="btnrow">
+          <button id="presetFleet">Fleet Preset</button>
+          <button id="presetLight">Light EV Preset</button>
+          <button id="presetStationary">Stationary Preset</button>
+          <button id="resetAll">Reset Toggles</button>
+        </div>
+
+        <h3>2) Use Context</h3>
+        <div class="row two">
+          <div>
+            <label>Primary Use Case</label>
+            <select id="useCase">
+              <option value="fleet">EV — fleet / courier (high duty)</option>
+              <option value="light">EV — light personal</option>
+              <option value="stationary">Stationary — storage / microgrid</option>
+            </select>
+          </div>
+          <div>
+            <label>Operational Discipline</label>
+            <select id="discipline">
+              <option value="low">Low</option>
+              <option value="med" selected>Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row two" style="margin-top:10px;">
+          <div>
+            <label>Average Ambient Temp (°C)</label>
+            <input id="tempC" type="number" min="-20" max="60" step="1" value="18" />
+          </div>
+          <div>
+            <label>Rough Vibration Harshness</label>
+            <select id="vibe">
+              <option value="low">Low</option>
+              <option value="med" selected>Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="note" style="margin-top:12px;">
+          This is a demo estimator. It’s meant for pattern sense and pitch framing, not lab-grade claims.
+          The honest real-world win is usually “effective battery value”:
+          life + reduced downtime + improved predictability.
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="card">
+        <h2>3) Estimated Impact</h2>
+
+        <div class="impactBox">
+          <div class="impactTop">
+            <div>
+              <div class="muteline">Projected Effective Life Uplift (demo band)</div>
+              <div class="big" id="upliftRange">—</div>
+            </div>
+            <span class="pill" id="levelPill">concept-only</span>
+          </div>
+
+          <div class="takeaway" id="takeawayLine">
+            Expected real-world win: fewer stress events + better thermal uniformity + safer modular isolation.
+          </div>
+
+          <div class="muteline" style="margin-top:10px;">Likely driver breakdown (relative)</div>
+
+          <div class="bars">
+            <div class="barrow">
+              <div class="barlabel">AI rules</div>
+              <div class="track"><div class="fill" id="bar_ai"></div></div>
+              <div class="barpct" id="pct_ai">0%</div>
+            </div>
+            <div class="barrow">
+              <div class="barlabel">Thermal case</div>
+              <div class="track"><div class="fill" id="bar_case"></div></div>
+              <div class="barpct" id="pct_case">0%</div>
+            </div>
+            <div class="barrow">
+              <div class="barlabel">Micro-airflow</div>
+              <div class="track"><div class="fill" id="bar_air"></div></div>
+              <div class="barpct" id="pct_air">0%</div>
+            </div>
+            <div class="barrow">
+              <div class="barlabel">Honeycomb</div>
+              <div class="track"><div class="fill" id="bar_hex"></div></div>
+              <div class="barpct" id="pct_hex">0%</div>
+            </div>
+            <div class="barrow">
+              <div class="barlabel">Damping</div>
+              <div class="track"><div class="fill" id="bar_damp"></div></div>
+              <div class="barpct" id="pct_damp">0%</div>
+            </div>
+            <div class="barrow">
+              <div class="barlabel">Solar maint.</div>
+              <div class="track"><div class="fill" id="bar_solar"></div></div>
+              <div class="barpct" id="pct_solar">0%</div>
+            </div>
+          </div>
+
+          <div class="note" style="margin-top:12px;">
+            Rule of thumb: improvements overlap. The stack wins by reducing stress exposure consistently,
+            not by one magical feature.
+          </div>
+        </div>
+
+        <h3>4) ASCII Design Diagram (dimensioned placeholders)</h3>
+        <div class="ascii" id="asciiBox"></div>
+
+        <div class="row two" style="margin-top:10px;">
+          <div>
+            <label>Example L_pack (mm)</label>
+            <input id="L_pack" type="number" min="200" max="4000" value="1200" />
+          </div>
+          <div>
+            <label>Example W_pack (mm)</label>
+            <input id="W_pack" type="number" min="200" max="3000" value="800" />
+          </div>
+        </div>
+        <div class="row two" style="margin-top:10px;">
+          <div>
+            <label>Example H_pack (mm)</label>
+            <input id="H_pack" type="number" min="40" max="600" value="140" />
+          </div>
+          <div>
+            <label>Honeycomb pitch P_hex (mm)</label>
+            <input id="P_hex" type="number" min="5" max="200" value="55" />
+          </div>
+        </div>
+
+        <div class="note" style="margin-top:10px;">
+          The diagram text is a concept map. These numbers help keep the story “engineer-clean”
+          in meetings without overcommitting to one platform.
+        </div>
+
+        <h3>5) Assumption Audit (mini)</h3>
+        <div class="row two">
+          <div>
+            <label>Baseline life expectation (years)</label>
+            <input id="baseLife" type="number" min="1" max="30" step="0.5" value="8" />
+          </div>
+          <div>
+            <label>Baseline annual battery-related cost (£)</label>
+            <input id="baseCost" type="number" min="0" max="10000000" step="500" value="20000" />
+          </div>
+        </div>
+
+        <div class="roi" style="margin-top:10px;">
+          <strong id="projLife">Projected life: —</strong>
+          <div id="roiBand">Rough annual value uplift: —</div>
+          <div class="muteline">
+            This estimate assumes reduced replacements + reduced downtime in relevant use cases.
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px;">
+          <h2 style="margin-bottom:8px;">Pilot metrics we will measure</h2>
+          <div class="muteline">This is your “I’m ready to run a real trial” signal.</div>
+          <ul style="margin:8px 0 0 18px;color:var(--soft);font-size:11.8px;">
+            <li>Temperature spread across pack</li>
+            <li>Stress-event frequency</li>
+            <li>Degradation slope vs baseline</li>
+            <li>Vibration exposure effects</li>
+            <li>Downtime / maintenance delta</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="foot">
+      QDS Battery Habitat v1.2 — Build 002 demo. Architecture-level concept tool, not a lab certificate.
+      Designed for LifeFirst-aligned, safety-first pilots.
+    </div>
+
+  </div>
+
+<script>
+(() => {
+  // --- Feature base weights (relative contribution to stress reduction) ---
+  const W = {
+    ai: 0.34,
+    case: 0.23,
+    air: 0.17,
+    hex: 0.19,
+    damp: 0.12,
+    solar: 0.06
+  };
+
+  // --- Context multipliers (stress environment intensity) ---
+  const USE = {
+    fleet: 1.00,
+    light: 0.72,
+    stationary: 0.88
+  };
+
+  const DISCIPLINE = {
+    low: 1.08,   // more chaos -> more upside from good control
+    med: 1.00,
+    high: 0.92
+  };
+
+  const VIBE = {
+    low: 0.90,
+    med: 1.00,
+    high: 1.10
+  };
+
+  function tempFactor(t){
+    // Hotter environments increase value of thermal control.
+    if (t <= 0) return 0.92;
+    if (t <= 10) return 0.96;
+    if (t <= 20) return 1.00;
+    if (t <= 30) return 1.06;
+    if (t <= 40) return 1.12;
+    return 1.18;
+  }
+
+  // --- Maturity mapping ---
+  // rawScore is 0..~1 from selected features
+  const LEVEL_MAP = {
+    concept: { lowMul: 0.10, highMul: 0.22, capLow: 14, capHigh: 24, pill:"concept-only" },
+    early:   { lowMul: 0.14, highMul: 0.30, capLow: 18, capHigh: 30, pill:"early prototype" },
+    strong:  { lowMul: 0.18, highMul: 0.38, capLow: 20, capHigh: 32, pill:"strong claim pathway" }
+  };
+
+  // --- DOM ---
+  const $ = (id) => document.getElementById(id);
+
+  const toggles = {
+    ai: $("f_ai"),
+    case: $("f_case"),
+    air: $("f_air"),
+    hex: $("f_hex"),
+    damp: $("f_damp"),
+    solar: $("f_solar")
+  };
+
+  const bars = {
+    ai: $("bar_ai"), case: $("bar_case"), air: $("bar_air"),
+    hex: $("bar_hex"), damp: $("bar_damp"), solar: $("bar_solar")
+  };
+
+  const pcts = {
+    ai: $("pct_ai"), case: $("pct_case"), air: $("pct_air"),
+    hex: $("pct_hex"), damp: $("pct_damp"), solar: $("pct_solar")
+  };
+
+  let level = "concept";
+
+  function selectedWeights(){
+    const s = {};
+    Object.keys(W).forEach(k => s[k] = toggles[k].checked ? W[k] : 0);
+    return s;
+  }
+
+  function normalisedContrib(sw){
+    const total = Object.values(sw).reduce((a,b)=>a+b,0) || 1;
+    const out = {};
+    Object.keys(sw).forEach(k => out[k] = sw[k]/total);
+    return { out, total };
+  }
+
+  function computeRawScore(sw, ctx){
+    // Sum of enabled weights, mildly boosted by context stress
+    const base = Object.values(sw).reduce((a,b)=>a+b,0); // 0..~1.1
+    // Convert to skillful diminishing returns curve
+    const curved = 1 - Math.exp(-2.2 * base); // 0..~0.9
+    return curved * ctx;
+  }
+
+  function contextMultiplier(){
+    const use = $("useCase").value;
+    const disc = $("discipline").value;
+    const vibe = $("vibe").value;
+    const temp = Number($("tempC").value || 18);
+
+    return USE[use] * DISCIPLINE[disc] * VIBE[vibe] * tempFactor(temp);
+  }
+
+  function updateSolarGate(){
+    const use = $("useCase").value;
+    const note = $("solarNote");
+
+    // Show helpful note when solar is enabled or use-case is stationary.
+    const show = toggles.solar.checked || use === "stationary";
+    note.style.display = show ? "block" : "none";
+
+    // Soft hint: if fleet selected, solar is de-emphasised in contribution.
+  }
+
+  function updateASCII(){
+    const L = Number($("L_pack").value || 1200);
+    const Wp = Number($("W_pack").value || 800);
+    const H = Number($("H_pack").value || 140);
+    const P = Number($("P_hex").value || 55);
+
+    $("asciiBox").textContent =
+`PACK TOP VIEW (concept)
+<------------------------------ L_pack ------------------------------>
+
++-------------------------------------------------------------------+
+|                                                                   |
+|   HONEYCOMB MODULE BAY BLOCKS                                     |
+|                                                                   |
+|     +--------------------+      +--------------------+            |
+|     | BAY A (hex array)  |      | BAY B (hex array)  |            |
+|     +--------------------+      +--------------------+            |
+|                                                                   |
+|     +--------------------+      +--------------------+            |
+|     | BAY C (hex array)  |      | BAY D (hex array)  |            |
+|     +--------------------+      +--------------------+            |
+|                                                                   |
+|   Service edge: connectors, fuses, BMS, vent routing              |
+|                                                                   |
++-------------------------------------------------------------------+
+<------------------------------ W_pack ------------------------------>
+
+CROSS-SECTION STACK (concept)
+[A] Outer Sacrificial Skin        t_A
+[B] Damping/Impact Layer          t_B
+[C] Thermal + Micro-Airflow       t_C   (channels d_air)
+[D] Honeycomb Cradle              h_hex (walls t_hex, pads t_pad)
+[E] Structural Inner Tray         t_E
+[F] Service Zone                  h_srv
+
+Example dimensions (placeholders)
+L_pack = ${L} mm
+W_pack = ${Wp} mm
+H_pack = ${H} mm
+Honeycomb pitch P_hex = ${P} mm`;
+  }
+
+  function updateROI(upliftMid){
+    const baseLife = Number($("baseLife").value || 8);
+    const baseCost = Number($("baseCost").value || 0);
+
+    // Translate uplift into life extension factor (conservative)
+    const lifeGain = upliftMid * 0.55; // not 1:1; keeps honest
+    const newLife = baseLife * (1 + lifeGain);
+
+    $("projLife").textContent =
+      `Projected life: ${newLife.toFixed(1)} years (baseline ${baseLife}y)`;
+
+    // Annual value band (simple proportional story)
+    const lowVal = baseCost * Math.max(0, upliftMid * 0.35);
+    const highVal = baseCost * Math.max(0, upliftMid * 0.75);
+
+    const fmt = (n) => "£" + Math.round(n).toLocaleString("en-GB");
+
+    $("roiBand").textContent =
+      `Rough annual value uplift: ${fmt(lowVal)} to ${fmt(highVal)}`;
+  }
+
+  function updateImpact(){
+    updateSolarGate();
+
+    const sw = selectedWeights();
+    const { out } = normalisedContrib(sw);
+
+    // Apply soft solar de-weighting outside stationary context
+    const use = $("useCase").value;
+    if(use !== "stationary"){
+      out.solar = out.solar * 0.35;
+      // re-normalise after adjustment
+      const tot = Object.values(out).reduce((a,b)=>a+b,0) || 1;
+      Object.keys(out).forEach(k => out[k] = out[k]/tot);
+    }
+
+    // Bars
+    Object.keys(out).forEach(k => {
+      const pct = Math.round(out[k] * 100);
+      bars[k].style.width = pct + "%";
+      pcts[k].textContent = pct + "%";
+    });
+
+    // Context + raw score
+    const ctx = contextMultiplier();
+    const raw = computeRawScore(sw, ctx);
+
+    const L = LEVEL_MAP[level];
+
+    // Uplift in fraction terms (0..)
+    let low = raw * L.lowMul;
+    let high = raw * L.highMul;
+
+    // Convert to percent
+    low = low * 100;
+    high = high * 100;
+
+    // Caps per maturity
+    low = Math.min(low, L.capLow);
+    high = Math.min(high, L.capHigh);
+
+    // Ensure ordering sanity
+    if(high < low) high = low + 1;
+
+    $("upliftRange").innerHTML =
+      `${low.toFixed(1)}% to ${high.toFixed(1)}% <small>(capped for credibility)</small>`;
+
+    $("levelPill").textContent = L.pill;
+
+    // Takeaway line stays constant but feels purposeful
+    $("takeawayLine").textContent =
+      "Expected real-world win: fewer stress events + better thermal uniformity + safer modular isolation.";
+
+    // ROI uses midpoint
+    const mid = ((low + high) / 2) / 100;
+    updateROI(mid);
+  }
+
+  // --- Legend interaction ---
+  $("rangeLegend").addEventListener("click", (e) => {
+    const b = e.target.closest(".badge");
+    if(!b) return;
+    document.querySelectorAll(".badge").forEach(x => x.classList.remove("active"));
+    b.classList.add("active");
+    level = b.dataset.level;
+    updateImpact();
+  });
+
+  // --- Presets ---
+  $("presetFleet").onclick = () => {
+    $("useCase").value = "fleet";
+    $("discipline").value = "med";
+    $("tempC").value = 18;
+    $("vibe").value = "med";
+    toggles.ai.checked = true;
+    toggles.case.checked = true;
+    toggles.air.checked = true;
+    toggles.hex.checked = true;
+    toggles.damp.checked = false;
+    toggles.solar.checked = false;
+    level = "early";
+    syncLegend();
+    updateAll();
+  };
+
+  $("presetLight").onclick = () => {
+    $("useCase").value = "light";
+    $("discipline").value = "high";
+    $("tempC").value = 16;
+    $("vibe").value = "low";
+    toggles.ai.checked = true;
+    toggles.case.checked = true;
+    toggles.air.checked = false;
+    toggles.hex.checked = true;
+    toggles.damp.checked = false;
+    toggles.solar.checked = false;
+    level = "concept";
+    syncLegend();
+    updateAll();
+  };
+
+  $("presetStationary").onclick = () => {
+    $("useCase").value = "stationary";
+    $("discipline").value = "high";
+    $("tempC").value = 20;
+    $("vibe").value = "low";
+    toggles.ai.checked = true;
+    toggles.case.checked = true;
+    toggles.air.checked = true;
+    toggles.hex.checked = true;
+    toggles.damp.checked = false;
+    toggles.solar.checked = true;
+    level = "strong";
+    syncLegend();
+    updateAll();
+  };
+
+  $("resetAll").onclick = () => {
+    Object.values(toggles).forEach(t => t.checked = false);
+    toggles.ai.checked = true;
+    level = "concept";
+    syncLegend();
+    updateAll();
+  };
+
+  function syncLegend(){
+    document.querySelectorAll(".badge").forEach(x => {
+      x.classList.toggle("active", x.dataset.level === level);
+    });
+  }
+
+  function updateAll(){
+    updateASCII();
+    updateImpact();
+  }
+
+  // --- Listeners ---
+  [...Object.values(toggles)].forEach(t => t.addEventListener("change", updateImpact));
+  ["useCase","discipline","tempC","vibe","baseLife","baseCost"]
+    .forEach(id => $(id).addEventListener("input", updateImpact));
+
+  ["L_pack","W_pack","H_pack","P_hex"]
+    .forEach(id => $(id).addEventListener("input", updateASCII));
+
+  // Init
+  syncLegend();
+  updateAll();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>UV-QDS — Offers Index</title>
+<style>
+:root{
+  --bg:#07080d; --panel:#0e111b; --panel2:#0b0e16;
+  --text:#eef1ff; --muted:#a7acc7;
+  --accent:#a78bfa; --accent2:#22d3ee; --ok:#7cffa7;
+  --radius:22px;
+  --shadow:0 10px 40px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.04);
+}
+*{box-sizing:border-box}
+body{
+  margin:0; color:var(--text);
+  background:
+    radial-gradient(900px 600px at 15% 10%, rgba(167,139,250,.12), transparent 60%),
+    radial-gradient(900px 700px at 85% 20%, rgba(34,211,238,.10), transparent 60%),
+    linear-gradient(180deg, #05060a, var(--bg) 35%, #05060a);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+.wrap{max-width:980px; margin:0 auto; padding:26px 16px 60px}
+.badge{
+  display:inline-flex; gap:8px; align-items:center;
+  padding:8px 12px; border-radius:999px;
+  background:linear-gradient(90deg, rgba(167,139,250,.18), rgba(34,211,238,.14));
+  border:1px solid rgba(255,255,255,.06); color:var(--muted);
+  font-size:12px; letter-spacing:.3px;
+}
+h1{font-size:clamp(28px, 6vw, 44px); margin:14px 0 8px}
+p.lead{color:var(--muted); font-size:clamp(14px, 2.5vw, 18px); line-height:1.5}
+.grid{display:grid; gap:14px; margin-top:18px}
+@media(min-width:740px){.grid{grid-template-columns:repeat(3,1fr)}}
+.card{
+  background:linear-gradient(180deg, rgba(255,255,255,.03), transparent 35%), var(--panel);
+  border-radius:var(--radius); padding:18px; box-shadow:var(--shadow);
+  border:1px solid rgba(255,255,255,.06);
+}
+.card h3{margin:0 0 8px; font-size:20px}
+.small{color:var(--muted); font-size:13px}
+.price{
+  margin-top:10px; font-weight:700; font-size:22px;
+  background:linear-gradient(90deg, var(--accent), #ff6bd6);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.btn{
+  display:flex; justify-content:space-between; align-items:center;
+  width:100%; margin-top:12px; padding:12px 14px;
+  border-radius:14px; text-decoration:none; color:var(--text);
+  background:linear-gradient(90deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+  border:1px solid rgba(255,255,255,.08);
+}
+.btn:hover{border-color:rgba(167,139,250,.35)}
+.footer{
+  margin-top:28px; padding:16px;
+  background:var(--panel2); border-radius:16px;
+  border:1px solid rgba(255,255,255,.05);
+  color:var(--muted); font-size:12px;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="badge">UV-QDS • Productised offers • Mobile-first shipping</span>
+  <h1>Offer Stack — Quick, Clean, Hard to Refuse</h1>
+  <p class="lead">
+    Three simple packages built for fast decision-making.
+    No waffle, no agency theatre — just clear scope and a strong wow path.
+  </p>
+
+  <div class="grid">
+    <div class="card">
+      <h3>One-Page Microsite</h3>
+      <div class="small">A clean brand/idea page with hero, sections, and contact links.</div>
+      <div class="price">£300–£900</div>
+      <a class="btn" href="offer_microsite_v1.html">
+        <span>Open page</span><span>→</span>
+      </a>
+    </div>
+
+    <div class="card">
+      <h3>Showcase Hub</h3>
+      <div class="small">Home index + 5–10 linked pages/tools with a guided “Start Here” route.</div>
+      <div class="price">£800–£2,500</div>
+      <a class="btn" href="offer_showcase_hub_v1.html">
+        <span>Open page</span><span>→</span>
+      </a>
+    </div>
+
+    <div class="card">
+      <h3>Interactive Demo Suite</h3>
+      <div class="small">2–4 lightweight tools with versioned releases + one-command launch.</div>
+      <div class="price">£1,500–£5,500</div>
+      <a class="btn" href="offer_demo_suite_v1.html">
+        <span>Open page</span><span>→</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="footer">
+    Tip: link this index from your main portfolio or index.html so clients can
+    jump straight to pricing and deliverables.
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,7 @@
+QDS SINCE REPORT (DEDUPED BY CONTENT)
+Found files scanned: 0
+Unique payload files: 0
+Duplicate payloads skipped: 0
+Unique bytes: 0
+
+By extension (unique only):

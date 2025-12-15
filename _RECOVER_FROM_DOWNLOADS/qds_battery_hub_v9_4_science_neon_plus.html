@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>QDS Battery Hub v9.4 — Science Neon+</title>
+<style>
+  :root{
+    --bg:#05040a;
+    --panel:#0c0a18;
+    --panel2:#0b0b12;
+    --purple:#a855f7;
+    --purple2:#6d28d9;
+    --green:#39ff88;
+    --green2:#00d46a;
+    --text:#e9e6ff;
+    --muted:#a8a3c7;
+    --danger:#ff4d8d;
+    --glow: 0 0 12px rgba(168,85,247,.35), 0 0 18px rgba(57,255,136,.22);
+    --radius: 16px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background: radial-gradient(1200px 800px at 10% 10%, rgba(168,85,247,.08), transparent 60%),
+                     radial-gradient(1200px 800px at 90% 20%, rgba(57,255,136,.08), transparent 60%),
+                     linear-gradient(180deg, #040309, #05040a 40%, #070615);
+    color:var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  }
+  header{
+    padding:18px 16px 10px 16px;
+  }
+  .title{
+    font-size:22px; font-weight:800; letter-spacing:.4px;
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+  }
+  .badge{
+    font-size:11px; padding:3px 8px; border-radius:999px;
+    background: linear-gradient(90deg, rgba(168,85,247,.18), rgba(57,255,136,.18));
+    border:1px solid rgba(255,255,255,.08);
+  }
+  .sub{
+    margin-top:6px; color:var(--muted); font-size:12.5px;
+  }
+
+  .wrap{padding:0 12px 22px 12px; max-width:1100px; margin:0 auto;}
+  .tabs{
+    display:flex; gap:8px; padding:8px; background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.06); border-radius:var(--radius);
+  }
+  .tab{
+    flex:1; text-align:center; padding:10px 8px; font-size:12.5px; font-weight:650;
+    color:var(--muted);
+    border-radius:12px; cursor:pointer; user-select:none;
+    border:1px solid transparent;
+  }
+  .tab.active{
+    color:var(--text);
+    background: linear-gradient(135deg, rgba(168,85,247,.18), rgba(57,255,136,.12));
+    border-color: rgba(255,255,255,.08);
+    box-shadow: var(--glow);
+  }
+
+  .grid{
+    display:grid; gap:12px; margin-top:12px;
+    grid-template-columns: 1fr;
+  }
+  @media(min-width:900px){
+    .grid{grid-template-columns: 1.1fr .9fr;}
+  }
+
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:var(--radius);
+    padding:14px;
+    box-shadow: 0 8px 30px rgba(0,0,0,.35);
+  }
+  .card h3{
+    margin:0 0 10px 0; font-size:14.5px; letter-spacing:.3px;
+    display:flex; gap:8px; align-items:center;
+  }
+  .hint{color:var(--muted); font-size:11.5px; line-height:1.35;}
+  .row{display:grid; grid-template-columns: 1fr; gap:8px; margin:10px 0;}
+  .row2{display:grid; grid-template-columns: 1fr 1fr; gap:8px;}
+  @media(min-width:520px){
+    .row2{grid-template-columns: 1fr 1fr;}
+  }
+
+  label{
+    font-size:11px; color:var(--muted);
+    display:flex; justify-content:space-between; gap:10px;
+  }
+  input[type="range"], input[type="number"], select{
+    width:100%;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+    color:var(--text);
+    padding:8px 9px;
+    border-radius:10px;
+    outline:none;
+  }
+  input[type="number"]{font-size:12.5px;}
+  select{font-size:12px;}
+  .toggle{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:8px 10px; border-radius:10px;
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.06);
+  }
+  .toggle span{font-size:11.5px; color:var(--muted)}
+  .toggle strong{font-size:12px;}
+  .toggle input{transform:scale(1.08)}
+
+  .btns{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;}
+  button{
+    background: linear-gradient(135deg, rgba(168,85,247,.25), rgba(57,255,136,.18));
+    border:1px solid rgba(255,255,255,.09);
+    color:var(--text);
+    padding:9px 11px; font-size:12px; font-weight:700;
+    border-radius:12px; cursor:pointer;
+    box-shadow: var(--glow);
+  }
+  button.secondary{
+    background: rgba(255,255,255,.04);
+    box-shadow:none;
+  }
+  button.danger{
+    background: linear-gradient(135deg, rgba(255,77,141,.22), rgba(168,85,247,.12));
+  }
+
+  .kpi{
+    display:grid; grid-template-columns: 1fr 1fr; gap:8px;
+  }
+  .kbox{
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:12px; padding:10px;
+  }
+  .kbox .klabel{font-size:10.5px; color:var(--muted)}
+  .kbox .kval{font-size:18px; font-weight:800; margin-top:2px;}
+  .kbox .ksub{font-size:10px; color:var(--muted)}
+
+  .split{
+    display:grid; grid-template-columns: 1fr; gap:10px;
+  }
+  @media(min-width:900px){
+    .split{grid-template-columns: 1fr 1fr;}
+  }
+
+  canvas{
+    width:100%; height:180px;
+    background: linear-gradient(180deg, rgba(0,0,0,.18), rgba(255,255,255,.02));
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:12px;
+  }
+
+  .history{
+    max-height:240px; overflow:auto;
+    border:1px solid rgba(255,255,255,.06);
+    background:rgba(255,255,255,.02);
+    border-radius:12px; padding:8px;
+  }
+  .hist-item{
+    padding:8px; border-bottom:1px dashed rgba(255,255,255,.06);
+    font-size:11.3px;
+  }
+  .hist-item:last-child{border-bottom:none}
+  .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;}
+  .small{font-size:10.5px; color:var(--muted)}
+  .pill{
+    display:inline-block; padding:2px 6px; border-radius:999px;
+    font-size:9.5px; margin-right:6px;
+    border:1px solid rgba(255,255,255,.08);
+    background:rgba(255,255,255,.04);
+  }
+  .footer-note{
+    margin-top:10px; font-size:10.5px; color:var(--muted);
+  }
+</style>
+</head>
+<body>
+  <header class="wrap">
+    <div class="title">
+      QDS Battery Hub v9.4 — <span style="color:var(--purple)">Science</span> <span style="color:var(--green)">Neon+</span>
+      <span class="badge">Offline</span>
+      <span class="badge">Phone-safe</span>
+      <span class="badge">Poster Mode</span>
+      <span class="badge">AutoBench Import</span>
+      <span class="badge">Shed Edition ⚙️🔋</span>
+    </div>
+    <div class="sub">
+      Semi-empirical capacity-fade toy for intuition:
+      <span class="mono">k₁·√t + k₂·t</span> scaled by operating stress.
+      White stress vs AR(1) correlated “QDS-style” stress.
+      Correct qualitative behaviours, not a chemistry-grade predictor.
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="tabs">
+      <div class="tab active" data-tab="lab">Overview & Lab</div>
+      <div class="tab" data-tab="coach">Battery Coach</div>
+      <div class="tab" data-tab="bench">AutoBench Viewer</div>
+    </div>
+
+    <!-- LAB -->
+    <section id="lab" class="tabpane">
+      <div class="grid">
+        <div class="card">
+          <h3>Controls</h3>
+
+          <div class="row2">
+            <div>
+              <label>Base cycle fade scale (k₁)
+                <span class="mono" id="k1v"></span>
+              </label>
+              <input id="k1" type="range" min="0.0006" max="0.0040" step="0.0001" value="0.0018"/>
+              <div class="hint">Higher = faster cycle-driven loss (toy). Think C-rate + DoD effects pooled.</div>
+            </div>
+            <div>
+              <label>Secondary linear wear (k₂)
+                <span class="mono" id="k2v"></span>
+              </label>
+              <input id="k2" type="range" min="0.0000" max="0.0012" step="0.0001" value="0.0004"/>
+              <div class="hint">Captures “steady grind” modes; kept small for stability.</div>
+            </div>
+          </div>
+
+          <div class="row2">
+            <div>
+              <label>Noise amplitude (operating stress %)
+                <span class="mono" id="ampv"></span>
+              </label>
+              <input id="amp" type="range" min="0.4" max="6.0" step="0.1" value="2.4"/>
+              <div class="hint">Per-cycle stress multiplier affecting effective fade rate.</div>
+            </div>
+            <div>
+              <label>Correlation ρ (0–0.99)
+                <span class="mono" id="rhov"></span>
+              </label>
+              <input id="rho" type="range" min="0" max="0.99" step="0.01" value="0.60"/>
+              <div class="hint">QDS-style persistence in operating stress.</div>
+            </div>
+          </div>
+
+          <div class="row2">
+            <div>
+              <label>Temperature (°C)
+                <span class="mono" id="tempv"></span>
+              </label>
+              <input id="temp" type="range" min="-5" max="55" step="1" value="25"/>
+              <div class="hint">
+                Simple Arrhenius-ish toy scaling of stress. Heat amplifies wear and variance.
+              </div>
+            </div>
+            <div>
+              <label>Charge window / DoD mode
+                <span class="mono" id="dodv"></span>
+              </label>
+              <select id="dod">
+                <option value="1.00">0–100% (max wear)</option>
+                <option value="0.88">10–90% (gentler)</option>
+                <option value="0.75" selected>20–80% (life-friendly)</option>
+                <option value="0.62">30–70% (ultra gentle)</option>
+              </select>
+              <div class="hint">Toy multiplier on effective k₁/k₂ to mimic DoD stress economics.</div>
+            </div>
+          </div>
+
+          <div class="row2">
+            <div>
+              <label>Cell count (Monte Carlo)
+                <span class="mono" id="nv"></span>
+              </label>
+              <input id="n" type="range" min="200" max="2000" step="50" value="1200"/>
+            </div>
+            <div>
+              <label>Max cycles simulated
+                <span class="mono" id="maxcv"></span>
+              </label>
+              <input id="maxc" type="range" min="400" max="4000" step="50" value="2500"/>
+            </div>
+          </div>
+
+          <div class="row2">
+            <div>
+              <label>Failure threshold (capacity %)
+                <span class="mono" id="thrv"></span>
+              </label>
+              <input id="thr" type="range" min="60" max="95" step="1" value="80"/>
+              <div class="hint">Typical consumer “end of life” bands hover ~80%.</div>
+            </div>
+            <div>
+              <label>Seed
+                <span class="mono" id="seedv"></span>
+              </label>
+              <input id="seed" type="number" min="1" max="999999" value="17345"/>
+              <div class="hint">Seed lock enables clean A/B comparisons.</div>
+            </div>
+          </div>
+
+          <div class="row2">
+            <div class="toggle">
+              <div>
+                <strong>Seed lock</strong><br/>
+                <span>Same seed = cleaner White vs QDS</span>
+              </div>
+              <input id="seedlock" type="checkbox" checked/>
+            </div>
+            <div class="toggle">
+              <div>
+                <strong>Poster Mode</strong><br/>
+                <span>Tames extremes for sane demos</span>
+              </div>
+              <input id="poster" type="checkbox" checked/>
+            </div>
+          </div>
+
+          <div class="row2">
+            <div class="toggle">
+              <div>
+                <strong>NoRegen</strong><br/>
+                <span>Prevents negative-stress “free wins”</span>
+              </div>
+              <input id="noregen" type="checkbox" checked/>
+            </div>
+            <div class="toggle">
+              <div>
+                <strong>Fast mode</strong><br/>
+                <span>Skips heavy per-cell trace work</span>
+              </div>
+              <input id="fast" type="checkbox" checked/>
+            </div>
+          </div>
+
+          <div class="btns">
+            <button id="run">Run simulation</button>
+            <button class="secondary" id="reset">Reset defaults</button>
+            <button class="secondary" id="presetPhone">Realistic phone</button>
+            <button class="secondary" id="presetQDS">QDS contrast</button>
+            <button class="secondary" id="presetChaos">Chaos</button>
+          </div>
+
+          <div class="btns">
+            <button class="secondary" id="copy">Copy summary</button>
+            <button class="secondary" id="exportLast">Export last JSON</button>
+            <button class="secondary" id="exportAll">Export full history</button>
+            <button class="danger" id="clearHist">Clear history</button>
+          </div>
+
+          <div class="footer-note">
+            Tip: keep <span class="mono">ρ ≤ 0.7</span> for “science poster” behaviour.
+            Go wild only when you want tail-risk fireworks.
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Results</h3>
+          <div class="kpi">
+            <div class="kbox">
+              <div class="klabel">White mean cycles to threshold</div>
+              <div class="kval" id="wMean">—</div>
+              <div class="ksub mono" id="wP">P10/P50/P90 —</div>
+            </div>
+            <div class="kbox">
+              <div class="klabel">White σ</div>
+              <div class="kval" id="wSig">—</div>
+              <div class="ksub">Independent operating stress</div>
+            </div>
+            <div class="kbox">
+              <div class="klabel">QDS mean cycles to threshold</div>
+              <div class="kval" id="qMean">—</div>
+              <div class="ksub mono" id="qP">P10/P50/P90 —</div>
+            </div>
+            <div class="kbox">
+              <div class="klabel">QDS σ</div>
+              <div class="kval" id="qSig">—</div>
+              <div class="ksub">AR(1) correlated operating stress</div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:10px; padding:10px;">
+            <div class="klabel">Relative change (QDS vs White)</div>
+            <div class="kval" id="delta">—</div>
+            <div class="small" id="meta">—</div>
+          </div>
+
+          <div class="split" style="margin-top:10px;">
+            <div>
+              <div class="small">Cycles-to-threshold distribution (binned)</div>
+              <canvas id="hist"></canvas>
+            </div>
+            <div>
+              <div class="small">Sample capacity traces (1 cell each)</div>
+              <canvas id="trace"></canvas>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:10px;">
+            <div class="hint">
+              Model: capacity starts at 100%. Per-cycle loss approx
+              <span class="mono">k₁·√t + k₂·t</span> multiplied by operating stress.
+              White uses i.i.d. noise; QDS uses AR(1) with ρ.
+              Each cell gets small random offsets in k₁ and k₂.
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:10px;">
+            <h3>Recent run history (local)</h3>
+            <div class="history" id="historyBox"></div>
+            <div class="small">Stored on-device via localStorage. Last 6 entries shown.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COACH -->
+    <section id="coach" class="tabpane" style="display:none;">
+      <div class="grid">
+        <div class="card">
+          <h3>Battery Coach (toy advice)</h3>
+          <div class="hint">
+            This is a friendly “physics-ish” coach based on your sliders.
+            It does not read your real phone data.
+          </div>
+
+          <div class="card" style="margin-top:10px;">
+            <div id="coachText" class="mono"></div>
+          </div>
+
+          <div class="btns">
+            <button id="coachRefresh">Refresh coach with current settings</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Coach heuristics used</h3>
+          <ul class="hint">
+            <li>Higher temperature amplifies effective stress and shortens expected life.</li>
+            <li>Narrower charge windows reduce effective wear multipliers (DoD toy).</li>
+            <li>High ρ increases streak risk; mean can stay similar while tails widen.</li>
+            <li>Poster Mode is recommended for demos and social posts.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- BENCH -->
+    <section id="bench" class="tabpane" style="display:none;">
+      <div class="grid">
+        <div class="card">
+          <h3>AutoBench Viewer — Import</h3>
+          <div class="hint">
+            Import your JSON logs from <span class="mono">QDS_BATTERY_LOGS</span>.
+            The browser can’t read Termux folders directly, so use file picker.
+          </div>
+
+          <div class="row">
+            <input id="benchFiles" type="file" accept=".json,application/json" multiple/>
+          </div>
+
+          <div class="btns">
+            <button id="benchLoad">Load selected logs</button>
+            <button class="secondary" id="benchClear">Clear viewer</button>
+          </div>
+
+          <div class="card" style="margin-top:10px;">
+            <div class="small">Parsed summaries</div>
+            <div class="history" id="benchBox"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Quick Termux helper (optional)</h3>
+          <div class="hint">
+            If you want the last AutoBench filename quickly:
+          </div>
+<pre class="mono small" style="white-space:pre-wrap;">
+cd ~/OMEGA_EMPIRE/UV_QDS/www/QDS_BATTERY_LOGS
+ls -t | head -5
+</pre>
+          <div class="hint">
+            Then you can tap-hold to share/open JSON in the browser picker.
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+<script>
+/* =========================================================
+   QDS Battery Hub v9.4 — Science Neon+
+   Single-file, offline, phone-safe
+   Focus: qualitative behaviour of correlated stress
+   ========================================================= */
+
+const $ = (id)=>document.getElementById(id);
+const TABS = [...document.querySelectorAll(".tab")];
+const PANES = {
+  lab: $("lab"),
+  coach: $("coach"),
+  bench: $("bench"),
+};
+
+function setTab(name){
+  TABS.forEach(t=>t.classList.toggle("active", t.dataset.tab===name));
+  Object.keys(PANES).forEach(k=>PANES[k].style.display = (k===name) ? "" : "none");
+}
+TABS.forEach(t=>t.addEventListener("click", ()=>setTab(t.dataset.tab)));
+
+/* ---------- Persistent history ---------- */
+const HIST_KEY = "QDS_BATTERY_HUB_V9_4_HISTORY";
+let history = [];
+try{ history = JSON.parse(localStorage.getItem(HIST_KEY)||"[]"); }catch(e){ history=[]; }
+function saveHistory(){
+  localStorage.setItem(HIST_KEY, JSON.stringify(history.slice(-120)));
+  renderHistory();
+}
+function renderHistory(){
+  const box = $("historyBox");
+  if(!box) return;
+  const last = history.slice(-6).reverse();
+  box.innerHTML = last.length ? "" : `<div class="hist-item small">No runs yet.</div>`;
+  last.forEach(h=>{
+    const tag = h.tag ? `<span class="pill">${h.tag}</span>` : "";
+    box.innerHTML += `
+      <div class="hist-item">
+        ${tag}<strong>${h.time}</strong><br/>
+        <span class="mono">
+          k1=${h.k1} • k2=${h.k2} • amp=${h.amp}% • ρ=${h.rho} • T=${h.temp}°C • DoD=${h.dodLabel} • thr=${h.thr}% • n=${h.n}
+        </span><br/>
+        <span class="mono">
+          white μ=${h.wMean} σ=${h.wSig} • QDS μ=${h.qMean} σ=${h.qSig} • Δ=${h.delta}
+        </span>
+      </div>`;
+  });
+}
+renderHistory();
+
+/* ---------- UI value sync ---------- */
+function fmt(x, d=4){ return (+x).toFixed(d); }
+function fmt2(x){ return (+x).toFixed(2); }
+
+const defaults = {
+  k1:0.0018, k2:0.0004, amp:2.4, rho:0.60,
+  temp:25, dod:"0.75",
+  n:1200, maxc:2500, thr:80,
+  seed:17345, seedlock:true, poster:true, noregen:true, fast:true
+};
+
+function updateLabels(){
+  $("k1v").textContent = fmt($("k1").value);
+  $("k2v").textContent = fmt($("k2").value);
+  $("ampv").textContent = fmt2($("amp").value)+"%";
+  $("rhov").textContent = fmt2($("rho").value);
+  $("tempv").textContent = $("temp").value+"°C";
+  const dodSel = $("dod");
+  $("dodv").textContent = dodSel.options[dodSel.selectedIndex].text.replace(/\s*\(.*\)/,"");
+  $("nv").textContent = $("n").value;
+  $("maxcv").textContent = $("maxc").value;
+  $("thrv").textContent = $("thr").value+"%";
+  $("seedv").textContent = $("seed").value;
+}
+["k1","k2","amp","rho","temp","dod","n","maxc","thr","seed"].forEach(id=>{
+  $(id).addEventListener("input", updateLabels);
+});
+updateLabels();
+
+/* ---------- PRNG ---------- */
+function mulberry32(a){
+  return function(){
+    let t = a += 0x6D2B79F5;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  }
+}
+function randn(rng){
+  // Box-Muller
+  let u=0,v=0;
+  while(u===0) u=rng();
+  while(v===0) v=rng();
+  return Math.sqrt(-2*Math.log(u)) * Math.cos(2*Math.PI*v);
+}
+
+/* ---------- Toy physics knobs ---------- */
+function tempMultiplier(T){
+  // Gentle exponential-ish scaling around 25°C.
+  // This is intentionally mild to avoid poster explosions.
+  const beta = 0.018; // tweakable
+  return Math.exp(beta * (T - 25));
+}
+function dodLabelFromValue(v){
+  if(v==="1.00") return "0–100";
+  if(v==="0.88") return "10–90";
+  if(v==="0.75") return "20–80";
+  if(v==="0.62") return "30–70";
+  return "custom";
+}
+
+/* ---------- Simulation core ---------- */
+function simulateModel(params, correlated=false){
+  const {
+    k1, k2, amp, rho, temp, dodMult, n, maxc, thr,
+    seed, poster, noregen, fast
+  } = params;
+
+  const rng = mulberry32(seed);
+  const thrCap = thr;
+  const cycles = new Array(n);
+
+  // Per-cell variability (small)
+  const k1J = 0.10; // ±10%
+  const k2J = 0.12;
+
+  // Noise amplitude as fraction
+  const ampFrac = amp/100;
+
+  const Tm = tempMultiplier(temp);
+  const effectiveK1Base = k1 * dodMult * Tm;
+  const effectiveK2Base = k2 * dodMult * Tm;
+
+  // Poster clamps
+  const minStress = poster ? 0.35 : -Infinity;
+  const maxStress = poster ? 2.30 : Infinity;
+
+  for(let i=0;i<n;i++){
+    const k1i = effectiveK1Base * (1 + (rng()*2-1)*k1J);
+    const k2i = effectiveK2Base * (1 + (rng()*2-1)*k2J);
+
+    let cap = 100.0;
+    let x = 0.0; // AR(1) state
+
+    let t=1;
+    for(; t<=maxc; t++){
+      // base loss grows with sqrt(t) + linear
+      const baseLoss = k1i*Math.sqrt(t) + k2i*t;
+
+      let eps = randn(rng) * ampFrac; // gaussian stress %
+      if(correlated){
+        x = rho*x + eps;
+      }else{
+        x = eps;
+      }
+
+      // Convert stress to multiplicative factor on loss
+      let stress = 1 + x;
+
+      // NoRegen: don't allow "super-negative" stress to unrealistically heal the model
+      if(noregen && stress < 0.70) stress = 0.70;
+
+      if(poster){
+        if(stress < minStress) stress = minStress;
+        if(stress > maxStress) stress = maxStress;
+      }
+
+      cap -= baseLoss * stress * 100; // scale to % capacity units
+
+      if(cap <= thrCap) break;
+
+      // Fast mode avoids any extra per-cycle bookkeeping
+      if(!fast){
+        // placeholder for future richer traces
+      }
+    }
+    cycles[i] = (t>maxc) ? maxc : t;
+  }
+
+  return cycles;
+}
+
+/* ---------- Stats ---------- */
+function mean(arr){
+  let s=0; for(let i=0;i<arr.length;i++) s+=arr[i];
+  return s/arr.length;
+}
+function std(arr, m){
+  let s=0; for(let i=0;i<arr.length;i++){ const d=arr[i]-m; s+=d*d; }
+  return Math.sqrt(s/(arr.length-1 || 1));
+}
+function percentile(sorted, p){
+  if(!sorted.length) return 0;
+  const idx = (p/100)*(sorted.length-1);
+  const lo = Math.floor(idx), hi = Math.ceil(idx);
+  if(lo===hi) return sorted[lo];
+  const w = idx-lo;
+  return sorted[lo]*(1-w)+sorted[hi]*w;
+}
+
+/* ---------- Lightweight drawing ---------- */
+function drawHistogram(canvas, white, qds){
+  const ctx = canvas.getContext("2d");
+  const w = canvas.width = canvas.clientWidth * devicePixelRatio;
+  const h = canvas.height = canvas.clientHeight * devicePixelRatio;
+  ctx.clearRect(0,0,w,h);
+
+  const all = white.concat(qds);
+  const min = Math.min(...all), max = Math.max(...all);
+  const bins = 28;
+  const bw = Math.max(1, Math.floor((max-min)/bins));
+
+  const countBins = (data)=>{
+    const out = new Array(bins).fill(0);
+    for(const v of data){
+      const b = Math.min(bins-1, Math.max(0, Math.floor((v-min)/bw)));
+      out[b] += 1;
+    }
+    return out;
+  }
+  const bwc = countBins(white);
+  const bqc = countBins(qds);
+  const peak = Math.max(...bwc, ...bqc, 1);
+
+  // axes glow lines
+  ctx.globalAlpha = 0.15;
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, h-2, w, 2);
+  ctx.globalAlpha = 1;
+
+  const pad = 10*devicePixelRatio;
+  const chartW = w - pad*2;
+  const chartH = h - pad*2;
+  const barW = chartW / bins;
+
+  for(let i=0;i<bins;i++){
+    const x = pad + i*barW;
+    const hw = (bwc[i]/peak) * chartH;
+    const hq = (bqc[i]/peak) * chartH;
+
+    // White bars (purple soft)
+    ctx.globalAlpha = 0.55;
+    ctx.fillStyle = "rgba(168,85,247,0.55)";
+    ctx.fillRect(x, pad + (chartH-hw), barW*0.92, hw);
+
+    // QDS overlay (neon green)
+    ctx.globalAlpha = 0.65;
+    ctx.fillStyle = "rgba(57,255,136,0.65)";
+    ctx.fillRect(x+barW*0.12, pad + (chartH-hq), barW*0.60, hq);
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawTraces(canvas, params){
+  const ctx = canvas.getContext("2d");
+  const w = canvas.width = canvas.clientWidth * devicePixelRatio;
+  const h = canvas.height = canvas.clientHeight * devicePixelRatio;
+  ctx.clearRect(0,0,w,h);
+
+  const {
+    k1, k2, amp, rho, temp, dodMult, maxc, thr, seed, poster, noregen
+  } = params;
+
+  const rngW = mulberry32(seed+101);
+  const rngQ = mulberry32(seed+202);
+
+  const ampFrac = amp/100;
+  const Tm = tempMultiplier(temp);
+  const effK1 = k1 * dodMult * Tm;
+  const effK2 = k2 * dodMult * Tm;
+
+  const minStress = poster ? 0.35 : -Infinity;
+  const maxStress = poster ? 2.30 : Infinity;
+
+  function buildTrace(correlated, rng){
+    let cap = 100;
+    let x = 0;
+    const out = new Float32Array(maxc);
+    for(let t=1;t<=maxc;t++){
+      const baseLoss = (effK1*Math.sqrt(t) + effK2*t);
+      let eps = randn(rng) * ampFrac;
+      x = correlated ? (rho*x + eps) : eps;
+      let stress = 1 + x;
+      if(noregen && stress < 0.70) stress = 0.70;
+      if(poster){
+        if(stress < minStress) stress = minStress;
+        if(stress > maxStress) stress = maxStress;
+      }
+      cap -= baseLoss * stress * 100;
+      out[t-1] = cap;
+      if(cap <= thr) {
+        for(let k=t;k<=maxc;k++) out[k-1]=cap;
+        break;
+      }
+    }
+    return out;
+  }
+
+  const white = buildTrace(false, rngW);
+  const qds = buildTrace(true, rngQ);
+
+  const pad = 10*devicePixelRatio;
+  const chartW = w - pad*2;
+  const chartH = h - pad*2;
+
+  // frame line
+  ctx.globalAlpha = 0.12;
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, h-2, w, 2);
+  ctx.globalAlpha = 1;
+
+  function plot(arr, color){
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2*devicePixelRatio;
+    ctx.beginPath();
+    for(let i=0;i<arr.length;i++){
+      const x = pad + (i/(arr.length-1))*chartW;
+      const yVal = Math.max(0, Math.min(100, arr[i]));
+      const y = pad + (1 - yVal/100)*chartH;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+
+  plot(white, "rgba(168,85,247,0.9)");
+  plot(qds, "rgba(57,255,136,0.9)");
+
+  // threshold line
+  const yThr = pad + (1 - thr/100)*chartH;
+  ctx.globalAlpha = 0.25;
+  ctx.strokeStyle = "rgba(255,255,255,0.5)";
+  ctx.setLineDash([6*devicePixelRatio, 6*devicePixelRatio]);
+  ctx.beginPath(); ctx.moveTo(pad, yThr); ctx.lineTo(pad+chartW, yThr); ctx.stroke();
+  ctx.setLineDash([]); ctx.globalAlpha = 1;
+}
+
+/* ---------- Run orchestration ---------- */
+function collectParams(){
+  const dodMult = parseFloat($("dod").value);
+  return {
+    k1: parseFloat($("k1").value),
+    k2: parseFloat($("k2").value),
+    amp: parseFloat($("amp").value),
+    rho: parseFloat($("rho").value),
+    temp: parseInt($("temp").value,10),
+    dodMult,
+    dodLabel: dodLabelFromValue($("dod").value),
+    n: parseInt($("n").value,10),
+    maxc: parseInt($("maxc").value,10),
+    thr: parseInt($("thr").value,10),
+    seed: parseInt($("seed").value,10) || 1,
+    seedlock: $("seedlock").checked,
+    poster: $("poster").checked,
+    noregen: $("noregen").checked,
+    fast: $("fast").checked,
+  };
+}
+
+let lastResult = null;
+
+function runSimulation(tag=""){
+  const p = collectParams();
+
+  // If seed lock off, jitter seed a bit per run
+  if(!p.seedlock){
+    p.seed = (p.seed + Math.floor(Math.random()*9999)) % 999999 + 1;
+    $("seed").value = p.seed;
+    updateLabels();
+  }
+
+  const seedWhite = p.seed;
+  const seedQDS = p.seed + 777; // deterministic separation
+
+  const wCycles = simulateModel({...p, seed: seedWhite}, false);
+  const qCycles = simulateModel({...p, seed: seedQDS}, true);
+
+  // stats
+  const wSorted = wCycles.slice().sort((a,b)=>a-b);
+  const qSorted = qCycles.slice().sort((a,b)=>a-b);
+
+  const wM = mean(wCycles), qM = mean(qCycles);
+  const wS = std(wCycles, wM), qS = std(qCycles, qM);
+
+  const wP10 = percentile(wSorted,10), wP50 = percentile(wSorted,50), wP90 = percentile(wSorted,90);
+  const qP10 = percentile(qSorted,10), qP50 = percentile(qSorted,50), qP90 = percentile(qSorted,90);
+
+  const delta = (qM - wM) / Math.max(1e-9, wM) * 100;
+
+  // UI
+  $("wMean").textContent = fmt2(wM);
+  $("wSig").textContent = fmt2(wS);
+  $("qMean").textContent = fmt2(qM);
+  $("qSig").textContent = fmt2(qS);
+  $("wP").textContent = `P10/P50/P90 ${fmt2(wP10)} / ${fmt2(wP50)} / ${fmt2(wP90)}`;
+  $("qP").textContent = `P10/P50/P90 ${fmt2(qP10)} / ${fmt2(qP50)} / ${fmt2(qP90)}`;
+  $("delta").textContent = `${delta>=0?"+":""}${fmt2(delta)}%`;
+
+  $("meta").textContent =
+    `Poster=${p.poster} · NoRegen=${p.noregen} · ρ=${fmt2(p.rho)} · T=${p.temp}°C · DoD=${p.dodLabel} · n=${p.n}`;
+
+  // Charts
+  drawHistogram($("hist"), wCycles, qCycles);
+  if(p.fast){
+    // still draw a light trace with lower cost
+    drawTraces($("trace"), {...p, seed:p.seed});
+  }else{
+    drawTraces($("trace"), {...p, seed:p.seed});
+  }
+
+  // record history
+  const now = new Date();
+  const time = now.toLocaleString();
+  const entry = {
+    tag,
+    time,
+    k1: fmt(p.k1),
+    k2: fmt(p.k2),
+    amp: fmt2(p.amp),
+    rho: fmt2(p.rho),
+    temp: p.temp,
+    dodLabel: p.dodLabel,
+    thr: p.thr,
+    n: p.n,
+    maxc: p.maxc,
+    wMean: fmt2(wM),
+    wSig: fmt2(wS),
+    qMean: fmt2(qM),
+    qSig: fmt2(qS),
+    delta: `${delta>=0?"+":""}${fmt2(delta)}%`,
+    wP10: fmt2(wP10), wP50: fmt2(wP50), wP90: fmt2(wP90),
+    qP10: fmt2(qP10), qP50: fmt2(qP50), qP90: fmt2(qP90),
+    poster: p.poster, noregen: p.noregen, seed: p.seed
+  };
+  history.push(entry);
+  saveHistory();
+
+  lastResult = { params:p, wCycles, qCycles, entry };
+}
+
+/* ---------- Buttons ---------- */
+$("run").addEventListener("click", ()=>runSimulation("RUN"));
+$("reset").addEventListener("click", ()=>{
+  $("k1").value = defaults.k1;
+  $("k2").value = defaults.k2;
+  $("amp").value = defaults.amp;
+  $("rho").value = defaults.rho;
+  $("temp").value = defaults.temp;
+  $("dod").value = defaults.dod;
+  $("n").value = defaults.n;
+  $("maxc").value = defaults.maxc;
+  $("thr").value = defaults.thr;
+  $("seed").value = defaults.seed;
+  $("seedlock").checked = defaults.seedlock;
+  $("poster").checked = defaults.poster;
+  $("noregen").checked = defaults.noregen;
+  $("fast").checked = defaults.fast;
+  updateLabels();
+});
+
+$("presetPhone").addEventListener("click", ()=>{
+  $("k1").value = 0.0017;
+  $("k2").value = 0.00035;
+  $("amp").value = 2.0;
+  $("rho").value = 0.55;
+  $("temp").value = 28;
+  $("dod").value = "0.75";
+  $("thr").value = 80;
+  $("n").value = 1200;
+  $("maxc").value = 2600;
+  $("poster").checked = true;
+  $("noregen").checked = true;
+  $("fast").checked = true;
+  updateLabels();
+  runSimulation("REALISTIC");
+});
+
+$("presetQDS").addEventListener("click", ()=>{
+  $("k1").value = 0.0018;
+  $("k2").value = 0.0004;
+  $("amp").value = 2.4;
+  $("rho").value = 0.70;
+  $("temp").value = 25;
+  $("dod").value = "0.75";
+  $("thr").value = 80;
+  $("n").value = 1200;
+  $("maxc").value = 2500;
+  $("poster").checked = true;
+  $("noregen").checked = true;
+  $("fast").checked = true;
+  updateLabels();
+  runSimulation("QDS-CONTRAST");
+});
+
+$("presetChaos").addEventListener("click", ()=>{
+  $("k1").value = 0.0022;
+  $("k2").value = 0.0005;
+  $("amp").value = 3.2;
+  $("rho").value = 0.99;
+  $("temp").value = 40;
+  $("dod").value = "1.00";
+  $("thr").value = 80;
+  $("n").value = 600;
+  $("maxc").value = 2500;
+  $("poster").checked = true;   // still keep sane
+  $("noregen").checked = true;
+  $("fast").checked = true;
+  updateLabels();
+  runSimulation("CHAOS");
+});
+
+/* ---------- Export / Copy ---------- */
+function download(name, text){
+  const blob = new Blob([text], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 0);
+}
+
+$("copy").addEventListener("click", async ()=>{
+  if(!lastResult){ runSimulation("RUN"); }
+  const e = lastResult.entry;
+  const summary =
+`QDS Battery Hub v9.4 — Science Neon+
+${e.time}
+${e.tag ? "["+e.tag+"] " : ""}k1=${e.k1} • k2=${e.k2} • amp=${e.amp}% • ρ=${e.rho} • T=${e.temp}°C • DoD=${e.dodLabel} • thr=${e.thr}% • n=${e.n}
+white μ=${e.wMean} σ=${e.wSig} • QDS μ=${e.qMean} σ=${e.qSig} • Δ=${e.delta}`;
+  try{ await navigator.clipboard.writeText(summary); }catch(err){}
+});
+
+$("exportLast").addEventListener("click", ()=>{
+  if(!lastResult){ runSimulation("RUN"); }
+  const payload = {
+    version:"9.4",
+    type:"QDS_BATTERY_HUB_RUN",
+    entry:lastResult.entry,
+    params:lastResult.params,
+  };
+  const stamp = new Date().toISOString().replace(/[:.]/g,"-");
+  download(`QDS_BatteryHub_v9.4_${stamp}.json`, JSON.stringify(payload,null,2));
+});
+
+$("exportAll").addEventListener("click", ()=>{
+  const payload = {
+    version:"9.4",
+    type:"QDS_BATTERY_HUB_HISTORY",
+    history
+  };
+  const stamp = new Date().toISOString().replace(/[:.]/g,"-");
+  download(`QDS_BatteryHub_v9.4_HISTORY_${stamp}.json`, JSON.stringify(payload,null,2));
+});
+
+$("clearHist").addEventListener("click", ()=>{
+  history = [];
+  saveHistory();
+});
+
+/* ---------- Coach ---------- */
+function buildCoachText(){
+  const p = collectParams();
+  const Tm = tempMultiplier(p.temp);
+  const dodLabel = p.dodLabel;
+
+  const riskRho =
+    p.rho < 0.3 ? "low streak risk" :
+    p.rho < 0.7 ? "moderate streak risk" :
+    "high streak risk (tails widen)";
+
+  const tempMsg =
+    p.temp <= 10 ? "cold regime: performance may sag, but wear stress is lower (toy logic)." :
+    p.temp <= 30 ? "comfort regime: most stable toy outcomes." :
+    "hot regime: expect accelerated wear + fatter tails.";
+
+  const dodMsg =
+    dodLabel === "0–100" ? "Wide window: fastest toy wear." :
+    dodLabel === "10–90" ? "Moderate window: improved toy longevity." :
+    dodLabel === "20–80" ? "Sweet spot: life-friendly settings." :
+    "Ultra narrow: maximum toy kindness.";
+
+  const posterMsg = p.poster ? "Poster Mode ON: chaos tamed ✅" : "Poster Mode OFF: expect fireworks ⚠️";
+  const regenMsg = p.noregen ? "NoRegen ON: avoids unrealistic negative-stress wins." : "NoRegen OFF: toy can over-credit lucky cycles.";
+
+  return (
+`COACH READOUT (toy)
+ρ=${fmt2(p.rho)} → ${riskRho}
+T=${p.temp}°C → ${tempMsg}
+DoD=${dodLabel} → ${dodMsg}
+
+Effective stress multiplier (temp) ≈ ${fmt2(Tm)}
+k1=${fmt(p.k1)}  k2=${fmt(p.k2)}  amp=${fmt2(p.amp)}%
+
+Advice:
+• If you want “science poster” plots: keep ρ ≤ 0.7, Poster ON.
+• For best-life demos: choose 20–80 or 30–70 window, lower amp, cooler temps.
+• Use Chaos preset only when showing tail-risk behaviour.
+
+Flags:
+• ${posterMsg}
+• ${regenMsg}`
+  );
+}
+function refreshCoach(){
+  $("coachText").textContent = buildCoachText();
+}
+$("coachRefresh").addEventListener("click", refreshCoach);
+refreshCoach();
+
+/* ---------- AutoBench Viewer Import ---------- */
+$("benchLoad").addEventListener("click", async ()=>{
+  const files = $("benchFiles").files;
+  const box = $("benchBox");
+  if(!files || !files.length){
+    box.innerHTML = `<div class="hist-item small">No files selected.</div>`;
+    return;
+  }
+  box.innerHTML = "";
+  for(const f of files){
+    try{
+      const text = await f.text();
+      const j = JSON.parse(text);
+
+      // We try to gracefully read either AutoBench v9.1-PRO logs
+      // or Hub exports.
+      let line = "";
+      if(j && j.meta && j.results){
+        // hypothetical structure
+        line = `${f.name} — ${JSON.stringify(j.meta).slice(0,120)}...`;
+      } else if(j && j.entry){
+        const e = j.entry;
+        line = `${f.name}
+k1=${e.k1} k2=${e.k2} amp=${e.amp}% ρ=${e.rho} thr=${e.thr}% n=${e.n}
+white μ=${e.wMean} σ=${e.wSig} • QDS μ=${e.qMean} σ=${e.qSig} • Δ=${e.delta}`;
+      } else {
+        // raw log fallback
+        line = `${f.name} — parsed JSON (structure unknown)`;
+      }
+
+      box.innerHTML += `<div class="hist-item mono">${line.replace(/\n/g,"<br/>")}</div>`;
+    }catch(err){
+      box.innerHTML += `<div class="hist-item mono">${f.name} — failed to parse</div>`;
+    }
+  }
+});
+
+$("benchClear").addEventListener("click", ()=>{
+  $("benchBox").innerHTML = `<div class="hist-item small">Viewer cleared.</div>`;
+});
+
+/* ---------- First run for a nice landing ---------- */
+setTimeout(()=>{ if(!history.length) runSimulation("BOOT"); }, 80);
+</script>
+</body>
+</html>

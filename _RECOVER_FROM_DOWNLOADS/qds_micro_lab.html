@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>QDS Microphysics Lab</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      background: #05060a;
+      color: #e5f2ff;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+    h1 { font-size: 1.6rem; margin-bottom: 4px; }
+    h2 { font-size: 1.1rem; margin: 12px 0 4px; }
+    .sub {
+      font-size: 0.9rem;
+      color: #9fb3cc;
+      margin-bottom: 14px;
+    }
+    .panel {
+      border-radius: 12px;
+      background: radial-gradient(circle at top left, #15253a, #05060a);
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      border: 1px solid #28374d;
+    }
+    label {
+      font-size: 0.85rem;
+      color: #c4d7f2;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: flex-end;
+      margin-bottom: 8px;
+    }
+    .field {
+      flex: 1 1 120px;
+      min-width: 110px;
+    }
+    input[type="number"] {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid #394a63;
+      background: #040712;
+      color: #e5f2ff;
+      font-size: 0.9rem;
+    }
+    input[type="number"]:focus {
+      outline: none;
+      border-color: #4fd1c5;
+      box-shadow: 0 0 0 1px #4fd1c5;
+    }
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      background: linear-gradient(135deg, #38bdf8, #22c55e);
+      color: #020617;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    button.secondary {
+      background: #0f172a;
+      color: #cbd5f5;
+      border: 1px solid #334155;
+    }
+    button:active { transform: translateY(1px); }
+    .summary {
+      font-size: 0.85rem;
+      color: #9fb3cc;
+      margin-top: 6px;
+    }
+    canvas {
+      width: 100%;
+      max-width: 100%;
+      background: #020617;
+      border-radius: 12px;
+      border: 1px solid #1e293b;
+      margin-top: 6px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      font-size: 0.75rem;
+      margin-left: 4px;
+      color: #cbd5f5;
+    }
+    .kv {
+      display: grid;
+      grid-template-columns: auto auto;
+      gap: 4px 12px;
+      font-size: 0.85rem;
+      margin-top: 6px;
+    }
+    .kv label {
+      margin: 0;
+      font-size: 0.8rem;
+      color: #9fb3cc;
+      display: inline;
+    }
+    .kv span {
+      font-variant-numeric: tabular-nums;
+    }
+    @media (max-width: 640px) {
+      .row { flex-direction: column; align-items: stretch; }
+      button { width: 100%; text-align: center; }
+      .kv { grid-template-columns: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>QDS Microphysics Lab</h1>
+    <div class="sub">
+      Kernel: <code>K(t,r) = σ² · exp(-|t|/τ<sub>c</sub>) · exp(-r² / (2 λ<sub>c</sub>²))</code>.<br>
+      Explore how the finite correlation time <code>τ<sub>c</sub></code> and coherence length
+      <code>λ<sub>c</sub></code> shape temporal and spatial correlations.
+    </div>
+
+    <!-- Kernel controls -->
+    <div class="panel">
+      <h2>1. Kernel parameters</h2>
+      <div class="row">
+        <div class="field">
+          <label for="sigma2">σ² (variance)</label>
+          <input type="number" id="sigma2" step="0.01" value="1.00">
+        </div>
+        <div class="field">
+          <label for="tau">τ<sub>c</sub> (correlation time, units of t)</label>
+          <input type="number" id="tau" step="0.1" value="1.0">
+        </div>
+        <div class="field">
+          <label for="lambda">λ<sub>c</sub> (coherence length, units of r)</label>
+          <input type="number" id="lambda" step="0.1" value="1.0">
+        </div>
+        <div class="field" style="flex:0 0 auto;">
+          <button id="recalcBtn" type="button">Update curves</button>
+        </div>
+      </div>
+      <div class="summary">
+        For intuition: the temporal curve is shown for <strong>t = 0 → 5 τ<sub>c</sub></strong>,
+        and the spatial curve for <strong>r = 0 → 4 λ<sub>c</sub></strong>.
+      </div>
+    </div>
+
+    <!-- Probe point -->
+    <div class="panel">
+      <h2>2. Probe a point <span class="badge">dimensionless K and K/σ²</span></h2>
+      <div class="row">
+        <div class="field">
+          <label for="tProbe">|t| (same units as τ<sub>c</sub>)</label>
+          <input type="number" id="tProbe" step="0.1" value="0.0">
+        </div>
+        <div class="field">
+          <label for="rProbe">r (same units as λ<sub>c</sub>)</label>
+          <input type="number" id="rProbe" step="0.1" value="0.0">
+        </div>
+        <div class="field" style="flex:0 0 auto;">
+          <button id="probeBtn" type="button">Compute K(t,r)</button>
+        </div>
+      </div>
+      <div class="kv" id="probeResults">
+        <label>σ²:</label><span id="outSigma2">—</span>
+        <label>K(t,r):</label><span id="outK">—</span>
+        <label>K/σ²:</label><span id="outKRel">—</span>
+        <label>exp(-|t|/τ<sub>c</sub>):</label><span id="outTfac">—</span>
+        <label>exp(-r²/(2 λ<sub>c</sub>²)):</label><span id="outRfac">—</span>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="panel">
+      <h2>3. Correlation shapes</h2>
+      <div class="summary">
+        Top: temporal correlation <code>K(t,0)/σ²</code> vs t (0 → 5 τ<sub>c</sub>).<br>
+        Bottom: spatial correlation <code>K(0,r)/σ²</code> vs r (0 → 4 λ<sub>c</sub>).
+      </div>
+      <canvas id="chart" width="800" height="360"></canvas>
+    </div>
+  </div>
+
+  <script>
+    const sigma2Input = document.getElementById('sigma2');
+    const tauInput    = document.getElementById('tau');
+    const lambdaInput = document.getElementById('lambda');
+    const recalcBtn   = document.getElementById('recalcBtn');
+
+    const tProbeInput = document.getElementById('tProbe');
+    const rProbeInput = document.getElementById('rProbe');
+    const probeBtn    = document.getElementById('probeBtn');
+
+    const outSigma2 = document.getElementById('outSigma2');
+    const outK      = document.getElementById('outK');
+    const outKRel   = document.getElementById('outKRel');
+    const outTfac   = document.getElementById('outTfac');
+    const outRfac   = document.getElementById('outRfac');
+
+    const canvas = document.getElementById('chart');
+    const ctx    = canvas.getContext('2d');
+
+    function K_norm_t(t, tau) {
+      if (tau <= 0) return 0;
+      return Math.exp(-Math.abs(t) / tau);
+    }
+
+    function K_norm_r(r, lambdaC) {
+      if (lambdaC <= 0) return 0;
+      const x = r / lambdaC;
+      return Math.exp(-0.5 * x * x);
+    }
+
+    function recomputeCurves() {
+      drawChart();
+      // also refresh probe display if something is already there
+      if (outK.textContent !== '—') {
+        doProbe();
+      }
+    }
+
+    function doProbe() {
+      const sigma2 = parseFloat(sigma2Input.value) || 0;
+      const tau    = parseFloat(tauInput.value)    || 0;
+      const lambda = parseFloat(lambdaInput.value) || 0;
+      const t      = parseFloat(tProbeInput.value) || 0;
+      const r      = parseFloat(rProbeInput.value) || 0;
+
+      const tfac = K_norm_t(t, tau);
+      const rfac = K_norm_r(r, lambda);
+      const kRel = tfac * rfac;
+      const k    = sigma2 * kRel;
+
+      outSigma2.textContent = sigma2.toFixed(3);
+      outK.textContent      = k.toExponential(4);
+      outKRel.textContent   = kRel.toFixed(4);
+      outTfac.textContent   = tfac.toFixed(4);
+      outRfac.textContent   = rfac.toFixed(4);
+    }
+
+    function drawChart() {
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      ctx.fillStyle = '#020617';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.save();
+      ctx.translate(48, 16);
+      const plotW = w - 64;
+      const plotH = h - 48;
+
+      const tau    = parseFloat(tauInput.value)    || 1;
+      const lambda = parseFloat(lambdaInput.value) || 1;
+
+      // We'll split the canvas vertically: top half = temporal, bottom half = spatial
+      const halfH = (plotH - 16) / 2;
+
+      // Utility: draw one panel
+      function drawPanel(yOffset, xMax, xLabel, yLabel, fn) {
+        ctx.save();
+        ctx.translate(0, yOffset);
+
+        const panelW = plotW;
+        const panelH = halfH;
+
+        ctx.strokeStyle = '#1f2937';
+        ctx.lineWidth = 1;
+        // axes
+        ctx.beginPath();
+        ctx.moveTo(0, panelH);
+        ctx.lineTo(panelW, panelH);
+        ctx.moveTo(0, 0);
+        ctx.lineTo(0, panelH);
+        ctx.stroke();
+
+        // grid + labels
+        ctx.fillStyle = '#64748b';
+        ctx.font = '10px system-ui';
+
+        const tickCountY = 4;
+        for (let i = 0; i <= tickCountY; i++) {
+          const yVal = i / tickCountY;
+          const yPix = panelH - yVal * panelH;
+          ctx.beginPath();
+          ctx.moveTo(0, yPix);
+          ctx.lineTo(panelW, yPix);
+          ctx.strokeStyle = 'rgba(100,116,139,0.25)';
+          ctx.stroke();
+          ctx.fillText(yVal.toFixed(1), -28, yPix + 3);
+        }
+
+        // x-axis labels: 0, xMax/2, xMax
+        const tickCountX = 4;
+        for (let i = 0; i <= tickCountX; i++) {
+          const xVal = (i / tickCountX) * xMax;
+          const xPix = (i / tickCountX) * panelW;
+          ctx.fillText(xVal.toFixed(1), xPix - 6, panelH + 12);
+        }
+
+        ctx.fillText(xLabel, panelW - 40, panelH + 24);
+        ctx.fillText(yLabel, -4, -6);
+
+        // curve
+        ctx.beginPath();
+        const steps = 120;
+        for (let i = 0; i <= steps; i++) {
+          const t = (i / steps) * xMax;
+          const yVal = fn(t);
+          const xPix = (t / xMax) * panelW;
+          const yPix = panelH - yVal * panelH;
+          if (i === 0) ctx.moveTo(xPix, yPix);
+          else ctx.lineTo(xPix, yPix);
+        }
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      // temporal: t in [0, 5 tau]
+      const tMax = 5 * tau;
+      drawPanel(
+        0,
+        tMax > 0 ? tMax : 5,
+        't',
+        'K(t,0)/σ²',
+        (t) => K_norm_t(t, tau)
+      );
+
+      // spatial: r in [0, 4 lambda]
+      const rMax = 4 * lambda;
+      drawPanel(
+        halfH + 16,
+        rMax > 0 ? rMax : 4,
+        'r',
+        'K(0,r)/σ²',
+        (r) => K_norm_r(r, lambda)
+      );
+
+      ctx.restore();
+    }
+
+    // Wiring
+    recalcBtn.addEventListener('click', recomputeCurves);
+    sigma2Input.addEventListener('change', recomputeCurves);
+    tauInput.addEventListener('change', recomputeCurves);
+    lambdaInput.addEventListener('change', recomputeCurves);
+
+    probeBtn.addEventListener('click', doProbe);
+    tProbeInput.addEventListener('change', doProbe);
+    rProbeInput.addEventListener('change', doProbe);
+
+    // Initial draw
+    drawChart();
+  </script>
+</body>
+</html>

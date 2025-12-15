@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ω-QDS Battery Deck — Neon Index</title>
+<style>
+  :root{
+    --bg-0:#07030f;
+    --bg-1:#12051f;
+    --panel:#0b0616cc;
+    --purple:#a855f7;
+    --purple-2:#7c3aed;
+    --green:#39ff88;
+    --green-2:#00ff66;
+    --text:#f7f2ff;
+    --muted:#cdb8ff;
+    --glow: 0 0 10px rgba(168,85,247,.35), 0 0 18px rgba(57,255,136,.25);
+    --radius: 14px;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Noto Sans",sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(1200px 800px at 10% 10%, rgba(168,85,247,.12), transparent 60%),
+      radial-gradient(900px 700px at 90% 20%, rgba(57,255,136,.10), transparent 60%),
+      linear-gradient(160deg, var(--bg-0), var(--bg-1) 50%, #05020a 100%);
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+
+  header{
+    padding:18px 16px 8px;
+  }
+
+  .title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:800;
+    letter-spacing:.5px;
+    font-size: clamp(20px, 3.6vw, 28px);
+    text-shadow: 0 0 18px rgba(168,85,247,.25);
+  }
+  .subtitle{
+    margin-top:6px;
+    color:var(--muted);
+    font-size: clamp(11px, 2.4vw, 13px);
+  }
+
+  .server-pill{
+    margin:10px 16px 0;
+    padding:8px 10px;
+    border-radius: 999px;
+    display:inline-flex;
+    gap:8px;
+    align-items:center;
+    background: linear-gradient(90deg, rgba(168,85,247,.14), rgba(57,255,136,.10));
+    border:1px solid rgba(255,255,255,.06);
+    box-shadow: var(--glow);
+    font-size: 11px;
+    color:#efe7ff;
+  }
+  .server-pill b{color:var(--green)}
+
+  .deck{
+    margin: 14px 12px 22px;
+    padding: 12px;
+    background: var(--panel);
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: var(--radius);
+    box-shadow: 0 10px 30px rgba(0,0,0,.35), var(--glow);
+  }
+
+  .row-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:8px;
+  }
+  .row-title h3{
+    margin:0;
+    font-size: 13px;
+    letter-spacing:.6px;
+    color:#f6eeff;
+    opacity:.95;
+  }
+  .row-title .hint{
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  /* Rolling button rail */
+  .rail{
+    display:flex;
+    gap:10px;
+    overflow-x:auto;
+    padding: 8px 4px 12px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .rail::-webkit-scrollbar{height:8px}
+  .rail::-webkit-scrollbar-thumb{
+    background: linear-gradient(90deg, rgba(168,85,247,.35), rgba(57,255,136,.35));
+    border-radius: 10px;
+  }
+
+  .card-btn{
+    min-width: 210px;
+    max-width: 250px;
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    text-decoration:none;
+    color: var(--text);
+    border-radius: 16px;
+    padding: 14px 14px 12px;
+    position: relative;
+    overflow:hidden;
+    border: 1px solid rgba(255,255,255,.08);
+    background:
+      linear-gradient(135deg, rgba(168,85,247,.16), rgba(57,255,136,.10)),
+      linear-gradient(180deg, rgba(255,255,255,.03), transparent 40%);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.03), var(--glow);
+    transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+  }
+  .card-btn:active{
+    transform: scale(.985);
+  }
+
+  .card-btn .tag{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 9px;
+    letter-spacing:.4px;
+    background: rgba(0,0,0,.22);
+    border:1px solid rgba(255,255,255,.06);
+    color:#f4eaff;
+  }
+
+  .card-btn h4{
+    margin: 10px 0 6px;
+    font-size: 15px;
+    letter-spacing:.4px;
+  }
+  .card-btn p{
+    margin:0;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .chipline{
+    margin-top: 10px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  .chip{
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: rgba(168,85,247,.12);
+    border: 1px solid rgba(168,85,247,.25);
+  }
+  .chip.green{
+    background: rgba(57,255,136,.10);
+    border-color: rgba(57,255,136,.25);
+  }
+
+  /* Subtle animated scan line */
+  .scan{
+    position:absolute;
+    inset:-40% -10% auto -10%;
+    height: 120px;
+    background:
+      linear-gradient(90deg,
+        transparent,
+        rgba(57,255,136,.08),
+        rgba(168,85,247,.12),
+        rgba(57,255,136,.08),
+        transparent);
+    filter: blur(8px);
+    transform: translateX(-30%);
+    animation: drift 6.5s linear infinite;
+    pointer-events:none;
+    opacity:.7;
+  }
+  @keyframes drift{
+    0%{transform: translateX(-30%)}
+    100%{transform: translateX(130%)}
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap:10px;
+  }
+  @media (min-width: 720px){
+    .grid{grid-template-columns: repeat(3, minmax(0,1fr));}
+  }
+
+  .mini-btn{
+    text-decoration:none;
+    color: var(--text);
+    padding: 10px 10px;
+    border-radius: 12px;
+    background:
+      linear-gradient(135deg, rgba(168,85,247,.12), rgba(57,255,136,.08));
+    border:1px solid rgba(255,255,255,.08);
+    box-shadow: var(--glow);
+    font-size: 11px;
+  }
+
+  footer{
+    padding: 8px 16px 26px;
+    color: var(--muted);
+    font-size: 10px;
+  }
+
+  .legend{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top: 6px;
+  }
+  .dot{
+    width:8px; height:8px; border-radius:50%;
+    display:inline-block; margin-right:6px;
+  }
+  .dot.p{background: var(--purple)}
+  .dot.g{background: var(--green)}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="title">🔋 Ω-QDS Battery Deck — Neon Index</div>
+  <div class="subtitle">Shed Edition • Offline-ready • Purple / Neon Green OS launcher</div>
+</header>
+
+<div class="server-pill" id="srvPill">Status: checking…</div>
+
+<div class="deck">
+  <div class="row-title">
+    <h3>PRIMARY LAUNCHERS</h3>
+    <div class="hint">Swipe → tap to launch</div>
+  </div>
+
+  <div class="rail" id="primaryRail">
+    <!-- cards injected by JS -->
+  </div>
+</div>
+
+<div class="deck">
+  <div class="row-title">
+    <h3>BATTERY SUITES & SHOWCASES</h3>
+    <div class="hint">Quick access set</div>
+  </div>
+  <div class="grid" id="suiteGrid"></div>
+</div>
+
+<div class="deck">
+  <div class="row-title">
+    <h3>MISC LABS & TOYS</h3>
+    <div class="hint">Bonus bays</div>
+  </div>
+  <div class="grid" id="miscGrid"></div>
+</div>
+
+<footer>
+  <div><span class="dot p"></span>Purple = interface</div>
+  <div><span class="dot g"></span>Neon green = action / confirm</div>
+  <div class="legend">
+    <span>Tip: If a page fails to open, it may be renamed or incomplete (your 9.5.1 looked tiny earlier).</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  const primary = [
+    {
+      file:"qds_battery_hub_v9_6_science_neon.html",
+      title:"Battery Hub v9.6",
+      tag:"LATEST SCIENCE NEON",
+      desc:"AR(1) stress + T + DoD + Poster/NoRegen + QuickSweep.",
+      chips:["k1/k2","Temp","DoD","AR(1)","Poster-safe"],
+      accent:"green"
+    },
+    {
+      file:"qds_battery_hub_v9_5_science_neon.html",
+      title:"Battery Hub v9.5",
+      tag:"STABLE BASELINE",
+      desc:"Clean semi-empirical toy. Great for demos.",
+      chips:["Seed lock","Dedupe history","Fast hist"],
+      accent:""
+    },
+    {
+      file:"qds_battery_hub_v9_4_science_neon_plus.html",
+      title:"Battery Hub v9.4+",
+      tag:"PLUS FEATURES",
+      desc:"Earlier expanded science shell.",
+      chips:["Neon UI","Spread focus"],
+      accent:""
+    },
+    {
+      file:"qds_battery_hub_v9_3_science_neon.html",
+      title:"Battery Hub v9.3",
+      tag:"FOUNDATION",
+      desc:"First solid science neon cut.",
+      chips:["Toy realism"],
+      accent:""
+    },
+    {
+      file:"qds_battery_hub_v9_2_purple_neon.html",
+      title:"Battery Hub v9.2",
+      tag:"PURPLE NEON",
+      desc:"High-style contrast build.",
+      chips:["Aesthetic"],
+      accent:""
+    },
+    {
+      file:"qds_battery_hub_v9_1_purple_neon.html",
+      title:"Battery Hub v9.1",
+      tag:"ORIGIN",
+      desc:"Early purple-neon hub.",
+      chips:["Classic"],
+      accent:""
+    }
+  ];
+
+  const suites = [
+    ["qds_battery_suite_v8_nextlevel.html","Suite v8 NextLevel"],
+    ["qds_battery_suite_v8_3_neon_shell.html","Suite v8.3 Neon Shell"],
+    ["qds_battery_suite_v8_2_poster_tamed.html","Suite v8.2 Poster Tamed"],
+    ["qds_battery_suite_v8_1_fairpath.html","Suite v8.1 Fair Path"],
+    ["qds_battery_suite_v6_realworld.html","Suite v6 RealWorld"],
+    ["qds_battery_suite_v5_boss_polish.html","Suite v5 Boss Polish"],
+    ["qds_battery_suite_v4_showcase.html","Suite v4 Showcase"],
+    ["qds_battery_lab_showcase_stress_bias_v2.html","Stress Bias v2"],
+    ["qds_battery_lab_showcase_stress_bias_v1.html","Stress Bias v1"],
+    ["qds_battery_lab_showcase_v1.html","Lab Showcase v1"]
+  ];
+
+  const misc = [
+    ["qds_battery_lab.html","Noise & Lifetime Lab"],
+    ["qds_battery_noise_toy_v1.html","Noise Toy v1"],
+    ["qds_battery_whisperer_v2.html","Battery Whisperer"],
+    ["qds_battery_coach_v3.html","Battery Coach v3"],
+    ["solar_system_v8_offline.html","Solar System V8 (bonus)"],
+    ["omega_qds_lab.html","Ω Unified Lab"],
+    ["indus_atlas_v1_qds_language_lab.html","Indus Atlas (bonus)"]
+  ];
+
+  function cardHTML(item){
+    const chips = (item.chips||[]).map(c=>{
+      const cls = (item.accent==="green" && (c==="AR(1)" || c==="Temp" || c==="DoD")) ? "chip green":"chip";
+      return `<span class="${cls}">${c}</span>`;
+    }).join("");
+    return `
+      <a class="card-btn" href="${item.file}">
+        <span class="scan"></span>
+        <span class="tag">🔋 ${item.tag}</span>
+        <h4>${item.title}</h4>
+        <p>${item.desc}</p>
+        <div class="chipline">${chips}</div>
+      </a>
+    `;
+  }
+
+  function miniHTML(file, label){
+    return `<a class="mini-btn" href="${file}">⚡ ${label}</a>`;
+  }
+
+  const rail = document.getElementById("primaryRail");
+  rail.innerHTML = primary.map(cardHTML).join("");
+
+  const suiteGrid = document.getElementById("suiteGrid");
+  suiteGrid.innerHTML = suites.map(s=>miniHTML(s[0], s[1])).join("");
+
+  const miscGrid = document.getElementById("miscGrid");
+  miscGrid.innerHTML = misc.map(m=>miniHTML(m[0], m[1])).join("");
+
+  // Server status hint
+  const pill = document.getElementById("srvPill");
+  const isLocal = location.hostname === "127.0.0.1" || location.hostname === "localhost";
+  if(isLocal){
+    pill.innerHTML = "Status: <b>LOCAL SERVER OK</b> • You’re in the Shed grid ⚙️";
+  }else if(location.protocol === "file:"){
+    pill.textContent = "Status: FILE MODE • Most pages still work, but best via http.server";
+  }else{
+    pill.textContent = "Status: Remote/unknown host • If something breaks, serve locally";
+  }
+})();
+</script>
+</body>
+</html>

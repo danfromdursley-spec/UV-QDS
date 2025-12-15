@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Binary Pulsar Lab · Method Notes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+                   Roboto, sans-serif;
+      background: #050b18;
+      color: #e4f0ff;
+      padding: 16px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    a { color: #00f5a0; text-decoration: none; }
+    code { font-family: "JetBrains Mono", monospace; font-size: 0.85rem; }
+    h1 { font-size: 1.3rem; margin-bottom: 0.4rem; }
+    h2 { font-size: 1.0rem; margin-top: 1rem; }
+    p  { font-size: 0.9rem; line-height: 1.45; color: #9cb3d8; }
+    ul { font-size: 0.9rem; color: #9cb3d8; padding-left: 1.1rem; }
+  </style>
+</head>
+<body>
+  <p><a href="qds_test_platformV3.html">← Back to QDS Labs</a></p>
+  <h1>Binary Pulsar Constraint Lab — Method Notes</h1>
+
+  <p>
+    This page documents the simple sanity-check used in the
+    <strong>Binary Pulsar Lab</strong>. It is not a full analysis, just a
+    quick way to see whether a given QDS parameter choice
+    \((\alpha, \lambda_c)\) would already be excluded by high-precision
+    timing of relativistic binaries.
+  </p>
+
+  <h2>1. Model</h2>
+  <p>
+    We treat the QDS correction as an effective Yukawa-like modification
+    to the Newtonian acceleration:
+  </p>
+  <p>
+    <code>a_eff / a_N ≈ α · exp(-r / λ_c).</code>
+  </p>
+
+  <h2>2. Constraint logic</h2>
+  <ul>
+    <li>Choose a binary separation \(r\) (in any convenient units).</li>
+    <li>Pick QDS parameters \(\alpha\) and \(\lambda_c\) in the same units.</li>
+    <li>Compute <code>|α · exp(-r / λc)|</code>.</li>
+    <li>
+      Compare to an allowed fractional deviation band
+      <code>|Δa/a|<sub>max</sub></code> (typical timing limits are
+      ≲ 0.2–0.3% for well-measured systems).
+    </li>
+  </ul>
+
+  <p>
+    If <code>|α · exp(-r / λc)| &gt; |Δa/a|<sub>max</sub></code>, then this
+    particular parameter point is labelled “ruled out” at that scale.
+  </p>
+
+  <h2>3. Status</h2>
+  <p>
+    The lab is intentionally conservative and is meant to stop “too large”
+    QDS gravitational tweaks from being used elsewhere. A full publication
+    would replace this toy filter with system-by-system timing fits.
+  </p>
+</body>
+</html>

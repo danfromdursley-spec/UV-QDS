@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>QDS Avian Magnetoreception Lab v1</title>
+<style>
+    body {
+        background: #050510;
+        font-family: Arial, sans-serif;
+        color: #d0f6ff;
+        margin: 20px;
+        text-align: center;
+    }
+    h1 { color: #7bfaff; text-shadow: 0 0 10px #00eaff; }
+    .panel {
+        background: #0a0f2a;
+        padding: 20px;
+        margin: 15px auto;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 650px;
+        box-shadow: 0 0 12px #009dff88;
+    }
+    input[type=range] {
+        width: 80%;
+    }
+    .value { color:#9df9a0; font-weight:bold; }
+    .result {
+        margin-top: 20px;
+        padding: 15px;
+        background: #04121f;
+        border-radius: 12px;
+        font-size: 1.3em;
+        box-shadow: 0 0 12px #14ff8899;
+    }
+    .success { color: #4cff95; }
+    .fail { color: #ff4f7a; }
+</style>
+</head>
+
+<body>
+
+<h1>🦅 QDS Avian Magnetoreception Lab<br>v1 – Cryptochrome Kernel</h1>
+
+<div class="panel">
+    <h2>1) τ<sub>c</sub> — Coherence Time (ms)</h2>
+    <input id="tau" type="range" min="0.1" max="5" value="2" step="0.1" oninput="update()">
+    <div>Current: <span id="tauVal" class="value">2</span> ms</div>
+</div>
+
+<div class="panel">
+    <h2>2) λ<sub>c</sub> — Spatial Coherence (nm)</h2>
+    <input id="lambda" type="range" min="0.5" max="10" value="2" step="0.1" oninput="update()">
+    <div>Current: <span id="lambdaVal" class="value">2</span> nm</div>
+</div>
+
+<div class="panel">
+    <h2>3) EM Noise Level</h2>
+    <input id="noise" type="range" min="0" max="1" value="0.2" step="0.01" oninput="update()">
+    <div>Current: <span id="noiseVal" class="value">0.2</span></div>
+</div>
+
+<div class="panel">
+    <h2>QDS Kernel Strength K</h2>
+    <div id="kernelOut" class="value">0.00</div>
+</div>
+
+<div id="resultBox" class="result">
+    Navigation Status: <span id="navStatus" class="success">Stable Orientation</span>
+</div>
+
+<script>
+function update() {
+    const tau = parseFloat(document.getElementById("tau").value);
+    const lambda = parseFloat(document.getElementById("lambda").value);
+    const noise = parseFloat(document.getElementById("noise").value);
+
+    document.getElementById("tauVal").textContent = tau;
+    document.getElementById("lambdaVal").textContent = lambda;
+    document.getElementById("noiseVal").textContent = noise;
+
+    // QDS-inspired kernel: K = e^(-noise) * (tau/2.5) * (2/lambda)
+    const K = Math.exp(-noise) * (tau/2.5) * (2/lambda);
+
+    document.getElementById("kernelOut").textContent = K.toFixed(3);
+
+    const status = document.getElementById("navStatus");
+    const box = document.getElementById("resultBox");
+
+    if (K >= 1) {
+        status.textContent = "Stable Orientation";
+        status.className = "success";
+        box.style.boxShadow = "0 0 15px #00ff8899";
+    } else if (K >= 0.5) {
+        status.textContent = "Partially Stable – Increased Error";
+        status.className = "value";
+        box.style.boxShadow = "0 0 15px #ffaa0099";
+    } else {
+        status.textContent = "Disoriented – Compass Collapse";
+        status.className = "fail";
+        box.style.boxShadow = "0 0 15px #ff006699";
+    }
+}
+update();
+</script>
+
+</body>
+</html>

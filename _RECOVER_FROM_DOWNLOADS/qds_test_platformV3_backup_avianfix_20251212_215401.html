@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>QDS Reality-Check Labs • Ω-Phone</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #030712;
+      --bg-shell: #050816;
+      --border: rgba(148, 163, 184, 0.3);
+      --accent: #22ffc9;
+      --accent-soft: rgba(34, 255, 201, 0.16);
+      --accent-blue: #38bdf8;
+      --text: #e5f0ff;
+      --muted: #94a3b8;
+      --heading: #f9fbff;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #111827 0, #020617 55%, #000000 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 16px;
+    }
+    .shell {
+      width: 100%;
+      max-width: 960px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: linear-gradient(135deg, #0b1021, #020617);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9);
+      padding: 18px 18px 22px;
+    }
+    header {
+      margin-bottom: 16px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+      padding-bottom: 10px;
+    }
+    .badge-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+    .pill {
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: radial-gradient(
+        circle at 0 0,
+        rgba(34, 255, 201, 0.7) 0,
+        rgba(34, 255, 201, 0.25) 22%,
+        #020617 65%
+      );
+      color: #022c22;
+      font-weight: 600;
+    }
+    .pill-ghost {
+      background: transparent;
+      color: var(--muted);
+      border-style: dashed;
+    }
+    h1 {
+      font-size: 1.4rem;
+      margin: 0 0 4px;
+      color: var(--heading);
+    }
+    .subtitle {
+      font-size: 0.9rem;
+      color: var(--muted);
+      max-width: 620px;
+    }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+      font-size: 0.85rem;
+      background: rgba(15, 23, 42, 0.9);
+      padding: 1px 4px;
+      border-radius: 4px;
+    }
+
+    .lab-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+    .lab-card {
+      border-radius: 16px;
+      padding: 12px 12px 14px;
+      background: radial-gradient(circle at 0 0, #111827 0, #020617 55%, #000000 100%);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .lab-tag {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+    }
+    .lab-card h2 {
+      font-size: 1.0rem;
+      margin: 0;
+      color: var(--heading);
+    }
+    .lab-card p {
+      font-size: 0.85rem;
+      margin: 0;
+      color: var(--muted);
+    }
+    .lab-meta {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 6px 11px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn-main {
+      background: linear-gradient(90deg, var(--accent), var(--accent-blue));
+      color: #001219;
+      border: none;
+      box-shadow: 0 10px 30px rgba(34, 255, 201, 0.4);
+    }
+    .btn-ghost {
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      color: var(--text);
+      background: rgba(15, 23, 42, 0.7);
+    }
+
+    .footer {
+      margin-top: 16px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(30, 64, 175, 0.55);
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 16px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .footer span {
+      white-space: nowrap;
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 10px;
+      }
+      .shell {
+        padding: 14px 12px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div class="badge-row">
+        <span class="pill">QDS Reality-Check Labs</span>
+        <span class="pill pill-ghost">Kernel: K(t,r) = σ² e<sup>-|t|/τc</sup> e<sup>-r²/(2λc²)</sup></span>
+      </div>
+      <h1>Ω-Phone QDS Test Platform</h1>
+      <p class="subtitle">
+        Quick launch pad for falsification-first QDS tests on this device.
+        Each lab compares QDS predictions against data or tight GR limits
+        and is built to <strong>break bad parameter choices</strong>, not just
+        confirm nice ones.
+      </p>
+    </header>
+
+    <section class="lab-grid">
+      <!-- COSMOLOGY • H0 VARIANCE -->
+      <article class="lab-card">
+        <div class="lab-tag">COSMOLOGY • HUBBLE VARIANCE</div>
+        <h2>H₀ Variance Lab</h2>
+        <p>
+          Enter patch radii R (Mpc) and observed σ(H)/H, then compare against the
+          QDS variance law <code>σ/H = A · R<sup>-p</sup></code>. Designed to
+          test the environment-driven H₀ variance slope (A = 0.017, p = 0.35)
+          across scales ~5–100 Mpc.
+        </p>
+        <p class="lab-meta">
+          Shows predicted vs observed σ/H, per-point residuals, and pass/fail vs a
+          chosen tolerance band.
+        </p>
+        <div class="btn-row">
+          <a href="qds_variance_lab.html" class="btn btn-main">
+            Open H₀ Variance Lab
+          </a>
+          <a href="qds_variance_lab.html" class="btn btn-ghost">
+            view table / chart
+          </a>
+        </div>
+      </article>
+
+      <!-- GALAXIES • ROTATION CURVES -->
+      <article class="lab-card">
+        <div class="lab-tag">GALAXIES • ROTATION CURVES</div>
+        <h2>Rotation Curve Tester</h2>
+        <p>
+          Input radii r (kpc), Newtonian speeds v<sub>N</sub> and observed v,
+          then compare against the QDS-modified law
+          <code>v<sub>QDS</sub> = v<sub>N</sub> √(1 + α · e<sup>-r/λc</sup>)</code>.
+          Tune α and λc and watch per-point percentage errors collapse or blow up.
+        </p>
+        <p class="lab-meta">
+          Per-radius % error, pass/fail flags, and side-by-side Newtonian vs QDS
+          curves for quick visual checks.
+        </p>
+        <div class="btn-row">
+          <a href="qds_rotation_lab.html" class="btn btn-main">
+            Open Rotation Lab
+          </a>
+          <a href="qds_rotation_lab.html" class="btn btn-ghost">
+            view Newtonian vs QDS
+          </a>
+        </div>
+      </article>
+
+      <!-- MICROPHYSICS • KERNEL SHAPE -->
+      <article class="lab-card">
+        <div class="lab-tag">MICROPHYSICS • KERNEL SHAPE</div>
+        <h2>Microphysics Lab</h2>
+        <p>
+          Explore the kernel directly. Set σ², τc and λc, probe K(t,r), and
+          inspect temporal and spatial correlation curves in dimensionless units.
+          See how changing correlation lengths reshapes the substrate.
+        </p>
+        <p class="lab-meta">
+          Shows K/σ² split into temporal and spatial factors; good for building
+          intuition before plugging into real systems.
+        </p>
+        <div class="btn-row">
+          <a href="qds_micro_lab.html" class="btn btn-main">
+            Open Microphysics Lab
+          </a>
+          <a href="q.html" class="btn btn-ghost">
+            see correlation shapes
+          </a>
+        </div>
+      </article>
+
+      <!-- GR PRECISION • BINARY PULSARS -->
+      <article class="lab-card">
+        <div class="lab-tag">GR PRECISION • BINARY PULSARS</div>
+        <h2>Binary Pulsar Constraint Lab</h2>
+        <p>
+          Use high-precision timing of relativistic binary pulsars to carve out
+          allowed QDS parameter space. At these separations, orbital
+          period-decay matches GR to within a few tenths of a percent, so any
+          extra QDS gravity must be tiny.
+        </p>
+        <p class="lab-meta">
+          Evaluates <code>|α<sub>eff</sub>| = |α · e<sup>-r/λc</sup>|</code> at the
+          binary separation and flags it as <strong>OK</strong> or
+          <strong>ruled out</strong> against an adjustable deviation band
+          (~0.2% by default).
+        </p>
+        <div class="btn-row">
+          <a href="qds_binary_pulsar_lab.html" class="btn btn-main"><a href="qds_binary_pulsar_lab.html" class="btn btn-main">
+            Open Binary Pulsar Lab
+          </a>
+          <a href="qds_pulsar_lab.html#details" class="btn btn-ghost">
+            view method / notes
+          </a>
+        </div>
+      </article>
+<!-- BIO / ECO • BIRD MIGRATION -->
+<div class="card">
+  <div class="tag">BIO / ECO • MIGRATION</div>
+  <h2>Bird Migration Coherence Lab</h2>
+  <p>
+    Route coherence + timing jitter checks. Load CSV, compare cohorts,
+    and flag drift/anomalies (phone-first).
+  </p>
+  <div class="btnrow">
+    <a class="btn primary" href="qds_avian_navigation_lab.html">OPEN BIRD MIGRATION LAB</a>
+    <a class="btn" href="qds_avian_lab_latest.html">VIEW METHOD / NOTES</a>
+  </div>
+</div>
+
+<!-- DATA • BINARY / PACKETS -->
+<div class="card">
+  <div class="tag">DATA • BINARY</div>
+  <h2>Binary Data App</h2>
+  <p>
+    Quick sanity tools for binary/hex, bitfields, CRC checks, and tiny plots.
+    Built for on-device debugging.
+  </p>
+  <div class="btnrow">
+    <div class="actions">
+<a class="btn primary" href="binary_data_app.html">OPEN BINARY DATA APP</a>
+    <a class="btn" href="binary_data_notes.html">VIEW METHOD / NOTES</a>
+</div>
+  </div>
+</div>
+    </section>
+
+    <footer class="footer">
+      <span>Device: <strong>Ω-Phone QDS Lab</strong> • <code>localhost:8000</code></span>
+      <span>Built by Dan-Operator &amp; GPT-5.1 Thinking 🎩</span>
+    </footer>
+  </main>
+</body>
+</html>

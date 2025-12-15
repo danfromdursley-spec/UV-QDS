@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>DDmelts • Denny's Delights — Microsite v1.2</title>
+
+<style>
+  :root{
+    /* Feminine baby-pink palette */
+    --bg-0: #0b0a12;
+    --bg-1: #120f1f;
+    --bg-2: #1a132a;
+
+    --pink-0:#ffe9f3;
+    --pink-1:#ffd6ea;
+    --pink-2:#ffb9dd;
+    --pink-3:#ff9ccc;
+
+    --lav-1:#e7d7ff;
+    --lav-2:#cbb6ff;
+
+    --glass: rgba(255,255,255,0.06);
+    --glass-2: rgba(255,255,255,0.09);
+    --stroke: rgba(255,255,255,0.08);
+    --stroke-2: rgba(255,255,255,0.14);
+
+    --text-0:#ffffff;
+    --text-1: rgba(255,255,255,0.86);
+    --text-2: rgba(255,255,255,0.68);
+    --muted: rgba(255,255,255,0.55);
+
+    --good:#98ffd6;
+
+    --radius-1: 14px;
+    --radius-2: 18px;
+    --radius-3: 26px;
+
+    --shadow-1: 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-2: inset 0 1px 0 rgba(255,255,255,0.06);
+
+    --max: 980px;
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    color:var(--text-0);
+    background:
+      radial-gradient(900px 600px at 10% 10%, rgba(255,156,204,0.12), transparent 60%),
+      radial-gradient(800px 600px at 90% 15%, rgba(203,182,255,0.12), transparent 60%),
+      radial-gradient(900px 700px at 20% 85%, rgba(255,214,234,0.10), transparent 60%),
+      linear-gradient(180deg, var(--bg-1), var(--bg-0) 35%, var(--bg-2) 100%);
+    overflow-x:hidden;
+  }
+
+  /* Soft floating hearts (subtle) */
+  .hearts{
+    position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:0;
+  }
+  .heart{
+    position:absolute;
+    width:14px; height:14px;
+    background: linear-gradient(135deg, rgba(255,214,234,0.22), rgba(255,156,204,0.22));
+    transform: rotate(45deg);
+    border-radius: 3px;
+    filter: blur(0.2px);
+    opacity:0.6;
+    animation: floatUp linear infinite;
+  }
+  .heart:before,.heart:after{
+    content:"";
+    position:absolute;
+    width:14px; height:14px;
+    background: inherit;
+    border-radius: 50%;
+  }
+  .heart:before{left:-7px; top:0;}
+  .heart:after{left:0; top:-7px;}
+  @keyframes floatUp{
+    from{transform: translateY(20vh) rotate(45deg); opacity:0;}
+    15%{opacity:.5;}
+    50%{opacity:.35;}
+    to{transform: translateY(-120vh) rotate(45deg); opacity:0;}
+  }
+
+  .wrap{
+    position:relative; z-index:1;
+    padding: 24px 14px 110px;
+    display:flex; justify-content:center;
+  }
+  .page{
+    width:min(100%, var(--max));
+  }
+
+  .topbar{
+    display:flex; align-items:center; gap:14px;
+    padding: 8px 6px 18px;
+  }
+  .logo{
+    width:56px; height:56px;
+    border-radius: 16px;
+    background:
+      linear-gradient(135deg, rgba(255,214,234,0.18), rgba(203,182,255,0.18)),
+      rgba(255,255,255,0.05);
+    border:1px solid var(--stroke);
+    box-shadow: var(--shadow-2), var(--shadow-1);
+    display:grid; place-items:center;
+    font-weight:700; letter-spacing:0.5px;
+    color: var(--pink-1);
+  }
+  .brandblock{
+    display:flex; flex-direction:column; gap:6px;
+  }
+  .kicker{
+    font-size:10px; letter-spacing:0.18em; text-transform:uppercase;
+    color: var(--muted);
+  }
+  .brand{
+    font-size:26px; font-weight:800; line-height:1.05;
+  }
+  .subbrand{
+    font-size:14px; color:var(--text-2);
+  }
+
+  .pillrow{
+    margin-left:auto;
+    display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;
+  }
+  .pill{
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: var(--glass);
+    border:1px solid var(--stroke);
+    color: var(--text-2);
+    font-size:11px; letter-spacing:0.06em; text-transform:uppercase;
+  }
+
+  .hero{
+    background:
+      linear-gradient(135deg, rgba(255,214,234,0.10), rgba(203,182,255,0.08)),
+      var(--glass);
+    border:1px solid var(--stroke);
+    border-radius: var(--radius-3);
+    padding: 22px 18px 18px;
+    box-shadow: var(--shadow-2), var(--shadow-1);
+  }
+
+  .status{
+    display:inline-flex; align-items:center; gap:8px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: rgba(152,255,214,0.08);
+    border:1px solid rgba(152,255,214,0.22);
+    font-size:11px; color: var(--text-1);
+    letter-spacing:0.04em; text-transform:uppercase;
+  }
+  .dot{
+    width:8px; height:8px; border-radius:50%;
+    background: var(--good);
+    box-shadow: 0 0 10px rgba(152,255,214,0.7);
+  }
+
+  .hero h1{
+    margin: 14px 0 8px;
+    font-size: clamp(26px, 5.5vw, 40px);
+    line-height:1.08;
+  }
+  .hero p{
+    margin:0 0 14px;
+    color: var(--text-2);
+    font-size: 15.5px;
+  }
+
+  .chips{
+    display:flex; flex-wrap:wrap; gap:8px;
+    margin: 8px 0 16px;
+  }
+  .chip{
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.04);
+    border:1px solid var(--stroke);
+    font-size:12px; color: var(--text-2);
+  }
+
+  .ctaRow{
+    display:flex; gap:10px; flex-wrap:wrap;
+  }
+  .btn{
+    appearance:none; border:none; cursor:pointer;
+    padding: 12px 14px;
+    border-radius: 14px;
+    font-weight:650;
+    letter-spacing:0.01em;
+    font-size:14.5px;
+    text-decoration:none;
+    display:inline-flex; align-items:center; justify-content:center;
+    gap:8px;
+    transition: transform .08s ease, border-color .15s ease, background .15s ease, opacity .15s ease;
+  }
+  .btn:active{transform: translateY(1px) scale(0.99)}
+  .btn.primary{
+    color:#1b0b14;
+    background:
+      linear-gradient(135deg, var(--pink-1), var(--pink-3));
+    box-shadow: 0 8px 22px rgba(255,156,204,0.22);
+  }
+  .btn.secondary{
+    color: var(--text-0);
+    background: var(--glass-2);
+    border:1px solid var(--stroke-2);
+  }
+  .btn.ghost{
+    color: var(--text-1);
+    background: rgba(255,255,255,0.03);
+    border:1px solid var(--stroke);
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-top: 16px;
+  }
+  @media (min-width: 820px){
+    .grid.two{grid-template-columns: 1fr 1fr;}
+    .grid.three{grid-template-columns: 1fr 1fr 1fr;}
+  }
+
+  .card{
+    background:
+      linear-gradient(135deg, rgba(255,214,234,0.08), rgba(203,182,255,0.06)),
+      var(--glass);
+    border:1px solid var(--stroke);
+    border-radius: var(--radius-2);
+    padding: 16px 14px;
+    box-shadow: var(--shadow-2), var(--shadow-1);
+  }
+  .card.soft{
+    background:
+      linear-gradient(135deg, rgba(255,214,234,0.12), rgba(255,156,204,0.08)),
+      var(--glass);
+  }
+
+  .tag{
+    display:inline-flex;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size:10px; letter-spacing:0.08em; text-transform:uppercase;
+    background: rgba(255,214,234,0.10);
+    border:1px solid rgba(255,214,234,0.22);
+    color: var(--pink-0);
+  }
+
+  h2{
+    margin: 6px 0 4px;
+    font-size: 20px;
+  }
+  h3{
+    margin: 8px 0 6px;
+    font-size: 17.5px;
+  }
+  .muted{color: var(--text-2)}
+  .tiny{font-size:11px; color:var(--muted)}
+
+  .price{
+    font-size: 22px; font-weight:800;
+    color: var(--pink-1);
+  }
+
+  .list{
+    display:grid; gap:10px;
+  }
+  .line{
+    display:flex; justify-content:space-between; gap:10px;
+    padding: 10px 10px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.04);
+    border:1px solid var(--stroke);
+  }
+
+  .photoGrid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  @media (min-width: 520px){
+    .photoGrid{grid-template-columns: 1fr 1fr 1fr;}
+  }
+  .photoSlot{
+    min-height: 90px;
+    border-radius: 14px;
+    background:
+      linear-gradient(135deg, rgba(255,214,234,0.08), rgba(203,182,255,0.08)),
+      rgba(255,255,255,0.03);
+    border:1px dashed rgba(255,255,255,0.14);
+    display:flex; align-items:center; justify-content:center;
+    text-align:center;
+    padding: 10px;
+    color: var(--muted);
+    font-size: 11.5px;
+  }
+
+  label{
+    display:block; font-size:11px; letter-spacing:0.08em; text-transform:uppercase;
+    color: var(--muted);
+    margin: 10px 0 6px;
+  }
+  input, select, textarea{
+    width:100%;
+    padding: 12px 12px;
+    border-radius: 12px;
+    border:1px solid var(--stroke);
+    background: rgba(0,0,0,0.18);
+    color: var(--text-0);
+    outline:none;
+  }
+  textarea{min-height: 86px; resize: vertical;}
+
+  .row{
+    display:flex; gap:10px; flex-wrap:wrap;
+  }
+  .row > *{flex:1 1 160px}
+
+  .output{
+    margin-top: 10px;
+    padding: 12px;
+    border-radius: 12px;
+    border:1px dashed rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.03);
+    font-size: 13.4px;
+    color: var(--text-1);
+    white-space: pre-wrap;
+  }
+
+  /* Sticky bottom quick links */
+  .dock{
+    position: fixed;
+    left: 10px; right: 10px; bottom: 10px;
+    z-index: 5;
+  }
+  .dockInner{
+    max-width: var(--max);
+    margin: 0 auto;
+    display:flex; gap:8px; flex-wrap:wrap;
+    padding: 10px;
+    border-radius: 18px;
+    background:
+      linear-gradient(135deg, rgba(255,214,234,0.12), rgba(203,182,255,0.10)),
+      rgba(8,8,14,0.78);
+    border:1px solid rgba(255,255,255,0.10);
+    backdrop-filter: blur(10px);
+  }
+  .dockLabel{
+    display:inline-flex; align-items:center;
+    padding: 8px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    letter-spacing:0.06em;
+    color: var(--pink-0);
+    background: rgba(255,214,234,0.08);
+    border:1px solid rgba(255,214,234,0.18);
+  }
+  .dockBtn{
+    padding: 8px 10px;
+    border-radius: 12px;
+    font-size: 11.5px;
+  }
+
+  footer{
+    margin-top: 18px;
+    padding: 10px 2px 0;
+    text-align:center;
+    color: var(--muted);
+    font-size: 11px;
+  }
+  .sep{
+    height:1px; background: rgba(255,255,255,0.06);
+    margin: 14px 0;
+  }
+</style>
+</head>
+
+<body>
+  <!-- floating hearts -->
+  <div class="hearts" id="hearts"></div>
+
+  <div class="wrap">
+    <div class="page">
+
+      <!-- TOP BAR -->
+      <div class="topbar">
+        <div class="logo">DD</div>
+        <div class="brandblock">
+          <div class="kicker">Handmade scent & bath treats</div>
+          <div class="brand">DDmelts • Denny’s Delights</div>
+          <div class="subbrand">Local • Small-batch • Gift-ready</div>
+        </div>
+        <div class="pillrow">
+          <span class="pill">Microsite v1.2</span>
+          <span class="pill">Offline-friendly</span>
+        </div>
+      </div>
+
+      <!-- HERO -->
+      <section class="hero">
+        <span class="status"><span class="dot"></span> Taking orders • UK shipping / local drop</span>
+        <h1>Cosy scents & bath-time joy — made with love. ✨💗</h1>
+        <p>
+          Wax melts, burners, bath bombs, soaps and car perfumes designed for warm evenings,
+          thoughtful gifts, and that “new house, new vibes” feeling.
+          Small batches, big heart.
+        </p>
+
+        <div class="chips">
+          <span class="chip">Wax melts</span>
+          <span class="chip">Burners</span>
+          <span class="chip">Bath bombs</span>
+          <span class="chip">Soap</span>
+          <span class="chip">Car perfume</span>
+          <span class="chip">Seasonal launches</span>
+          <span class="chip">Gift sets</span>
+        </div>
+
+        <div class="ctaRow">
+          <a class="btn primary" href="https://ddmelts.sumupstore.com" target="_blank" rel="noopener">
+            🛍️ Shop SumUp
+          </a>
+          <a class="btn secondary" href="https://instagram.com/dennysdelightswaxmelts" target="_blank" rel="noopener">
+            📸 Instagram
+          </a>
+          <a class="btn ghost" href="#order">
+            💌 Order / Enquire
+          </a>
+          <a class="btn ghost" href="#photos">
+            📷 Photos
+          </a>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="row">
+          <div class="card soft">
+            <span class="tag">Local maker</span>
+            <h3>Dursley-based, UK-wide shipping</h3>
+            <div class="muted">16 Forge Road, Dursley, GL11 4GB</div>
+            <div class="tiny">Ask about local drop days + bundle offers.</div>
+          </div>
+
+          <div class="card soft">
+            <span class="tag">Sunday self-care</span>
+            <h3>3 Bath Bombs for £10</h3>
+            <div class="muted">Beautifully boxed • Shipped UK-wide • Great little pick-me-up.</div>
+            <div class="row" style="margin-top:10px">
+              <a class="btn primary" href="https://ddmelts.sumupstore.com" target="_blank" rel="noopener">Shop now</a>
+              <a class="btn ghost" href="https://instagram.com/dennysdelightswaxmelts" target="_blank" rel="noopener">See latest posts</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- BESTSELLERS -->
+      <section class="grid two">
+        <div class="card">
+          <span class="tag">⭐ Bestsellers (rename anytime)</span>
+          <h2>Quick picks for “safe wins”</h2>
+          <div class="list">
+            <div class="line">
+              <div>
+                <strong>Cosy Cottage</strong><br>
+                <span class="tiny">Soft vanilla, warm woods, gentle clean finish.</span>
+              </div>
+              <div class="tiny">Wax melts</div>
+            </div>
+            <div class="line">
+              <div>
+                <strong>Sleepy Blush</strong><br>
+                <span class="tiny">Lavender-musk comfort with a sweet creamy edge.</span>
+              </div>
+              <div class="tiny">Bath bombs</div>
+            </div>
+            <div class="line">
+              <div>
+                <strong>Fresh Start Box</strong><br>
+                <span class="tiny">Mixed minis for that “unpack + exhale” moment.</span>
+              </div>
+              <div class="tiny">Gift set</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="tag">🧺 The range</span>
+          <h2>Small-batch joy</h2>
+          <div class="list">
+            <div class="line"><strong>Wax melt snap bars & minis</strong><span class="tiny">Seasonal drops + clean staples</span></div>
+            <div class="line"><strong>Classic & gift-ready burners</strong><span class="tiny">Pretty, sturdy, bundle-friendly</span></div>
+            <div class="line"><strong>Bath bombs</strong><span class="tiny">Foam, fizz & soft-skin vibes</span></div>
+            <div class="line"><strong>Soap & self-care extras</strong><span class="tiny">Gentle everyday treats</span></div>
+            <div class="line"><strong>Car perfume</strong><span class="tiny">Fresh rides, cosy commutes</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PRICES -->
+      <section class="grid two" id="prices">
+        <div class="card">
+          <span class="tag">💗 Quick price guide</span>
+          <h2>Keep this page “ready-to-sell”</h2>
+          <div class="muted">Update these as her real catalogue evolves.</div>
+          <div class="sep"></div>
+          <div class="list">
+            <div class="line">
+              <div><strong>Wax melt snap bars</strong><br><span class="tiny">Popular everyday picks</span></div>
+              <div class="price">£X.XX</div>
+            </div>
+            <div class="line">
+              <div><strong>Mini melt bundles</strong><br><span class="tiny">Mix-and-match scent packs</span></div>
+              <div class="price">£X.XX</div>
+            </div>
+            <div class="line">
+              <div><strong>Bath bombs</strong><br><span class="tiny">Single or multi-buy options</span></div>
+              <div class="price">£X.XX</div>
+            </div>
+            <div class="line">
+              <div><strong>Burners</strong><br><span class="tiny">Gift-ready classics</span></div>
+              <div class="price">£X.XX</div>
+            </div>
+            <div class="line">
+              <div><strong>Car perfume</strong><br><span class="tiny">Fresh + cosy commuters</span></div>
+              <div class="price">£X.XX</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="tag">🌸 Why DDmelts?</span>
+          <h2>Handmade with care</h2>
+          <div class="list">
+            <div class="line">
+              <div>
+                <strong>Small-batch love</strong><br>
+                <span class="tiny">Every batch is made to feel personal — cosy scents, soothing baths, and gifts that mean something.</span>
+              </div>
+            </div>
+            <div class="line">
+              <div>
+                <strong>Perfect little pick-me-ups</strong><br>
+                <span class="tiny">From house-warming bundles to mini treat packs — simple joys you can smell and feel.</span>
+              </div>
+            </div>
+            <div class="line">
+              <div>
+                <strong>Local heart, UK reach</strong><br>
+                <span class="tiny">Dursley-based maker with UK shipping and friendly local drops.</span>
+              </div>
+            </div>
+          </div>
+          <div class="sep"></div>
+          <div class="tiny">
+            Tip: Add allergy / ingredient notes to product listings on the shop and confirm with customers when needed.
+          </div>
+        </div>
+      </section>
+
+      <!-- PHOTOS -->
+      <section class="card" id="photos">
+        <span class="tag">📷 Photos</span>
+        <h2>Drop her real photos here later</h2>
+        <div class="muted">These placeholders keep the layout pretty until you swap in images.</div>
+        <div class="sep"></div>
+
+        <div class="photoGrid">
+          <div class="photoSlot">Hero product shot<br><span class="tiny">Add photo when ready</span></div>
+          <div class="photoSlot">Seasonal lineup<br><span class="tiny">Add photo when ready</span></div>
+          <div class="photoSlot">Gift sets<br><span class="tiny">Add photo when ready</span></div>
+          <div class="photoSlot">Burners display<br><span class="tiny">Add photo when ready</span></div>
+          <div class="photoSlot">Bath bomb colours<br><span class="tiny">Add photo when ready</span></div>
+          <div class="photoSlot">Packaging / thank-you cards<br><span class="tiny">Add photo when ready</span></div>
+        </div>
+
+        <div class="sep"></div>
+        <div class="row">
+          <a class="btn secondary" href="https://instagram.com/dennysdelightswaxmelts" target="_blank" rel="noopener">
+            View Instagram gallery
+          </a>
+          <a class="btn ghost" href="https://ddmelts.sumupstore.com" target="_blank" rel="noopener">
+            Browse shop photos
+          </a>
+        </div>
+      </section>
+
+      <!-- ORDER / ENQUIRE -->
+      <section class="card" id="order">
+        <span class="tag">🛒 Order / Enquire</span>
+        <h2>Low-friction order message</h2>
+        <div class="muted">
+          Fill this in, tap generate, then copy the message to send via Instagram / Facebook / WhatsApp.
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Your name</label>
+            <input id="custName" placeholder="e.g., Sarah" />
+          </div>
+          <div>
+            <label>Delivery type</label>
+            <select id="delivery">
+              <option>Local drop</option>
+              <option>UK shipping</option>
+              <option>Collection (if offered)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Product type</label>
+            <select id="product">
+              <option>Wax melts</option>
+              <option>Burner</option>
+              <option>Bath bombs</option>
+              <option>Soap</option>
+              <option>Car perfume</option>
+              <option>Gift set</option>
+              <option>Not sure — recommend me something</option>
+            </select>
+          </div>
+          <div>
+            <label>Quantity</label>
+            <input id="qty" type="number" min="1" value="1" />
+          </div>
+        </div>
+
+        <label>Scent / vibe</label>
+        <input id="vibe" placeholder="clean • cosy • sweet • seasonal • fresh laundry • floral • fruity..." />
+
+        <label>Budget (optional)</label>
+        <input id="budget" placeholder="e.g., £10–£20" />
+
+        <label>Notes</label>
+        <textarea id="notes" placeholder="Any favourites, allergies, gift message, dates, etc."></textarea>
+
+        <div class="row" style="margin-top:10px">
+          <button class="btn primary" id="genBtn">💗 Generate message</button>
+          <button class="btn secondary" id="copyBtn">📋 Copy message</button>
+          <a class="btn ghost" id="igBtn" href="https://instagram.com/dennysdelightswaxmelts" target="_blank" rel="noopener">
+            Send via Instagram
+          </a>
+        </div>
+
+        <div class="output" id="outBox">Your generated order message will appear here.</div>
+
+        <div class="sep"></div>
+        <div class="tiny">
+          This page is a lightweight “order helper.” Final prices, stock, ingredients and allergy checks should be confirmed with the customer.
+        </div>
+      </section>
+
+      <footer>
+        DDmelts • Denny’s Delights — Microsite v1.2 • Live socials + shop • Offline-friendly •
+        Baby-pink edition 💗
+      </footer>
+
+    </div>
+  </div>
+
+  <!-- Sticky quick links -->
+  <div class="dock">
+    <div class="dockInner">
+      <span class="dockLabel">DDmelts • quick links</span>
+      <a class="btn ghost dockBtn" href="#order">Order</a>
+      <a class="btn ghost dockBtn" href="#photos">Photos</a>
+      <a class="btn secondary dockBtn" href="https://ddmelts.sumupstore.com" target="_blank" rel="noopener">Shop</a>
+      <a class="btn secondary dockBtn" href="https://instagram.com/dennysdelightswaxmelts" target="_blank" rel="noopener">Instagram</a>
+      <a class="btn ghost dockBtn" href="#prices">Prices</a>
+    </div>
+  </div>
+
+<script>
+  // -------------------------------------------------------
+  // DDmelts Microsite v1.2 config (easy edits)
+  // -------------------------------------------------------
+  const BRAND = {
+    name: "DDmelts • Denny’s Delights",
+    instagram: "https://instagram.com/dennysdelightswaxmelts",
+    shop: "https://ddmelts.sumupstore.com",
+    address: "16 Forge Road, Dursley, GL11 4GB"
+  };
+
+  // -------------------------------------------------------
+  // Hearts generator (light + random)
+  // -------------------------------------------------------
+  (function makeHearts(){
+    const wrap = document.getElementById("hearts");
+    const count = 18; // subtle
+    for(let i=0;i<count;i++){
+      const h = document.createElement("div");
+      h.className = "heart";
+      const left = Math.random()*100;
+      const delay = Math.random()*8;
+      const dur = 10 + Math.random()*14;
+      const size = 10 + Math.random()*10;
+
+      h.style.left = left + "vw";
+      h.style.animationDelay = delay + "s";
+      h.style.animationDuration = dur + "s";
+      h.style.width = size + "px";
+      h.style.height = size + "px";
+
+      wrap.appendChild(h);
+    }
+  })();
+
+  // -------------------------------------------------------
+  // Order message builder
+  // -------------------------------------------------------
+  const $ = (id)=>document.getElementById(id);
+
+  function buildMessage(){
+    const name = $("custName").value.trim() || "Hi!";
+    const delivery = $("delivery").value;
+    const product = $("product").value;
+    const qty = $("qty").value || "1";
+    const vibe = $("vibe").value.trim() || "open to recommendations";
+    const budget = $("budget").value.trim();
+    const notes = $("notes").value.trim();
+
+    let msg =
+`Hi ${BRAND.name} 💗
+
+Name: ${name}
+Delivery: ${delivery}
+Product: ${product}
+Quantity: ${qty}
+Scent / vibe: ${vibe}`;
+
+    if(budget) msg += `\nBudget: ${budget}`;
+    if(notes) msg += `\nNotes: ${notes}`;
+
+    msg += `
+
+Thanks! ✨`;
+
+    return msg;
+  }
+
+  $("genBtn").addEventListener("click", ()=>{
+    $("outBox").textContent = buildMessage();
+  });
+
+  $("copyBtn").addEventListener("click", async ()=>{
+    const msg = buildMessage();
+    $("outBox").textContent = msg;
+    try{
+      await navigator.clipboard.writeText(msg);
+      $("copyBtn").textContent = "✅ Copied";
+      setTimeout(()=> $("copyBtn").textContent = "📋 Copy message", 900);
+    }catch(e){
+      $("copyBtn").textContent = "Copy failed";
+      setTimeout(()=> $("copyBtn").textContent = "📋 Copy message", 900);
+    }
+  });
+
+  // keep IG button synced
+  $("igBtn").setAttribute("href", BRAND.instagram);
+</script>
+</body>
+</html>

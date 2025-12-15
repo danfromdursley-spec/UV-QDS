@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Revenue Floor + Capacity Truth (v3)</title>
+<style>
+  :root{
+    --bg:#070c14;
+    --panel:#0c1422;
+    --panel2:#0a111d;
+    --text:#e9f1ff;
+    --muted:#9aa7bd;
+    --border:rgba(255,255,255,0.08);
+    --a:#7fb3ff;
+    --b:#7fffd4;
+    --warn:#ffcf6b;
+    --bad:#ff6b8b;
+    --ok:#63ff9b;
+    --shadow: 0 0 0 1px rgba(127,179,255,0.10), 0 18px 60px rgba(0,0,0,0.45);
+    --r:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(900px 520px at 12% 0%, rgba(127,179,255,0.10), transparent 70%),
+      radial-gradient(900px 620px at 92% 8%, rgba(127,255,212,0.08), transparent 70%),
+      radial-gradient(900px 700px at 50% 120%, rgba(127,179,255,0.05), transparent 65%),
+      var(--bg);
+  }
+  .wrap{max-width:1040px;margin:18px auto 70px;padding:0 14px;}
+  .hero{
+    border:1px solid var(--border);
+    background:linear-gradient(180deg, rgba(12,20,34,0.92), rgba(10,17,29,0.92));
+    box-shadow:var(--shadow);
+    border-radius:var(--r);
+    padding:16px 16px 12px;
+  }
+  .topline{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+  .brand{
+    display:flex;gap:10px;align-items:center;
+  }
+  .dot{
+    width:12px;height:12px;border-radius:50%;
+    background:conic-gradient(from 120deg, var(--a), var(--b), var(--a));
+    box-shadow:0 0 18px rgba(127,179,255,0.35);
+  }
+  h1{margin:0;font-size:18px;letter-spacing:0.2px}
+  .sub{margin:6px 0 0;color:var(--muted);font-size:12.8px;line-height:1.35}
+  .pillrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .pill{
+    border:1px solid var(--border);
+    border-radius:999px;
+    padding:6px 10px;
+    font-size:12px;
+    color:var(--muted);
+    background:rgba(255,255,255,0.03);
+  }
+  .pill strong{color:var(--text);font-weight:650}
+  .actions{display:flex;gap:8px;flex-wrap:wrap}
+  button, .btn{
+    border:1px solid var(--border);
+    background:rgba(255,255,255,0.03);
+    color:var(--text);
+    padding:8px 10px;
+    border-radius:12px;
+    font-size:12.5px;
+    cursor:pointer;
+    transition:transform .05s ease, border-color .15s ease, background .15s ease;
+    user-select:none;
+  }
+  button:hover,.btn:hover{border-color:rgba(127,179,255,0.28);background:rgba(127,179,255,0.06)}
+  button:active,.btn:active{transform:translateY(1px)}
+  .grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px}
+  @media(min-width:980px){
+    .grid{grid-template-columns: 1.05fr 0.95fr;}
+  }
+
+  .card{
+    border:1px solid var(--border);
+    background:linear-gradient(180deg, rgba(12,20,34,0.88), rgba(10,17,29,0.88));
+    box-shadow:var(--shadow);
+    border-radius:var(--r);
+    padding:14px;
+  }
+  .card h2{
+    margin:0 0 10px;
+    font-size:14px;
+    color:rgba(233,241,255,0.92);
+    letter-spacing:0.25px;
+  }
+
+  .row{display:grid;grid-template-columns:1fr;gap:10px}
+  @media(min-width:720px){
+    .row{grid-template-columns:1fr 1fr;}
+  }
+
+  .field{
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:10px;
+    background:rgba(255,255,255,0.02);
+  }
+  .field .lab{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;gap:10px}
+  .field .lab span.k{color:rgba(233,241,255,0.80)}
+  .field input, .field select, .field textarea{
+    width:100%;
+    margin-top:7px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.10);
+    background:rgba(0,0,0,0.22);
+    color:var(--text);
+    padding:10px 10px;
+    font-size:14px;
+    outline:none;
+  }
+  textarea{min-height:64px;resize:vertical}
+
+  .kpiGrid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+  @media(min-width:720px){
+    .kpiGrid{grid-template-columns:1fr 1fr;}
+  }
+  .kpi{
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:12px;
+    background:rgba(255,255,255,0.02);
+  }
+  .kpi .t{font-size:12px;color:var(--muted)}
+  .kpi .v{margin-top:6px;font-size:22px;font-weight:800;letter-spacing:0.2px}
+  .kpi .n{margin-top:6px;font-size:12px;color:var(--muted)}
+  .kpi .v.ok{color:var(--ok)}
+  .kpi .v.warn{color:var(--warn)}
+  .kpi .v.bad{color:var(--bad)}
+
+  .mini{
+    margin-top:10px;
+    border-top:1px solid rgba(255,255,255,0.06);
+    padding-top:10px;
+    color:var(--muted);
+    font-size:12.5px;
+    line-height:1.5;
+  }
+  .mini strong{color:rgba(233,241,255,0.88)}
+
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:8px;
+    overflow:hidden;
+    border-radius:14px;
+  }
+  th,td{
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    padding:10px 10px;
+    font-size:12.8px;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{color:rgba(233,241,255,0.85);font-weight:700}
+  td{color:rgba(233,241,255,0.78)}
+  .muted{color:var(--muted)}
+  .right{text-align:right}
+  .badge{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:5px 9px;border-radius:999px;
+    border:1px solid rgba(255,255,255,0.10);
+    background:rgba(255,255,255,0.03);
+    font-size:12px;
+    color:var(--muted);
+  }
+  .badge i{
+    width:8px;height:8px;border-radius:50%;
+    background:var(--ok);
+    box-shadow:0 0 14px rgba(99,255,155,0.35);
+  }
+  .badge.warn i{background:var(--warn)}
+  .badge.bad i{background:var(--bad)}
+  .deltaPos{color:var(--ok);font-weight:750}
+  .deltaNeg{color:var(--bad);font-weight:750}
+  .deltaZero{color:var(--muted);font-weight:750}
+
+  .twoCols{display:grid;grid-template-columns:1fr;gap:12px}
+  @media(min-width:980px){.twoCols{grid-template-columns:1fr 1fr}}
+  .printOnly{display:none}
+  .onepager .hideInOnePager{display:none !important;}
+  .onepager .printOnly{display:block !important;}
+  .onepager .wrap{max-width:980px}
+  .onepager .card{box-shadow:none}
+  .onepager .hero{box-shadow:none}
+  @media print{
+    body{background:#fff;color:#000}
+    .actions, .pillrow{display:none !important;}
+    .card, .hero{box-shadow:none !important;background:#fff !important;color:#000 !important;border-color:#ddd !important;}
+    input,select,textarea{border-color:#ddd !important;background:#fff !important;color:#000 !important;}
+    .muted{color:#333 !important;}
+    .wrap{margin:0;max-width:none}
+  }
+
+  .toast{
+    position:fixed;left:50%;bottom:16px;transform:translateX(-50%);
+    padding:10px 12px;border-radius:14px;
+    border:1px solid rgba(255,255,255,0.12);
+    background:rgba(10,17,29,0.92);
+    color:rgba(233,241,255,0.90);
+    box-shadow:0 16px 50px rgba(0,0,0,0.55);
+    font-size:12.5px;
+    display:none;
+    max-width:92vw;
+  }
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="topline">
+      <div class="brand">
+        <div class="dot"></div>
+        <div>
+          <h1>QDS • GrowthHub — Revenue Floor + Capacity Truth <span class="muted">(v3)</span></h1>
+          <div class="sub">
+            Single-file business system: demand → conversion → capacity caps → MRR accumulation → assumption audit.
+            Built for honest planning, not hype.
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="btnOnePager">Toggle One-Pager View</button>
+        <button id="btnPrint">Print One-Pager</button>
+        <button id="btnCopy">Copy Board Summary</button>
+        <button id="btnReset">Reset to Base</button>
+      </div>
+    </div>
+
+    <div class="pillrow">
+      <div class="pill"><strong>Purpose:</strong> show revenue floor under realistic conversion + capacity</div>
+      <div class="pill"><strong>Output:</strong> monthly rev, yearly run-rate, MRR @ horizon</div>
+      <div class="pill"><strong>Truth:</strong> caps stop “infinite sprints” fantasy</div>
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <!-- LEFT: Inputs -->
+    <div class="card">
+      <h2>Inputs</h2>
+
+      <div class="row">
+        <div class="field">
+          <div class="lab"><span>Preset</span><span class="k">Mode</span></div>
+          <select id="mode">
+            <option value="con">Conservative</option>
+            <option value="base" selected>Base</option>
+            <option value="opt">Optimistic (still sane)</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <div class="lab"><span>Currency label (display)</span><span class="k">Symbol only</span></div>
+          <input id="sym" value="£" maxlength="2" />
+        </div>
+
+        <div class="field">
+          <div class="lab"><span>Months to project</span><span class="k">MRR horizon</span></div>
+          <input id="months" type="number" min="1" max="60" step="1" value="12" />
+        </div>
+
+        <div class="field">
+          <div class="lab"><span>Starting MRR</span><span class="k">M0</span></div>
+          <input id="m0" type="number" min="0" step="50" value="0" />
+        </div>
+      </div>
+
+      <div class="twoCols">
+        <div class="card" style="padding:12px;border-radius:16px;background:rgba(255,255,255,0.02)">
+          <h2 style="margin:0 0 8px;font-size:13px;">Demand</h2>
+          <div class="row">
+            <div class="field">
+              <div class="lab"><span>Leads / month</span><span class="k">L</span></div>
+              <input id="L" type="number" min="0" step="1" value="12" />
+            </div>
+            <div class="field">
+              <div class="lab"><span>Qualified rate (0–1)</span><span class="k">q</span></div>
+              <input id="q" type="number" min="0" max="1" step="0.01" value="0.50" />
+            </div>
+            <div class="field">
+              <div class="lab"><span>Sprint close of qualified (0–1)</span><span class="k">s</span></div>
+              <input id="s" type="number" min="0" max="1" step="0.01" value="0.35" />
+            </div>
+            <div class="field">
+              <div class="lab"><span>Pilot-from-sprint (0–1)</span><span class="k">p</span></div>
+              <input id="p" type="number" min="0" max="1" step="0.01" value="0.40" />
+            </div>
+            <div class="field">
+              <div class="lab"><span>Retainer-from-pilot (0–1)</span><span class="k">r</span></div>
+              <input id="r" type="number" min="0" max="1" step="0.01" value="0.30" />
+            </div>
+          </div>
+          <div class="mini">
+            Tip: keep rates in <strong>0–1</strong> format. This model auto-caps sprints/pilots using your capacity values.
+          </div>
+        </div>
+
+        <div class="card" style="padding:12px;border-radius:16px;background:rgba(255,255,255,0.02)">
+          <h2 style="margin:0 0 8px;font-size:13px;">Pricing + Capacity</h2>
+          <div class="row">
+            <div class="field">
+              <div class="lab"><span>Sprint price</span><span class="k">£ / sprint</span></div>
+              <input id="priceSprint" type="number" min="0" step="100" value="4500" />
+            </div>
+            <div class="field">
+              <div class="lab"><span>Pilot price</span><span class="k">£ / pilot</span></div>
+              <input id="pricePilot" type="number" min="0" step="100" value="6000" />
+            </div>
+            <div class="field">
+              <div class="lab"><span>Retainer / month</span><span class="k">£ / mo</span></div>
+              <input id="priceRet" type="number" min="0" step="50" value="2000" />
+            </div>
+            <div class="field">
+              <div class="lab"><span>Max sprints / month</span><span class="k">Smax</span></div>
+              <input id="Smax" type="number" min="0" step="1" value="3" />
+            </div>
+            <div class="field">
+              <div class="lab"><span>Max pilots / month</span><span class="k">Pmax</span></div>
+              <input id="Pmax" type="number" min="0" step="1" value="2" />
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:10px">
+            <div class="field">
+              <div class="lab"><span>Monthly churn %</span><span class="k">c</span></div>
+              <input id="churn" type="number" min="0" max="50" step="0.1" value="3.0" />
+            </div>
+            <div class="field">
+              <div class="lab"><span>Cost base / month (optional)</span><span class="k">£</span></div>
+              <input id="cost" type="number" min="0" step="50" value="0" />
+            </div>
+          </div>
+
+          <div class="field" style="margin-top:10px">
+            <div class="lab"><span>Notes (optional)</span><span class="k">assumption context</span></div>
+            <textarea id="notes" placeholder="e.g., 2 days/week available; partner work pending; outbound leads from X; etc."></textarea>
+          </div>
+
+          <div class="actions hideInOnePager" style="margin-top:10px">
+            <button id="btnSave">Save to localStorage</button>
+            <button id="btnLoad">Load from localStorage</button>
+            <button id="btnDefaults">Load defaults</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Outputs -->
+    <div class="card">
+      <h2>Live Outputs</h2>
+
+      <div class="kpiGrid">
+        <div class="kpi">
+          <div class="t">Revenue / Month</div>
+          <div class="v" id="kpiRevMo">—</div>
+          <div class="n">Sprints + Pilots + New MRR</div>
+        </div>
+
+        <div class="kpi">
+          <div class="t">Revenue / Year (Run-Rate)</div>
+          <div class="v" id="kpiRunRate">—</div>
+          <div class="n">Conservative if capacity-capped</div>
+        </div>
+
+        <div class="kpi">
+          <div class="t">New MRR / Month</div>
+          <div class="v" id="kpiNewMRR">—</div>
+          <div class="n">Based on new retainers</div>
+        </div>
+
+        <div class="kpi">
+          <div class="t">Projected MRR @ Horizon</div>
+          <div class="v" id="kpiMRRH">—</div>
+          <div class="n" id="kpiMRRHNote">MRR after churn</div>
+        </div>
+      </div>
+
+      <div class="mini">
+        <div><strong>Expected volumes / month</strong></div>
+        <div id="volumes">—</div>
+        <div style="margin-top:8px"><strong>MRR accumulation</strong></div>
+        <div id="mrrLine">—</div>
+      </div>
+
+      <div class="card" style="margin-top:12px;padding:12px;border-radius:16px;background:rgba(255,255,255,0.02)">
+        <h2 style="margin:0 0 8px;font-size:13px;">Board summary (auto)</h2>
+        <div class="muted" style="font-size:12.6px;line-height:1.5" id="boardLine">—</div>
+        <div class="mini muted">This line is designed to be copy-safe for meetings.</div>
+      </div>
+
+      <div class="card" style="margin-top:12px;padding:12px;border-radius:16px;background:rgba(255,255,255,0.02)">
+        <h2 style="margin:0 0 8px;font-size:13px;">Assumption Audit</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Assumption</th>
+              <th class="right">Value</th>
+              <th>Confidence</th>
+              <th class="muted">Evidence note</th>
+            </tr>
+          </thead>
+          <tbody id="auditBody"></tbody>
+        </table>
+        <div class="mini muted">
+          Confidence is narrative fuel for the board: it turns a calculator into a calibrated system.
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px;padding:12px;border-radius:16px;background:rgba(255,255,255,0.02)">
+        <h2 style="margin:0 0 8px;font-size:13px;">What Moves the Needle (Sensitivity)</h2>
+        <table id="sensTable">
+          <thead>
+            <tr>
+              <th>Change</th>
+              <th class="right">Δ yearly run-rate</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>+1 lead / month</td><td class="right" data-sens="L">—</td></tr>
+            <tr><td>+0.10 sprint close rate</td><td class="right" data-sens="s">—</td></tr>
+            <tr><td>+1 sprint capacity</td><td class="right" data-sens="Smax">—</td></tr>
+            <tr><td>+0.05 pilot-from-sprint</td><td class="right" data-sens="p">—</td></tr>
+            <tr><td>+0.05 retainer-from-pilot</td><td class="right" data-sens="r">—</td></tr>
+          </tbody>
+        </table>
+        <div class="mini muted">
+          Simple local deltas. Good enough for decision chat; not pretending to be a full Monte Carlo.
+        </div>
+      </div>
+
+      <div class="printOnly" style="margin-top:10px">
+        <div class="muted">Print note: this is a planning tool; replace demo assumptions with your live funnel data over time.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  const $ = (id)=>document.getElementById(id);
+  const clamp01 = (x)=>Math.max(0, Math.min(1, x));
+  const num = (x)=> {
+    const v = Number(String(x).replace(/,/g,'').trim());
+    return Number.isFinite(v) ? v : 0;
+  };
+
+  function sym(){
+    const s = ($("sym").value || "£").trim();
+    return s.length ? s : "£";
+  }
+
+  function fmtMoney(x){
+    const S = sym();
+    const v = Math.round(x);
+    return S + v.toLocaleString(undefined,{maximumFractionDigits:0});
+  }
+
+  function fmtDeltaYear(x){
+    const S = sym();
+    if(!Number.isFinite(x)) return "—";
+    if(Math.abs(x) < 0.5) return "±" + S + "0";
+    const sign = x >= 0 ? "+" : "−";
+    const v = Math.round(Math.abs(x));
+    return sign + S + v.toLocaleString(undefined,{maximumFractionDigits:0});
+  }
+
+  function toast(msg){
+    const t = $("toast");
+    t.textContent = msg;
+    t.style.display = "block";
+    clearTimeout(window.__toastT);
+    window.__toastT = setTimeout(()=>{ t.style.display="none"; }, 1600);
+  }
+
+  function readInputs(){
+    return {
+      mode: $("mode").value,
+      sym: sym(),
+      months: Math.max(1, Math.min(60, Math.round(num($("months").value)))),
+      L: Math.max(0, num($("L").value)),
+      q: clamp01(num($("q").value)),
+      s: clamp01(num($("s").value)),
+      p: clamp01(num($("p").value)),
+      r: clamp01(num($("r").value)),
+      priceSprint: Math.max(0, num($("priceSprint").value)),
+      pricePilot: Math.max(0, num($("pricePilot").value)),
+      priceRet: Math.max(0, num($("priceRet").value)),
+      Smax: Math.max(0, num($("Smax").value)),
+      Pmax: Math.max(0, num($("Pmax").value)),
+      m0: Math.max(0, num($("m0").value)),
+      churnPct: Math.max(0, Math.min(50, num($("churn").value))),
+      cost: Math.max(0, num($("cost").value)),
+      notes: ($("notes").value || "").trim()
+    };
+  }
+
+  function model(inp){
+    // Funnel volumes
+    const qualified = inp.L * inp.q;
+    const sprintsRaw = qualified * inp.s;
+    const sprints = Math.min(sprintsRaw, inp.Smax);
+    const pilotsRaw = sprints * inp.p;
+    const pilots = Math.min(pilotsRaw, inp.Pmax);
+    const newRetainers = pilots * inp.r;
+
+    // Revenue
+    const revSprints = sprints * inp.priceSprint;
+    const revPilots  = pilots  * inp.pricePilot;
+    const newMRR     = newRetainers * inp.priceRet; // per month
+
+    const revMonth = revSprints + revPilots + newMRR;
+    const runRateYear = revMonth * 12;
+
+    // MRR accumulation with churn: M_{t+1} = (M_t + newMRR) * (1 - c)
+    const c = inp.churnPct / 100;
+    let M = inp.m0;
+    let M3 = null, M6 = null, M12 = null;
+    for(let t=1; t<=inp.months; t++){
+      M = (M + newMRR) * (1 - c);
+      if(t===3) M3 = M;
+      if(t===6) M6 = M;
+      if(t===12) M12 = M;
+    }
+
+    // Optional net (cost)
+    const netMonth = revMonth - inp.cost;
+
+    return {
+      qualified, sprintsRaw, sprints, pilotsRaw, pilots, newRetainers,
+      revSprints, revPilots, newMRR, revMonth, runRateYear, netMonth,
+      M_end: M, M3, M6, M12
+    };
+  }
+
+  function setPreset(mode){
+    // You can tweak these any time — they’re sane starting points.
+    const presets = {
+      con:  {L:6,  q:0.35, s:0.30, p:0.35, r:0.25, priceSprint:3500, pricePilot:5000, priceRet:1500, Smax:2, Pmax:1, churn:4.0, months:12},
+      base: {L:12, q:0.50, s:0.35, p:0.40, r:0.30, priceSprint:4500, pricePilot:6000, priceRet:2000, Smax:3, Pmax:2, churn:3.0, months:12},
+      opt:  {L:18, q:0.55, s:0.40, p:0.45, r:0.35, priceSprint:5500, pricePilot:7500, priceRet:2500, Smax:4, Pmax:3, churn:2.5, months:12},
+    };
+    const P = presets[mode] || presets.base;
+    $("L").value = P.L;
+    $("q").value = P.q;
+    $("s").value = P.s;
+    $("p").value = P.p;
+    $("r").value = P.r;
+    $("priceSprint").value = P.priceSprint;
+    $("pricePilot").value = P.pricePilot;
+    $("priceRet").value = P.priceRet;
+    $("Smax").value = P.Smax;
+    $("Pmax").value = P.Pmax;
+    $("churn").value = P.churn;
+    $("months").value = P.months;
+    $("m0").value = 0;
+    $("cost").value = 0;
+    // don't wipe notes
+  }
+
+  function buildAudit(inp){
+    // Minimal: keep it simple + editable narrative (stored in notes)
+    const rows = [
+      {name:"Qualified rate (q)", val: inp.q.toFixed(2), conf:"Med", note:"How many leads are actually in-scope."},
+      {name:"Sprint close (s)", val: inp.s.toFixed(2), conf:"Med", note:"Conversion from qualified to paid sprint."},
+      {name:"Pilot-from-sprint (p)", val: inp.p.toFixed(2), conf:"Med", note:"Who extends from sprint into pilot."},
+      {name:"Retainer-from-pilot (r)", val: inp.r.toFixed(2), conf:"Med", note:"Pilot → ongoing retainer conversion."},
+      {name:"Churn (c)", val: inp.churnPct.toFixed(1) + "%", conf:"Low", note:"Until you have 6–12 months data."},
+      {name:"Capacity caps", val: `Smax=${inp.Smax}, Pmax=${inp.Pmax}`, conf:"High", note:"Your time/ops reality (non-negotiable)."},
+    ];
+    const tb = $("auditBody");
+    tb.innerHTML = "";
+    for(const r of rows){
+      const tr = document.createElement("tr");
+      const td1 = document.createElement("td"); td1.textContent = r.name;
+      const td2 = document.createElement("td"); td2.className="right"; td2.textContent = r.val;
+      const td3 = document.createElement("td");
+      const badge = document.createElement("span");
+      badge.className = "badge" + (r.conf==="Low" ? " warn" : r.conf==="High" ? "" : "");
+      badge.innerHTML = `<i></i>${r.conf}`;
+      td3.appendChild(badge);
+      const td4 = document.createElement("td"); td4.className="muted"; td4.textContent = r.note;
+      tr.append(td1, td2, td3, td4);
+      tb.appendChild(tr);
+    }
+  }
+
+  function updateSensitivity(inp, base){
+    const scenarios = [
+      {key:"L",    label:"+1 lead / month",           apply:(x)=>({...x, L:x.L+1})},
+      {key:"s",    label:"+0.10 sprint close rate",   apply:(x)=>({...x, s:clamp01(x.s+0.10)})},
+      {key:"Smax", label:"+1 sprint capacity",        apply:(x)=>({...x, Smax:x.Smax+1})},
+      {key:"p",    label:"+0.05 pilot-from-sprint",   apply:(x)=>({...x, p:clamp01(x.p+0.05)})},
+      {key:"r",    label:"+0.05 retainer-from-pilot", apply:(x)=>({...x, r:clamp01(x.r+0.05)})},
+    ];
+
+    for(const sc of scenarios){
+      const m = model(sc.apply(inp));
+      const deltaYear = m.runRateYear - base.runRateYear;
+      const cell = document.querySelector(`[data-sens="${sc.key}"]`);
+      if(cell){
+        cell.textContent = fmtDeltaYear(deltaYear);
+        cell.classList.remove("deltaPos","deltaNeg","deltaZero");
+        if(deltaYear > 0.5) cell.classList.add("deltaPos");
+        else if(deltaYear < -0.5) cell.classList.add("deltaNeg");
+        else cell.classList.add("deltaZero");
+      }
+    }
+  }
+
+  function update(){
+    const inp = readInputs();
+    const m = model(inp);
+
+    $("kpiRevMo").textContent = fmtMoney(m.revMonth);
+    $("kpiRunRate").textContent = fmtMoney(m.runRateYear);
+
+    $("kpiNewMRR").textContent = fmtMoney(m.newMRR);
+    $("kpiMRRH").textContent = fmtMoney(m.M_end);
+    $("kpiMRRHNote").textContent = `MRR after churn @ ${inp.months} months`;
+
+    const vol = [
+      `Qualified: <strong>${m.qualified.toFixed(2)}</strong>`,
+      `Sprints: <strong>${m.sprints.toFixed(2)}</strong> <span class="muted">(raw ${m.sprintsRaw.toFixed(2)})</span>`,
+      `Pilots: <strong>${m.pilots.toFixed(2)}</strong> <span class="muted">(raw ${m.pilotsRaw.toFixed(2)})</span>`,
+      `New retainers: <strong>${m.newRetainers.toFixed(2)}</strong>`
+    ].join(" • ");
+    $("volumes").innerHTML = vol;
+
+    const pick = (x)=> (x==null ? "—" : fmtMoney(x));
+    const mrrLine = [
+      `Starting: <strong>${fmtMoney(inp.m0)}</strong>`,
+      `MRR @ 3 mo: <strong>${pick(m.M3)}</strong>`,
+      `MRR @ 6 mo: <strong>${pick(m.M6)}</strong>`,
+      `MRR @ 12 mo: <strong>${pick(m.M12)}</strong>`,
+      `MRR @ horizon: <strong>${fmtMoney(m.M_end)}</strong>`
+    ].join(" • ");
+    $("mrrLine").innerHTML = mrrLine;
+
+    const netNote = inp.cost > 0 ? ` • Net after costs: ${fmtMoney(m.netMonth)}/mo` : "";
+    const capNote = (m.sprintsRaw > inp.Smax || m.pilotsRaw > inp.Pmax) ? " (capacity-capped)" : "";
+    $("boardLine").innerHTML =
+      `Base plan: <strong>${fmtMoney(m.revMonth)}/mo</strong> revenue${capNote} → <strong>${fmtMoney(m.runRateYear)}/yr</strong> run-rate.
+       Adds <strong>${fmtMoney(m.newMRR)}/mo</strong> new MRR; projected MRR @ ${inp.months} months: <strong>${fmtMoney(m.M_end)}</strong>.${netNote}`;
+
+    buildAudit(inp);
+    updateSensitivity(inp, m);
+  }
+
+  function saveLocal(){
+    const inp = readInputs();
+    localStorage.setItem("QDS_REV_FLOOR_V3", JSON.stringify(inp));
+    toast("Saved to localStorage");
+  }
+
+  function loadLocal(){
+    const raw = localStorage.getItem("QDS_REV_FLOOR_V3");
+    if(!raw){ toast("Nothing saved yet"); return; }
+    try{
+      const x = JSON.parse(raw);
+      if(x.mode) $("mode").value = x.mode;
+      if(x.sym) $("sym").value = x.sym;
+      if(x.months!=null) $("months").value = x.months;
+      $("L").value = x.L ?? $("L").value;
+      $("q").value = x.q ?? $("q").value;
+      $("s").value = x.s ?? $("s").value;
+      $("p").value = x.p ?? $("p").value;
+      $("r").value = x.r ?? $("r").value;
+      $("priceSprint").value = x.priceSprint ?? $("priceSprint").value;
+      $("pricePilot").value = x.pricePilot ?? $("pricePilot").value;
+      $("priceRet").value = x.priceRet ?? $("priceRet").value;
+      $("Smax").value = x.Smax ?? $("Smax").value;
+      $("Pmax").value = x.Pmax ?? $("Pmax").value;
+      $("m0").value = x.m0 ?? $("m0").value;
+      $("churn").value = x.churnPct ?? $("churn").value;
+      $("cost").value = x.cost ?? $("cost").value;
+      $("notes").value = x.notes ?? $("notes").value;
+      toast("Loaded from localStorage");
+      update();
+    }catch(e){
+      toast("Load failed (bad JSON)");
+    }
+  }
+
+  function copyBoard(){
+    const text = document.getElementById("boardLine").innerText.replace(/\s+/g,' ').trim();
+    navigator.clipboard?.writeText(text).then(()=>toast("Board summary copied")).catch(()=>toast("Copy blocked (browser)"));
+  }
+
+  // Wire buttons
+  $("btnOnePager").addEventListener("click", ()=>{
+    document.body.classList.toggle("onepager");
+  });
+  $("btnPrint").addEventListener("click", ()=>window.print());
+  $("btnCopy").addEventListener("click", copyBoard);
+  $("btnReset").addEventListener("click", ()=>{
+    $("mode").value = "base";
+    setPreset("base");
+    $("sym").value = "£";
+    $("notes").value = "";
+    toast("Reset to Base");
+    update();
+  });
+
+  $("btnSave").addEventListener("click", saveLocal);
+  $("btnLoad").addEventListener("click", loadLocal);
+  $("btnDefaults").addEventListener("click", ()=>{
+    setPreset($("mode").value);
+    toast("Defaults loaded");
+    update();
+  });
+
+  $("mode").addEventListener("change", ()=>{
+    setPreset($("mode").value);
+    toast("Preset applied");
+    update();
+  });
+
+  // Live update on any input
+  document.addEventListener("input", (e)=>{
+    if(e && e.target && (e.target.tagName==="INPUT" || e.target.tagName==="SELECT" || e.target.tagName==="TEXTAREA")) update();
+  }, true);
+  document.addEventListener("change", update, true);
+
+  // Init
+  setPreset($("mode").value);
+  update();
+
+})();
+</script>
+</body>
+</html>

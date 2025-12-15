@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QDS Revenue Floor + Capacity Truth</title>
+  <style>
+    :root{
+      --bg:#0b0f14;
+      --panel:#0f1620;
+      --panel-2:#0c121a;
+      --text:#e6edf3;
+      --muted:#9aa7b2;
+      --accent:#7bdcff;
+      --accent-2:#a78bfa;
+      --good:#52ffb8;
+      --warn:#ffd36a;
+      --bad:#ff7b7b;
+      --border:rgba(255,255,255,0.08);
+      --shadow: 0 10px 30px rgba(0,0,0,0.35);
+      --radius: 16px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 20% -10%, rgba(123,220,255,0.12), transparent),
+                  radial-gradient(1200px 600px at 90% 10%, rgba(167,139,250,0.12), transparent),
+                  var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
+
+    header{
+      padding: 22px 18px 6px 18px;
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+
+    .title{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .badge{
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:11px;
+      letter-spacing:0.06em;
+      text-transform:uppercase;
+      background: linear-gradient(90deg, rgba(123,220,255,0.18), rgba(167,139,250,0.18));
+      border:1px solid var(--border);
+      color:var(--muted);
+    }
+    h1{
+      font-size: 20px;
+      margin:0;
+      font-weight:650;
+      letter-spacing:0.2px;
+    }
+    .subtitle{
+      margin:0;
+      color:var(--muted);
+      font-size:12.5px;
+    }
+
+    .top-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    button, .pill{
+      background: linear-gradient(135deg, rgba(123,220,255,0.12), rgba(167,139,250,0.12));
+      border:1px solid var(--border);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      font-size: 12.5px;
+      cursor:pointer;
+      transition: 0.15s ease;
+    }
+    button:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,0.18); }
+    button:active{ transform: translateY(0px); }
+
+    .container{
+      padding: 12px 14px 32px 14px;
+      display:grid;
+      gap:12px;
+      grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 980px){
+      .container{
+        grid-template-columns: 1.1fr 0.9fr;
+        align-items:start;
+      }
+    }
+
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent), var(--panel);
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+
+    .panel h2{
+      font-size: 14px;
+      margin: 0 0 10px 0;
+      color: var(--text);
+      font-weight: 620;
+    }
+    .panel h3{
+      font-size: 12px;
+      margin: 14px 0 8px 0;
+      color: var(--muted);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .grid{
+      display:grid;
+      gap:10px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 520px){
+      .grid.cols-2{ grid-template-columns: 1fr 1fr; }
+      .grid.cols-3{ grid-template-columns: 1fr 1fr 1fr; }
+    }
+
+    label{
+      display:block;
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    input[type="number"], input[type="text"], select, textarea{
+      width:100%;
+      background: var(--panel-2);
+      border:1px solid var(--border);
+      color: var(--text);
+      padding: 10px 10px;
+      border-radius: 10px;
+      font-size: 13px;
+      outline:none;
+    }
+    textarea{
+      min-height: 60px;
+      resize: vertical;
+    }
+
+    .row{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .muted{
+      color: var(--muted);
+      font-size: 11.5px;
+    }
+
+    .kpi-bar{
+      display:grid;
+      gap:10px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 520px){
+      .kpi-bar{ grid-template-columns: 1fr 1fr 1fr; }
+    }
+
+    .kpi{
+      border:1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.02), transparent);
+    }
+    .kpi .label{
+      font-size: 10.5px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .kpi .value{
+      font-size: 22px;
+      margin-top: 4px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+    .kpi .sub{
+      margin-top: 2px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .status-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      border:1px solid var(--border);
+    }
+
+    .status-green{ color: var(--good); }
+    .status-amber{ color: var(--warn); }
+    .status-red{ color: var(--bad); }
+
+    .mini-table{
+      width:100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .mini-table th, .mini-table td{
+      border-bottom: 1px solid var(--border);
+      padding: 8px 4px;
+      text-align:left;
+      vertical-align:top;
+    }
+    .mini-table th{
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 11px;
+    }
+
+    .divider{
+      height:1px;
+      background: var(--border);
+      margin: 12px 0;
+    }
+
+    .onepager{
+      background: #0a0f15;
+    }
+
+    .onepager .big-title{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .onepager h2{
+      font-size: 18px;
+      margin: 0;
+    }
+    .onepager .purpose{
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .onepager .section{
+      margin-top: 12px;
+    }
+
+    .onepager .section-title{
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+
+    .onepager .compact{
+      display:grid;
+      gap: 8px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 520px){
+      .onepager .compact.cols-2{ grid-template-columns: 1fr 1fr; }
+      .onepager .compact.cols-3{ grid-template-columns: 1fr 1fr 1fr; }
+    }
+
+    .onepager .summary-box{
+      border:1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      font-size: 11.5px;
+      color: var(--muted);
+      background: linear-gradient(135deg, rgba(123,220,255,0.06), rgba(167,139,250,0.06));
+    }
+
+    .mono{
+      font-variant-numeric: tabular-nums;
+    }
+
+    .hidden{ display:none !important; }
+
+    /* Print rules */
+    @media print{
+      body{
+        background: #ffffff;
+        color:#000000;
+      }
+      header, .editor-panel, .top-actions, .hint{
+        display:none !important;
+      }
+      .container{
+        padding:0;
+        grid-template-columns: 1fr !important;
+      }
+      .panel{
+        box-shadow:none;
+        border: 1px solid #ddd;
+        background: #fff !important;
+      }
+      .onepager{
+        background:#fff !important;
+      }
+      .mini-table th, .mini-table td{
+        border-bottom: 1px solid #ddd;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="title">
+    <span class="badge">QDS GrowthHub</span>
+    <div>
+      <h1>Revenue Floor + Capacity Truth</h1>
+      <p class="subtitle">Single-file tool with MRR accumulation, capacity guardrails, and assumption audit.</p>
+    </div>
+  </div>
+  <div class="top-actions">
+    <button id="toggleViewBtn">Toggle One-Pager View</button>
+    <button id="copySummaryBtn">Copy Board Summary</button>
+    <button id="printBtn">Print One-Pager</button>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- EDITOR / INPUTS -->
+  <div class="panel editor-panel">
+    <h2>Inputs</h2>
+
+    <h3>Mode</h3>
+    <div class="grid cols-3">
+      <div>
+        <label>Preset</label>
+        <select id="preset">
+          <option value="base">Base</option>
+          <option value="conservative">Conservative</option>
+          <option value="optimistic">Optimistic</option>
+        </select>
+      </div>
+      <div>
+        <label>Currency label (display)</label>
+        <input id="currencyLabel" type="text" value="£" />
+      </div>
+      <div>
+        <label>Months to project</label>
+        <input id="months" type="number" min="3" max="36" step="1" value="12" />
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>Demand</h3>
+    <div class="grid cols-3">
+      <div>
+        <label>Leads / month (L)</label>
+        <input id="leads" type="number" min="0" step="1" value="20" />
+      </div>
+      <div>
+        <label>Qualified rate (q, 0–1)</label>
+        <input id="qRate" type="number" min="0" max="1" step="0.01" value="0.5" />
+      </div>
+      <div>
+        <label>Sprint close of qualified (s, 0–1)</label>
+        <input id="sClose" type="number" min="0" max="1" step="0.01" value="0.4" />
+      </div>
+      <div>
+        <label>Pilot-from-sprint (p, 0–1)</label>
+        <input id="pFromS" type="number" min="0" max="1" step="0.01" value="0.35" />
+      </div>
+      <div>
+        <label>Retainer-from-pilot (r, 0–1)</label>
+        <input id="rFromP" type="number" min="0" max="1" step="0.01" value="0.3" />
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>Pricing</h3>
+    <div class="grid cols-3">
+      <div>
+        <label>Sprint price</label>
+        <input id="priceSprint" type="number" min="0" step="50" value="2500" />
+      </div>
+      <div>
+        <label>Pilot price</label>
+        <input id="pricePilot" type="number" min="0" step="50" value="6000" />
+      </div>
+      <div>
+        <label>Retainer / month</label>
+        <input id="priceRetainer" type="number" min="0" step="50" value="2000" />
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>Capacity</h3>
+    <div class="grid cols-3">
+      <div>
+        <label>Max sprints / month (Smax)</label>
+        <input id="capSprints" type="number" min="0" step="1" value="6" />
+      </div>
+      <div>
+        <label>Max pilots / month (Pmax)</label>
+        <input id="capPilots" type="number" min="0" step="1" value="3" />
+      </div>
+      <div>
+        <label>Notes (optional)</label>
+        <input id="capNotes" type="text" placeholder="E.g., 1 person team, 60% delivery time" />
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>MRR</h3>
+    <div class="grid cols-3">
+      <div>
+        <label>Starting MRR (M0)</label>
+        <input id="startMRR" type="number" min="0" step="50" value="0" />
+      </div>
+      <div>
+        <label>Monthly churn % (c)</label>
+        <input id="churn" type="number" min="0" max="50" step="0.1" value="3" />
+      </div>
+      <div>
+        <label>Cost base / month (optional)</label>
+        <input id="costBase" type="number" min="0" step="50" value="0" />
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>Assumption Audit</h3>
+    <table class="mini-table">
+      <thead>
+        <tr>
+          <th>Assumption</th>
+          <th>Value</th>
+          <th>Confidence</th>
+          <th>Evidence note</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Qualified rate (q)</td>
+          <td><span id="qAuditVal" class="mono"></span></td>
+          <td>
+            <select id="qConf">
+              <option>Low</option><option selected>Med</option><option>High</option>
+            </select>
+          </td>
+          <td><input id="qNote" type="text" placeholder="e.g., last 10 calls" /></td>
+        </tr>
+        <tr>
+          <td>Sprint close (s)</td>
+          <td><span id="sAuditVal" class="mono"></span></td>
+          <td>
+            <select id="sConf">
+              <option>Low</option><option selected>Med</option><option>High</option>
+            </select>
+          </td>
+          <td><input id="sNote" type="text" placeholder="e.g., 3 recent wins" /></td>
+        </tr>
+        <tr>
+          <td>Churn (c)</td>
+          <td><span id="cAuditVal" class="mono"></span></td>
+          <td>
+            <select id="cConf">
+              <option>Low</option><option selected>Med</option><option>High</option>
+            </select>
+          </td>
+          <td><input id="cNote" type="text" placeholder="e.g., sector avg" /></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="muted hint" style="margin-top:10px;">
+      Tip: keep rates in 0–1 format. The tool caps volumes using your capacity values automatically.
+    </p>
+  </div>
+
+  <!-- OUTPUTS + ONEPAGER -->
+  <div class="panel onepager" id="rightPanel">
+
+    <!-- Live dashboard section -->
+    <div id="dashboardView">
+      <h2>Live Outputs</h2>
+
+      <div class="row" style="justify-content:space-between; margin-bottom:8px;">
+        <span class="muted">Auto-updates as you type</span>
+        <span id="statusPill" class="status-pill status-green">Status</span>
+      </div>
+
+      <div class="kpi-bar">
+        <div class="kpi">
+          <div class="label">Revenue / month</div>
+          <div id="kpiRevMo" class="value mono">£0</div>
+          <div class="sub">Sprints + Pilots + New MRR</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Revenue / year (run-rate)</div>
+          <div id="kpiRevYr" class="value mono">£0</div>
+          <div class="sub">Conservative if capacity-capped</div>
+        </div>
+        <div class="kpi">
+          <div class="label">New MRR / month</div>
+          <div id="kpiNewMRR" class="value mono">£0</div>
+          <div class="sub">Based on new retainers</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="grid cols-2">
+        <div class="kpi">
+          <div class="label">Expected volumes / month</div>
+          <div class="sub mono">
+            Qualified: <span id="outQualified">0</span><br/>
+            Sprints: <span id="outSprints">0</span>
+            <span id="capSFlag"></span><br/>
+            Pilots: <span id="outPilots">0</span>
+            <span id="capPFlag"></span><br/>
+            New retainers: <span id="outRetainers">0</span>
+          </div>
+        </div>
+        <div class="kpi">
+          <div class="label">MRR accumulation</div>
+          <div class="sub mono">
+            Starting: <span id="outStartMRR">0</span><br/>
+            MRR @ 3 months: <span id="outMRR3">0</span><br/>
+            MRR @ 6 months: <span id="outMRR6">0</span><br/>
+            MRR @ 12 months: <span id="outMRR12">0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <h3>What Moves the Needle (Sensitivity)</h3>
+      <table class="mini-table">
+        <thead>
+          <tr>
+            <th>Change</th>
+            <th>Effect on yearly run-rate</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>+1 lead / month</td>
+            <td class="mono" id="sensLead">£0</td>
+          </tr>
+          <tr>
+            <td>+0.10 sprint close rate</td>
+            <td class="mono" id="sensClose">£0</td>
+          </tr>
+          <tr>
+            <td>+1 sprint capacity</td>
+            <td class="mono" id="sensCap">£0</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="divider"></div>
+
+      <h3>Board Summary (auto)</h3>
+      <div id="boardSummaryBox" class="summary-box"></div>
+    </div>
+
+    <!-- One-pager print view -->
+    <div id="onePagerView" class="hidden">
+      <div class="big-title">
+        <div>
+          <h2>Revenue Floor + Capacity Truth (One-Pager)</h2>
+          <div class="purpose" id="opPurpose"></div>
+        </div>
+        <span id="opStatus" class="status-pill status-green">Green</span>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Inputs (Monthly)</div>
+        <div class="compact cols-3">
+          <div class="summary-box" id="opDemand"></div>
+          <div class="summary-box" id="opPricing"></div>
+          <div class="summary-box" id="opCapacity"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Assumption Audit (Top 3)</div>
+        <div class="summary-box" id="opAudit"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Expected Volumes</div>
+        <div class="compact cols-2">
+          <div class="summary-box" id="opVolumes"></div>
+          <div class="summary-box" id="opBottleneck"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Core Outputs</div>
+        <div class="compact cols-3">
+          <div class="summary-box" id="opOutputs1"></div>
+          <div class="summary-box" id="opOutputs2"></div>
+          <div class="summary-box" id="opOutputs3"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">MRR Accumulation</div>
+        <div class="summary-box" id="opMRR"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">What Moves the Needle</div>
+        <div class="summary-box" id="opSensitivity"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Board-Safe Summary</div>
+        <div class="summary-box" id="opSummary"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ---------- Utilities ----------
+  const $ = (id) => document.getElementById(id);
+
+  function clamp(n, min, max){
+    if (Number.isNaN(n)) return min;
+    return Math.min(Math.max(n, min), max);
+  }
+
+  function num(v){ return Number(v ?? 0) || 0; }
+
+  function fmtMoney(value, currencyLabel="£"){
+    const v = Math.round(value);
+    // Simple grouping without Intl to stay ultra-portable
+    const s = v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return `${currencyLabel}${s}`;
+  }
+
+  function fmtNum(value, digits=2){
+    return Number(value).toFixed(digits);
+  }
+
+  // ---------- Presets ----------
+  const PRESETS = {
+    conservative: {
+      qRate: 0.4, sClose: 0.3, pFromS: 0.3, rFromP: 0.25,
+      churn: 4
+    },
+    base: {
+      qRate: 0.5, sClose: 0.4, pFromS: 0.35, rFromP: 0.3,
+      churn: 3
+    },
+    optimistic: {
+      qRate: 0.6, sClose: 0.5, pFromS: 0.45, rFromP: 0.4,
+      churn: 2
+    }
+  };
+
+  // ---------- Core model ----------
+  function computeModel(overrides={}){
+    const currencyLabel = $("currencyLabel").value || "£";
+    const months = clamp(num($("months").value), 3, 36);
+
+    const L   = num(overrides.leads ?? $("leads").value);
+    const q   = clamp(num(overrides.qRate ?? $("qRate").value), 0, 1);
+    const s   = clamp(num(overrides.sClose ?? $("sClose").value), 0, 1);
+    const p   = clamp(num(overrides.pFromS ?? $("pFromS").value), 0, 1);
+    const r   = clamp(num(overrides.rFromP ?? $("rFromP").value), 0, 1);
+
+    const S£  = num(overrides.priceSprint ?? $("priceSprint").value);
+    const P£  = num(overrides.pricePilot ?? $("pricePilot").value);
+    const R£  = num(overrides.priceRetainer ?? $("priceRetainer").value);
+
+    const Smax = num(overrides.capSprints ?? $("capSprints").value);
+    const Pmax = num(overrides.capPilots ?? $("capPilots").value);
+
+    const M0  = num(overrides.startMRR ?? $("startMRR").value);
+    const cPct = clamp(num(overrides.churn ?? $("churn").value), 0, 50);
+    const c = cPct / 100;
+
+    const costBase = num($("costBase").value);
+
+    // Funnel
+    const Q = L * q;
+    const Es_raw = Q * s;
+    const Es = (Smax >= 0) ? Math.min(Es_raw, Smax) : Es_raw;
+
+    const Ep_raw = Es * p;
+    const Ep = (Pmax >= 0) ? Math.min(Ep_raw, Pmax) : Ep_raw;
+
+    const Nr = Ep * r;
+
+    // Revenue
+    const Rev_s = Es * S£;
+    const Rev_p = Ep * P£;
+    const NewMRR = Nr * R£;
+
+    const Rev_mo = Rev_s + Rev_p + NewMRR;
+    const Rev_yr = Rev_mo * 12;
+
+    // MRR accumulation
+    const MRR = [M0];
+    for(let i=1; i<=months; i++){
+      const prev = MRR[i-1];
+      MRR[i] = (prev * (1 - c)) + NewMRR;
+    }
+
+    // Bottleneck + status
+    let bottleneck = "None";
+    let status = "Green";
+    const capS = (Smax >= 0 && Es_raw > Smax);
+    const capP = (Pmax >= 0 && Ep_raw > Pmax);
+
+    if(capS) bottleneck = "Sprints";
+    else if(capP) bottleneck = "Pilots";
+
+    if(capS || capP) status = "Amber";
+    if((capS && Smax === 0) || (capP && Pmax === 0)) status = "Red";
+
+    const breakEven = (costBase > 0) ? (Rev_mo - costBase) : null;
+
+    return {
+      currencyLabel, months,
+      L,q,s,p,r,S£,P£,R£,Smax,Pmax,M0,cPct,c,costBase,
+      Q, Es_raw, Es, Ep_raw, Ep, Nr,
+      Rev_s, Rev_p, NewMRR, Rev_mo, Rev_yr,
+      MRR, status, bottleneck, capS, capP, breakEven
+    };
+  }
+
+  // ---------- Sensitivity ----------
+  function computeSensitivity(base){
+    const plusLead = computeModel({ leads: base.L + 1 });
+    const deltaLeadYr = plusLead.Rev_yr - base.Rev_yr;
+
+    const plusClose = computeModel({ sClose: clamp(base.s + 0.10, 0, 1) });
+    const deltaCloseYr = plusClose.Rev_yr - base.Rev_yr;
+
+    const plusCap = computeModel({ capSprints: base.Smax + 1 });
+    const deltaCapYr = plusCap.Rev_yr - base.Rev_yr;
+
+    return { deltaLeadYr, deltaCloseYr, deltaCapYr };
+  }
+
+  // ---------- Board summary ----------
+  function buildBoardSummary(m){
+    const ccy = m.currencyLabel;
+    const capLine = (m.capS || m.capP)
+      ? `Capacity cap active (${m.bottleneck}).`
+      : `No capacity cap triggered.`;
+
+    const churnLine = `Churn assumed at ${fmtNum(m.cPct,1)}%/mo.`;
+
+    const summary =
+`This model is deliberately conservative.
+${capLine}
+Expected per month: ${fmtNum(m.Es,2)} sprints, ${fmtNum(m.Ep,2)} pilots, ${fmtNum(m.Nr,2)} new retainers.
+Revenue / mo: ${fmtMoney(m.Rev_mo, ccy)} | Run-rate / year: ${fmtMoney(m.Rev_yr, ccy)}.
+New MRR / mo: ${fmtMoney(m.NewMRR, ccy)}. ${churnLine}
+Upside comes from lead volume, conversion quality, and delivery capacity — not optimistic assumptions.`;
+
+    return summary;
+  }
+
+  // ---------- One-pager content ----------
+  function renderOnePager(m, sens){
+    const ccy = m.currencyLabel;
+
+    $("opPurpose").textContent =
+      `Conservative forecast built on real funnel conversions + delivery limits. Mode: ${$("preset").value}.`;
+
+    $("opStatus").className =
+      `status-pill ${m.status === "Green" ? "status-green" : m.status === "Amber" ? "status-amber" : "status-red"}`;
+    $("opStatus").textContent = m.status;
+
+    $("opDemand").innerHTML =
+      `<b>Demand</b><br/>
+       Leads: <span class="mono">${fmtNum(m.L,0)}</span><br/>
+       Qualified rate q: <span class="mono">${fmtNum(m.q,2)}</span><br/>
+       Sprint close s: <span class="mono">${fmtNum(m.s,2)}</span><br/>
+       Pilot-from-sprint p: <span class="mono">${fmtNum(m.p,2)}</span><br/>
+       Retainer-from-pilot r: <span class="mono">${fmtNum(m.r,2)}</span>`;
+
+    $("opPricing").innerHTML =
+      `<b>Pricing</b><br/>
+       Sprint: <span class="mono">${fmtMoney(m.S£, ccy)}</span><br/>
+       Pilot: <span class="mono">${fmtMoney(m.P£, ccy)}</span><br/>
+       Retainer / mo: <span class="mono">${fmtMoney(m.R£, ccy)}</span>`;
+
+    $("opCapacity").innerHTML =
+      `<b>Capacity</b><br/>
+       Max sprints/mo: <span class="mono">${fmtNum(m.Smax,0)}</span><br/>
+       Max pilots/mo: <span class="mono">${fmtNum(m.Pmax,0)}</span><br/>
+       Bottleneck: <span class="mono">${m.bottleneck}</span>`;
+
+    const qConf = $("qConf").value, sConf = $("sConf").value, cConf = $("cConf").value;
+    const qNote = $("qNote").value || "—";
+    const sNote = $("sNote").value || "—";
+    const cNote = $("cNote").value || "—";
+
+    $("opAudit").innerHTML =
+      `<b>Qualified rate (q)</b>: <span class="mono">${fmtNum(m.q,2)}</span> (${qConf}) — ${qNote}<br/>
+       <b>Sprint close (s)</b>: <span class="mono">${fmtNum(m.s,2)}</span> (${sConf}) — ${sNote}<br/>
+       <b>Churn (c)</b>: <span class="mono">${fmtNum(m.cPct,1)}%</span> (${cConf}) — ${cNote}`;
+
+    $("opVolumes").innerHTML =
+      `<b>Expected volumes / month</b><br/>
+       Qualified: <span class="mono">${fmtNum(m.Q,2)}</span><br/>
+       Sprints: <span class="mono">${fmtNum(m.Es,2)}</span>${m.capS ? " <b>(capped)</b>" : ""}<br/>
+       Pilots: <span class="mono">${fmtNum(m.Ep,2)}</span>${m.capP ? " <b>(capped)</b>" : ""}<br/>
+       New retainers: <span class="mono">${fmtNum(m.Nr,2)}</span>`;
+
+    $("opBottleneck").innerHTML =
+      `<b>Status</b>: <span class="mono">${m.status}</span><br/>
+       <b>Bottleneck</b>: <span class="mono">${m.bottleneck}</span><br/>
+       <span class="muted">Capacity constraints prevent unrealistic forecasts and define a true revenue ceiling.</span>`;
+
+    $("opOutputs1").innerHTML =
+      `<b>Revenue / month</b><br/>
+       <span class="mono">${fmtMoney(m.Rev_mo, ccy)}</span>`;
+    $("opOutputs2").innerHTML =
+      `<b>Revenue / year</b><br/>
+       <span class="mono">${fmtMoney(m.Rev_yr, ccy)}</span>`;
+    $("opOutputs3").innerHTML =
+      `<b>New MRR / month</b><br/>
+       <span class="mono">${fmtMoney(m.NewMRR, ccy)}</span>`;
+
+    const m3 = m.MRR[Math.min(3, m.months)];
+    const m6 = m.MRR[Math.min(6, m.months)];
+    const m12 = m.MRR[Math.min(12, m.months)];
+
+    $("opMRR").innerHTML =
+      `<b>MRR accumulation</b><br/>
+       Starting MRR: <span class="mono">${fmtMoney(m.M0, ccy)}</span><br/>
+       MRR @ 3 mo: <span class="mono">${fmtMoney(m3, ccy)}</span><br/>
+       MRR @ 6 mo: <span class="mono">${fmtMoney(m6, ccy)}</span><br/>
+       MRR @ 12 mo: <span class="mono">${fmtMoney(m12, ccy)}</span><br/>
+       <span class="muted">Formula: MRRₜ₊₁ = MRRₜ × (1 − c) + NewMRR</span>`;
+
+    $("opSensitivity").innerHTML =
+      `+1 lead/mo → <span class="mono">${fmtMoney(sens.deltaLeadYr, ccy)}</span> / year<br/>
+       +0.10 sprint close → <span class="mono">${fmtMoney(sens.deltaCloseYr, ccy)}</span> / year<br/>
+       +1 sprint capacity → <span class="mono">${fmtMoney(sens.deltaCapYr, ccy)}</span> / year`;
+
+    $("opSummary").textContent = buildBoardSummary(m);
+  }
+
+  // ---------- Render dashboard ----------
+  function render(){
+    const m = computeModel();
+    const sens = computeSensitivity(m);
+    const ccy = m.currencyLabel;
+
+    // Audit values
+    $("qAuditVal").textContent = fmtNum(m.q,2);
+    $("sAuditVal").textContent = fmtNum(m.s,2);
+    $("cAuditVal").textContent = fmtNum(m.cPct,1) + "%";
+
+    // Status pill
+    $("statusPill").className =
+      `status-pill ${m.status === "Green" ? "status-green" : m.status === "Amber" ? "status-amber" : "status-red"}`;
+    $("statusPill").textContent = `${m.status} • Bottleneck: ${m.bottleneck}`;
+
+    // KPIs
+    $("kpiRevMo").textContent = fmtMoney(m.Rev_mo, ccy);
+    $("kpiRevYr").textContent = fmtMoney(m.Rev_yr, ccy);
+    $("kpiNewMRR").textContent = fmtMoney(m.NewMRR, ccy);
+
+    // Volumes
+    $("outQualified").textContent = fmtNum(m.Q,2);
+    $("outSprints").textContent = fmtNum(m.Es,2);
+    $("outPilots").textContent = fmtNum(m.Ep,2);
+    $("outRetainers").textContent = fmtNum(m.Nr,2);
+
+    $("capSFlag").textContent = m.capS ? " (capped)" : "";
+    $("capPFlag").textContent = m.capP ? " (capped)" : "";
+
+    // MRR outputs
+    $("outStartMRR").textContent = fmtMoney(m.M0, ccy);
+    const m3 = m.MRR[Math.min(3, m.months)];
+    const m6 = m.MRR[Math.min(6, m.months)];
+    const m12 = m.MRR[Math.min(12, m.months)];
+
+    $("outMRR3").textContent = fmtMoney(m3, ccy);
+    $("outMRR6").textContent = fmtMoney(m6, ccy);
+    $("outMRR12").textContent = fmtMoney(m12, ccy);
+
+    // Sensitivity
+    $("sensLead").textContent = fmtMoney(sens.deltaLeadYr, ccy);
+    $("sensClose").textContent = fmtMoney(sens.deltaCloseYr, ccy);
+    $("sensCap").textContent = fmtMoney(sens.deltaCapYr, ccy);
+
+    // Board summary
+    const summary = buildBoardSummary(m);
+    $("boardSummaryBox").textContent = summary;
+
+    // One-pager fields
+    renderOnePager(m, sens);
+
+    // Store for copy
+    $("copySummaryBtn").dataset.summary = summary;
+  }
+
+  // ---------- Preset handler ----------
+  function applyPreset(){
+    const key = $("preset").value;
+    const p = PRESETS[key] || PRESETS.base;
+    $("qRate").value = p.qRate;
+    $("sClose").value = p.sClose;
+    $("pFromS").value = p.pFromS;
+    $("rFromP").value = p.rFromP;
+    $("churn").value = p.churn;
+  }
+
+  // ---------- View toggle ----------
+  function toggleView(){
+    $("dashboardView").classList.toggle("hidden");
+    $("onePagerView").classList.toggle("hidden");
+  }
+
+  // ---------- Copy summary ----------
+  async function copySummary(){
+    const text = $("copySummaryBtn").dataset.summary || "";
+    if(!text) return;
+
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(text);
+        $("copySummaryBtn").textContent = "Copied ✓";
+        setTimeout(()=> $("copySummaryBtn").textContent = "Copy Board Summary", 900);
+      } else {
+        // Fallback
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        $("copySummaryBtn").textContent = "Copied ✓";
+        setTimeout(()=> $("copySummaryBtn").textContent = "Copy Board Summary", 900);
+      }
+    }catch(e){
+      $("copySummaryBtn").textContent = "Copy failed";
+      setTimeout(()=> $("copySummaryBtn").textContent = "Copy Board Summary", 900);
+    }
+  }
+
+  // ---------- Print ----------
+  function printOnePager(){
+    // Ensure pager view is visible for print
+    if($("onePagerView").classList.contains("hidden")){
+      toggleView();
+    }
+    window.print();
+  }
+
+  // ---------- Wire up ----------
+  const inputs = [
+    "preset","currencyLabel","months",
+    "leads","qRate","sClose","pFromS","rFromP",
+    "priceSprint","pricePilot","priceRetainer",
+    "capSprints","capPilots","capNotes",
+    "startMRR","churn","costBase",
+    "qConf","sConf","cConf",
+    "qNote","sNote","cNote"
+  ];
+
+  inputs.forEach(id=>{
+    const el = $(id);
+    if(!el) return;
+    el.addEventListener("input", ()=>{
+      if(id === "preset"){
+        applyPreset();
+      }
+      render();
+    });
+    el.addEventListener("change", ()=>{
+      if(id === "preset"){
+        applyPreset();
+      }
+      render();
+    });
+  });
+
+  $("toggleViewBtn").addEventListener("click", toggleView);
+  $("copySummaryBtn").addEventListener("click", copySummary);
+  $("printBtn").addEventListener("click", printOnePager);
+
+  // Init
+  applyPreset();
+  render();
+</script>
+
+</body>
+</html>

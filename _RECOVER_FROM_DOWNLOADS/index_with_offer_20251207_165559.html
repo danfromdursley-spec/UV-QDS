@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>QDS Hub</title>
+<style>
+  body{margin:0;background:#070b12;color:#e9eef7;font-family:system-ui,-apple-system,Segoe UI,Roboto;}
+  .wrap{max-width:980px;margin:0 auto;padding:26px 18px 70px;}
+  .badge{display:inline-block;padding:6px 10px;border-radius:999px;
+    background:#0b1220;border:1px solid #223049;font-size:11px;opacity:.9;margin-right:6px;}
+  h1{font-size:28px;margin:10px 0 6px;}
+  .sub{opacity:.7;margin:0 0 18px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;}
+  .card{padding:14px 14px 16px;border-radius:14px;background:#0b1220;border:1px solid #1d2a40;}
+  .card h3{margin:0 0 8px;font-size:18px;}
+  .card p{margin:0 0 12px;opacity:.75;font-size:13px;line-height:1.35;}
+  a.btn{display:inline-block;padding:10px 12px;border-radius:10px;border:1px solid #223049;
+    background:#0f1a2c;color:#e9eef7;text-decoration:none;font-weight:700;}
+  a.btn:hover{text-decoration:underline}
+  .foot{margin-top:22px;opacity:.6;font-size:12px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="badge">Termux-first</span>
+  <span class="badge">Proof → Pilot → Claim</span>
+  <span class="badge">Local demo hub</span>
+
+  <h1>QDS Demo Hub</h1>
+  <p class="sub">Quick launch for Battery + Growth pages. Generated 2025-12-07 16:55:46.</p>
+
+  <div class="grid">
+    <div class="card">
+      <h3>Growth Hub</h3>
+      <p>Investor-safe operator view: proof, pilot metrics, and path to commercialization.</p>
+      EOF
+
+if [[ -n "growthhub.html" ]]; then
+  echo "      <a class=\"btn\" href=\"growthhub.html\">Open growthhub.html</a>" >> index.html
+else
+  echo "      <span class=\"badge\">Not detected</span>" >> index.html
+fi
+
+cat >> index.html <<EOF
+    </div>
+
+    <div class="card">
+      <h3>Battery Habitat</h3>
+      <p>UI architecture, assumptions audit, pack concepts, and demo framing.</p>
+      EOF
+
+if [[ -n "qds_battery_habitat_demo.html" ]]; then
+  echo "      <a class=\"btn\" href=\"qds_battery_habitat_demo.html\">Open qds_battery_habitat_demo.html</a>" >> index.html
+else
+  echo "      <span class=\"badge\">Not detected</span>" >> index.html
+fi
+
+cat >> index.html <<EOF
+    </div>
+
+    <div class="card">
+      <h3>Battery Design</h3>
+      <p>Design stack, materials/thermal narrative, modular roadmap and integration logic.</p>
+      EOF
+
+if [[ -n "qds_battery_design_v1.html" ]]; then
+  echo "      <a class=\"btn\" href=\"qds_battery_design_v1.html\">Open qds_battery_design_v1.html</a>" >> index.html
+else
+  echo "      <span class=\"badge\">Not detected</span>" >> index.html
+fi
+
+cat >> index.html <<EOF
+    </div>
+
+    <div class="card">
+      <h3>All pages</h3>
+      <p>Full directory index for fast checking and screenshot runs.</p>
+      <a class="btn" href="all_pages_index.html">All pages (list)</a>
+      <a class="btn" href="all_pages_min.html">All pages (compact)</a>
+    </div>
+  </div>
+
+  <div class="foot">
+    Tip: Name files with <b>growthhub</b>, <b>battery_habitat</b>, or <b>battery_design</b> to auto-detect.
+  </div>
+</div>
+<!-- QDS_OFFER_BUNDLE_BLOCK_START -->
+<section style="
+  margin: 18px 0;
+  padding: 16px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+">
+  <div style="font-size:11px; letter-spacing:.08em; text-transform:uppercase; opacity:.75;">
+    GrowthHub • Offer
+  </div>
+  <h2 style="margin:6px 0 8px; font-size:20px;">
+    QDS Offer Bundle (Demo • Pilot • Pricing • Metrics)
+  </h2>
+  <div style="opacity:.8; font-size:13px; line-height:1.4;">
+    The boardroom-safe single page that unites the three commercial pillars
+    with a proof-first ladder and measurable KPIs.
+  </div>
+  <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+    <a href="./qds_offer_bundle_v1_20251207_165051.html" style="
+      display:inline-block; text-decoration:none;
+      padding:10px 12px; border-radius:10px;
+      border:1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      color: inherit;
+    ">Open Offer Bundle</a>
+    <span style="font-size:11px; opacity:.7; align-self:center;">
+      Auto-linked: qds_offer_bundle_v1_20251207_165051.html
+    </span>
+  </div>
+</section>
+<!-- QDS_OFFER_BUNDLE_BLOCK_END -->
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>QDS Battery Hub v9.1 — Purple Neon</title>
+<style>
+  :root{
+    --bg0:#07000f;
+    --bg1:#140026;
+    --bg2:#22003d;
+    --purple:#9b4dff;
+    --purple2:#5d00ff;
+    --green:#39ff14;
+    --green2:#00ff9d;
+    --text:#e9ddff;
+    --muted:#b79bff;
+    --glow: 0 0 10px rgba(57,255,20,.35), 0 0 30px rgba(155,77,255,.25);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(1200px 700px at 10% 10%, rgba(155,77,255,.12), transparent 55%),
+      radial-gradient(900px 600px at 90% 20%, rgba(57,255,20,.10), transparent 55%),
+      linear-gradient(160deg, var(--bg0), var(--bg1), var(--bg2));
+    min-height:100vh;
+  }
+  header{
+    padding:22px 18px 10px 18px;
+    border-bottom:1px solid rgba(155,77,255,.25);
+  }
+  .title{
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+  }
+  .badge{
+    font-size:12px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--green); border:1px solid rgba(57,255,20,.5);
+    padding:4px 8px; border-radius:999px; box-shadow: var(--glow);
+  }
+  h1{
+    margin:0; font-size:1.35rem; font-weight:700;
+    text-shadow: 0 0 12px rgba(155,77,255,.35);
+  }
+  .sub{
+    margin-top:6px; color:var(--muted); font-size:.95rem;
+  }
+  .wrap{padding:18px; display:grid; gap:14px; grid-template-columns: 1fr;}
+  .card{
+    background: linear-gradient(140deg, rgba(255,255,255,.04), rgba(255,255,255,.01));
+    border:1px solid rgba(155,77,255,.25);
+    border-radius:16px; padding:14px 14px 16px 14px;
+    box-shadow: inset 0 0 0 1px rgba(57,255,20,.05), 0 10px 30px rgba(0,0,0,.35);
+  }
+  .card h2{
+    margin:0 0 10px 0; font-size:1.05rem; color:var(--text);
+    display:flex; align-items:center; gap:8px;
+  }
+  .row{display:flex; gap:10px; flex-wrap:wrap}
+  a.btn, button.btn{
+    appearance:none; border:none; text-decoration:none; cursor:pointer;
+    color:var(--text);
+    padding:10px 12px; border-radius:12px; font-weight:600; font-size:.95rem;
+    background:
+      linear-gradient(135deg, rgba(155,77,255,.18), rgba(57,255,20,.12));
+    border:1px solid rgba(155,77,255,.35);
+    box-shadow: var(--glow);
+    transition: transform .12s ease, border-color .12s ease, filter .12s ease;
+  }
+  a.btn:hover, button.btn:hover{transform: translateY(-1px); border-color: rgba(57,255,20,.6); filter: brightness(1.08)}
+  .ghost{
+    background: linear-gradient(135deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+    border:1px dashed rgba(155,77,255,.35);
+  }
+  .tiny{font-size:.82rem; opacity:.85}
+  .battery{
+    width:100%; max-width:520px; height:22px; border-radius:999px;
+    border:1px solid rgba(57,255,20,.55);
+    background: rgba(0,0,0,.25);
+    position:relative; overflow:hidden;
+    box-shadow: inset 0 0 10px rgba(57,255,20,.15), var(--glow);
+    margin-top:10px;
+  }
+  .battery::after{
+    content:""; position:absolute; inset:2px;
+    border-radius:999px;
+    background:
+      linear-gradient(90deg,
+        rgba(57,255,20,.0) 0%,
+        rgba(57,255,20,.25) 15%,
+        rgba(155,77,255,.35) 45%,
+        rgba(57,255,20,.55) 70%,
+        rgba(0,255,157,.65) 100%);
+    animation: charge 3.2s ease-in-out infinite;
+    filter: blur(.2px);
+  }
+  @keyframes charge{
+    0%{transform: translateX(-35%)}
+    50%{transform: translateX(0%)}
+    100%{transform: translateX(35%)}
+  }
+  .status{
+    margin-top:8px; color:var(--muted);
+    display:flex; gap:10px; flex-wrap:wrap;
+  }
+  code{
+    background: rgba(155,77,255,.12);
+    border:1px solid rgba(155,77,255,.25);
+    padding:1px 6px; border-radius:6px;
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="title">
+    <span class="badge">QDS Battery</span>
+    <h1>Battery Hub v9.1 — Purple / Neon Green 🔋</h1>
+  </div>
+  <div class="sub">Local-first control deck for your Battery Lab + Suites.</div>
+  <div class="battery"></div>
+  <div class="status tiny" id="statusLine">Status: waiting for local server…</div>
+</header>
+
+<div class="wrap">
+
+  <section class="card">
+    <h2>⚡ Quick Launch</h2>
+    <div class="row">
+      <a class="btn" id="btnLatest" href="qds_battery_suite_v8_3_neon_shell.html">Open “Latest” Suite</a>
+      <a class="btn ghost" href="qds_battery_suite_v8_nextlevel.html">Open v8 NextLevel</a>
+      <a class="btn ghost" href="qds_battery_suite_v8_1_fairpath.html">Open v8.1 FairPath</a>
+      <a class="btn ghost" href="qds_battery_lab.html">Battery Lab</a>
+      <a class="btn ghost" href="qds_battery_coach_v3.html">Battery Coach v3</a>
+      <a class="btn ghost" href="qds_battery_whisperer_v2.html">Battery Whisperer v2</a>
+    </div>
+    <div class="tiny" style="margin-top:10px;">
+      The “Latest” button tries to auto-detect the newest file from a shortlist.
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>🧪 Showcases</h2>
+    <div class="row">
+      <a class="btn ghost" href="qds_battery_suite_v6_realworld.html">Suite v6 RealWorld</a>
+      <a class="btn ghost" href="qds_battery_suite_v5_boss_polish.html">Suite v5 Boss Polish</a>
+      <a class="btn ghost" href="qds_battery_suite_v4_showcase.html">Suite v4 Showcase</a>
+      <a class="btn ghost" href="qds_battery_lab_showcase_v1.html">Lab Showcase v1</a>
+      <a class="btn ghost" href="qds_battery_lab_showcase_stress_bias_v2.html">Stress/Bias v2</a>
+      <a class="btn ghost" href="qds_battery_noise_toy_v1.html">Noise Toy</a>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>📦 Logs & Bench</h2>
+    <div class="row">
+      <a class="btn ghost" href="QDS_BATTERY_LOGS/">Open AutoBench Logs Folder</a>
+      <a class="btn ghost" href="QDS_Battery_Lab/">Open Battery Lab Folder</a>
+      <a class="btn ghost" href="QDS_logs/">Open QDS Logs</a>
+    </div>
+    <div class="tiny" style="margin-top:10px;">
+      Folder browsing depends on your browser; works best in Chromium-based mobile.
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>🔧 Manual Loader (if you rename stuff)</h2>
+    <div class="row">
+      <input id="manualFile" placeholder="e.g. qds_battery_suite_v8_3_neon_shell.html"
+        style="flex:1; min-width:220px; padding:10px 12px; border-radius:12px;
+        color:var(--text); background:rgba(0,0,0,.25);
+        border:1px solid rgba(155,77,255,.35); outline:none; box-shadow: var(--glow);"/>
+      <button class="btn" id="manualGo">Open File</button>
+    </div>
+    <div class="tiny status" id="manualStatus"></div>
+  </section>
+
+</div>
+
+<script>
+  const statusLine = document.getElementById("statusLine");
+  const btnLatest = document.getElementById("btnLatest");
+  const manualFile = document.getElementById("manualFile");
+  const manualGo = document.getElementById("manualGo");
+  const manualStatus = document.getElementById("manualStatus");
+
+  // Candidates in "newest-first guess" order
+  const candidates = [
+    "qds_battery_suite_v9_1_purple_neon_green.html", // if you later create it
+    "qds_battery_suite_v9_0.html",
+    "qds_battery_suite_v8_3_neon_shell.html",
+    "qds_battery_suite_v8_nextlevel.html",
+    "qds_battery_suite_v8_2_poster_tamed.html",
+    "qds_battery_suite_v8_1_fairpath.html",
+    "qds_battery_suite_v6_realworld.html",
+    "qds_battery_lab.html"
+  ];
+
+  async function headOk(url){
+    try{
+      const r = await fetch(url, {method:"HEAD", cache:"no-store"});
+      return r.ok;
+    }catch(e){
+      return false;
+    }
+  }
+
+  async function detectLatest(){
+    statusLine.textContent = "Status: scanning for newest suite…";
+    for (const f of candidates){
+      if (await headOk(f)){
+        btnLatest.href = f;
+        btnLatest.textContent = `Open Latest: ${f}`;
+        statusLine.textContent = `Status: detected ${f}`;
+        return;
+      }
+    }
+    statusLine.textContent = "Status: none detected (check server + filenames).";
+  }
+
+  manualGo.addEventListener("click", ()=>{
+    const f = (manualFile.value || "").trim();
+    if (!f){
+      manualStatus.textContent = "Give me a filename, old chap. 🎩";
+      return;
+    }
+    window.location.href = f;
+  });
+
+  detectLatest();
+</script>
+</body>
+</html>

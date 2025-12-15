@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>QDS • Phys.org One-Touch Compare</title>
+<style>
+  :root{--bg:#0b0f14;--card:#111826;--muted:#8aa0b5;--fg:#e7f1ff;--ok:#2dd4bf;--bad:#fb7185;--warn:#fbbf24;--line:#1f2a3a}
+  html,body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+  .wrap{max-width:980px;margin:0 auto;padding:12px}
+  .top{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .title{font-weight:800;font-size:18px}
+  .pill{padding:6px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:12px}
+  .grid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}
+  @media(min-width:900px){.grid{grid-template-columns:320px 1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+  .btnrow{display:flex;gap:8px;flex-wrap:wrap}
+  button{background:#0e1623;color:var(--fg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-weight:700}
+  button.big{padding:12px 14px;font-size:14px}
+  button:hover{border-color:#2b3a52}
+  input,select,textarea{width:100%;box-sizing:border-box;background:#0e1623;color:var(--fg);border:1px solid var(--line);border-radius:12px;padding:10px}
+  .muted{color:var(--muted);font-size:12px}
+  .kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+  .kpi .box{background:#0e1623;border:1px solid var(--line);border-radius:14px;padding:10px}
+  .k{font-size:11px;color:var(--muted)}
+  .v{font-size:18px;font-weight:900;margin-top:2px}
+  .row{display:flex;gap:8px;align-items:center}
+  .row > *{flex:1}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .tab{cursor:pointer}
+  .tab.active{border-color:#3b82f6}
+  .list{margin-top:10px;display:flex;flex-direction:column;gap:8px}
+  .item{background:#0e1623;border:1px solid var(--line);border-radius:14px;padding:10px}
+  .item h3{margin:0 0 6px 0;font-size:14px;line-height:1.25}
+  .item .meta{display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:12px}
+  .tag{border:1px solid var(--line);padding:2px 8px;border-radius:999px}
+  a{color:#93c5fd;text-decoration:none}
+  a:hover{text-decoration:underline}
+  .good{color:var(--ok)} .bad{color:var(--bad)} .warn{color:var(--warn)}
+  .hr{height:1px;background:var(--line);margin:10px 0}
+  .sticky{position:sticky;top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="title">QDS • Phys.org One-Touch Compare</div>
+    <div class="pill" id="status">idle</div>
+    <div class="pill" id="paths">/news_rips/physorg/YYYY-MM-DD/MASTER.json</div>
+  </div>
+
+  <div class="grid">
+    <!-- LEFT / CONTROLS -->
+    <div class="card sticky">
+      <div class="muted">One-touch actions</div>
+      <div class="btnrow" style="margin-top:8px">
+        <button class="big" id="btnTY">Today vs Yesterday</button>
+        <button class="big" id="btnT7">Today vs 7 days</button>
+        <button class="big" id="btnReload">Reload</button>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="muted">Compare dates</div>
+      <div class="row" style="margin-top:8px">
+        <div>
+          <div class="muted">NEW (A)</div>
+          <select id="dateA"></select>
+        </div>
+        <div>
+          <div class="muted">OLD (B)</div>
+          <select id="dateB"></select>
+        </div>
+      </div>
+      <div class="btnrow" style="margin-top:8px">
+        <button id="btnCompare">Compare A vs B</button>
+        <button id="btnSwap">Swap</button>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="muted">Filter</div>
+      <div style="margin-top:8px">
+        <input id="q" placeholder="search title/desc/url…"/>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <select id="mode">
+          <option value="new">Show: New in A (not in B)</option>
+          <option value="both">Show: In both A and B</option>
+          <option value="old">Show: Only in B (not in A)</option>
+          <option value="all">Show: All (A union B)</option>
+        </select>
+        <select id="sort">
+          <option value="pub_desc">Sort: date desc</option>
+          <option value="pub_asc">Sort: date asc</option>
+          <option value="title">Sort: title</option>
+          <option value="bucket">Sort: bucket</option>
+        </select>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <input id="limit" type="number" min="10" step="10" value="200" />
+        <select id="bucket">
+          <option value="">Bucket: all</option>
+        </select>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="muted">AI helper pack (copy-paste)</div>
+      <div class="btnrow" style="margin-top:8px">
+        <button id="btnAIPack">Copy AI Pack</button>
+        <button id="btnCSV">Copy URLs</button>
+      </div>
+      <textarea id="ai" rows="8" style="margin-top:8px" placeholder="AI pack will appear here…"></textarea>
+
+      <div class="muted" style="margin-top:8px">
+        Tip: mode “New in A” + limit 40 = perfect morning sweep.
+      </div>
+    </div>
+
+    <!-- RIGHT / RESULTS -->
+    <div class="card">
+      <div class="muted">Compare results</div>
+      <div class="kpi" id="kpis">
+        <div class="box"><div class="k">A items</div><div class="v" id="kA">–</div></div>
+        <div class="box"><div class="k">B items</div><div class="v" id="kB">–</div></div>
+        <div class="box"><div class="k">New in A</div><div class="v good" id="kNew">–</div></div>
+      </div>
+
+      <div class="tabs" id="tabs">
+        <button class="tab active" data-tab="list">List</button>
+        <button class="tab" data-tab="diff">Diff Summary</button>
+        <button class="tab" data-tab="quality">Data Quality</button>
+      </div>
+
+      <div id="panel_list">
+        <div class="list" id="list"></div>
+      </div>
+
+      <div id="panel_diff" style="display:none">
+        <div class="hr"></div>
+        <div class="muted">What changed?</div>
+        <div id="diffBox" style="margin-top:8px"></div>
+      </div>
+
+      <div id="panel_quality" style="display:none">
+        <div class="hr"></div>
+        <div class="muted">Quick QA (helps your AI + your sanity)</div>
+        <div id="qaBox" style="margin-top:8px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = (id)=>document.getElementById(id);
+  const status = (s,cls="")=>{ $("status").textContent=s; $("status").className="pill "+cls; };
+  const pad2 = n => (n<10?"0":"")+n;
+  const ymd = (d)=>`${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+  const today = ()=> ymd(new Date());
+  const daysBack = (n)=>{ const d=new Date(); d.setDate(d.getDate()-n); return ymd(d); };
+  const base = "/news_rips/physorg";
+
+  let A=[], B=[], union=[], view=[], buckets=new Set();
+
+  function safeStr(x){ return (x==null?"":String(x)); }
+  function normUrl(u){ return safeStr(u).trim(); }
+
+  async function fetchJSON(path){
+    const r = await fetch(path, {cache:"no-store"});
+    if(!r.ok) throw new Error(`${r.status} ${path}`);
+    return await r.json();
+  }
+
+  function extractBucket(it){
+    // try common fields your rips might use
+    return safeStr(it.bucket || it.feed || it.category || it.section || "").trim();
+  }
+
+  function pubKey(it){
+    const p = safeStr(it.date_published || it.published || it.pubDate || it.date || "");
+    return p;
+  }
+
+  function titleKey(it){
+    return safeStr(it.title || it.headline || it.name || "").trim();
+  }
+
+  function descKey(it){
+    return safeStr(it.description || it.summary || it.teaser || "").trim();
+  }
+
+  function pickId(it){
+    return safeStr(it.id || it.guid || it._id || "");
+  }
+
+  function urlKey(it){
+    return normUrl(it.url || it.link || "");
+  }
+
+  function indexByUrl(arr){
+    const m = new Map();
+    for(const it of arr){
+      const u = urlKey(it);
+      if(u) m.set(u,it);
+    }
+    return m;
+  }
+
+  function buildBuckets(){
+    buckets = new Set();
+    for(const it of union){
+      const b = extractBucket(it);
+      if(b) buckets.add(b);
+    }
+    const sel = $("bucket");
+    const cur = sel.value;
+    sel.innerHTML = `<option value="">Bucket: all</option>` + [...buckets].sort().map(b=>`<option>${escapeHtml(b)}</option>`).join("");
+    sel.value = cur || "";
+  }
+
+  function escapeHtml(s){
+    return safeStr(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function setKPIs(){
+    $("kA").textContent = A.length;
+    $("kB").textContent = B.length;
+    const mapB = indexByUrl(B);
+    let newCount=0;
+    for(const it of A) if(urlKey(it) && !mapB.has(urlKey(it))) newCount++;
+    $("kNew").textContent = newCount;
+  }
+
+  function fmtDate(s){
+    s = safeStr(s);
+    if(!s) return "";
+    // keep raw; Phys often uses ISO or "December 14, 2025"
+    return s;
+  }
+
+  function renderList(){
+    const q = $("q").value.trim().toLowerCase();
+    const mode = $("mode").value;
+    const sort = $("sort").value;
+    const lim = Math.max(10, parseInt($("limit").value||"200",10));
+    const buck = $("bucket").value;
+
+    const mapA = indexByUrl(A);
+    const mapB = indexByUrl(B);
+    const allUrls = new Set([...mapA.keys(), ...mapB.keys()]);
+
+    let arr = [];
+    for(const u of allUrls){
+      const a = mapA.get(u);
+      const b = mapB.get(u);
+      if(mode==="new" && (!a || b)) continue;
+      if(mode==="old" && (!b || a)) continue;
+      if(mode==="both" && !(a && b)) continue;
+
+      const it = a || b;
+      const t = titleKey(it);
+      const d = descKey(it);
+      const bb = extractBucket(it) || "";
+      const pub = fmtDate(pubKey(it));
+      const hit = (t+" "+d+" "+u+" "+bb).toLowerCase();
+
+      if(buck && bb !== buck) continue;
+      if(q && !hit.includes(q)) continue;
+
+      arr.push({u,a,b,it,t,d,bb,pub});
+    }
+
+    // sorting
+    const pubVal = (x)=>{
+      const s = safeStr(pubKey(x.it));
+      // try Date parse; if fails, return s
+      const dt = Date.parse(s);
+      return isNaN(dt) ? s : dt;
+    };
+    if(sort==="pub_desc") arr.sort((x,y)=> (pubVal(y)>pubVal(x)?1:-1));
+    if(sort==="pub_asc")  arr.sort((x,y)=> (pubVal(x)>pubVal(y)?1:-1));
+    if(sort==="title")    arr.sort((x,y)=> x.t.localeCompare(y.t));
+    if(sort==="bucket")   arr.sort((x,y)=> (x.bb||"").localeCompare(y.bb||""));
+
+    view = arr.slice(0, lim);
+
+    const html = view.map(x=>{
+      const it=x.it;
+      const u = x.u;
+      const pub = fmtDate(pubKey(it));
+      const bb  = extractBucket(it);
+      const id  = pickId(it);
+      const aOnly = x.a && !x.b;
+      const bOnly = x.b && !x.a;
+      const both = x.a && x.b;
+
+      const badge = aOnly ? `<span class="tag good">NEW</span>` :
+                    bOnly ? `<span class="tag warn">OLD</span>` :
+                            `<span class="tag">BOTH</span>`;
+
+      return `
+      <div class="item">
+        <h3>${badge} <a href="${escapeHtml(u)}" target="_blank" rel="noopener">${escapeHtml(x.t || "(no title)")}</a></h3>
+        <div class="meta">
+          ${bb?`<span class="tag">${escapeHtml(bb)}</span>`:""}
+          ${pub?`<span class="tag">${escapeHtml(pub)}</span>`:""}
+          ${id?`<span class="tag">id:${escapeHtml(id)}</span>`:""}
+        </div>
+        ${x.d?`<div class="muted" style="margin-top:6px">${escapeHtml(x.d)}</div>`:""}
+      </div>`;
+    }).join("");
+
+    $("list").innerHTML = html || `<div class="muted">No items match your filters.</div>`;
+    buildAIPack(); // keep AI box synced
+  }
+
+  function buildAIPack(){
+    const mode = $("mode").value;
+    const aDate = $("dateA").value;
+    const bDate = $("dateB").value;
+
+    const top = view.slice(0, 40);
+    const lines = [];
+    lines.push(`# Phys.org compare pack`);
+    lines.push(`A (new): ${aDate}`);
+    lines.push(`B (old): ${bDate}`);
+    lines.push(`Mode: ${mode}`);
+    lines.push(`Items shown: ${view.length}`);
+    lines.push(``);
+    lines.push(`## Headlines`);
+    top.forEach((x,i)=>{
+      const it=x.it;
+      const bb=extractBucket(it)||"";
+      const pub=fmtDate(pubKey(it))||"";
+      lines.push(`${i+1}. ${titleKey(it)||"(no title)"} — ${bb}${pub?` — ${pub}`:""}`);
+      lines.push(`   - url: ${x.u}`);
+      const d = descKey(it);
+      if(d) lines.push(`   - note: ${d}`);
+    });
+    lines.push(``);
+    lines.push(`## Ask (copy/paste prompt)`);
+    lines.push(`- Pick 5 strongest "vs mainstream" items, justify briefly.`);
+    lines.push(`- Flag anything that directly touches QDS themes: correlated noise, kernels, decoherence, 2D materials, printable electronics, info/compression, sensors.`);
+    lines.push(`- Produce triage: vs / complement / action / risk (1 line each).`);
+
+    $("ai").value = lines.join("\n");
+  }
+
+  async function copyText(t){
+    try{ await navigator.clipboard.writeText(t); status("copied ✔","good"); }
+    catch(e){ status("copy failed (clipboard blocked)","bad"); }
+  }
+
+  function renderDiffSummary(){
+    const mapA=indexByUrl(A), mapB=indexByUrl(B);
+    let newU=[], oldU=[], bothU=[];
+    for(const u of mapA.keys()){
+      if(!mapB.has(u)) newU.push(u); else bothU.push(u);
+    }
+    for(const u of mapB.keys()){
+      if(!mapA.has(u)) oldU.push(u);
+    }
+    const h = `
+      <div class="item">
+        <div class="meta">
+          <span class="tag good">New in A: ${newU.length}</span>
+          <span class="tag warn">Only in B: ${oldU.length}</span>
+          <span class="tag">In both: ${bothU.length}</span>
+        </div>
+        <div class="muted" style="margin-top:8px">
+          New-in-A is your morning sweep list. “Only in B” is what disappeared (or arrived earlier).
+        </div>
+      </div>
+    `;
+    $("diffBox").innerHTML = h;
+  }
+
+  function renderQuality(){
+    const arr = union;
+    const miss = {title:0, desc:0, pub:0, url:0, bucket:0, id:0};
+    let dupe=0;
+    const seen=new Set();
+    for(const it of arr){
+      const u=urlKey(it);
+      if(!u) miss.url++;
+      else { if(seen.has(u)) dupe++; seen.add(u); }
+      if(!titleKey(it)) miss.title++;
+      if(!descKey(it)) miss.desc++;
+      if(!pubKey(it)) miss.pub++;
+      if(!extractBucket(it)) miss.bucket++;
+      if(!pickId(it)) miss.id++;
+    }
+    const h = `
+      <div class="item">
+        <div class="meta">
+          <span class="tag">Union items: ${arr.length}</span>
+          <span class="tag ${dupe? "warn":""}">Dupes by url: ${dupe}</span>
+        </div>
+        <div class="hr"></div>
+        <div class="muted">Missing fields (lower is better for AI + triage automation):</div>
+        <div class="meta" style="margin-top:8px;gap:8px">
+          <span class="tag ${miss.url? "warn":""}">url: ${miss.url}</span>
+          <span class="tag ${miss.title? "warn":""}">title: ${miss.title}</span>
+          <span class="tag ${miss.desc? "warn":""}">desc: ${miss.desc}</span>
+          <span class="tag ${miss.pub? "warn":""}">date: ${miss.pub}</span>
+          <span class="tag ${miss.bucket? "warn":""}">bucket: ${miss.bucket}</span>
+          <span class="tag ${miss.id? "warn":""}">id: ${miss.id}</span>
+        </div>
+      </div>
+    `;
+    $("qaBox").innerHTML = h;
+  }
+
+  async function loadDay(day){
+    const path = `${base}/${day}/MASTER.json?x=${Date.now()}`;
+    return await fetchJSON(path);
+  }
+
+  async function compare(aDate, bDate){
+    status("loading…","warn");
+    $("dateA").value=aDate; $("dateB").value=bDate;
+
+    let a=[], b=[];
+    try{ a = await loadDay(aDate); } catch(e){ a=[]; }
+    try{ b = await loadDay(bDate); } catch(e){ b=[]; }
+
+    // normalize arrays
+    A = Array.isArray(a) ? a : (a.items||[]);
+    B = Array.isArray(b) ? b : (b.items||[]);
+    const mapU = new Map();
+    for(const it of [...A,...B]){
+      const u=urlKey(it);
+      if(u && !mapU.has(u)) mapU.set(u,it);
+    }
+    union = [...mapU.values()];
+
+    setKPIs();
+    renderDiffSummary();
+    renderQuality();
+    buildBuckets();
+    renderList();
+    status(`A:${aDate} vs B:${bDate}`,"good");
+  }
+
+  function fillDates(){
+    const selA=$("dateA"), selB=$("dateB");
+    const opts=[];
+    for(let i=0;i<30;i++){
+      const d=daysBack(i);
+      opts.push(`<option value="${d}">${d}</option>`);
+    }
+    selA.innerHTML = opts.join("");
+    selB.innerHTML = opts.join("");
+    selA.value = today();
+    selB.value = daysBack(1);
+  }
+
+  function wire(){
+    $("btnTY").onclick = ()=> compare(today(), daysBack(1));
+    $("btnT7").onclick = ()=> compare(today(), daysBack(7));
+    $("btnCompare").onclick = ()=> compare($("dateA").value, $("dateB").value);
+    $("btnSwap").onclick = ()=>{
+      const a=$("dateA").value, b=$("dateB").value;
+      $("dateA").value=b; $("dateB").value=a;
+      compare($("dateA").value,$("dateB").value);
+    };
+    $("btnReload").onclick = ()=> compare($("dateA").value, $("dateB").value);
+
+    ["q","mode","sort","limit","bucket"].forEach(id=>{
+      $(id).addEventListener("input", renderList);
+      $(id).addEventListener("change", renderList);
+    });
+
+    $("btnAIPack").onclick = ()=> copyText($("ai").value);
+
+    $("btnCSV").onclick = ()=>{
+      const urls = view.map(x=>x.u).join("\n");
+      copyText(urls);
+    };
+
+    // tabs
+    $("tabs").addEventListener("click", (e)=>{
+      const b=e.target.closest("button"); if(!b) return;
+      const tab=b.dataset.tab;
+      document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+      b.classList.add("active");
+      $("panel_list").style.display = tab==="list" ? "" : "none";
+      $("panel_diff").style.display = tab==="diff" ? "" : "none";
+      $("panel_quality").style.display = tab==="quality" ? "" : "none";
+    });
+  }
+
+  fillDates();
+  wire();
+  compare(today(), daysBack(1)); // auto: morning default
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "name": "GrowthHub QDS — All-in-One",
+  "short_name": "GrowthHub",
+  "start_url": "./growthhub_allinone_v1_1.html",
+  "display": "standalone",
+  "background_color": "#05070b",
+  "theme_color": "#05070b",
+  "icons": [
+    { "src": "./growthhub_icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

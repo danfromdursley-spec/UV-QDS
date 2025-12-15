@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>QDS Universe V12B 🎩💥</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<style>
+  :root {
+    --bg1: #07101f;
+    --bg2: #0b2340;
+    --accent: #27e5ff;
+    --panel-grad: linear-gradient(145deg, #ff9966, #ff5e62);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: radial-gradient(circle at top, #10264f 0%, #02040a 70%);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #fff;
+    touch-action: none;
+  }
+  #qdsCanvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    background: radial-gradient(circle at 50% -10%, #2ad7ff 0%, #04101c 55%, #000 100%);
+  }
+  #hudToggle {
+    position: fixed;
+    right: 4vw;
+    bottom: 4vh;
+    width: 70px;
+    height: 70px;
+    border-radius: 999px;
+    border: none;
+    background: radial-gradient(circle at 30% 30%, #7df, #29a3ff);
+    color: #001325;
+    font-weight: 700;
+    font-size: 1rem;
+    box-shadow: 0 0 20px rgba(0,255,255,0.5);
+  }
+  #hudToggle:active { transform: scale(0.97); }
+  #panel {
+    position: fixed;
+    top: 3vh;
+    left: 3vw;
+    width: min(78vw, 380px);
+    max-width: 380px;
+    padding: 14px 16px 16px;
+    border-radius: 22px;
+    background-image: var(--panel-grad);
+    color: #fff;
+    box-shadow: 0 14px 30px rgba(0,0,0,0.45);
+    font-size: 0.9rem;
+  }
+  #panel.hidden { display: none; }
+  h1 {
+    font-size: 1.3rem;
+    letter-spacing: 0.12rem;
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    font-size: 0.78rem;
+    opacity: 0.9;
+    margin-bottom: 10px;
+  }
+  .label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.78rem;
+    margin-bottom: 2px;
+  }
+  .slider {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.3);
+    outline: none;
+    margin-bottom: 10px;
+  }
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ffd86b;
+    border: 2px solid rgba(255,255,255,0.8);
+    box-shadow: 0 0 10px rgba(255,255,255,0.6);
+  }
+  .button-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .btn {
+    flex: 1;
+    border: none;
+    border-radius: 999px;
+    padding: 7px 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    box-shadow: 0 7px 16px rgba(0,0,0,0.35);
+  }
+  .btn:active { transform: translateY(1px) scale(0.99); }
+  .btn-fire   { background: linear-gradient(135deg,#ffb347,#ff7b47); }
+  .btn-chaos  { background: linear-gradient(135deg,#ff6a88,#ff3c6f); }
+  .btn-normal { background: linear-gradient(135deg,#6dd5fa,#2193b0); }
+  .btn-ride   { background: linear-gradient(135deg,#5efc82,#0bab64); }
+  .btn-melt   { background: linear-gradient(135deg,#ff5858,#f857a6); margin-bottom: 8px; }
+  .select-row {
+    margin-bottom: 6px;
+  }
+  select {
+    width: 100%;
+    border-radius: 999px;
+    border: none;
+    padding: 7px 10px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    background: rgba(20,0,0,0.4);
+    color: #fff;
+  }
+  .info {
+    font-size: 0.74rem;
+    padding: 7px 9px;
+    border-radius: 14px;
+    background: rgba(0,0,0,0.18);
+    margin-bottom: 4px;
+  }
+  .status {
+    font-size: 0.72rem;
+    padding: 6px 9px;
+    border-radius: 14px;
+    background: rgba(0,0,0,0.24);
+  }
+  #footerHint {
+    position: fixed;
+    left: 50%;
+    bottom: 2.4vh;
+    transform: translateX(-50%);
+    font-size: 0.7rem;
+    letter-spacing: 0.15rem;
+    text-transform: uppercase;
+    color: rgba(210,244,255,0.7);
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+<canvas id="qdsCanvas"></canvas>
+
+<button id="hudToggle">HUD</button>
+
+<div id="panel">
+  <h1>QDS UNIVERSE V12 🎩💥</h1>
+  <div class="subtitle">
+    Neon warp-grid. Tune λ<sub>c</sub>, τ<sub>c</sub>, fire CMEs, ride planets, then trigger MELTDOWN.
+  </div>
+
+  <div class="label-row">
+    <span>λ<sub>c</sub> (spatial coherence)</span>
+    <span id="lambdaVal">2.0</span>
+  </div>
+  <input id="lambdaSlider" class="slider" type="range" min="0.8" max="3.5" step="0.1" value="2.0" />
+
+  <div class="label-row">
+    <span>τ<sub>c</sub> (temporal coherence)</span>
+    <span id="tauVal">2.0</span>
+  </div>
+  <input id="tauSlider" class="slider" type="range" min="0.8" max="3.5" step="0.1" value="2.0" />
+
+  <div class="button-row">
+    <button id="btnCME" class="btn btn-fire">💥 FIRE CME</button>
+    <button id="btnChaos" class="btn btn-chaos">🔥 MAX CHAOS</button>
+  </div>
+  <div class="button-row">
+    <button id="btnNormal" class="btn btn-normal">💎 NORMAL</button>
+    <button id="btnRide" class="btn btn-ride">🛸 RIDE ALONG</button>
+  </div>
+  <button id="btnMelt" class="btn btn-melt" style="width:100%;">☢️ QDS MELTDOWN</button>
+
+  <div class="select-row">
+    <select id="planetSelect">
+      <option>Mercury</option>
+      <option>Venus</option>
+      <option selected>Earth</option>
+      <option>Mars</option>
+      <option>Jupiter</option>
+      <option>Saturn</option>
+      <option>Uranus</option>
+      <option>Neptune</option>
+      <option>Pluto (respect!)</option>
+    </select>
+  </div>
+
+  <div id="planetInfo" class="info">Planet info will appear here.</div>
+  <div id="status" class="status">Status: Neon grid humming softly in Normal mode.</div>
+</div>
+
+<div id="footerHint">TAP GRID TO SPAWN CHAOS ORBS • SLIDERS BEND QDS WARP • HUD TOGGLE CONTROLS</div>
+
+<script>
+(function(){
+  const canvas = document.getElementById('qdsCanvas');
+  const ctx = canvas.getContext('2d');
+
+  let width = window.innerWidth;
+  let height = window.innerHeight;
+  canvas.width = width;
+  canvas.height = height;
+
+  window.addEventListener('resize', () => {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+  });
+
+  // Controls
+  const lambdaSlider = document.getElementById('lambdaSlider');
+  const tauSlider = document.getElementById('tauSlider');
+  const lambdaVal = document.getElementById('lambdaVal');
+  const tauVal = document.getElementById('tauVal');
+  const planetSelect = document.getElementById('planetSelect');
+  const planetInfo = document.getElementById('planetInfo');
+  const statusEl = document.getElementById('status');
+  const hudToggle = document.getElementById('hudToggle');
+  const panel = document.getElementById('panel');
+
+  let lambdaC = parseFloat(lambdaSlider.value);
+  let tauC = parseFloat(tauSlider.value);
+  let chaosLevel = 0;
+  let rideAlong = false;
+  let meltdown = false;
+  let cmePulse = 0;
+
+  lambdaSlider.addEventListener('input', () => {
+    lambdaC = parseFloat(lambdaSlider.value);
+    lambdaVal.textContent = lambdaC.toFixed(1);
+    statusEl.textContent = 'Status: Grid bend tuned – λc now ' + lambdaC.toFixed(1) + '.';
+  });
+  tauSlider.addEventListener('input', () => {
+    tauC = parseFloat(tauSlider.value);
+    tauVal.textContent = tauC.toFixed(1);
+    statusEl.textContent = 'Status: Temporal hum adjusted – τc now ' + tauC.toFixed(1) + '.';
+  });
+
+  document.getElementById('btnCME').addEventListener('click', () => {
+    cmePulse = 1.0;
+    statusEl.textContent = 'Status: CME fired – expanding shock rings through the QDS grid.';
+  });
+
+  document.getElementById('btnChaos').addEventListener('click', () => {
+    chaosLevel = chaosLevel > 0 ? 0 : 1;
+    statusEl.textContent = chaosLevel > 0
+      ? 'Status: MAX Chaos engaged – jittery orbits and noisy grid.'
+      : 'Status: Chaos damped – grid settling back to a gentle hum.';
+  });
+
+  document.getElementById('btnNormal').addEventListener('click', () => {
+    chaosLevel = 0;
+    meltdown = false;
+    rideAlong = false;
+    statusEl.textContent = 'Status: Normal mode – QDS grid humming softly.';
+  });
+
+  document.getElementById('btnRide').addEventListener('click', () => {
+    rideAlong = !rideAlong;
+    statusEl.textContent = rideAlong
+      ? 'Status: Ride Along – camera locked to ' + planetSelect.value + '.'
+      : 'Status: Ride Along disengaged – camera drifting freely.';
+  });
+
+  document.getElementById('btnMelt').addEventListener('click', () => {
+    meltdown = !meltdown;
+    chaosLevel = meltdown ? 1 : chaosLevel;
+    statusEl.textContent = meltdown
+      ? 'Status: QDS MELTDOWN – stacked CMEs, max coherence, neon storm.'
+      : 'Status: Meltdown cooling – vacuum settling, still spicy.';
+  });
+
+  hudToggle.addEventListener('click', () => {
+    panel.classList.toggle('hidden');
+  });
+
+  const planetMeta = {
+    'Mercury': 'Small, fast, baked. Orbital racetrack specialist.',
+    'Venus': 'Runaway greenhouse, atmospheric chaos expert.',
+    'Earth': 'Home. Liquid water, plate tectonics, questionable Wi‑Fi.',
+    'Mars': 'Rusty, dusty, future QDS field lab.',
+    'Jupiter': 'Gas giant, gravity bully, CME amplifier.',
+    'Saturn': 'Rings, vibes, and subtle warp-field harmonics.',
+    'Uranus': 'Sideways spinner, axial chaos demonstrator.',
+    'Neptune': 'Deep blue, supersonic winds, distant hum.',
+    'Pluto (respect!)': 'Tiny, icy, emotionally still a planet.'
+  };
+
+  function updatePlanetInfo() {
+    const name = planetSelect.value;
+    planetInfo.textContent = name + ' – ' + (planetMeta[name] || '');
+  }
+  planetSelect.addEventListener('change', updatePlanetInfo);
+  updatePlanetInfo();
+
+  // World + camera
+  const planets = [];
+  function initPlanets() {
+    const baseR = Math.min(width, height) * 0.035;
+    const centerY = height * 0.63;
+    planets.length = 0;
+    planets.push({ name: 'Sun', r: baseR * 1.4, orbitR: 0, speed: 0, color: '#ffd86b' });
+    planets.push({ name: 'Mercury', r: baseR * 0.35, orbitR: baseR * 2.0, speed: 0.018, color: '#ffddaa' });
+    planets.push({ name: 'Venus', r: baseR * 0.5, orbitR: baseR * 3.0, speed: 0.013, color: '#ffcf8a' });
+    planets.push({ name: 'Earth', r: baseR * 0.5, orbitR: baseR * 4.2, speed: 0.011, color: '#68c9ff' });
+    planets.push({ name: 'Mars', r: baseR * 0.42, orbitR: baseR * 5.2, speed: 0.009, color: '#ff865e' });
+    planets.push({ name: 'Jupiter', r: baseR * 0.9, orbitR: baseR * 7.8, speed: 0.006, color: '#f7d7b8' });
+    planets.push({ name: 'Saturn', r: baseR * 0.8, orbitR: baseR * 9.4, speed: 0.0045, color: '#f5e3b5', ring: true });
+    planets.push({ name: 'Uranus', r: baseR * 0.6, orbitR: baseR * 11.0, speed: 0.0035, color: '#a4f1ff' });
+    planets.push({ name: 'Neptune', r: baseR * 0.6, orbitR: baseR * 12.6, speed: 0.003, color: '#5fb6ff' });
+    planets.push({ name: 'Pluto (respect!)', r: baseR * 0.25, orbitR: baseR * 14.0, speed: 0.002, color: '#e0f0ff' });
+  }
+  initPlanets();
+
+  let t = 0;
+  let camera = {
+    x: 0,
+    y: height * 0.1,
+    zoom: 1
+  };
+
+  const chaosOrbs = [];
+  canvas.addEventListener('pointerdown', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    chaosOrbs.push({
+      x, y,
+      vx: (Math.random() - 0.5) * 0.8,
+      vy: -Math.random() * 1.2,
+      life: 1.0,
+      size: 6 + Math.random() * 10
+    });
+  });
+
+  function worldToScreen(wx, wy) {
+    const sx = (wx - camera.x) * camera.zoom + width / 2;
+    const sy = (wy - camera.y) * camera.zoom + height * 0.55;
+    return { x: sx, y: sy };
+  }
+
+  function drawGrid(time) {
+    const rows = 22;
+    const cols = 26;
+    const gridWidth = Math.min(width * 1.6, 1600);
+    const gridHeight = Math.min(height * 0.9, 900);
+    const yBase = height * 0.6;
+
+    const dx = gridWidth / cols;
+    const dy = gridHeight / rows;
+    const startX = -gridWidth / 2;
+    const startY = yBase - gridHeight * 0.2;
+
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(130, 230, 255, 0.7)';
+
+    const warpAmp = 18 * lambdaC;
+    const warpFreq = 0.7 + lambdaC * 0.3;
+    const chaosJitter = chaosLevel > 0 ? 6 : 0;
+
+    // Horizontal
+    for (let j = 0; j <= rows; j++) {
+      ctx.beginPath();
+      for (let i = 0; i <= cols; i++) {
+        const wx = startX + i * dx;
+        let wy = startY + j * dy;
+        const u = i / cols;
+        const v = j / rows;
+        wy += Math.sin(time * 0.7 + u * 4 * warpFreq) * warpAmp * (1 - v);
+        wy += Math.cos(time * 0.5 + v * 6) * warpAmp * 0.25;
+        if (chaosLevel > 0) {
+          wy += (Math.random() - 0.5) * chaosJitter;
+        }
+        const { x, y } = worldToScreen(wx, wy);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+
+    // Vertical
+    for (let i = 0; i <= cols; i++) {
+      ctx.beginPath();
+      for (let j = 0; j <= rows; j++) {
+        const wx = startX + i * dx;
+        let wy = startY + j * dy;
+        const u = i / cols;
+        const v = j / rows;
+        wy += Math.sin(time * 0.7 + u * 4 * warpFreq) * warpAmp * (1 - v);
+        wy += Math.cos(time * 0.5 + v * 6) * warpAmp * 0.25;
+        if (chaosLevel > 0) {
+          wy += (Math.random() - 0.5) * chaosJitter;
+        }
+        const { x, y } = worldToScreen(wx, wy);
+        if (j === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+  }
+
+  function drawOrbits(time) {
+    const centerY = height * 0.6;
+    ctx.save();
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(200,220,255,0.22)';
+    planets.forEach((p, idx) => {
+      if (idx === 0) return; // skip sun
+      const orbitR = p.orbitR;
+      const steps = 80;
+      ctx.beginPath();
+      for (let i = 0; i <= steps; i++) {
+        const ang = (i / steps) * Math.PI * 2;
+        let wx = Math.cos(ang) * orbitR;
+        let wy = centerY + Math.sin(ang) * orbitR * 0.22;
+        const wobble = Math.sin(time * 0.3 + idx + i * 0.22) * 4 * tauC;
+        wy += wobble;
+        const { x, y } = worldToScreen(wx, wy);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    });
+    ctx.restore();
+  }
+
+  function updatePlanets(dt) {
+    const centerY = height * 0.6;
+    planets.forEach((p, idx) => {
+      if (idx === 0) {
+        p.wx = 0;
+        p.wy = centerY;
+        return;
+      }
+      const chaosSpin = chaosLevel > 0 ? (Math.sin(t * 0.8 + idx) * 0.015) : 0;
+      p.angle = (p.angle || 0) + (p.speed + chaosSpin) * dt * tauC;
+      const ang = p.angle;
+      let wx = Math.cos(ang) * p.orbitR;
+      let wy = centerY + Math.sin(ang) * p.orbitR * 0.22;
+      const wobble = Math.sin(t * 0.4 + idx * 0.7) * 12 * (tauC - 0.8);
+      wy += wobble;
+      p.wx = wx;
+      p.wy = wy;
+    });
+  }
+
+  function drawPlanets() {
+    planets.forEach((p, idx) => {
+      const screen = worldToScreen(p.wx, p.wy);
+      const r = p.r * camera.zoom;
+      if (idx === 0) {
+        // sun glow
+        const grad = ctx.createRadialGradient(screen.x, screen.y, 0, screen.x, screen.y, r * 2.0);
+        const glow = 0.55 + 0.45 * Math.sin(t * 0.9);
+        grad.addColorStop(0, 'rgba(255,244,200,1)');
+        grad.addColorStop(0.5, 'rgba(255,210,120,' + glow + ')');
+        grad.addColorStop(1, 'rgba(255,210,120,0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(screen.x, screen.y, r * 2.1, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // planet
+      const gradP = ctx.createRadialGradient(screen.x - r * 0.5, screen.y - r * 0.5, r * 0.2,
+                                             screen.x, screen.y, r);
+      gradP.addColorStop(0, '#ffffff');
+      gradP.addColorStop(0.4, p.color);
+      gradP.addColorStop(1, '#000000');
+      ctx.fillStyle = gradP;
+      ctx.beginPath();
+      ctx.arc(screen.x, screen.y, r, 0, Math.PI * 2);
+      ctx.fill();
+
+      if (p.ring) {
+        ctx.strokeStyle = 'rgba(255,255,255,0.75)';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.ellipse(screen.x, screen.y, r * 1.7, r * 0.9, 0.4, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // highlight selected planet ring
+      if (planetSelect.value === p.name) {
+        ctx.strokeStyle = 'rgba(255,230,150,0.9)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(screen.x, screen.y, r * 1.5, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    });
+  }
+
+  function drawChaosOrbs(dt) {
+    for (let i = chaosOrbs.length - 1; i >= 0; i--) {
+      const o = chaosOrbs[i];
+      o.x += o.vx * dt;
+      o.y += o.vy * dt;
+      o.vy += 0.002 * dt;
+      o.life -= 0.0015 * dt;
+      if (o.life <= 0) {
+        chaosOrbs.splice(i, 1);
+        continue;
+      }
+      const alpha = Math.max(0, o.life);
+      const radius = o.size * (0.5 + 0.5 * (1 - o.life));
+      const grad = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, radius);
+      grad.addColorStop(0, 'rgba(255,255,255,' + alpha + ')');
+      grad.addColorStop(0.4, 'rgba(120,230,255,' + alpha + ')');
+      grad.addColorStop(1, 'rgba(120,230,255,0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(o.x, o.y, radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function updateCamera(dt) {
+    const wobbleAmp = 18 * (lambdaC - 0.8);
+    const wobbleX = Math.sin(t * 0.15) * wobbleAmp;
+    const wobbleY = Math.cos(t * 0.18) * wobbleAmp;
+
+    let targetX = wobbleX;
+    let targetY = wobbleY;
+
+    if (rideAlong) {
+      const name = planetSelect.value;
+      const targetPlanet = planets.find(p => p.name === name) || planets[2];
+      targetX = targetPlanet.wx;
+      targetY = targetPlanet.wy - height * 0.12;
+    }
+
+    const lerp = (a,b,s)=>a+(b-a)*s;
+    const followSpeed = rideAlong ? 0.08 : 0.03;
+    camera.x = lerp(camera.x, targetX, followSpeed * dt * 0.06);
+    camera.y = lerp(camera.y, targetY, followSpeed * dt * 0.06);
+
+    const targetZoom = meltdown ? 1.2 : rideAlong ? 1.05 : 1.0;
+    camera.zoom = lerp(camera.zoom, targetZoom, 0.04 * dt * 0.06);
+  }
+
+  function drawCME(time) {
+    if (cmePulse <= 0.001) return;
+    const sun = planets[0];
+    const center = worldToScreen(sun.wx, sun.wy);
+    const maxR = Math.max(width, height) * 1.2;
+    const r = (1 - cmePulse) * maxR;
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(255,230,160,' + cmePulse + ')';
+    ctx.beginPath();
+    ctx.arc(center.x, center.y, r, 0, Math.PI * 2);
+    ctx.stroke();
+    cmePulse *= 0.96;
+  }
+
+  let last = performance.now();
+  function loop(now){
+    const dt = now - last;
+    last = now;
+    t += dt * 0.0015 * tauC;
+
+    ctx.clearRect(0,0,width,height);
+
+    updateCamera(dt);
+    updatePlanets(dt);
+    drawGrid(t);
+    drawOrbits(t);
+    drawPlanets();
+    drawChaosOrbs(dt);
+    drawCME(t);
+
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

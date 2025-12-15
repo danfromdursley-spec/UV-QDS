@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>QDS HTML Compressor v1.0</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  :root {
+    --bg: #050915;
+    --panel: #0d1726;
+    --accent: #24c6ff;
+    --accent2: #ff5c93;
+    --text: #e7f2ff;
+    --muted: #8ca0c0;
+    --danger: #ff7a7a;
+    --ok: #5cffb3;
+  }
+  * { box-sizing: border-box; font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }
+  body {
+    margin: 0;
+    padding: 12px;
+    background: radial-gradient(circle at top left,#1b2842,#050915);
+    color: var(--text);
+  }
+  .shell {
+    max-width: 960px;
+    margin: 0 auto;
+    background: linear-gradient(135deg,#182437,#050915);
+    border-radius: 18px;
+    padding: 12px 12px 16px;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+  }
+  h1 {
+    font-size: 1.1rem;
+    margin: 0 0 4px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .subtitle {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .badge-row { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
+  .badge {
+    font-size: 0.7rem;
+    padding:3px 8px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,0.1);
+    background: radial-gradient(circle at top,#263656,#101726);
+  }
+  .badge.green { border-color: var(--ok); color: var(--ok); }
+  .cols {
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .col {
+    flex:1 1 280px;
+    min-width:0;
+  }
+  label { font-size:0.78rem; color:var(--muted); display:block; margin-bottom:4px; }
+  textarea {
+    width:100%;
+    min-height:180px;
+    border-radius:10px;
+    border:1px solid #1c2940;
+    padding:8px;
+    resize:vertical;
+    background:#050915;
+    color:var(--text);
+    font-family:"JetBrains Mono","Fira Code",monospace;
+    font-size:0.8rem;
+  }
+  textarea:focus {
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:0 0 0 1px rgba(36,198,255,0.4);
+  }
+  .btn-row { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0; }
+  button {
+    border:none;
+    border-radius:999px;
+    padding:7px 14px;
+    font-size:0.8rem;
+    cursor:pointer;
+    background:linear-gradient(135deg,#24c6ff,#3b8dff);
+    color:#04101f;
+    font-weight:600;
+    box-shadow:0 4px 12px rgba(0,0,0,0.5);
+  }
+  button.secondary {
+    background:linear-gradient(135deg,#202a3c,#141b29);
+    color:var(--text);
+  }
+  button.danger {
+    background:linear-gradient(135deg,#ff5c93,#ff9966);
+    color:#2a050c;
+  }
+  button:active { transform:translateY(1px); box-shadow:0 2px 8px rgba(0,0,0,0.6); }
+  .stats {
+    font-size:0.72rem;
+    color:var(--muted);
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:4px;
+  }
+  .stats span strong { color:var(--accent); }
+  .footer {
+    margin-top:10px;
+    font-size:0.7rem;
+    color:var(--muted);
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  input[type="file"] {
+    font-size:0.7rem;
+    color:var(--muted);
+    max-width:100%;
+  }
+  .hint { font-size:0.72rem; color:var(--muted); margin-top:4px; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <h1>QDS HTML Compressor v1.0</h1>
+  <div class="subtitle">
+    Stand-alone, browser-only compressor. LZW-style codec + Base64. No servers, no tracking – just bits.
+  </div>
+  <div class="badge-row">
+    <div class="badge green">Offline &amp; phone-safe</div>
+    <div class="badge">Single file • drop into any HTML</div>
+    <div class="badge">Codec: QDS-LZW-B64</div>
+  </div>
+
+  <div class="cols">
+    <div class="col">
+      <label for="input">Input (raw text / JSON / HTML / code)</label>
+      <textarea id="input" placeholder="Paste your text here, old chap…"></textarea>
+
+      <div class="btn-row">
+        <button onclick="compressText()">⚙️ Compress ➜</button>
+        <button class="secondary" onclick="decompressToInput()">⬅︎ Decompress from right</button>
+        <button class="secondary" onclick="clearBoth()">🧹 Clear</button>
+      </div>
+
+      <div class="stats" id="leftStats"></div>
+
+      <div class="hint">
+        File mode:
+        <input type="file" id="fileInput" onchange="loadFile(event)">
+        <button class="secondary" onclick="downloadCompressed()">💾 Download compressed</button>
+      </div>
+    </div>
+
+    <div class="col">
+      <label for="output">Output (compressed Base64 or decompressed text)</label>
+      <textarea id="output" placeholder="Compressed data will appear here…"></textarea>
+
+      <div class="btn-row">
+        <button onclick="decompressText()">🔓 Decompress ➜</button>
+        <button class="secondary" onclick="copyOutput()">📋 Copy output</button>
+      </div>
+
+      <div class="stats" id="rightStats"></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Codec hint: LZW-style dictionary ➜ binary string ➜ UTF-8 ➜ Base64.</span>
+    <span>Dan &amp; QDS • Shed edition 🎩</span>
+  </div>
+</div>
+
+<script>
+// ---------- Small helpers ----------
+function bytesForString(str) {
+  return new TextEncoder().encode(str).length;
+}
+function humanBytes(n) {
+  if (!isFinite(n)) return "0 B";
+  const units = ["B","KB","MB","GB"];
+  let i = 0;
+  while (n >= 1024 && i < units.length-1) { n /= 1024; i++; }
+  return n.toFixed(2) + " " + units[i];
+}
+function updateStats() {
+  const inEl  = document.getElementById('input');
+  const outEl = document.getElementById('output');
+  const left  = document.getElementById('leftStats');
+  const right = document.getElementById('rightStats');
+
+  const inSize  = bytesForString(inEl.value || "");
+  const outSize = bytesForString(outEl.value || "");
+  let ratioText = "";
+  if (inSize > 0 && outSize > 0) {
+    const ratio = outSize / inSize;
+    ratioText = ` • ratio: <strong>${ratio.toFixed(3)}</strong>`;
+  }
+  left.innerHTML  = `Input: <strong>${humanBytes(inSize)}</strong>`;
+  right.innerHTML = `Output: <strong>${humanBytes(outSize)}</strong>${ratioText}`;
+}
+
+// ---------- LZW-style codec (from scratch, QDS-safe) ----------
+// Compresses to a binary string (sequence of 16-bit codes), then we Base64 it.
+function lzwCompress(uncompressed) {
+  if (!uncompressed) return "";
+  const dict = new Map();
+  let data = Array.from(uncompressed);
+  let out = [];
+  let phrase = data[0];
+  let code = 256;
+  for (let i = 1; i < data.length; i++) {
+    const currChar = data[i];
+    const combo = phrase + currChar;
+    if (dict.has(combo)) {
+      phrase = combo;
+    } else {
+      out.push(phrase.length > 1 ? dict.get(phrase) : phrase.charCodeAt(0));
+      dict.set(combo, code++);
+      phrase = currChar;
+    }
+  }
+  out.push(phrase.length > 1 ? dict.get(phrase) : phrase.charCodeAt(0));
+  // turn code array into binary string
+  return out.map(c => String.fromCharCode(c)).join('');
+}
+
+function lzwDecompress(compressed) {
+  if (!compressed) return "";
+  const dict = new Map();
+  let data = Array.from(compressed).map(c => c.charCodeAt(0));
+  let currChar = String.fromCharCode(data[0]);
+  let oldPhrase = currChar;
+  let out = [currChar];
+  let code = 256;
+  let phrase;
+  for (let i = 1; i < data.length; i++) {
+    const currCode = data[i];
+    if (currCode < 256) {
+      phrase = String.fromCharCode(currCode);
+    } else if (dict.has(currCode)) {
+      phrase = dict.get(currCode);
+    } else {
+      phrase = oldPhrase + currChar;
+    }
+    out.push(phrase);
+    currChar = phrase.charAt(0);
+    dict.set(code++, oldPhrase + currChar);
+    oldPhrase = phrase;
+  }
+  return out.join('');
+}
+
+// ---------- Base64 wrappers (UTF-8 safe) ----------
+function toBase64(u8string) {
+  // u8string is a binary string; encode as UTF-8 then Base64
+  return btoa(unescape(encodeURIComponent(u8string)));
+}
+function fromBase64(b64) {
+  return decodeURIComponent(escape(atob(b64)));
+}
+
+// ---------- UI actions ----------
+function compressText() {
+  const input = document.getElementById('input').value;
+  if (!input) {
+    alert("Nothing to compress, old chap.");
+    return;
+  }
+  const bin = lzwCompress(input);
+  const b64 = toBase64(bin);
+  document.getElementById('output').value = b64;
+  updateStats();
+}
+
+function decompressText() {
+  const outEl = document.getElementById('output');
+  const data = outEl.value.trim();
+  if (!data) {
+    alert("Nothing to decompress on the right.");
+    return;
+  }
+  try {
+    const bin = fromBase64(data);
+    const txt = lzwDecompress(bin);
+    document.getElementById('input').value = txt;
+    updateStats();
+  } catch (e) {
+    alert("Decompression failed – is that valid QDS-LZW-B64, old chap?");
+    console.error(e);
+  }
+}
+
+function decompressToInput() {
+  decompressText();
+}
+
+function clearBoth() {
+  document.getElementById('input').value = "";
+  document.getElementById('output').value = "";
+  updateStats();
+}
+
+function copyOutput() {
+  const outEl = document.getElementById('output');
+  outEl.select();
+  outEl.setSelectionRange(0, 999999);
+  document.execCommand('copy');
+  alert("Output copied to clipboard 🎩");
+}
+
+// ---------- File handling ----------
+let lastCompressedB64 = "";
+
+function loadFile(ev) {
+  const file = ev.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('input').value = e.target.result;
+    updateStats();
+  };
+  reader.readAsText(file);
+}
+
+function downloadCompressed() {
+  const input = document.getElementById('input').value;
+  if (!input) {
+    alert("Nothing to compress for download.");
+    return;
+  }
+  const b64 = toBase64(lzwCompress(input));
+  lastCompressedB64 = b64;
+  const blob = new Blob([b64], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = "data.qdsz.txt";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+updateStats();
+</script>
+</body>
+</html>

@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>QDS × NASA Lab Suite</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root {
+      --bg: #050814;
+      --bg-alt: #0b1222;
+      --card: #10192c;
+      --card-soft: #111b30;
+      --accent: #28d7ff;
+      --accent-soft: rgba(40,215,255,0.25);
+      --accent-2: #ff6b9a;
+      --accent-3: #8bffb1;
+      --text: #f5f7ff;
+      --text-muted: #a3b0d6;
+      --border-subtle: rgba(255,255,255,0.06);
+      --shadow-soft: 0 22px 45px rgba(0,0,0,0.7);
+      --radius-lg: 24px;
+      --radius-pill: 999px;
+      --transition-fast: 0.18s ease-out;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        Roboto, sans-serif;
+      background: radial-gradient(circle at top, #142040 0, #050814 55%, #02040b 100%);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 16px 14px 40px;
+    }
+
+    /* Top bar */
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 14px;
+      margin-bottom: 18px;
+      border-radius: var(--radius-pill);
+      background: linear-gradient(120deg, rgba(10,26,56,0.96), rgba(7,18,42,0.96));
+      box-shadow: 0 12px 30px rgba(0,0,0,0.55);
+      border: 1px solid rgba(255,255,255,0.08);
+      position: sticky;
+      top: 8px;
+      z-index: 50;
+      backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 20%, #ffffff 0, #d5e8ff 18%, #002b7f 60%, #000325 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.2),
+                  0 0 20px rgba(88,166,255,0.7);
+      overflow: hidden;
+    }
+
+    .brand-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .brand-text-main {
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #c2d7ff;
+    }
+
+    .brand-text-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border: 1px solid rgba(255,255,255,0.16);
+      color: var(--text-muted);
+      background: rgba(2,8,23,0.8);
+    }
+
+    .pill.nasa {
+      border-color: rgba(40,215,255,0.7);
+      color: var(--accent);
+      box-shadow: 0 0 12px rgba(40,215,255,0.45);
+    }
+
+    .pill.live {
+      border-color: rgba(139,255,177,0.7);
+      color: var(--accent-3);
+    }
+
+    /* Hero */
+
+    .hero {
+      margin-bottom: 20px;
+    }
+
+    .hero-title {
+      font-size: 24px;
+      line-height: 1.15;
+      font-weight: 650;
+      margin-bottom: 6px;
+    }
+
+    .hero-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      max-width: 640px;
+    }
+
+    .hero-sub strong {
+      color: #e1eeff;
+      font-weight: 550;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.7fr) minmax(0, 1.2fr);
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .hero-card {
+      background: linear-gradient(145deg, rgba(11,20,41,0.98), rgba(5,11,28,0.98));
+      border-radius: var(--radius-lg);
+      padding: 14px 14px 12px;
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: radial-gradient(circle at 0 0, rgba(40,215,255,0.22), transparent 58%),
+                  radial-gradient(circle at 90% 110%, rgba(255,107,154,0.18), transparent 55%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .hero-card-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .hero-chip {
+      font-size: 10px;
+      padding: 4px 9px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(6,16,39,0.86);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .hero-chip.primary {
+      border-color: rgba(40,215,255,0.7);
+      color: var(--accent);
+    }
+
+    .hero-mainline {
+      font-size: 15px;
+      font-weight: 550;
+      margin-bottom: 6px;
+    }
+
+    .hero-mainline span {
+      color: var(--accent);
+    }
+
+    .hero-list {
+      list-style: none;
+      padding: 0;
+      margin: 8px 0 0;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .hero-list li {
+      margin-bottom: 4px;
+    }
+
+    .hero-list strong {
+      color: #dde8ff;
+      font-weight: 550;
+    }
+
+    .hero-mini-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 10px;
+      font-size: 11px;
+    }
+
+    .mini-stat {
+      background: linear-gradient(135deg, rgba(12,24,52,0.98), rgba(6,11,25,0.98));
+      border-radius: 18px;
+      padding: 8px 10px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .mini-label {
+      color: var(--text-muted);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .mini-value {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .mini-value span {
+      font-size: 10px;
+      opacity: 0.8;
+    }
+
+    .mini-tag {
+      margin-top: 4px;
+      font-size: 10px;
+      color: #88ffc1;
+    }
+
+    /* Section headings */
+
+    .section {
+      margin-top: 24px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .section-title span {
+      color: var(--accent);
+    }
+
+    .section-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      max-width: 340px;
+    }
+
+    /* Lab grid */
+
+    .lab-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 12px;
+    }
+
+    .lab-card {
+      position: relative;
+      border-radius: var(--radius-lg);
+      padding: 12px 12px 11px;
+      background: radial-gradient(circle at top left, rgba(40,215,255,0.10), transparent 55%),
+                  radial-gradient(circle at bottom right, rgba(255,107,154,0.08), transparent 55%),
+                  var(--card-soft);
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 14px 30px rgba(0,0,0,0.65);
+      overflow: hidden;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+    }
+
+    .lab-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.8);
+      border-color: rgba(40,215,255,0.65);
+      background: radial-gradient(circle at top left, rgba(40,215,255,0.18), transparent 60%),
+                  radial-gradient(circle at bottom right, rgba(255,107,154,0.14), transparent 58%),
+                  #0c1427;
+    }
+
+    .lab-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .lab-tag {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #bcd6ff;
+    }
+
+    .lab-chip {
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: var(--text-muted);
+      background: rgba(5,12,31,0.9);
+      white-space: nowrap;
+    }
+
+    .lab-chip.ok {
+      border-color: rgba(139,255,177,0.7);
+      color: var(--accent-3);
+    }
+
+    .lab-chip.wip {
+      border-color: rgba(255,193,107,0.7);
+      color: #ffd48a;
+    }
+
+    .lab-name {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .lab-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .lab-meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .lab-meta-pill {
+      padding: 3px 7px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(7,15,34,0.92);
+    }
+
+    .lab-open-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 11px;
+      border-radius: var(--radius-pill);
+      border: none;
+      outline: none;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: radial-gradient(circle at top left, #3cf0ff, #1b9aff);
+      color: #020712;
+      cursor: pointer;
+      box-shadow: 0 10px 24px rgba(36,180,255,0.65);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), filter var(--transition-fast);
+    }
+
+    .lab-open-btn span.icon {
+      font-size: 12px;
+    }
+
+    .lab-open-btn.alt {
+      background: linear-gradient(135deg, #ffc26b, #ff6b9a);
+      box-shadow: 0 10px 24px rgba(255,142,142,0.6);
+      color: #19050d;
+    }
+
+    .lab-open-btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+      box-shadow: 0 12px 26px rgba(36,180,255,0.85);
+    }
+
+    .lab-open-btn.alt:hover {
+      box-shadow: 0 12px 26px rgba(255,142,142,0.85);
+    }
+
+    .footer-note {
+      margin-top: 24px;
+      font-size: 10px;
+      color: var(--text-muted);
+      line-height: 1.4;
+      border-top: 1px solid rgba(255,255,255,0.04);
+      padding-top: 12px;
+    }
+
+    .footer-note strong {
+      color: #d4e4ff;
+    }
+
+    @media (max-width: 720px) {
+      .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .hero-grid {
+        grid-template-columns: minmax(0,1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- TOP BAR -->
+    <header class="top-bar">
+      <div class="brand">
+        <div class="brand-logo">
+          <!-- Optional local image -->
+          <!-- <img src="nasa_meatball.png" alt="NASA logo"> -->
+        </div>
+        <div>
+          <div class="brand-text-main">QDS × NASA LAB SUITE</div>
+          <div class="brand-text-sub">Personal sandbox · RW batteries · cosmology · microphysics</div>
+        </div>
+      </div>
+      <div class="pill-row">
+        <div class="pill nasa">NASA-style UI · personal use</div>
+        <div class="pill live">Local HTML · offline capable</div>
+      </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-title">Mission Deck · QDS tools styled like a NASA control room</div>
+      <div class="hero-sub">
+        One launchpad for all your **NASA-linked QDS labs**: random-walk batteries, binary pulsars,
+        rotation curves, news vaults and more. Every button below just opens an existing local
+        HTML lab – no servers, no internet needed.
+      </div>
+
+      <div class="hero-grid">
+        <div class="hero-card">
+          <div class="hero-card-content">
+            <div class="hero-chip-row">
+              <div class="hero-chip primary">RW1 · RW2 · RW7 · RW8</div>
+              <div class="hero-chip">Random-walk discharge campaign</div>
+            </div>
+            <div class="hero-mainline">
+              Calibrate your <span>real packs</span> against NASA’s abuse tests.
+            </div>
+            <ul class="hero-list">
+              <li><strong>Reference cycles</strong> → capacity vs cycle curve (50-cycle beacons).</li>
+              <li><strong>Random-walk profile</strong> → 0.5–4 A, 3.2–4.2 V, variable recharge windows.</li>
+              <li><strong>This hub</strong> → one-click into your RW habitat and RW3 report pages.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="hero-mini-grid">
+          <div class="mini-stat">
+            <div class="mini-label">Local labs linked</div>
+            <div class="mini-value">12 <span>HTML tools</span></div>
+            <div class="mini-tag">Battery · pulsar · galaxy · news</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-label">Mode</div>
+            <div class="mini-value">Offline <span>phone-first</span></div>
+            <div class="mini-tag">Tap to launch · Chrome or local server</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BATTERY / RW BLOCK -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-title">Random-walk batteries <span>· NASA RW suite</span></div>
+        <div class="section-sub">
+          RW cells at 0.5–4 A between 4.2→3.2 V. Use these two pages for life-estimate and
+          detailed RW3 notes.
+        </div>
+      </div>
+
+      <div class="lab-grid">
+        <article class="lab-card">
+          <div class="lab-header-row">
+            <div class="lab-tag">RW habitat</div>
+            <div class="lab-chip ok">ready</div>
+          </div>
+          <div class="lab-name">Random-Walk Discharge Lab · v1.3</div>
+          <div class="lab-desc">
+            Single-cell life estimator calibrated to NASA RW1/RW2/RW7/RW8. Adjust cycles/day,
+            duty severity and capacity points to sketch end-of-life.
+          </div>
+          <div class="lab-meta-row">
+            <div class="lab-meta-pill">file: qds_battery_habitat_rw_v1_3.html</div>
+            <div class="lab-meta-pill">inputs: Ah, RW/day, NASA points</div>
+          </div>
+          <button
+            class="lab-open-btn"
+            onclick="location.href='qds_battery_habitat_rw_v1_3.html'">
+            <span class="icon">▶</span> Open RW habitat
+          </button>
+        </article>
+
+        <article class="lab-card">
+          <div class="lab-header-row">
+            <div class="lab-tag">RW3 notes</div>
+            <div class="lab-chip">report</div>
+          </div>
+          <div class="lab-name">NASA RW3 · experiment report</div>
+          <div class="lab-desc">
+            Your cleaned-up notes and visuals for the NASA RW data: procedure, reference cycles,
+            degradation plots and commentary.
+          </div>
+          <div class="lab-meta-row">
+            <div class="lab-meta-pill">file: nasa_rw3/NASA_RW3_report.html</div>
+            <div class="lab-meta-pill">content: README + QDS overlay</div>
+          </div>
+          <button
+            class="lab-open-btn alt"
+            onclick="location.href='nasa_rw3/NASA_RW3_report.html'">
+            <span class="icon">📄</span> Open RW3 report
+          </button>
+        </article>
+      </div>
+    </section>
+
+    <!-- COSMOLOGY / GALAXY BLOCK -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-title">Cosmology & galaxies <span>· variance & rotation</span></div>
+        <div class="section-sub">
+          Tools for H₀ variance, rotation curves and mega-suites where cosmic variance lives with
+          the rest of the lab stack.
+        </div>
+      </div>
+
+      <div class="lab-grid">
+        <article class="lab-card">
+          <div class="lab-header-row">
+            <div class="lab-tag">Multi-lab engine</div>
+            <div class="lab-chip ok">cosmic variance inside</div>
+          </div>
+          <div class="lab-name">QDS Test Platform · v3</div>
+          <div class="lab-desc">
+            Master panel with variance law toys, sliders and quick links into specialist labs.
+            Use as your “cosmology cockpit”.
+          </div>
+          <div class="lab-meta-row">
+            <div class="lab-meta-pill">file: qds_test_platformV3.html</div>
+            <div class="lab-meta-pill">mode: multi-panel</div>
+          </div>
+          <button
+            class="lab-open-btn"
+            onclick="location.href='qds_test_platformV3.html'">
+            <span class="icon">🛰️</span> Open cosmology deck
+          </button>
+        </article>
+
+        <article class="lab-card">
+          <div class="lab-header-row">
+            <div class="lab-tag">Galaxy dynamics</div>
+            <div class="lab-chip ok">ready</div>
+          </div>
+          <div class="lab-name">Rotmod Extreme Lab</div>
+          <div class="lab-desc">
+            Rotation-curve sandbox: baryonic vs QDS boosts, microphysics kernel knobs and
+            extreme parameter sweeps.
+          </div>
+          <div class="lab-meta-row">
+            <div class="lab-meta-pill">file: qds_rotmod_extreme_lab.html</div>
+            <div class="lab-meta-pill">inputs: v₀, λ, χ² data</div>
+          </div>
+          <button
+            class="lab-open-btn"
+            onclick="location.href='qds_rotmod_extreme_lab.html'">
+            <span class="icon">🌌</span> Open rotation lab
+          </button>
+        </article>
+
+        <article class="lab-card">
+          <div class="lab-header-row">
+            <div class="lab-tag">Mega-suite</div>
+            <div class="lab-chip wip">dev / demo</div>
+          </div>
+          <div class="lab-name">QDS MegaSuite · one-button MAX</div>
+          <div class="lab-desc">
+            High-level “press once to tour”: launches multiple QDS panels (variance, rotation,
+            binary, battery) from a single screen.
+          </div>
+          <div class="lab-meta-row">
+            <div class="lab-meta-pill">file: qds_megasuite_onebutton_MAX.html</div>
+          </div>
+          <button
+            class="lab-open-btn"
+            onclick="location.href='qds_megasuite_onebutton_MAX.html'">
+            <span class="icon">🚀</span> Open MegaSuite
+          </button>
+        </article>
+      </div>
+    </section>
+
+    <!-- MICROPHYSICS / PULSARS -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-title">Microphysics & compact objects <span>· binaries & RC</span></div>
+        <div class="section-sub">
+          Binary pulsars, RC networks and other microphysical playgrounds. Good for showing
+          QDS at the “microscopic” end of the stack.
+        </div>
+      </div>
+
+      <div class="lab-grid">
+        <article class="lab-card">
+          <div class="lab-header-row">
+            <div class="lab-tag">Binary pulsar</div>
+            <div class="lab-chip ok">v2 MAX</div>
+          </div>
+          <div class="lab-name">Binary Pulsar Lab</div>
+          <div class="lab-desc">
+            Timing curves, orbital parameters and QDS-style noise overlay in a compact “binary
+            sandbox” page.
+          </div>
+          <div class="lab-meta-row">
+            <div class="lab-meta-pill">file: qds_binary_pulsar_lab_v2_max.html</div>
+          </div>
+          <button
+            class="lab-open-btn"
+            onclick="location.href='qds_binary_pulsar_lab_v2_max.html'">
+            <span class="icon">🌀</span> Open pulsar lab
+          </button>
+        </article>
+
+        <article class="lab-card">
+          <div class="lab-header-row">
+            <div class="lab-tag">RC micro-lab</div>
+            <div class="lab-chip ok">ultra</div>
+          </div>
+          <div class="lab-name">RC Lab · ultra</div>
+          <div class="lab-desc">
+            RC / microphysics playground for damping, noise shaping and time-constant games –
+            useful analogy engine for QDS kernels.
+          </div>
+          <div class="lab-meta-row">
+            <div class="lab-meta-pill">file: qds_rc_lab_ultra.html</div>
+          </div>
+          <button
+            class="lab-open-btn"
+            onclick="location.href='qds_rc_lab_ultra.html'">
+            <span class="icon">📡</span> Open RC lab
+          </button>
+        </article>
+
+        <article class="lab-card">
+          <div class="lab-header-row">
+            <div class="lab-tag">Pulsar suite</div>
+            <div class="lab-chip wip">launcher</div>
+          </div>
+          <div class="lab-name">Pulsar Suite · one-button MAX</div>
+          <div class="lab-desc">
+            Quick-launch hub for all pulsar-related experiments. One button; many tabs.
+          </div>
+          <div class="lab-meta-row">
+            <div class="lab-meta-pill">file: qds_pulsar_suite_onebutton_MAX.html</div>
+          </div>
+          <button
+            class="lab-open-btn"
+            onclick="location.href='qds_pulsar_suite_onebutton_MAX.html'">
+            <span class="icon">⭐</span> Open pulsar suite
+          </button>
+        </article>
+      </div>
+    </section>
+
+    <!-- NEWS / DATA VAULTS -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-title">News & evidence <span>· Phys.org triage</span></div>
+        <div class="section-sub">
+          Dashboards that scan, triage and archive Phys.org / space-physics stories against
+          QDS expectations.
+        </div>
+      </div>
+
+      <div class="lab-grid">
+        <article class="lab-card">
+          <div class="lab-header-row">
+            <div class="lab-tag">Daily feed</div>
+            <div class="lab-chip ok">viewer</div>
+          </div>
+          <div class="lab-name">Phys.org News Dashboard</div>
+          <div class="lab-desc">
+            High-level view of your ripped Phys.org feed: filters, quick-read tiles and links
+            into detailed articles.
+          </div>
+          <div class="lab-meta-row">
+            <div class="lab-meta-pill">file: physorg_news_dashboard.html</div>
+          </div>
+          <button
+            class="lab-open-btn"
+            onclick="location.href='physorg_news_dashboard.html'">
+            <span class="icon">📰</span> Open news dashboard
+          </button>
+        </article>
+
+        <article class="lab-card">
+          <div class="lab-header-row">
+            <div class="lab-tag">Triage lab</div>
+            <div class="lab-chip ok">QDS linkage</div>
+          </div>
+          <div class="lab-name">Phys.org QDS Triage</div>
+          <div class="lab-desc">
+            Mark stories as “supports / neutral / conflicts”, tag them by domain and export
+            triage snapshots.
+          </div>
+          <div class="lab-meta-row">
+            <div class="lab-meta-pill">file: physorg_qds_triage.html</div>
+          </div>
+          <button
+            class="lab-open-btn"
+            onclick="location.href='physorg_qds_triage.html'">
+            <span class="icon">📊</span> Open triage lab
+          </button>
+        </article>
+
+        <article class="lab-card">
+          <div class="lab-header-row">
+            <div class="lab-tag">Vault</div>
+            <div class="lab-chip wip">supervault v4</div>
+          </div>
+          <div class="lab-name">Phys.org SuperVault</div>
+          <div class="lab-desc">
+            Long-term archive of pre-triaged stories, coherence scores and links back to the
+            rest of the QDS evidence base.
+          </div>
+          <div class="lab-meta-row">
+            <div class="lab-meta-pill">file: physorg_supervault_v4.html</div>
+          </div>
+          <button
+            class="lab-open-btn"
+            onclick="location.href='physorg_supervault_v4.html'">
+            <span class="icon">🧬</span> Open SuperVault
+          </button>
+        </article>
+      </div>
+    </section>
+
+    <!-- OTHER TOYS -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-title">Other toys <span>· avian & alphabet</span></div>
+        <div class="section-sub">
+          Not strictly NASA, but fun to have on the same “mission deck”.
+        </div>
+      </div>
+
+      <div class="lab-grid">
+        <article class="lab-card">
+          <div class="lab-header-row">
+            <div class="lab-tag">Migration</div>
+            <div class="lab-chip ok">avian lab</div>
+          </div>
+          <div class="lab-name">Bird Migration Lab</div>
+          <div class="lab-desc">
+            The RW-style migration sandbox – timelines, routes and coherence bands for our
+            feathered friends.
+          </div>
+          <div class="lab-meta-row">
+            <div class="lab-meta-pill">file: bird_migration_lab.html</div>
+          </div>
+          <button
+            class="lab-open-btn"
+            onclick="location.href='bird_migration_lab.html'">
+            <span class="icon">🕊️</span> Open migration lab
+          </button>
+        </article>
+
+        <article class="lab-card">
+          <div class="lab-header-row">
+            <div class="lab-tag">Alphabet</div>
+            <div class="lab-chip wip">learning tools</div>
+          </div>
+          <div class="lab-name">Learning Alphabet Lab · vmax</div>
+          <div class="lab-desc">
+            Neon alphabet playground tying language-kernel thinking to simple interactive
+            tiles – one for the kids (and the inner kid).
+          </div>
+          <div class="lab-meta-row">
+            <div class="lab-meta-pill">file: qds_learning_alphabet_lab_vmax.html</div>
+          </div>
+          <button
+            class="lab-open-btn"
+            onclick="location.href='qds_learning_alphabet_lab_vmax.html'">
+            <span class="icon">🔤</span> Open alphabet lab
+          </button>
+        </article>
+      </div>
+    </section>
+
+    <div class="footer-note">
+      <strong>Note:</strong> This page is a personal, NASA-style control deck that only opens local
+      HTML files on your device. Logos, names and vibes are for private sandbox use – this is not an
+      official NASA product or interface.
+    </div>
+  </div>
+</body>
+</html>

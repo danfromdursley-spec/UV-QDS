@@ -1,0 +1,1148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>QDS Battery Hub v9.7 — Lab-Shaped Neon</title>
+<style>
+:root{
+  --bg:#07020f;
+  --panel:#0d041e;
+  --panel2:#120626;
+  --accent:#9b5cff;
+  --accent2:#00ff88;
+  --text:#f5edff;
+  --muted:#cbb8ff;
+  --warn:#ff4bd8;
+  --ok:#7dffcc;
+  --glow: 0 0 10px rgba(155,92,255,.35), 0 0 16px rgba(0,255,136,.18);
+  --radius:14px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(900px 500px at 0% 0%, rgba(155,92,255,.18), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(0,255,136,.14), transparent 60%),
+    linear-gradient(180deg, #05010c, var(--bg));
+}
+header{
+  padding:16px 14px 6px;
+}
+h1{
+  margin:0 0 4px 0;
+  font-size:1.15rem;
+}
+.sub{
+  color:var(--muted);
+  font-size:.9rem;
+}
+.tabs{
+  display:flex; gap:8px; padding:8px 12px 0;
+  position:sticky; top:0; background:linear-gradient(180deg, rgba(7,2,15,.95), rgba(7,2,15,.6));
+  backdrop-filter: blur(6px);
+  z-index:5;
+}
+.tab{
+  flex:1;
+  text-align:center;
+  padding:10px 8px;
+  border-radius:10px;
+  border:1px solid rgba(155,92,255,.25);
+  color:var(--text);
+  background: linear-gradient(135deg, rgba(155,92,255,.14), rgba(0,255,136,.08));
+  font-weight:700;
+  font-size:.88rem;
+}
+.tab.active{
+  border-color: rgba(0,255,136,.45);
+  box-shadow: var(--glow);
+}
+.wrap{ padding: 10px 12px 22px; display:grid; gap:12px; }
+.panel{
+  background:
+    linear-gradient(135deg, rgba(155,92,255,.08), rgba(0,255,136,.06)),
+    linear-gradient(180deg, var(--panel), var(--panel2));
+  border:1px solid rgba(155,92,255,.22);
+  border-radius:var(--radius);
+  padding:12px;
+  box-shadow: var(--glow);
+}
+h2{
+  margin:0 0 8px 0;
+  font-size:1rem;
+}
+label{
+  display:block;
+  font-size:.83rem;
+  color:var(--muted);
+  margin:10px 0 5px;
+}
+input[type="range"]{ width:100%; }
+input[type="number"], select, textarea{
+  width:100%;
+  background: rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  color:var(--text);
+  padding:8px 10px;
+  border-radius:10px;
+  font-size:.95rem;
+}
+textarea{ min-height:70px; resize:vertical; }
+.row{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:10px;
+}
+@media (min-width:720px){
+  .row{ grid-template-columns: 1fr 1fr 1fr; }
+}
+.inline{
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+}
+.pill{
+  padding:2px 8px;
+  border-radius:999px;
+  border:1px solid rgba(0,255,136,.35);
+  color:var(--accent2);
+  font-size:.7rem;
+}
+.btn{
+  background: linear-gradient(135deg, rgba(155,92,255,.28), rgba(0,255,136,.16));
+  border:1px solid rgba(0,255,136,.35);
+  color:var(--text);
+  padding:10px 12px;
+  border-radius:12px;
+  font-weight:800;
+  font-size:.95rem;
+}
+.btn.secondary{
+  border-color: rgba(155,92,255,.35);
+}
+.btn:active{ transform: translateY(1px) scale(.99); }
+.small{
+  font-size:.78rem; color:var(--muted);
+}
+.hr{
+  height:1px; background: linear-gradient(90deg, transparent, rgba(155,92,255,.35), rgba(0,255,136,.35), transparent);
+  margin:10px 0;
+}
+.kv{
+  display:grid; grid-template-columns: 1fr 1fr; gap:8px;
+}
+.kv .box{
+  padding:10px;
+  background: rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:10px;
+}
+.kv .label{ color:var(--muted); font-size:.75rem; }
+.kv .value{ font-size:1.2rem; font-weight:800; margin-top:2px; }
+.ok{ color: var(--ok); }
+.warn{ color: var(--warn); }
+canvas{
+  width:100%;
+  height:220px;
+  background: rgba(0,0,0,.18);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:12px;
+}
+.history-item{
+  padding:10px;
+  background: rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:10px;
+  margin-bottom:8px;
+}
+.history-item b{ color:var(--accent2); }
+.badge{
+  display:inline-block;
+  padding:2px 7px;
+  border-radius:999px;
+  border:1px solid rgba(155,92,255,.35);
+  color:var(--accent);
+  font-size:.68rem;
+}
+.toggle{
+  display:flex; align-items:center; gap:8px;
+  padding:8px 10px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.03);
+}
+.toggle input{ transform: scale(1.15); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>QDS Battery Hub v9.7 — Lab-Shaped Neon <span class="pill">Shed Edition ⚙️🔋</span></h1>
+  <div class="sub">Offline • Phone-safe • White vs QDS AR(1) stress • Capacity + Resistance EoL</div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" data-tab="lab">Overview & Lab</div>
+  <div class="tab" data-tab="coach">Battery Coach</div>
+  <div class="tab" data-tab="viewer">AutoBench Viewer</div>
+</div>
+
+<!-- ======================= LAB TAB ======================= -->
+<section id="tab-lab">
+  <div class="wrap">
+
+    <div class="panel">
+      <h2>Controls</h2>
+
+      <div class="row">
+        <div>
+          <label>Base cycle fade scale (k₁)</label>
+          <input id="k1" type="number" step="0.0001" value="0.0018">
+          <div class="small">Higher = faster cycle-driven loss (toy).</div>
+        </div>
+        <div>
+          <label>Secondary linear wear (k₂)</label>
+          <input id="k2" type="number" step="0.0001" value="0.0004">
+          <div class="small">Steady grind term.</div>
+        </div>
+        <div>
+          <label>Noise amplitude (operating stress %)</label>
+          <input id="amp" type="number" step="0.1" value="2.4">
+          <div class="small">Per-cycle stress multiplier spread.</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Correlation ρ (0–0.99)</label>
+          <input id="rho" type="number" step="0.01" min="0" max="0.99" value="0.60">
+          <div class="small">QDS-style persistence in operating stress (AR(1)).</div>
+        </div>
+        <div>
+          <label>Temperature (°C)</label>
+          <input id="temp" type="number" step="1" value="25">
+          <div class="small">Toy Arrhenius-like multiplier.</div>
+        </div>
+        <div>
+          <label>Failure threshold (Capacity %)</label>
+          <input id="thrC" type="number" step="1" value="80">
+          <div class="small">Consumer EoL often ~80%.</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>DoD window</label>
+          <select id="dod">
+            <option value="20-80">20–80 (phone-friendly)</option>
+            <option value="10-90">10–90</option>
+            <option value="40-80">40–80 (gentle)</option>
+            <option value="60-100">60–100 (stressful)</option>
+            <option value="0-100">0–100 (full depth)</option>
+          </select>
+          <div class="small">Maps to a simple stress factor.</div>
+        </div>
+        <div>
+          <label>Cell count (Monte Carlo)</label>
+          <input id="n" type="number" step="50" value="1200">
+        </div>
+        <div>
+          <label>Max cycles simulated</label>
+          <input id="maxCycles" type="number" step="100" value="2500">
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="row">
+        <div class="toggle">
+          <input id="seedLock" type="checkbox" checked>
+          <label for="seedLock" style="margin:0">Seed lock (cleaner A/B)</label>
+        </div>
+        <div class="toggle">
+          <input id="poster" type="checkbox" checked>
+          <label for="poster" style="margin:0">Poster Mode (tames extremes)</label>
+        </div>
+        <div class="toggle">
+          <input id="noregen" type="checkbox" checked>
+          <label for="noregen" style="margin:0">NoRegen (prevents “healing”)</label>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:8px">
+        <div class="toggle">
+          <input id="useCalendar" type="checkbox" checked>
+          <label for="useCalendar" style="margin:0">Include Calendar Ageing</label>
+        </div>
+        <div class="toggle">
+          <input id="useResistance" type="checkbox" checked>
+          <label for="useResistance" style="margin:0">Include Resistance EoL</label>
+        </div>
+        <div>
+          <label>Resistance EoL threshold (×R₀)</label>
+          <input id="thrR" type="number" step="0.05" value="1.35">
+          <div class="small">Toy: trip EoL if resistance crosses this multiple.</div>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="inline">
+        <button class="btn" id="runBtn">Run simulation</button>
+        <button class="btn secondary" id="resetBtn">Reset defaults</button>
+        <button class="btn secondary" id="sweepBtn">QuickSweep ×10</button>
+        <span class="small" id="status"></span>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="inline">
+        <button class="btn secondary" id="presetReal">Preset: Realistic phone</button>
+        <button class="btn secondary" id="presetQds">Preset: QDS contrast</button>
+        <button class="btn secondary" id="presetChaos">Preset: Chaos</button>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="inline">
+        <button class="btn secondary" id="copySummary">Copy summary</button>
+        <button class="btn secondary" id="exportLast">Export last JSON</button>
+        <button class="btn secondary" id="exportAll">Export full history</button>
+        <button class="btn secondary" id="clearHist">Clear history</button>
+      </div>
+
+      <p class="small" style="margin-top:10px">
+        Model: capacity starts at 100%. Per-cycle loss uses
+        <b>ΔC(t) ≈ [k₁·√t + k₂·t] · S · F(T) · F(DoD)</b>.
+        White: S i.i.d. | QDS: S AR(1) with ρ.
+        Calendar ageing adds a small time-driven term per cycle.
+        Resistance is a parallel toy channel for “power fade”.
+      </p>
+    </div>
+
+    <div class="panel">
+      <h2>Results</h2>
+      <div class="kv">
+        <div class="box">
+          <div class="label">White mean cycles to EoL</div>
+          <div class="value" id="wMean">—</div>
+          <div class="small" id="wP">P10/P50/P90 —</div>
+        </div>
+        <div class="box">
+          <div class="label">QDS mean cycles to EoL</div>
+          <div class="value" id="qMean">—</div>
+          <div class="small" id="qP">P10/P50/P90 —</div>
+        </div>
+        <div class="box">
+          <div class="label">White σ</div>
+          <div class="value" id="wSd">—</div>
+          <div class="small">Independent operating stress</div>
+        </div>
+        <div class="box">
+          <div class="label">QDS σ</div>
+          <div class="value" id="qSd">—</div>
+          <div class="small">AR(1) correlated stress</div>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="box" style="padding:10px; border-radius:10px; border:1px solid rgba(255,255,255,.06); background:rgba(255,255,255,.03)">
+        <div class="label">Relative change (QDS vs White)</div>
+        <div class="value" id="delta">—</div>
+        <div class="small" id="metaLine">—</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Cycles-to-EoL distribution (binned for mobile)</h2>
+      <canvas id="hist"></canvas>
+      <p class="small">Expect subtle mean shifts; stronger tail/spread effects at higher ρ + amp.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Sample traces (1 white + 1 QDS)</h2>
+      <canvas id="trace"></canvas>
+      <p class="small">Shows capacity (and faint resistance effect if enabled).</p>
+    </div>
+
+    <div class="panel">
+      <h2>Recent run history (local)</h2>
+      <div id="history"></div>
+      <div class="small">Stored on-device via localStorage. Dedupe active.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ======================= COACH TAB ======================= -->
+<section id="tab-coach" style="display:none">
+  <div class="wrap">
+    <div class="panel">
+      <h2>Battery Coach (v9.7 integrated)</h2>
+      <p class="small">
+        This is a friendly interpretation of your current settings.
+        It’s still a toy; use it for habits and intuition.
+      </p>
+      <div id="coachOut" class="panel" style="margin:0"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= VIEWER TAB ======================= -->
+<section id="tab-viewer" style="display:none">
+  <div class="wrap">
+    <div class="panel">
+      <h2>AutoBench Viewer (lightweight)</h2>
+      <p class="small">
+        This viewer reads your on-device Hub history.
+        If you want the full Python AutoBench view, keep using your existing script.
+      </p>
+      <div id="viewerOut"></div>
+    </div>
+  </div>
+</section>
+
+<script>
+/* ============================================================
+   QDS Battery Hub v9.7 — phone-safe semi-empirical simulator
+   No deps. Canvas charts. localStorage history + dedupe.
+   ============================================================ */
+
+const LS_KEY = "QDS_BATTERY_HUB_HISTORY_V9_7";
+const MAX_SHOW = 8;
+
+const $ = id => document.getElementById(id);
+
+const defaults = {
+  k1: 0.0018, k2: 0.0004, amp: 2.4, rho: 0.60,
+  temp: 25, thrC: 80, dod: "20-80",
+  n: 1200, maxCycles: 2500,
+  seedLock: true, poster: true, noregen: true,
+  useCalendar: true, useResistance: true, thrR: 1.35
+};
+
+function clamp(x,a,b){ return Math.max(a, Math.min(b, x)); }
+function mean(arr){ return arr.reduce((s,v)=>s+v,0)/arr.length; }
+function sd(arr){
+  const m = mean(arr);
+  const v = mean(arr.map(x=>(x-m)*(x-m)));
+  return Math.sqrt(v);
+}
+function quantile(arr, q){
+  const a=[...arr].sort((x,y)=>x-y);
+  const idx = (a.length-1)*q;
+  const lo = Math.floor(idx), hi = Math.ceil(idx);
+  if(lo===hi) return a[lo];
+  const t = idx-lo;
+  return a[lo]*(1-t)+a[hi]*t;
+}
+
+function tempFactor(T){
+  // Toy Arrhenius-ish multiplier kept gentle for mobile stability.
+  // Roughly ~ +2% per °C above 25, -1.5% per °C below 25, capped.
+  const d = T - 25;
+  let f = 1 + (d>=0 ? 0.02*d : 0.015*d);
+  return clamp(f, 0.55, 2.8);
+}
+
+function dodFactor(dod){
+  // Simple stress mapping: deeper windows = harsher.
+  const map = {
+    "40-80": 0.85,
+    "20-80": 1.00,
+    "10-90": 1.12,
+    "60-100": 1.28,
+    "0-100": 1.40
+  };
+  return map[dod] ?? 1.0;
+}
+
+function makeRNG(seed){
+  // tiny LCG for reproducibility
+  let s = seed>>>0;
+  return function(){
+    s = (1664525*s + 1013904223) >>> 0;
+    return (s / 4294967296);
+  };
+}
+function randn(rng){
+  // Box-Muller
+  let u=0,v=0;
+  while(u===0) u=rng();
+  while(v===0) v=rng();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+}
+
+function ar1Series(len, rho, amp, rng, poster){
+  // returns multiplicative stress factor S_t around 1.0
+  let x = 0;
+  const out = new Array(len);
+  const sigma = amp/100; // convert % to fraction
+  for(let t=0;t<len;t++){
+    const eps = randn(rng) * sigma;
+    x = rho*x + eps;
+    let s = 1 + x;
+    if(poster){
+      s = clamp(s, 1-2.5*sigma, 1+2.5*sigma);
+    }
+    out[t]=s;
+  }
+  return out;
+}
+
+function iidSeries(len, amp, rng, poster){
+  const sigma = amp/100;
+  const out = new Array(len);
+  for(let t=0;t<len;t++){
+    let s = 1 + randn(rng)*sigma;
+    if(poster){
+      s = clamp(s, 1-2.5*sigma, 1+2.5*sigma);
+    }
+    out[t]=s;
+  }
+  return out;
+}
+
+function simulateOneCell(params, rng, correlated){
+  const {
+    k1,k2,amp,rho,temp,thrC,dod,maxCycles,
+    poster,noregen,useCalendar,useResistance,thrR
+  } = params;
+
+  // small per-cell variability (manufacturing spread)
+  const k1i = k1 * (0.92 + 0.16*rng());
+  const k2i = k2 * (0.92 + 0.16*rng());
+
+  const FT = tempFactor(temp);
+  const FD = dodFactor(dod);
+
+  // stress series
+  const S = correlated
+    ? ar1Series(maxCycles, rho, amp, rng, poster)
+    : iidSeries(maxCycles, amp, rng, poster);
+
+  let cap = 100.0;
+  let R = 1.0; // resistance multiple of R0
+
+  // calendar ageing per cycle: tiny baseline that scales with temp
+  const calBase = useCalendar ? (0.00006 * FT) : 0;
+
+  // resistance growth baseline factor
+  const rBase = useResistance ? (0.00005 * FT * FD) : 0;
+
+  for(let t=1; t<=maxCycles; t++){
+    const cycLoss = (k1i*Math.sqrt(t) + k2i*t) * FT * FD * S[t-1] * 100; 
+    // scale into % points
+    let dC = cycLoss * 0.00001; 
+    // The 1e-5 factor keeps values in a sane phone-toy regime.
+
+    // calendar term (time-driven)
+    dC += calBase * 100;
+
+    if(noregen) dC = Math.max(0, dC);
+
+    cap -= dC;
+
+    // resistance drift (toy)
+    if(useResistance){
+      // correlated stress also nudges resistance a bit
+      let dR = rBase * (0.6 + 0.8*S[t-1]);
+      if(poster) dR = clamp(dR, 0, rBase*2.2);
+      R += dR;
+    }
+
+    const capFail = cap <= thrC;
+    const rFail = useResistance ? (R >= thrR) : false;
+
+    if(capFail || rFail){
+      return {cycles:t, capEnd:cap, REnd:R};
+    }
+  }
+  return {cycles:maxCycles, capEnd:cap, REnd:R};
+}
+
+function runModel(params, correlated, seed){
+  const rng = makeRNG(seed);
+  const cycles = new Array(params.n);
+  const sampleTrace = [];
+  const sampleTraceR = [];
+  // pick first cell as sample
+  for(let i=0;i<params.n;i++){
+    const res = simulateOneCell(params, rng, correlated);
+    cycles[i]=res.cycles;
+    if(i===0){
+      // re-run a trace with same RNG seed style but higher resolution
+      // We'll do a simplified quick trace using a fresh rng derived from seed+i+offset
+      const trng = makeRNG(seed + (correlated?777:333));
+      const trace = buildTrace(params, trng, correlated);
+      sampleTrace.push(...trace.cap);
+      sampleTraceR.push(...trace.R);
+    }
+  }
+  return {cycles, sample:{cap:sampleTrace, R:sampleTraceR}};
+}
+
+function buildTrace(params, rng, correlated){
+  const {
+    k1,k2,amp,rho,temp,thrC,dod,maxCycles,
+    poster,noregen,useCalendar,useResistance,thrR
+  } = params;
+
+  const k1i = k1;
+  const k2i = k2;
+
+  const FT = tempFactor(temp);
+  const FD = dodFactor(dod);
+
+  const S = correlated
+    ? ar1Series(maxCycles, rho, amp, rng, poster)
+    : iidSeries(maxCycles, amp, rng, poster);
+
+  let cap=100, R=1.0;
+  const calBase = useCalendar ? (0.00006 * FT) : 0;
+  const rBase = useResistance ? (0.00005 * FT * FD) : 0;
+
+  const capArr = new Array(maxCycles);
+  const rArr = new Array(maxCycles);
+
+  for(let t=1; t<=maxCycles; t++){
+    const cycLoss = (k1i*Math.sqrt(t) + k2i*t) * FT * FD * S[t-1] * 100;
+    let dC = cycLoss * 0.00001;
+    dC += calBase * 100;
+    if(noregen) dC = Math.max(0, dC);
+    cap -= dC;
+
+    if(useResistance){
+      let dR = rBase * (0.6 + 0.8*S[t-1]);
+      if(poster) dR = clamp(dR, 0, rBase*2.2);
+      R += dR;
+    }
+
+    capArr[t-1]=cap;
+    rArr[t-1]=R;
+
+    if(cap <= thrC || (useResistance && R>=thrR)){
+      // keep filling flat tail for nicer chart
+      for(let k=t;k<=maxCycles;k++){
+        capArr[k-1]=capArr[t-1];
+        rArr[k-1]=rArr[t-1];
+      }
+      break;
+    }
+  }
+  return {cap:capArr, R:rArr};
+}
+
+function getParams(){
+  return {
+    k1: parseFloat($("k1").value),
+    k2: parseFloat($("k2").value),
+    amp: parseFloat($("amp").value),
+    rho: clamp(parseFloat($("rho").value), 0, 0.99),
+    temp: parseFloat($("temp").value),
+    thrC: parseFloat($("thrC").value),
+    dod: $("dod").value,
+    n: Math.max(50, parseInt($("n").value,10)||defaults.n),
+    maxCycles: Math.max(50, parseInt($("maxCycles").value,10)||defaults.maxCycles),
+    seedLock: $("seedLock").checked,
+    poster: $("poster").checked,
+    noregen: $("noregen").checked,
+    useCalendar: $("useCalendar").checked,
+    useResistance: $("useResistance").checked,
+    thrR: parseFloat($("thrR").value)
+  };
+}
+
+function setParams(p){
+  $("k1").value = p.k1;
+  $("k2").value = p.k2;
+  $("amp").value = p.amp;
+  $("rho").value = p.rho;
+  $("temp").value = p.temp;
+  $("thrC").value = p.thrC;
+  $("dod").value = p.dod;
+  $("n").value = p.n;
+  $("maxCycles").value = p.maxCycles;
+  $("seedLock").checked = p.seedLock;
+  $("poster").checked = p.poster;
+  $("noregen").checked = p.noregen;
+  $("useCalendar").checked = p.useCalendar;
+  $("useResistance").checked = p.useResistance;
+  $("thrR").value = p.thrR ?? defaults.thrR;
+  updateCoach();
+}
+
+function presetRealistic(){
+  setParams({
+    ...defaults,
+    k1:0.0018, k2:0.0004, amp:2.0, rho:0.55,
+    temp:25, thrC:80, dod:"20-80",
+    n:1200, maxCycles:2500,
+    poster:true, noregen:true,
+    useCalendar:true, useResistance:true, thrR:1.35
+  });
+}
+function presetQDS(){
+  setParams({
+    ...defaults,
+    k1:0.0018, k2:0.0004, amp:2.4, rho:0.70,
+    temp:25, thrC:80, dod:"20-80",
+    n:1200, maxCycles:2500,
+    poster:true, noregen:true,
+    useCalendar:true, useResistance:true, thrR:1.35
+  });
+}
+function presetChaos(){
+  setParams({
+    ...defaults,
+    k1:0.0022, k2:0.0006, amp:4.2, rho:0.99,
+    temp:40, thrC:80, dod:"0-100",
+    n:600, maxCycles:2500,
+    poster:false, noregen:true,
+    useCalendar:true, useResistance:true, thrR:1.45
+  });
+}
+
+function makeRunSummary(params, whiteStats, qdsStats){
+  const d = ((qdsStats.mean - whiteStats.mean)/whiteStats.mean)*100;
+  const line =
+    `k1=${params.k1.toFixed(4)} • k2=${params.k2.toFixed(4)} • `+
+    `amp=${params.amp.toFixed(2)}% • ρ=${params.rho.toFixed(2)} • `+
+    `T=${params.temp}°C • DoD=${params.dod.replace("-","–")} • `+
+    `thrC=${params.thrC}% • `+
+    (params.useResistance ? `thrR=${params.thrR.toFixed(2)}×R0 • ` : ``)+
+    `n=${params.n}`;
+
+  return {delta:d, line};
+}
+
+function computeStats(cycles){
+  const m = mean(cycles);
+  return {
+    mean: m,
+    sd: sd(cycles),
+    p10: quantile(cycles, .10),
+    p50: quantile(cycles, .50),
+    p90: quantile(cycles, .90),
+  };
+}
+
+function drawHistogram(canvas, white, qds){
+  const ctx = canvas.getContext("2d");
+  const w = canvas.width = canvas.clientWidth * devicePixelRatio;
+  const h = canvas.height = canvas.clientHeight * devicePixelRatio;
+  ctx.clearRect(0,0,w,h);
+
+  const all = white.concat(qds);
+  const min = Math.min(...all), max = Math.max(...all);
+  const bins = 24;
+  const binSize = Math.max(1, Math.ceil((max-min+1)/bins));
+
+  function binCount(arr){
+    const counts = new Array(bins).fill(0);
+    for(const x of arr){
+      const idx = clamp(Math.floor((x-min)/binSize), 0, bins-1);
+      counts[idx]++;
+    }
+    return counts;
+  }
+  const cw = binCount(white);
+  const cq = binCount(qds);
+  const maxC = Math.max(...cw, ...cq, 1);
+
+  const pad = 18*devicePixelRatio;
+  const chartW = w - pad*2;
+  const chartH = h - pad*2;
+  const barW = chartW / bins;
+
+  // axes faint
+  ctx.strokeStyle = "rgba(255,255,255,0.08)";
+  ctx.lineWidth = 1*devicePixelRatio;
+  ctx.strokeRect(pad, pad, chartW, chartH);
+
+  for(let i=0;i<bins;i++){
+    const x = pad + i*barW;
+    const hw = (cw[i]/maxC)*chartH;
+    const hq = (cq[i]/maxC)*chartH;
+
+    // white bars (lavender)
+    ctx.fillStyle = "rgba(155,92,255,0.35)";
+    ctx.fillRect(x+barW*0.08, pad + (chartH-hw), barW*0.38, hw);
+
+    // qds bars (neon)
+    ctx.fillStyle = "rgba(0,255,136,0.35)";
+    ctx.fillRect(x+barW*0.54, pad + (chartH-hq), barW*0.38, hq);
+  }
+
+  // legend
+  ctx.fillStyle = "rgba(155,92,255,0.9)";
+  ctx.fillRect(pad, 6*devicePixelRatio, 12*devicePixelRatio, 6*devicePixelRatio);
+  ctx.fillStyle = "rgba(0,255,136,0.9)";
+  ctx.fillRect(pad+70*devicePixelRatio, 6*devicePixelRatio, 12*devicePixelRatio, 6*devicePixelRatio);
+
+  ctx.fillStyle = "rgba(245,237,255,0.85)";
+  ctx.font = `${10*devicePixelRatio}px system-ui`;
+  ctx.fillText("White", pad+16*devicePixelRatio, 12*devicePixelRatio);
+  ctx.fillText("QDS", pad+86*devicePixelRatio, 12*devicePixelRatio);
+}
+
+function drawTrace(canvas, whiteTrace, qdsTrace, params){
+  const ctx = canvas.getContext("2d");
+  const w = canvas.width = canvas.clientWidth * devicePixelRatio;
+  const h = canvas.height = canvas.clientHeight * devicePixelRatio;
+  ctx.clearRect(0,0,w,h);
+
+  const pad = 18*devicePixelRatio;
+  const chartW = w - pad*2;
+  const chartH = h - pad*2;
+
+  // axes
+  ctx.strokeStyle = "rgba(255,255,255,0.08)";
+  ctx.lineWidth = 1*devicePixelRatio;
+  ctx.strokeRect(pad, pad, chartW, chartH);
+
+  const len = Math.min(whiteTrace.cap.length, qdsTrace.cap.length);
+  const xScale = chartW/(len-1);
+
+  // y range around capacity
+  const minCap = Math.min(
+    ...whiteTrace.cap.slice(0,len),
+    ...qdsTrace.cap.slice(0,len),
+    params.thrC-2
+  );
+  const maxCap = 102;
+  const yScale = chartH/(maxCap - minCap);
+
+  function y(c){ return pad + (maxCap - c)*yScale; }
+  function x(i){ return pad + i*xScale; }
+
+  // threshold line
+  ctx.strokeStyle = "rgba(255,75,216,0.35)";
+  ctx.setLineDash([4*devicePixelRatio, 4*devicePixelRatio]);
+  ctx.beginPath();
+  ctx.moveTo(pad, y(params.thrC));
+  ctx.lineTo(pad+chartW, y(params.thrC));
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // white trace
+  ctx.strokeStyle = "rgba(155,92,255,0.85)";
+  ctx.lineWidth = 2*devicePixelRatio;
+  ctx.beginPath();
+  for(let i=0;i<len;i++){
+    const yc = y(whiteTrace.cap[i]);
+    if(i===0) ctx.moveTo(x(i), yc);
+    else ctx.lineTo(x(i), yc);
+  }
+  ctx.stroke();
+
+  // qds trace
+  ctx.strokeStyle = "rgba(0,255,136,0.85)";
+  ctx.lineWidth = 2*devicePixelRatio;
+  ctx.beginPath();
+  for(let i=0;i<len;i++){
+    const yc = y(qdsTrace.cap[i]);
+    if(i===0) ctx.moveTo(x(i), yc);
+    else ctx.lineTo(x(i), yc);
+  }
+  ctx.stroke();
+
+  // faint resistance overlay (if enabled)
+  if(params.useResistance){
+    const minR = 1.0;
+    const maxR = Math.max(params.thrR, 1.5);
+    const rScale = chartH/(maxR-minR);
+    function yR(r){ return pad + (maxR - r)*rScale; }
+
+    ctx.strokeStyle = "rgba(155,92,255,0.25)";
+    ctx.lineWidth = 1*devicePixelRatio;
+    ctx.beginPath();
+    for(let i=0;i<len;i++){
+      const yr = yR(whiteTrace.R[i]);
+      if(i===0) ctx.moveTo(x(i), yr);
+      else ctx.lineTo(x(i), yr);
+    }
+    ctx.stroke();
+
+    ctx.strokeStyle = "rgba(0,255,136,0.25)";
+    ctx.beginPath();
+    for(let i=0;i<len;i++){
+      const yr = yR(qdsTrace.R[i]);
+      if(i===0) ctx.moveTo(x(i), yr);
+      else ctx.lineTo(x(i), yr);
+    }
+    ctx.stroke();
+  }
+
+  // legend text
+  ctx.fillStyle = "rgba(245,237,255,0.9)";
+  ctx.font = `${10*devicePixelRatio}px system-ui`;
+  ctx.fillText("Capacity traces", pad, h - 6*devicePixelRatio);
+}
+
+function loadHistory(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr : [];
+  }catch{ return []; }
+}
+function saveHistory(arr){
+  localStorage.setItem(LS_KEY, JSON.stringify(arr));
+}
+
+function paramsKey(p){
+  // stable signature for dedupe
+  return [
+    p.k1,p.k2,p.amp,p.rho,p.temp,p.thrC,p.dod,p.n,p.maxCycles,
+    p.seedLock,p.poster,p.noregen,p.useCalendar,p.useResistance,p.thrR
+  ].join("|");
+}
+
+function renderHistory(){
+  const root = $("history");
+  root.innerHTML = "";
+  const hist = loadHistory().slice(0, MAX_SHOW);
+  if(hist.length===0){
+    root.innerHTML = `<div class="small">No runs yet. Smash “Run simulation”.</div>`;
+    return;
+  }
+  for(const h of hist){
+    const div = document.createElement("div");
+    div.className = "history-item";
+    div.innerHTML = `
+      <div class="small"><span class="badge">${h.mode||"RUN"}</span> <b>${h.time}</b></div>
+      <div class="small">${h.line}</div>
+      <div class="small">
+        white μ=${h.white.mean.toFixed(2)} σ=${h.white.sd.toFixed(2)} •
+        QDS μ=${h.qds.mean.toFixed(2)} σ=${h.qds.sd.toFixed(2)} •
+        <b>Δ=${h.delta.toFixed(2)}%</b>
+      </div>
+    `;
+    root.appendChild(div);
+  }
+}
+
+function updateCoach(){
+  const p = getParams();
+  const FT = tempFactor(p.temp);
+  const FD = dodFactor(p.dod);
+
+  let heatLabel = p.temp >= 40 ? "Hot" : (p.temp <= 15 ? "Cool" : "Moderate");
+  let dodLabel = p.dod === "40-80" ? "gentle mid-window"
+              : p.dod === "20-80" ? "phone-friendly mid-window"
+              : p.dod === "10-90" ? "broad window"
+              : p.dod === "60-100" ? "high-stress top range"
+              : "full depth";
+
+  let rhoLabel = p.rho >= 0.9 ? "streaky tails likely"
+              : p.rho >= 0.6 ? "mild persistence"
+              : "mostly i.i.d.";
+
+  const coachTxt = `
+    <div class="section-title"><span>Coach readout</span><span class="pill">toy wisdom</span></div>
+    <div class="small">
+      <b>${heatLabel}</b> regime • <b>${dodLabel}</b> • <b>${rhoLabel}</b>.<br>
+      Stress multipliers: F(T)≈${FT.toFixed(2)} • F(DoD)≈${FD.toFixed(2)}.<br>
+      ${p.poster ? "Poster ON: demo-safe clipping active." : "Poster OFF: tails are allowed to roar."}<br>
+      ${p.useResistance ? `Resistance EoL active at ${p.thrR.toFixed(2)}×R₀.` : "Resistance channel disabled."}
+    </div>
+  `;
+  $("coachOut").innerHTML = coachTxt;
+  $("viewerOut").innerHTML = renderViewerText();
+}
+
+function renderViewerText(){
+  const hist = loadHistory();
+  if(hist.length===0) return `<div class="small">No history yet.</div>`;
+  const last = hist[0];
+  return `
+    <div class="history-item">
+      <div class="small"><b>Latest run</b></div>
+      <div class="small">${last.time}</div>
+      <div class="small">${last.line}</div>
+      <div class="small">White μ ${last.white.mean.toFixed(2)} • QDS μ ${last.qds.mean.toFixed(2)} • Δ ${last.delta.toFixed(2)}%</div>
+    </div>
+  `;
+}
+
+function runOnce(modeTag="RUN"){
+  $("status").textContent = "Running…";
+
+  const p = getParams();
+  const seedBase = p.seedLock ? 123456 : Math.floor(Math.random()*1e9);
+
+  const whiteRes = runModel(p, false, seedBase + 11);
+  const qdsRes   = runModel(p, true,  seedBase + 22);
+
+  const whiteStats = computeStats(whiteRes.cycles);
+  const qdsStats   = computeStats(qdsRes.cycles);
+
+  const summary = makeRunSummary(p, whiteStats, qdsStats);
+
+  // UI
+  $("wMean").textContent = whiteStats.mean.toFixed(2);
+  $("qMean").textContent = qdsStats.mean.toFixed(2);
+  $("wSd").textContent = whiteStats.sd.toFixed(2);
+  $("qSd").textContent = qdsStats.sd.toFixed(2);
+  $("wP").textContent = `P10/P50/P90 ${whiteStats.p10.toFixed(1)} / ${whiteStats.p50.toFixed(1)} / ${whiteStats.p90.toFixed(1)}`;
+  $("qP").textContent = `P10/P50/P90 ${qdsStats.p10.toFixed(1)} / ${qdsStats.p50.toFixed(1)} / ${qdsStats.p90.toFixed(1)}`;
+
+  const dStr = (summary.delta>=0?"+":"") + summary.delta.toFixed(2) + "%";
+  $("delta").innerHTML = `<span class="${summary.delta>=0? "ok":"warn"}">${dStr}</span>`;
+  $("metaLine").textContent =
+    `ρ=${p.rho.toFixed(2)} · T=${p.temp}°C · DoD=${p.dod} · `+
+    `Poster=${p.poster} · NoRegen=${p.noregen} · `+
+    `${p.n} runs/model`;
+
+  drawHistogram($("hist"), whiteRes.cycles, qdsRes.cycles);
+
+  drawTrace(
+    $("trace"),
+    {cap:whiteRes.sample.cap, R:whiteRes.sample.R},
+    {cap:qdsRes.sample.cap, R:qdsRes.sample.R},
+    p
+  );
+
+  // history with dedupe
+  const now = new Date();
+  const timeStr = now.toLocaleString();
+
+  const entry = {
+    version:"9.7",
+    mode: modeTag,
+    time: timeStr,
+    line: summary.line,
+    delta: summary.delta,
+    params: p,
+    white: whiteStats,
+    qds: qdsStats,
+    key: paramsKey(p)
+  };
+
+  let hist = loadHistory();
+  const idx = hist.findIndex(h=>h.key===entry.key);
+  if(idx===0){
+    hist[0]=entry; // refresh timestamp
+  }else if(idx>0){
+    hist.splice(idx,1);
+    hist.unshift(entry);
+  }else{
+    hist.unshift(entry);
+  }
+  hist = hist.slice(0, 80);
+  saveHistory(hist);
+  renderHistory();
+  updateCoach();
+
+  $("status").textContent = `Done. Δ=${summary.delta.toFixed(2)}% • history updated.`;
+  return entry;
+}
+
+function resetDefaults(){
+  setParams({...defaults});
+  $("status").textContent = "Defaults restored.";
+}
+
+function quickSweep(){
+  const baseParams = getParams();
+  const runs = 10;
+  let lastEntry=null;
+  for(let i=0;i<runs;i++){
+    // Slightly jitter rho for sweep flavour
+    $("rho").value = clamp(baseParams.rho + (i-5)*0.01, 0, 0.99).toFixed(2);
+    lastEntry = runOnce("SWEEP");
+  }
+  $("rho").value = baseParams.rho;
+  $("status").textContent = `Sweep complete ×${runs}.`;
+  return lastEntry;
+}
+
+function copySummary(){
+  const hist = loadHistory();
+  if(hist.length===0){ $("status").textContent="Nothing to copy yet."; return; }
+  const h = hist[0];
+  const txt =
+    `${h.mode} ${h.time}\n`+
+    `${h.line}\n`+
+    `white μ=${h.white.mean.toFixed(2)} σ=${h.white.sd.toFixed(2)}\n`+
+    `QDS μ=${h.qds.mean.toFixed(2)} σ=${h.qds.sd.toFixed(2)}\n`+
+    `Δ=${h.delta.toFixed(2)}%`;
+  navigator.clipboard?.writeText(txt).then(()=>{
+    $("status").textContent="Summary copied.";
+  }).catch(()=>{
+    $("status").textContent="Copy failed (browser limits).";
+  });
+}
+
+function exportJSON(obj, filename){
+  const blob = new Blob([JSON.stringify(obj, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download=filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function exportLast(){
+  const hist = loadHistory();
+  if(hist.length===0){ $("status").textContent="No history yet."; return; }
+  exportJSON(hist[0], `qds_battery_hub_v9_7_last.json`);
+}
+function exportAll(){
+  const hist = loadHistory();
+  exportJSON(hist, `qds_battery_hub_v9_7_history.json`);
+}
+function clearHistory(){
+  localStorage.removeItem(LS_KEY);
+  renderHistory();
+  updateCoach();
+  $("status").textContent="History cleared.";
+}
+
+// Tabs
+document.querySelectorAll(".tab").forEach(t=>{
+  t.addEventListener("click", ()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+    t.classList.add("active");
+    const tab = t.dataset.tab;
+    $("tab-lab").style.display = tab==="lab" ? "" : "none";
+    $("tab-coach").style.display = tab==="coach" ? "" : "none";
+    $("tab-viewer").style.display = tab==="viewer" ? "" : "none";
+  });
+});
+
+// Wire buttons
+$("runBtn").onclick = ()=>runOnce("RUN");
+$("resetBtn").onclick = resetDefaults;
+$("sweepBtn").onclick = quickSweep;
+
+$("presetReal").onclick = presetRealistic;
+$("presetQds").onclick = presetQDS;
+$("presetChaos").onclick = presetChaos;
+
+$("copySummary").onclick = copySummary;
+$("exportLast").onclick = exportLast;
+$("exportAll").onclick = exportAll;
+$("clearHist").onclick = clearHistory;
+
+// Update coach on input changes
+["k1","k2","amp","rho","temp","thrC","dod","n","maxCycles","seedLock","poster","noregen","useCalendar","useResistance","thrR"]
+  .forEach(id=>{
+    const el = $(id);
+    el.addEventListener("change", updateCoach);
+    el.addEventListener("input", ()=>{ if(id==="rho"||id==="amp") updateCoach(); });
+  });
+
+// Init
+resetDefaults();
+renderHistory();
+updateCoach();
+</script>
+</body>
+</html>

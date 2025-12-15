@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>QDS Dark Substrate Map 3D v2 — Violent</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #02030b;
+    --panel-bg: rgba(5, 8, 30, 0.9);
+    --accent: #36d5ff;
+    --accent-soft: #4df2b8;
+    --text: #e7f7ff;
+    --muted: #6b7c9e;
+  }
+  * { box-sizing: border-box; margin:0; padding:0; }
+
+  body {
+    background: radial-gradient(circle at top, #0a0418 0%, #02030b 60%, #000 100%);
+    font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    color: var(--text);
+    overflow: hidden;
+  }
+
+  #container {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #canvasWrap {
+    position: relative;
+    flex: 1;
+  }
+
+  #qdsCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    background: radial-gradient(circle at center, #040016 0%, #020108 60%, #000 100%);
+  }
+
+  #hudOverlay {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: rgba(3, 8, 28, 0.82);
+    border: 1px solid rgba(255, 100, 180, 0.55);
+    backdrop-filter: blur(6px);
+    font-size: 10px;
+    line-height: 1.35;
+    max-width: 72vw;
+  }
+  #hudTitle {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #ff5b9c;
+    margin-bottom: 2px;
+  }
+  #hudSubtitle { color: var(--muted); }
+  #hudStats { margin-top: 4px; color: var(--accent-soft); }
+
+  #intensityBar {
+    margin-top: 4px;
+    width: 100%;
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(80,100,160,0.4);
+    overflow: hidden;
+  }
+  #intensityFill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg,#4df2b8,#fdd835,#ff7043,#ff4081);
+    box-shadow: 0 0 6px rgba(255,64,129,0.7);
+  }
+
+  #controls {
+    padding: 8px 10px 10px;
+    background: linear-gradient(to top, rgba(0,0,0,0.97), rgba(8,0,20,0.95));
+    border-top: 1px solid rgba(255,90,150,0.35);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .control-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 110px;
+    flex: 1 1 110px;
+  }
+
+  .control-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 2px;
+  }
+  .control-label span { color: var(--accent-soft); }
+
+  input[type="range"] {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(120,80,160,0.45);
+    outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance:none;
+    width:14px;height:14px;border-radius:50%;
+    background:#ff5b9c;
+    border:2px solid #fff;
+    box-shadow:0 0 5px rgba(255,90,150,0.9);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width:14px;height:14px;border-radius:50%;
+    background:#ff5b9c;
+    border:2px solid #fff;
+    box-shadow:0 0 5px rgba(255,90,150,0.9);
+  }
+
+  #buttons {
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px;
+    justify-content:flex-end;
+    min-width:190px;
+  }
+
+  button {
+    border:1px solid rgba(255,120,190,0.7);
+    background: radial-gradient(circle at top,#261239 0%,#090212 60%,#020004 100%);
+    border-radius:999px;
+    color:var(--text);
+    font-size:10px;
+    padding:4px 8px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+  }
+  button span.dot {
+    width:6px;height:6px;border-radius:50%;display:inline-block;
+  }
+  #btnPause span.dot { background:#fdd835; }
+  #btnReset span.dot { background:#ff4d89; }
+  button.preset span.dot { background:#4df2b8; }
+  #btnViolent span.dot { background:#ff1744; }
+
+  button:active {
+    transform:translateY(1px) scale(0.99);
+    box-shadow:0 0 4px rgba(255,120,190,0.8);
+  }
+
+  @media (max-width:640px) {
+    #hudOverlay { max-width:80vw;font-size:9px; }
+    #buttons { justify-content:flex-start; }
+  }
+</style>
+</head>
+<body>
+<div id="container">
+  <div id="canvasWrap">
+    <canvas id="qdsCanvas"></canvas>
+    <div id="hudOverlay">
+      <div id="hudTitle">QDS DARK SUBSTRATE MAP — 3D v2 (Violent)</div>
+      <div id="hudSubtitle">Simulated finite-correlation field (not live cosmological data)</div>
+      <div id="hudStats"></div>
+      <div id="intensityBar"><div id="intensityFill"></div></div>
+    </div>
+  </div>
+
+  <div id="controls">
+    <div class="control-group">
+      <label class="control-label" for="lambdaSlider">
+        Spatial Coherence <span>λ<sub>c</sub></span>
+      </label>
+      <input id="lambdaSlider" type="range" min="1" max="20" value="5">
+    </div>
+
+    <div class="control-group">
+      <label class="control-label" for="tauSlider">
+        Temporal Persistence <span>τ<sub>c</sub></span>
+      </label>
+      <input id="tauSlider" type="range" min="5" max="200" value="60">
+    </div>
+
+    <div class="control-group">
+      <label class="control-label" for="noiseSlider">
+        Noise Injection <span>σ</span>
+      </label>
+      <input id="noiseSlider" type="range" min="1" max="120" value="80">
+    </div>
+
+    <div id="buttons">
+      <button id="btnPause"><span class="dot"></span> Pause</button>
+      <button id="btnReset"><span class="dot"></span> Reset</button>
+      <button class="preset" id="btnCalm"><span class="dot"></span> Calm</button>
+      <button class="preset" id="btnStorm"><span class="dot"></span> Storm</button>
+      <button class="preset" id="btnViolent"><span class="dot"></span> Max Chaos</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const canvas = document.getElementById('qdsCanvas');
+  const ctx = canvas.getContext('2d');
+  const hudStats = document.getElementById('hudStats');
+  const intensityFill = document.getElementById('intensityFill');
+
+  const lambdaSlider = document.getElementById('lambdaSlider');
+  const tauSlider = document.getElementById('tauSlider');
+  const noiseSlider = document.getElementById('noiseSlider');
+  const btnPause = document.getElementById('btnPause');
+  const btnReset = document.getElementById('btnReset');
+  const btnCalm = document.getElementById('btnCalm');
+  const btnStorm = document.getElementById('btnStorm');
+  const btnViolent = document.getElementById('btnViolent');
+
+  // Slightly denser grid – still phone-safe
+  let gridW = 64;
+  let gridH = 40;
+  let field = [];
+  let fieldNext = [];
+  let running = true;
+  let lastTime = performance.now();
+  let lastStatUpdate = performance.now();
+  let energyPhase = 0;
+
+  function initField() {
+    field = new Array(gridW * gridH);
+    fieldNext = new Array(gridW * gridH);
+    for (let i = 0; i < field.length; i++) {
+      field[i] = (Math.random() * 2 - 1) * 0.3;
+      fieldNext[i] = 0;
+    }
+  }
+
+  function resizeCanvas() {
+    const w = canvas.clientWidth;
+    const h = canvas.clientHeight;
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  window.addEventListener('resize', resizeCanvas);
+
+  function updateField(dt) {
+    const lambdaUi = parseFloat(lambdaSlider.value);
+    const tauUi = parseFloat(tauSlider.value);
+    const sigmaUi = parseFloat(noiseSlider.value);
+
+    // Violent kernel: stronger neighbour mixing + bursty noise
+    const spatialMix = 0.08 + (lambdaUi / 20) * 0.28;
+    const tauNorm = tauUi / 200;
+    const temporalPersistence = 0.70 + tauNorm * 0.22;
+
+    energyPhase += dt * 0.0012;
+    const burst = 0.5 + 0.5 * Math.sin(energyPhase * 2.7);
+    const baseNoise = 0.004 + (sigmaUi / 120) * 0.045;
+    const noiseAmp = baseNoise * (0.6 + 1.4 * burst);
+
+    const w = gridW, h = gridH;
+
+    for (let y = 0; y < h; y++) {
+      const ym1 = (y === 0 ? 0 : y - 1);
+      const yp1 = (y === h - 1 ? h - 1 : y + 1);
+      for (let x = 0; x < w; x++) {
+        const xm1 = (x === 0 ? 0 : x - 1);
+        const xp1 = (x === w - 1 ? w - 1 : x + 1);
+
+        const idx = y * w + x;
+        const self = field[idx];
+
+        const n1 = field[y * w + xm1];
+        const n2 = field[y * w + xp1];
+        const n3 = field[ym1 * w + x];
+        const n4 = field[yp1 * w + x];
+
+        // include diagonals for wider patches
+        const n5 = field[ym1 * w + xm1];
+        const n6 = field[ym1 * w + xp1];
+        const n7 = field[yp1 * w + xm1];
+        const n8 = field[yp1 * w + xp1];
+
+        const neighbourAvg = (n1 + n2 + n3 + n4 + n5 + n6 + n7 + n8) / 8;
+        const spatiallySmoothed = self * (1 - spatialMix) + neighbourAvg * spatialMix;
+
+        let target = spatiallySmoothed + (Math.random() * 2 - 1) * noiseAmp;
+
+        fieldNext[idx] = self * temporalPersistence + target * (1 - temporalPersistence);
+      }
+    }
+
+    // occasional local "shock" injections
+    if (Math.random() < 0.10) {
+      const shocks = 6;
+      for (let s = 0; s < shocks; s++) {
+        const sx = (Math.random() * w) | 0;
+        const sy = (Math.random() * h) | 0;
+        const sidx = sy * w + sx;
+        fieldNext[sidx] += (Math.random() * 2 - 1) * 0.5;
+      }
+    }
+
+    const tmp = field;
+    field = fieldNext;
+    fieldNext = tmp;
+
+    const now = performance.now();
+    if (now - lastStatUpdate > 300) {
+      lastStatUpdate = now;
+      const mean = computeMean(field);
+      const varr = computeVariance(field, mean);
+      hudStats.textContent =
+        `λc ≈ ${lambdaUi.toFixed(1)}  |  τc (ui) ≈ ${tauUi.toFixed(1)}  |  σ (ui) ≈ ${sigmaUi.toFixed(1)}  ` +
+        `|  ⟨χ⟩ ≈ ${mean.toFixed(3)}  |  Var[χ] ≈ ${varr.toFixed(3)}`;
+      const intensity = Math.min(1, Math.sqrt(varr * 40));
+      intensityFill.style.width = (intensity * 100).toFixed(1) + "%";
+    }
+  }
+
+  function computeMean(arr) {
+    let s = 0;
+    for (let i = 0; i < arr.length; i++) s += arr[i];
+    return s / arr.length;
+  }
+
+  function computeVariance(arr, mean) {
+    let s = 0;
+    for (let i = 0; i < arr.length; i++) {
+      const d = arr[i] - mean;
+      s += d * d;
+    }
+    return s / arr.length;
+  }
+
+  function renderField3D(time) {
+    const w = canvas.clientWidth;
+    const h = canvas.clientHeight;
+
+    ctx.clearRect(0, 0, w, h);
+
+    const gradient = ctx.createRadialGradient(
+      w * 0.5, h * 0.8, 10,
+      w * 0.5, h * 0.8, h * 0.95
+    );
+    gradient.addColorStop(0, '#0b0728');
+    gradient.addColorStop(1, '#000005');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, w, h);
+
+    const centerX = w * 0.5;
+    const centerY = h * 0.75;
+
+    const baseScale = Math.min(w, h) / (gridW + gridH) * 1.35;
+    const heightScale = baseScale * 6.0;
+
+    const t = time * 0.00016;
+    const wobble = Math.sin(t * 1.8) * 0.3;
+    const tilt = 0.50 + 0.15 * Math.cos(t * 1.3);
+
+    for (let y = 0; y < gridH; y++) {
+      for (let x = 0; x < gridW; x++) {
+        const v = field[y * gridW + x];
+
+        // Emphasise extremes
+        const amp = Math.max(-1, Math.min(1, v * 3.0));
+        const sign = amp >= 0 ? 1 : -1;
+        const nv = Math.abs(amp);             // 0..1
+        const intensity = Math.pow(nv, 1.4);  // bias towards spikes
+
+        const gx = x - gridW / 2;
+        const gy = y - gridH / 2;
+
+        const rotX = gx * Math.cos(wobble) - gy * Math.sin(wobble);
+        const rotY = gx * Math.sin(wobble) + gy * Math.cos(wobble);
+
+        const isoX = (rotX - rotY) * baseScale + centerX;
+        const isoY = (rotX + rotY) * baseScale * tilt + centerY;
+
+        const hgt = intensity * heightScale * (0.7 + 0.6 * Math.sin(t + (x + y) * 0.08));
+        const topY = isoY - hgt;
+
+        const colHalf = baseScale * 0.7;
+
+        // colour: negative → magenta, positive → cyan/blue
+        const huePos = 190;   // cool
+        const hueNeg = 320;   // hot
+        const hue = sign > 0 ? huePos : hueNeg;
+        const light = 25 + intensity * 55;
+        const sat = 70 + intensity * 25;
+
+        ctx.fillStyle = `hsl(${hue}, ${sat}%, ${light}%)`;
+        ctx.beginPath();
+        ctx.moveTo(isoX - colHalf, isoY);
+        ctx.lineTo(isoX - colHalf, topY);
+        ctx.lineTo(isoX + colHalf, topY);
+        ctx.lineTo(isoX + colHalf, isoY);
+        ctx.closePath();
+        ctx.fill();
+
+        // glow cap
+        const glowR = colHalf * 0.9;
+        const g = ctx.createRadialGradient(
+          isoX, topY, 0,
+          isoX, topY, glowR
+        );
+        g.addColorStop(0, `hsla(${hue}, ${sat}%, ${Math.min(light+28,96)}%, 0.95)`);
+        g.addColorStop(1, `hsla(${hue}, ${sat}%, ${light}%, 0.0)`);
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(isoX, topY, glowR, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+
+  function loop(now) {
+    const dt = now - lastTime;
+    lastTime = now;
+    if (running) {
+      updateField(dt);
+      renderField3D(now);
+    }
+    requestAnimationFrame(loop);
+  }
+
+  btnPause.addEventListener('click', () => {
+    running = !running;
+    btnPause.innerHTML = running
+      ? '<span class="dot"></span> Pause'
+      : '<span class="dot"></span> Run';
+  });
+
+  btnReset.addEventListener('click', () => {
+    initField();
+  });
+
+  btnCalm.addEventListener('click', () => {
+    lambdaSlider.value = 15;
+    tauSlider.value    = 180;
+    noiseSlider.value  = 12;
+  });
+
+  btnStorm.addEventListener('click', () => {
+    lambdaSlider.value = 8;
+    tauSlider.value    = 90;
+    noiseSlider.value  = 70;
+  });
+
+  btnViolent.addEventListener('click', () => {
+    lambdaSlider.value = 4;
+    tauSlider.value    = 35;
+    noiseSlider.value  = 110;
+  });
+
+  // Init
+  initField();
+  resizeCanvas();
+  lastTime = performance.now();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

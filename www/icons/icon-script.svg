@@ -1,0 +1,11 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="60" fill="#0a0f12"/>
+  <rect x="90" y="120" width="332" height="40" rx="8" fill="#00ffcc" opacity="0.85"/>
+  <rect x="90" y="200" width="280" height="40" rx="8" fill="#7cffae" opacity="0.85"/>
+  <rect x="90" y="280" width="320" height="40" rx="8" fill="#33ffff" opacity="0.85"/>
+  <rect x="90" y="360" width="240" height="40" rx="8" fill="#00ffcc" opacity="0.85"/>
+  <text x="256" y="75" font-size="48" text-anchor="middle" fill="#7cffae"
+        style="font-family:Arial; text-shadow:0 0 6px #00ffcc;">
+    SCRIPT
+  </text>
+</svg>

@@ -1,0 +1,695 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>QDS • SuperVault (Phys.org)</title>
+<style>
+  :root{
+    --bg:#060812;
+    --panel:#0a1023cc;
+    --card:#0b1328cc;
+    --text:#eaf0ff;
+    --muted:#9fb0d8;
+    --line:#ffffff14;
+
+    --neonR:#ff2d2d;
+    --neonO:#ff7a00;
+    --neonY:#ffd000;
+    --neonP:#ff3bd4;
+    --neonC:#22e6ff;
+    --good:#35ff9a;
+    --warn:#ffd54a;
+    --bad:#ff3d6e;
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial;
+    color:var(--text);
+    background:
+      radial-gradient(1200px 600px at 10% -10%, rgba(255,208,0,.18), transparent 60%),
+      radial-gradient(900px 500px at 85% 0%, rgba(255,61,110,.14), transparent 55%),
+      radial-gradient(900px 700px at 50% 110%, rgba(34,230,255,.12), transparent 60%),
+      linear-gradient(#040612, #060812 60%, #050718);
+  }
+
+  .sticky{
+    position:sticky; top:0; z-index:50;
+    backdrop-filter: blur(12px);
+    background: linear-gradient(to bottom, rgba(6,8,18,.92), rgba(6,8,18,.70));
+    border-bottom:1px solid var(--line);
+  }
+  .wrap{max-width:1100px;margin:0 auto;padding:14px 12px 80px}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+  h1{margin:0;font-size:18px;letter-spacing:.35px}
+  .sub{color:var(--muted);font-size:12px}
+
+  .pill{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:7px 10px;border-radius:999px;
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(10,14,28,.55);
+    font-size:12px;color:var(--muted);
+    white-space:nowrap;
+  }
+  .dot{width:8px;height:8px;border-radius:50%}
+  .dot.ok{background:var(--good); box-shadow:0 0 10px rgba(53,255,154,.55)}
+  .dot.bad{background:var(--bad); box-shadow:0 0 10px rgba(255,61,110,.55)}
+  .dot.warn{background:var(--warn); box-shadow:0 0 10px rgba(255,213,74,.45)}
+
+  .panel{
+    margin-top:10px;
+    border-radius:18px;
+    padding:12px;
+    background:var(--panel);
+    border:1px solid rgba(255,255,255,.10);
+    position:relative;
+    overflow:hidden;
+  }
+  .panel::before{
+    content:"";
+    position:absolute; inset:-3px;
+    background: linear-gradient(90deg,var(--neonR),var(--neonO),var(--neonY),var(--neonP),var(--neonC),var(--neonY),var(--neonO),var(--neonR));
+    filter: blur(12px);
+    opacity:.30;
+  }
+  .panel::after{
+    content:"";
+    position:absolute; inset:1px;
+    background: rgba(8,12,24,.78);
+    border-radius:16px;
+  }
+  .panel > *{position:relative; z-index:1}
+
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:10px}
+  .col3{grid-column:span 6}
+  .col4{grid-column:span 6}
+  .col6{grid-column:span 12}
+  .col12{grid-column:span 12}
+  @media(min-width:900px){
+    .col3{grid-column:span 3}
+    .col4{grid-column:span 4}
+    .col6{grid-column:span 6}
+  }
+  label{display:block;margin:0 0 6px 2px;font-size:11px;color:var(--muted);letter-spacing:.5px}
+  select,input,textarea{
+    width:100%;
+    border-radius:14px;
+    padding:10px 12px;
+    border:1px solid rgba(255,255,255,.14);
+    background: rgba(7,10,18,.60);
+    color:var(--text);
+    outline:none;
+  }
+  textarea{min-height:220px;resize:vertical;line-height:1.35}
+
+  .btnRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  button{
+    border:none;
+    padding:10px 12px;
+    border-radius:14px;
+    color:var(--text);
+    background: rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.12);
+    cursor:pointer;
+  }
+  button:hover{background:rgba(255,255,255,.12)}
+  .cta{
+    border-color: rgba(255,208,0,.45);
+    box-shadow:0 0 20px rgba(255,208,0,.14);
+    background: rgba(255,208,0,.08);
+  }
+  .danger{
+    border-color: rgba(255,61,110,.35);
+    background: rgba(255,61,110,.06);
+  }
+  .chipRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .chip{
+    padding:8px 10px;border-radius:999px;
+    font-size:12px;color:var(--muted);
+    border:1px solid rgba(255,255,255,.12);
+    background: rgba(7,10,18,.55);
+  }
+
+  .list{margin-top:12px;display:flex;flex-direction:column;gap:10px}
+  .card{
+    border-radius:18px;
+    padding:12px;
+    background:var(--card);
+    border:1px solid rgba(255,255,255,.10);
+    position:relative; overflow:hidden;
+  }
+  .card::before{
+    content:"";
+    position:absolute;left:-60px;top:-60px;width:160px;height:160px;
+    background: radial-gradient(circle at 30% 30%, rgba(255,208,0,.18), transparent 65%);
+    opacity:.9;
+  }
+  .card > *{position:relative}
+  .top{display:flex;gap:10px;justify-content:space-between;align-items:flex-start}
+  .title{margin:0;font-size:16px;line-height:1.2}
+  .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .tag{
+    font-size:11px;color:var(--muted);
+    padding:6px 10px;border-radius:999px;
+    border:1px solid rgba(255,255,255,.10);
+    background: rgba(0,0,0,.16);
+    white-space:nowrap;
+  }
+  .bucket{
+    font-size:12px;padding:7px 10px;border-radius:999px;white-space:nowrap;
+    border:1px solid rgba(255,255,255,.14);
+    background: rgba(0,0,0,.16);
+  }
+  .b-none{color:var(--muted)}
+  .b-vs{color:var(--warn); border-color: rgba(255,213,74,.35)}
+  .b-comp{color:var(--good); border-color: rgba(53,255,154,.35)}
+  .b-broken{color:var(--bad); border-color: rgba(255,61,110,.35)}
+  .desc{margin:8px 0 10px 0;color:#cdd7f5;line-height:1.35}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .aBtn{padding:8px 10px;border-radius:12px;font-size:12px}
+  .small{font-size:11px;color:var(--muted)}
+  .hr{height:1px;background:var(--line);margin:10px 0}
+</style>
+</head>
+<body>
+
+<div class="sticky">
+  <div class="wrap">
+    <div class="row">
+      <div>
+        <h1>QDS • SuperVault</h1>
+        <div class="sub">One page: load snapshot + triage, filter, and generate a ≤40-line copy/paste brief.</div>
+      </div>
+      <div class="row" style="justify-content:flex-end">
+        <span class="pill"><span id="dot" class="dot warn"></span><span id="status">idle</span></span>
+        <span class="pill">Snapshot: <span id="snapPath" class="small">physorg_latest_snapshot.json</span></span>
+        <span class="pill">Updated: <span id="updated" class="small">—</span></span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="grid">
+        <div class="col3">
+          <label>SOURCE</label>
+          <select id="sourceSel">
+            <option value="latest" selected>Latest snapshot (physorg_latest_snapshot.json)</option>
+            <option value="probe">Probe rip folders (news_rips/physorg/YYYY-MM-DD/MASTER.json)</option>
+          </select>
+        </div>
+
+        <div class="col3">
+          <label>DATE (probe mode)</label>
+          <select id="dateSel" disabled>
+            <option value="">—</option>
+          </select>
+        </div>
+
+        <div class="col3">
+          <label>VIEW</label>
+          <select id="viewSel">
+            <option value="triaged">Triaged only</option>
+            <option value="all">All</option>
+            <option value="untriaged">Untriaged only</option>
+          </select>
+        </div>
+
+        <div class="col3">
+          <label>BUCKET</label>
+          <select id="bucketSel">
+            <option value="any">Any</option>
+            <option value="broken">QDS Broken by Data?</option>
+            <option value="vs">QDS vs MAINSTREAM</option>
+            <option value="comp">QDS complements MAINSTREAM</option>
+            <option value="none">None</option>
+          </select>
+        </div>
+
+        <div class="col6">
+          <label>SEARCH (title/category/summary/notes)</label>
+          <input id="q" placeholder="neutrino, ferromagnetism, entropy, decoherence, battery, etc."/>
+        </div>
+
+        <div class="col3">
+          <label>SORT</label>
+          <select id="sortSel">
+            <option value="priority" selected>Priority (broken → vs → comp → none)</option>
+            <option value="newest">Newest</option>
+            <option value="title">Title A→Z</option>
+            <option value="bucket">Bucket</option>
+          </select>
+        </div>
+
+        <div class="col3">
+          <label>BRIEF LINES (MAX)</label>
+          <select id="lineSel">
+            <option>25</option>
+            <option selected>40</option>
+            <option>60</option>
+            <option>80</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="btnRow">
+        <button class="cta" id="runBtn">REFRESH + BUILD BRIEF</button>
+        <button id="reloadBtn">Reload only</button>
+        <button id="openTriageBtn">Open triage page</button>
+        <button id="exportBtn">Export evidence pack</button>
+        <button class="danger" id="copyBtn">Copy brief</button>
+      </div>
+
+      <div class="chipRow">
+        <span class="chip">Items: <b id="nItems">0</b></span>
+        <span class="chip">Triaged: <b id="nTriaged">0</b></span>
+        <span class="chip">broken?: <b id="nBroken">0</b></span>
+        <span class="chip">vs: <b id="nVs">0</b></span>
+        <span class="chip">complements: <b id="nComp">0</b></span>
+        <span class="chip">untriaged: <b id="nNone">0</b></span>
+        <span class="chip">Query: <span id="qChip">—</span></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <div class="grid">
+      <div class="col12">
+        <label>SUPER SMART BRIEF (≤ N lines, copy/paste to chat)</label>
+        <textarea id="brief" placeholder="Press REFRESH + BUILD BRIEF…"></textarea>
+        <div class="small">This brief is generated from: snapshot items + your triage/notes stored in localStorage (from the triage page).</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list" id="list"></div>
+
+  <div class="small" style="margin-top:14px;color:var(--muted)">
+    Storage keys used: <code>qds_news_triage_v1</code> and <code>qds_news_notes_v1</code>. (Same as your triage cockpit.)
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = (id)=>document.getElementById(id);
+
+  const TRIAGE_KEY = "qds_news_triage_v1";
+  const NOTES_KEY  = "qds_news_notes_v1";
+
+  const state = {
+    items: [],
+    triage: loadJson(TRIAGE_KEY, {}),
+    notes: loadJson(NOTES_KEY, {}),
+    source: "latest",
+    probeDates: [],
+    probeDate: "",
+    snapMeta: { created_at:"", item_count:0, master_path:"", source:"" }
+  };
+
+  function loadJson(k, fallback){
+    try { return JSON.parse(localStorage.getItem(k) || "") || fallback; }
+    catch { return fallback; }
+  }
+  function setStatus(kind, msg){
+    $("status").textContent = msg;
+    $("dot").className = "dot " + (kind==="ok"?"ok":kind==="bad"?"bad":"warn");
+  }
+
+  function normalizeItem(x){
+    const it = {...x};
+    it.title = it.title || it.TITLE || "Untitled";
+    it.link  = it.link  || it.LINK  || it.url || "";
+    it.pubDate = it.pubDate || it.date || it.published || it.pub || "";
+    it.category = it.category || it.cat || it.section || it.feed || "";
+    it.summary  = it.summary  || it.description || it.desc || it.contentSnippet || "";
+    it.source   = it.source   || it.site || "phys.org";
+    return it;
+  }
+
+  function itemKey(it){
+    return (it.guid || it.link || (it.title+"|"+(it.pubDate||""))).slice(0,512);
+  }
+
+  function bucketOf(it){
+    return state.triage[itemKey(it)] || "none";
+  }
+
+  function bucketLabel(b){
+    if(b==="broken") return "QDS broken by data?";
+    if(b==="vs") return "QDS vs MAINSTREAM";
+    if(b==="comp") return "QDS complements MAINSTREAM";
+    return "untriaged";
+  }
+
+  function bucketClass(b){
+    if(b==="broken") return "b-broken";
+    if(b==="vs") return "b-vs";
+    if(b==="comp") return "b-comp";
+    return "b-none";
+  }
+
+  function priorityScore(b){
+    if(b==="broken") return 0;
+    if(b==="vs") return 1;
+    if(b==="comp") return 2;
+    return 3;
+  }
+
+  function timeVal(pubDate){
+    const t = Date.parse(pubDate);
+    return isNaN(t) ? 0 : t;
+  }
+
+  async function loadLatestSnapshot(){
+    const url = "physorg_latest_snapshot.json";
+    $("snapPath").textContent = url;
+    const r = await fetch(url, {cache:"no-store"});
+    if(!r.ok) throw new Error("No latest snapshot found (run ~/qdsnews.sh first)");
+    const j = await r.json();
+    state.snapMeta = {
+      source: j.source || "snapshot",
+      created_at: j.created_at || "",
+      item_count: j.item_count || (j.items?j.items.length:0),
+      master_path: j.master_path || ""
+    };
+    const items = (j.items || []).map(normalizeItem);
+    state.items = items;
+  }
+
+  async function listProbeDates(){
+    const days = 21;
+    const out = [];
+    const today = new Date();
+    for(let i=0;i<days;i++){
+      const d = new Date(today.getTime() - i*86400e3);
+      const yyyy=d.getFullYear();
+      const mm=String(d.getMonth()+1).padStart(2,"0");
+      const dd=String(d.getDate()).padStart(2,"0");
+      const s=`${yyyy}-${mm}-${dd}`;
+      const url=`news_rips/physorg/${s}/MASTER.json`;
+      try{
+        const r = await fetch(url, {cache:"no-store"});
+        if(r.ok) out.push(s);
+      }catch(e){}
+    }
+    return out;
+  }
+
+  async function loadProbeDate(dateStr){
+    const url = `news_rips/physorg/${dateStr}/MASTER.json`;
+    $("snapPath").textContent = url;
+    const r = await fetch(url, {cache:"no-store"});
+    if(!r.ok) throw new Error("Probe MASTER.json fetch failed");
+    const j = await r.json();
+    const items = (Array.isArray(j) ? j : (j.items || j.ITEMS || j.master || [])).map(normalizeItem);
+    state.snapMeta = { source:"probe", created_at:dateStr, item_count:items.length, master_path:url };
+    state.items = items;
+  }
+
+  function computeStats(){
+    const c = {broken:0,vs:0,comp:0,none:0};
+    let triaged = 0;
+    for(const it of state.items){
+      const b = bucketOf(it);
+      if(b!=="none") triaged++;
+      c[b] = (c[b]||0)+1;
+    }
+    $("nItems").textContent = state.items.length;
+    $("nTriaged").textContent = triaged;
+    $("nBroken").textContent = c.broken||0;
+    $("nVs").textContent = c.vs||0;
+    $("nComp").textContent = c.comp||0;
+    $("nNone").textContent = c.none||0;
+  }
+
+  function filteredItems(){
+    const view = $("viewSel").value;
+    const bucket = $("bucketSel").value;
+    const q = $("q").value.trim().toLowerCase();
+    const sort = $("sortSel").value;
+
+    $("qChip").textContent = q ? q : "—";
+
+    let items = state.items.slice();
+
+    items = items.filter(it=>{
+      const b = bucketOf(it);
+      if(view==="triaged" && b==="none") return false;
+      if(view==="untriaged" && b!=="none") return false;
+      if(bucket==="any") return true;
+      if(bucket==="none") return b==="none";
+      return b===bucket;
+    });
+
+    if(q){
+      items = items.filter(it=>{
+        const k=itemKey(it);
+        const note=(state.notes[k]||"");
+        const hay = `${it.title} ${it.category} ${it.summary} ${note}`.toLowerCase();
+        return hay.includes(q);
+      });
+    }
+
+    items.sort((a,b)=>{
+      const ba=bucketOf(a), bb=bucketOf(b);
+      if(sort==="priority"){
+        const pa=priorityScore(ba), pb=priorityScore(bb);
+        if(pa!==pb) return pa-pb;
+        return timeVal(b.pubDate)-timeVal(a.pubDate);
+      }
+      if(sort==="newest") return timeVal(b.pubDate)-timeVal(a.pubDate);
+      if(sort==="title") return (a.title||"").localeCompare(b.title||"");
+      if(sort==="bucket") return (ba+(a.title||"")).localeCompare(bb+(b.title||""));
+      return 0;
+    });
+
+    return items;
+  }
+
+  function renderList(){
+    const list = $("list");
+    list.innerHTML = "";
+    const items = filteredItems().slice(0, 120); // display cap for speed
+
+    for(const it of items){
+      list.appendChild(renderCard(it));
+    }
+  }
+
+  function renderCard(it){
+    const k=itemKey(it);
+    const b=bucketOf(it);
+    const note = state.notes[k] || "";
+
+    const card = document.createElement("div");
+    card.className="card";
+
+    const top=document.createElement("div");
+    top.className="top";
+
+    const left=document.createElement("div");
+    left.style.flex="1";
+
+    const h=document.createElement("h3");
+    h.className="title";
+    h.textContent=it.title||"Untitled";
+
+    const meta=document.createElement("div");
+    meta.className="meta";
+    meta.innerHTML = `
+      <span class="tag">${escapeHtml(it.pubDate||"—")}</span>
+      <span class="tag">${escapeHtml(it.category||"—")}</span>
+      <span class="tag">${escapeHtml(it.source||"phys.org")}</span>
+      ${note ? `<span class="tag">note</span>` : ``}
+    `;
+
+    left.append(h, meta);
+
+    const right=document.createElement("div");
+    const buck=document.createElement("span");
+    buck.className=`bucket ${bucketClass(b)}`;
+    buck.textContent=bucketLabel(b);
+    right.appendChild(buck);
+
+    top.append(left,right);
+
+    const desc=document.createElement("div");
+    desc.className="desc";
+    desc.textContent=(it.summary||"").trim() || "—";
+
+    const actions=document.createElement("div");
+    actions.className="actions";
+
+    const open=document.createElement("button");
+    open.className="aBtn";
+    open.textContent="Open";
+    open.onclick=()=>{ if(it.link) window.open(it.link,"_blank"); };
+
+    const copyLine=document.createElement("button");
+    copyLine.className="aBtn";
+    copyLine.textContent="Copy 1-line";
+    copyLine.onclick=()=>{
+      const line = formatOneLine(it);
+      navigator.clipboard.writeText(line);
+    };
+
+    actions.append(open, copyLine);
+
+    card.append(top, desc, actions);
+    return card;
+  }
+
+  function formatOneLine(it){
+    const b = bucketOf(it);
+    const tag = (b==="broken")?"[BROKEN?]":(b==="vs")?"[VS]":(b==="comp")?"[COMP]":"[NEUTRAL]";
+    const title = (it.title||"").replace(/\s+/g," ").trim();
+    const link  = it.link || "";
+    const summ  = (it.summary||"").replace(/\s+/g," ").trim();
+    const short = summ.length>140 ? (summ.slice(0,137)+"…") : summ;
+    return `${tag} ${title} — ${short} ${link}`.trim();
+  }
+
+  function buildBrief(){
+    const maxLines = parseInt($("lineSel").value,10) || 40;
+    const items = filteredItems();
+
+    // brief priority list: broken first, then vs, then comp, then neutral
+    const pick = items.slice(0, 60);
+
+    const lines = [];
+    lines.push(`QDS SuperVault Brief`);
+    lines.push(`Snapshot: ${$("snapPath").textContent}`);
+    lines.push(`Updated: ${$("updated").textContent}`);
+    lines.push(`Counts: items=${$("nItems").textContent}, triaged=${$("nTriaged").textContent}, broken=${$("nBroken").textContent}, vs=${$("nVs").textContent}, comp=${$("nComp").textContent}, neutral=${$("nNone").textContent}`);
+    const q = $("q").value.trim();
+    if(q) lines.push(`Filter: query="${q}", bucket="${$("bucketSel").value}", view="${$("viewSel").value}"`);
+    lines.push(`---`);
+    lines.push(`Top items (priority-sorted). Please assess: does any item directly contradict a QDS prediction, or is it neutral/adjacent?`);
+
+    let n=1;
+    for(const it of pick){
+      const one = `${String(n).padStart(2,"0")}. ${formatOneLine(it)}`;
+      lines.push(one);
+      const k=itemKey(it);
+      const note=(state.notes[k]||"").trim();
+      if(note){
+        lines.push(`    note: ${note.replace(/\s+/g," ").slice(0,200)}`);
+      }
+      n++;
+      if(lines.length >= maxLines) break;
+    }
+
+    // hard cap
+    const out = lines.slice(0, maxLines).join("\n");
+    $("brief").value = out;
+  }
+
+  function exportEvidencePack(){
+    // Export: filtered snapshot items + full triage/notes + meta
+    const payload = {
+      version: 1,
+      exported_at: new Date().toISOString(),
+      snapshot: state.snapMeta,
+      items: state.items,
+      triage: state.triage,
+      notes: state.notes
+    };
+    const blob = new Blob([JSON.stringify(payload,null,2)], {type:"application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `qds_evidence_pack_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 1500);
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+
+  async function reload(){
+    setStatus("warn","loading…");
+    state.triage = loadJson(TRIAGE_KEY, {});
+    state.notes  = loadJson(NOTES_KEY, {});
+    state.source = $("sourceSel").value;
+
+    try{
+      if(state.source==="latest"){
+        $("dateSel").disabled = true;
+        await loadLatestSnapshot();
+      }else{
+        $("dateSel").disabled = false;
+        state.probeDates = await listProbeDates();
+        $("dateSel").innerHTML = state.probeDates.map(d=>`<option value="${d}">${d}</option>`).join("") || `<option value="">—</option>`;
+        const chosen = $("dateSel").value || state.probeDates[0] || "";
+        $("dateSel").value = chosen;
+        if(chosen) await loadProbeDate(chosen);
+      }
+
+      $("updated").textContent = state.snapMeta.created_at || new Date().toISOString().slice(0,19);
+      computeStats();
+      renderList();
+      setStatus("ok","ready");
+    }catch(e){
+      console.error(e);
+      computeStats();
+      renderList();
+      setStatus("bad","error");
+      $("brief").value = "ERROR: Could not load snapshot.\n\nFix:\n1) run ~/qdsnews.sh (creates physorg_latest_snapshot.json)\n2) refresh this page.\n\nOr switch SOURCE to 'probe'.";
+    }
+  }
+
+  // Wire up
+  $("sourceSel").onchange = async ()=>{
+    $("dateSel").disabled = $("sourceSel").value==="latest";
+    await reload();
+    buildBrief();
+  };
+
+  $("dateSel").onchange = async ()=>{
+    if($("sourceSel").value!=="probe") return;
+    setStatus("warn","loading…");
+    try{
+      await loadProbeDate($("dateSel").value);
+      $("updated").textContent = state.snapMeta.created_at || $("dateSel").value;
+      computeStats();
+      renderList();
+      setStatus("ok","ready");
+      buildBrief();
+    }catch(e){
+      console.error(e);
+      setStatus("bad","error");
+    }
+  };
+
+  for(const id of ["viewSel","bucketSel","sortSel","lineSel"]){
+    $(id).onchange = ()=>{ computeStats(); renderList(); buildBrief(); };
+  }
+  $("q").addEventListener("input", ()=>{
+    window.clearTimeout(window.__qt);
+    window.__qt = setTimeout(()=>{ computeStats(); renderList(); buildBrief(); }, 140);
+  });
+
+  $("runBtn").onclick = async ()=>{ await reload(); buildBrief(); };
+  $("reloadBtn").onclick = async ()=>{ await reload(); };
+  $("openTriageBtn").onclick = ()=>{ window.open("physorg_qds_triage.html?x="+Date.now(), "_blank"); };
+  $("exportBtn").onclick = exportEvidencePack;
+  $("copyBtn").onclick = async ()=>{
+    try{
+      await navigator.clipboard.writeText($("brief").value || "");
+      setStatus("ok","copied brief ✅");
+      setTimeout(()=>setStatus("ok","ready"), 900);
+    }catch{
+      alert("Copy failed (browser permission). Long-press to select/copy manually.");
+    }
+  };
+
+  // Boot
+  reload().then(buildBrief);
+})();
+</script>
+</body>
+</html>

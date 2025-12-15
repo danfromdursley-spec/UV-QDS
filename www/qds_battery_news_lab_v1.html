@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>QDS • Battery Intel Lab v1</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #030616;
+      --bg-alt: #05081f;
+      --card: #0b102b;
+      --accent: #00e5ff;
+      --accent-soft: rgba(0,229,255,0.12);
+      --accent-2: #7cffc4;
+      --danger: #ff4d6a;
+      --text: #e9f3ff;
+      --muted: #9aa4c6;
+      --border-subtle: rgba(255,255,255,0.06);
+      --shadow-soft: 0 18px 45px rgba(0,0,0,0.65);
+      --radius-lg: 18px;
+      --radius-pill: 999px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #111633 0, #020313 55%, #000 100%);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 18px 14px 32px;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: 1px solid rgba(0,229,255,0.4);
+      background: linear-gradient(135deg, rgba(0,229,255,0.18), transparent);
+      color: var(--accent-2);
+    }
+
+    h1 {
+      font-size: 22px;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h1 span.emoji {
+      font-size: 22px;
+    }
+
+    .subhead {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+      max-width: 640px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, rgba(0,229,255,0.12), transparent 55%),
+                  radial-gradient(circle at bottom right, rgba(124,255,196,0.08), transparent 55%),
+                  var(--card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-soft);
+      padding: 14px 14px 12px;
+    }
+
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card h2 span.icon {
+      font-size: 17px;
+    }
+
+    .card p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 10px;
+      margin-bottom: 8px;
+    }
+
+    label {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    input[type="text"] {
+      background: #050821;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-subtle);
+      padding: 6px 10px;
+      font-size: 13px;
+      color: var(--text);
+      outline: none;
+      min-width: 160px;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(0,229,255,0.25);
+    }
+
+    select {
+      background: #050821;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-subtle);
+      padding: 6px 10px;
+      font-size: 13px;
+      color: var(--text);
+      outline: none;
+      min-width: 140px;
+    }
+
+    button {
+      border-radius: var(--radius-pill);
+      border: none;
+      padding: 7px 13px;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.12s ease;
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, var(--accent), #4cffd4);
+      color: #001018;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.55);
+    }
+
+    button.primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 35px rgba(0,0,0,0.7);
+    }
+
+    button.secondary {
+      background: rgba(255,255,255,0.04);
+      color: var(--muted);
+      border: 1px solid var(--border-subtle);
+    }
+
+    button.secondary:hover {
+      background: rgba(255,255,255,0.07);
+    }
+
+    button span.btn-emoji {
+      font-size: 14px;
+    }
+
+    .status {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+      min-height: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px rgba(0,229,255,0.8);
+    }
+
+    .status.error .status-dot {
+      background: var(--danger);
+      box-shadow: 0 0 8px rgba(255,77,106,0.8);
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+      margin-bottom: 4px;
+    }
+
+    .metric-pill {
+      background: rgba(5,8,40,0.92);
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+      padding: 7px 8px 6px;
+      font-size: 11px;
+    }
+
+    .metric-label {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 3px;
+    }
+
+    .metric-value {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .metric-note {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .bar {
+      width: 100%;
+      height: 5px;
+      border-radius: 999px;
+      background: #050821;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      width: 0%;
+      transition: width 0.25s ease;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .pill {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.35);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .pill.bright {
+      border-color: rgba(0,229,255,0.7);
+      color: var(--accent-2);
+      background: rgba(0,229,255,0.12);
+    }
+
+    .pill span.pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .insight-box {
+      margin-top: 10px;
+      padding: 7px 9px;
+      border-radius: 11px;
+      background: rgba(0,0,0,0.45);
+      border: 1px dashed rgba(255,255,255,0.18);
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .insight-box span {
+      font-size: 15px;
+    }
+
+    .list-card {
+      margin-top: 14px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .list-header-title {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .list-header-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      font-size: 11px;
+    }
+
+    .list-header-actions select {
+      font-size: 11px;
+      padding: 4px 8px;
+    }
+
+    .articles {
+      margin-top: 4px;
+      max-height: 420px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .article {
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(3,5,30,0.95);
+      padding: 8px 9px;
+      margin-bottom: 8px;
+    }
+
+    .article-title {
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 3px;
+    }
+
+    .article-title a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .article-title a:hover {
+      text-decoration: underline;
+    }
+
+    .article-meta {
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .article-summary {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .article-summary span.highlight {
+      color: var(--accent-2);
+      font-weight: 500;
+    }
+
+    .footer-note {
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--muted);
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div>
+      <div class="badge">QDS • Battery Intel Lab</div>
+      <h1><span class="emoji">🔋</span><span>Battery News Insight • Phys.org Feed</span></h1>
+      <div class="subhead">
+        Phone-first lab that mines your local <code>news_rips/physorg/YYYY-MM-DD/MASTER.json</code>,
+        filters battery stories, tags chemistries + themes, and gives you fast human-readable insight.
+      </div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- LEFT: controls + metrics -->
+    <section class="card">
+      <h2><span class="icon">🧪</span><span>1) Load a day + analyse</span></h2>
+      <p>Select a phys.org rip date, then let QDS auto-tag all battery-related stories from that day.</p>
+
+      <div class="controls-row">
+        <div>
+          <label for="dateInput">Rip date (YYYY-MM-DD)</label><br/>
+          <input type="text" id="dateInput" placeholder="2025-12-14" />
+        </div>
+
+        <div>
+          <label>&nbsp;</label><br/>
+          <button class="primary" id="btnLoad">
+            <span class="btn-emoji">🚀</span>
+            <span>Load & Analyse</span>
+          </button>
+        </div>
+
+        <div>
+          <label>&nbsp;</label><br/>
+          <button class="secondary" id="btnToday">
+            <span class="btn-emoji">📅</span>
+            <span>Today</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="status" id="status">
+        <div class="status-dot"></div>
+        <span>Idle. Waiting for you to pick a date…</span>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-pill">
+          <div class="metric-label">Articles (day)</div>
+          <div class="metric-value" id="mTotal">—</div>
+          <div class="bar"><div class="bar-fill" id="barTotal"></div></div>
+          <div class="metric-note">Total items in MASTER.json</div>
+        </div>
+        <div class="metric-pill">
+          <div class="metric-label">Battery hits</div>
+          <div class="metric-value" id="mBattery">—</div>
+          <div class="bar"><div class="bar-fill" id="barBattery"></div></div>
+          <div class="metric-note"><span id="mBatteryPct">0%</span> of total</div>
+        </div>
+        <div class="metric-pill">
+          <div class="metric-label">Chemistry / materials</div>
+          <div class="metric-value" id="mChem">—</div>
+          <div class="metric-note" id="mChemNote">—</div>
+        </div>
+        <div class="metric-pill">
+          <div class="metric-label">Diagnostics / ageing</div>
+          <div class="metric-value" id="mDiag">—</div>
+          <div class="metric-note" id="mDiagNote">—</div>
+        </div>
+        <div class="metric-pill">
+          <div class="metric-label">Architecture / scale-up</div>
+          <div class="metric-value" id="mArch">—</div>
+          <div class="metric-note" id="mArchNote">—</div>
+        </div>
+      </div>
+
+      <div class="pill-row" id="tagRow">
+        <span class="pill bright"><span class="pill-dot"></span> Live keywords: battery, Li-ion, sodium-ion, cathode, anode, solid-state, electrolyte…</span>
+      </div>
+
+      <div class="insight-box" id="insightBox">
+        <span>🔍</span>
+        <div id="insightText">
+          No data yet. Once you load a day, this box will summarise what kind of battery stories dominate (new chemistry, ageing fixes, manufacturing, etc.).
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: list + filters -->
+    <section class="card">
+      <h2><span class="icon">📚</span><span>2) Battery article list</span></h2>
+      <p>Filtered view of battery-related stories. Click titles to open original phys.org pages.</p>
+
+      <div class="list-card">
+        <div class="list-header">
+          <div class="list-header-title">
+            Showing <span id="listCount">0</span> battery stories
+          </div>
+          <div class="list-header-actions">
+            <span>Sort:</span>
+            <select id="sortSelect">
+              <option value="recent">Newest first</option>
+              <option value="title">Title A → Z</option>
+              <option value="chem">Chemistry-heavy first</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="articles" id="articles"></div>
+      </div>
+
+      <div class="footer-note">
+        Local only • Uses your own <code>MASTER.json</code> rip • Built by Dan-Operator + QDS Silicone Wizard 🪄
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+(function() {
+  const dateInput = document.getElementById('dateInput');
+  const btnLoad = document.getElementById('btnLoad');
+  const btnToday = document.getElementById('btnToday');
+  const statusEl = document.getElementById('status');
+  const statusDot = statusEl.querySelector('.status-dot');
+  const statusText = statusEl.querySelector('span');
+
+  const mTotal = document.getElementById('mTotal');
+  const mBattery = document.getElementById('mBattery');
+  const mBatteryPct = document.getElementById('mBatteryPct');
+  const barTotal = document.getElementById('barTotal');
+  const barBattery = document.getElementById('barBattery');
+
+  const mChem = document.getElementById('mChem');
+  const mChemNote = document.getElementById('mChemNote');
+  const mDiag = document.getElementById('mDiag');
+  const mDiagNote = document.getElementById('mDiagNote');
+  const mArch = document.getElementById('mArch');
+  const mArchNote = document.getElementById('mArchNote');
+
+  const insightText = document.getElementById('insightText');
+  const listCount = document.getElementById('listCount');
+  const sortSelect = document.getElementById('sortSelect');
+  const articlesEl = document.getElementById('articles');
+
+  let currentBatteryItems = [];
+  let currentDate = null;
+
+  function setStatus(text, isError=false) {
+    statusText.textContent = text;
+    if (isError) {
+      statusEl.classList.add('error');
+    } else {
+      statusEl.classList.remove('error');
+    }
+  }
+
+  function setBars(total, battery) {
+    const maxForBar = Math.max(total, 50); // just for visual scaling
+    const totalPct = Math.min(100, (total / maxForBar) * 100);
+    const battPct = total > 0 ? Math.min(100, (battery / total) * 100) : 0;
+    barTotal.style.width = totalPct.toFixed(1) + '%';
+    barBattery.style.width = battPct.toFixed(1) + '%';
+  }
+
+  function getTitle(item) {
+    return item.title || item.headline || item.name || '(no title)';
+  }
+
+  function getSummary(item) {
+    return item.summary || item.description || item.teaser || '';
+  }
+
+  function getLink(item) {
+    return item.link || item.url || '#';
+  }
+
+  function getDate(item) {
+    return item.pubDate || item.date || item.published || '';
+  }
+
+  const batteryKeywords = [
+    'battery','batteries','li-ion','li ion','lithium','solid-state','solid state',
+    'sodium-ion','sodium ion','na-ion','na ion','cathode','anode','electrolyte',
+    'lithium-ion','li metal','lithium metal','lithium-sulfur','lithium sulfur',
+    'silicon anode','graphite anode','separator','intercalation'
+  ];
+
+  function isBatteryStory(item) {
+    const t = (getTitle(item) + ' ' + getSummary(item)).toLowerCase();
+    return batteryKeywords.some(k => t.includes(k));
+  }
+
+  function classifyItem(item) {
+    const t = (getTitle(item) + ' ' + getSummary(item)).toLowerCase();
+    let chem = false, diag = false, arch = false, app = false;
+
+    if (t.match(/cathode|anode|electrolyte|solid-state|solid state|lithium|sodium|intercalation|crystal|phase|nanoparticle|nanostructure/)) {
+      chem = true;
+    }
+    if (t.match(/degradation|cycle life|aging|ageing|diagnostic|health estimation|state of health|impedance|fault|random walk/)) {
+      diag = true;
+    }
+    if (t.match(/cell design|pouch cell|prismatic|manufactur|scale-up|gigafactory|production|fabrication|printing|electrode thickness/)) {
+      arch = true;
+    }
+    if (t.match(/grid|ev |electric vehicle|drone|storage system|microgrid|satellite|spacecraft|wearable/)) {
+      app = true;
+    }
+
+    let primary = 'general';
+    if (chem) primary = 'chem';
+    else if (diag) primary = 'diag';
+    else if (arch) primary = 'arch';
+    else if (app) primary = 'app';
+
+    return { chem, diag, arch, app, primary };
+  }
+
+  function makeInsight(total, battCount, cats) {
+    if (!total) return 'No MASTER.json items for this day yet. Run ripphys, then reload.';
+    if (!battCount) return 'No battery-related hits found for this rip. Either a quiet day or the keywords need tuning.';
+    const pct = (battCount/total*100).toFixed(1);
+    const top = Object.entries(cats).sort((a,b)=>b[1]-a[1])[0];
+    let theme = 'mixed';
+    if (top) {
+      if (top[0]==='chem') theme = 'chemistry / materials';
+      else if (top[0]==='diag') theme = 'diagnostics / ageing';
+      else if (top[0]==='arch') theme = 'architecture / manufacturing';
+      else if (top[0]==='app') theme = 'applications / systems';
+    }
+    return `Day summary: ${battCount} battery-related stories out of ${total} total (${pct}%). Dominant theme: ${theme}. Use these as seeds for QDS battery habitat parameters, degradation modes, and RW stress profiles.`;
+  }
+
+  function renderArticles(items) {
+    articlesEl.innerHTML = '';
+    listCount.textContent = items.length;
+
+    items.forEach(obj => {
+      const item = obj.item;
+      const cls = obj.cls;
+      const card = document.createElement('div');
+      card.className = 'article';
+
+      const titleDiv = document.createElement('div');
+      titleDiv.className = 'article-title';
+      const a = document.createElement('a');
+      a.href = getLink(item);
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.textContent = getTitle(item);
+      titleDiv.appendChild(a);
+
+      const meta = document.createElement('div');
+      meta.className = 'article-meta';
+      const dateSpan = document.createElement('span');
+      const d = getDate(item);
+      dateSpan.textContent = d ? `📅 ${d}` : '📅 (no date)';
+      meta.appendChild(dateSpan);
+
+      const tagsSpan = document.createElement('span');
+      let tagText = 'Tags: battery';
+      if (cls.chem) tagText += ' • chemistry/materials';
+      if (cls.diag) tagText += ' • diagnostics/ageing';
+      if (cls.arch) tagText += ' • architecture/scale-up';
+      if (cls.app) tagText += ' • applications';
+      tagsSpan.textContent = tagText;
+      meta.appendChild(tagsSpan);
+
+      const summary = document.createElement('div');
+      summary.className = 'article-summary';
+      let s = getSummary(item);
+      if (s.length > 260) s = s.slice(0, 257) + '…';
+      // light highlight: try to emphasise "battery"
+      s = s.replace(/(battery|batteries)/gi, '<span class="highlight">$1</span>');
+      summary.innerHTML = s || '<span class="highlight">No summary available.</span>';
+
+      card.appendChild(titleDiv);
+      card.appendChild(meta);
+      card.appendChild(summary);
+      articlesEl.appendChild(card);
+    });
+  }
+
+  function sortItems(mode) {
+    if (!currentBatteryItems.length) return;
+    let arr = [...currentBatteryItems];
+    if (mode === 'title') {
+      arr.sort((a,b) => getTitle(a.item).localeCompare(getTitle(b.item)));
+    } else if (mode === 'chem') {
+      arr.sort((a,b) => {
+        const aScore = (a.cls.chem?2:0) + (a.cls.diag?1:0);
+        const bScore = (b.cls.chem?2:0) + (b.cls.diag?1:0);
+        return bScore - aScore;
+      });
+    } else {
+      // recent: we don't have reliable timestamps, so keep order as in MASTER
+    }
+    renderArticles(arr);
+  }
+
+  async function loadDay(dateStr) {
+    currentDate = dateStr;
+    setStatus(`Loading MASTER.json for ${dateStr}…`);
+    statusDot.style.background = 'var(--accent)';
+    try {
+      const url = `/news_rips/physorg/${dateStr}/MASTER.json`;
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+      const data = await res.json();
+      const items = Array.isArray(data)
+        ? data
+        : (Array.isArray(data.items) ? data.items : []);
+      const total = items.length;
+      mTotal.textContent = total ? total : '0';
+
+      const battItems = [];
+      let cats = {chem:0, diag:0, arch:0, app:0};
+
+      items.forEach(it => {
+        if (isBatteryStory(it)) {
+          const cls = classifyItem(it);
+          battItems.push({item: it, cls});
+          if (cls.chem) cats.chem++;
+          if (cls.diag) cats.diag++;
+          if (cls.arch) cats.arch++;
+          if (cls.app) cats.app++;
+        }
+      });
+
+      currentBatteryItems = battItems;
+      const battCount = battItems.length;
+      mBattery.textContent = battCount;
+      const pct = total ? (battCount/total*100) : 0;
+      mBatteryPct.textContent = pct.toFixed(1) + '%';
+      setBars(total, battCount);
+
+      mChem.textContent = cats.chem;
+      mDiag.textContent = cats.diag;
+      mArch.textContent = cats.arch;
+      mChemNote.textContent = cats.chem ? 'New chemistries / materials focus' : '—';
+      mDiagNote.textContent = cats.diag ? 'Ageing / diagnostics angle' : '—';
+      mArchNote.textContent = cats.arch ? 'Design / manufacturing / scale-up' : '—';
+
+      insightText.textContent = makeInsight(total, battCount, cats);
+      setStatus(`Loaded ${total} items; found ${battCount} battery-related stories for ${dateStr}.`);
+
+      sortItems(sortSelect.value);
+    } catch (err) {
+      console.error(err);
+      currentBatteryItems = [];
+      mTotal.textContent = '—';
+      mBattery.textContent = '—';
+      mBatteryPct.textContent = '0%';
+      setBars(0,0);
+      mChem.textContent = '—';
+      mDiag.textContent = '—';
+      mArch.textContent = '—';
+      mChemNote.textContent = '—';
+      mDiagNote.textContent = '—';
+      mArchNote.textContent = '—';
+      insightText.textContent = 'Error loading MASTER.json. Check the date and that ripphys has written a folder for that day.';
+      setStatus(`Couldn’t load /news_rips/physorg/${dateStr}/MASTER.json`, true);
+      articlesEl.innerHTML = '';
+      listCount.textContent = '0';
+    }
+  }
+
+  // Wire up events
+  btnLoad.addEventListener('click', () => {
+    const d = dateInput.value.trim();
+    if (!d) {
+      setStatus('Please enter a date like 2025-12-14.', true);
+      return;
+    }
+    loadDay(d);
+  });
+
+  btnToday.addEventListener('click', () => {
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth()+1).padStart(2,'0');
+    const dd = String(now.getDate()).padStart(2,'0');
+    const d = `${yyyy}-${mm}-${dd}`;
+    dateInput.value = d;
+    loadDay(d);
+  });
+
+  sortSelect.addEventListener('change', () => {
+    sortItems(sortSelect.value);
+  });
+
+  // Initialise date to today (doesn't auto-load; that’s up to you)
+  (function seedDate() {
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth()+1).padStart(2,'0');
+    const dd = String(now.getDate()).padStart(2,'0');
+    dateInput.value = `${yyyy}-${mm}-${dd}`;
+  })();
+
+})();
+</script>
+</body>
+</html>

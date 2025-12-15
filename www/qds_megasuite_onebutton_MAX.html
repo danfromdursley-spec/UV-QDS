@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+<title>QDS MEGA Suite • One-Button MAX</title>
+<style>
+  :root{
+    --bg:#05070b; --card:#0b1220cc; --ink:#e9f1ff; --muted:#9bb0d0;
+    --a:#19f7d2; --b:#ffcc33; --c:#7aa7ff; --bad:#ff4d6d; --ok:#22c55e;
+    --line:#1b2b4a; --shadow: 0 18px 50px rgba(0,0,0,.45);
+    --r:22px;
+  }
+  html,body{height:100%;background:radial-gradient(1200px 700px at 25% 10%, #0a2b2a 0%, transparent 60%),
+                          radial-gradient(1000px 600px at 85% 15%, #2b1a05 0%, transparent 55%),
+                          radial-gradient(1200px 900px at 50% 120%, #06102a 0%, #04060a 60%, #030509 100%);
+            color:var(--ink); font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin:0;}
+  .wrap{max-width:980px; margin:0 auto; padding:18px 14px 60px;}
+  .top{padding:18px 16px; border:1px solid rgba(255,255,255,.08); border-radius:28px; background:linear-gradient(180deg, rgba(20,30,55,.65), rgba(10,14,25,.35));
+       box-shadow: var(--shadow); position:relative; overflow:hidden;}
+  .pill{display:inline-flex; gap:10px; align-items:center; padding:8px 12px; border-radius:999px;
+        border:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.25); color:var(--muted); font-size:12px;}
+  h1{margin:10px 0 6px; font-size:28px; letter-spacing:.2px;}
+  .sub{color:var(--muted); line-height:1.45; font-size:14px; max-width:70ch;}
+  .row{display:flex; gap:12px; flex-wrap:wrap; margin-top:14px;}
+  .btn{
+    flex:1; min-width:220px; padding:14px 14px; border-radius:16px; border:0; cursor:pointer;
+    font-weight:800; letter-spacing:.2px; box-shadow: 0 14px 30px rgba(0,0,0,.35);
+  }
+  .btn.run{background:linear-gradient(90deg, #19f7d2, #35c8ff); color:#06201b;}
+  .btn.self{background:linear-gradient(90deg, #ffcc33, #ff9955); color:#2a1a00;}
+  .btn.ghost{background:rgba(255,255,255,.06); color:var(--ink); border:1px solid rgba(255,255,255,.10); box-shadow:none;}
+  .grid{display:grid; grid-template-columns: 1fr; gap:14px; margin-top:14px;}
+  @media(min-width: 940px){ .grid{grid-template-columns: 1fr 1fr;} }
+  .card{background:rgba(8,14,26,.75); border:1px solid rgba(255,255,255,.08); border-radius:var(--r); padding:14px; box-shadow: var(--shadow);}
+  .card h2{margin:0 0 6px; font-size:16px;}
+  .muted{color:var(--muted); font-size:13px; line-height:1.4;}
+  textarea,input{width:100%; box-sizing:border-box; border-radius:14px; border:1px solid rgba(255,255,255,.10);
+                 background:rgba(0,0,0,.25); color:var(--ink); padding:10px 12px; outline:none;}
+  textarea{min-height:170px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; line-height:1.35;}
+  .small{font-size:12px; color:var(--muted);}
+  .badge{display:inline-flex; align-items:center; gap:8px; padding:10px 12px; border-radius:14px; border:1px solid rgba(255,255,255,.10);
+         background:rgba(0,0,0,.22); margin-top:10px;}
+  .dot{width:10px; height:10px; border-radius:99px; background:var(--muted);}
+  .dot.ok{background:var(--ok);} .dot.bad{background:var(--bad);}
+  .log{white-space:pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; line-height:1.35;
+       background:rgba(0,0,0,.25); border:1px solid rgba(255,255,255,.08); border-radius:18px; padding:12px; overflow:auto; max-height:320px;}
+  .canvasWrap{margin-top:10px; padding:12px; border-radius:18px; border:1px solid rgba(255,255,255,.08); background:rgba(0,0,0,.18);}
+  canvas{width:100%; height:260px; display:block;}
+  .tbl{width:100%; border-collapse:collapse; margin-top:10px; font-size:12px;}
+  .tbl th,.tbl td{padding:8px 6px; border-bottom:1px solid rgba(255,255,255,.08); text-align:left;}
+  .warn{color:#ffd56a;}
+  .foot{margin-top:14px; color:var(--muted); font-size:12px;}
+  a{color:#7fe8ff;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="pill">🧪 QDS MEGA SUITE • <b>One-Button MAX</b> • phone-first</div>
+    <h1>Push once → run everything</h1>
+    <div class="sub">
+      Runs a falsification-first stack: microphysics kernel-shape, UV finiteness sanity, H₀ variance law check,
+      rotation-curve sanity, binary/pulsar constraint proxy, and bird-migration coherence.
+      <br><span class="small">No external libs. Standalone. Exportable report. Built by Dan-Operator & GPT-5.1 Thinking ☕</span>
+    </div>
+
+    <div class="row">
+      <button class="btn run" id="btnRun">RUN FULL MEGA SUITE (one button)</button>
+      <button class="btn self" id="btnSelf">Run self-tests</button>
+      <button class="btn ghost" id="btnClear">Clear</button>
+      <button class="btn ghost" id="btnExportJSON">Export report (JSON)</button>
+      <button class="btn ghost" id="btnExportCSV">Export curves (CSV)</button>
+    </div>
+
+    <div class="badge" id="statusBadge">
+      <span class="dot" id="statusDot"></span>
+      <div>
+        <div style="font-weight:800" id="statusTitle">Ready</div>
+        <div class="small" id="statusSub">Load defaults or edit datasets, then run.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>1) Datasets (defaults are “decent demo-real”) </h2>
+      <div class="muted">Edit JSON then hit <b>RUN</b>. Everything is deterministic + logged.</div>
+      <div style="margin-top:10px">
+        <textarea id="dataBox"></textarea>
+        <div class="row" style="margin-top:10px">
+          <button class="btn ghost" id="btnDefaults">Load defaults</button>
+          <button class="btn ghost" id="btnSave">Save to localStorage</button>
+          <button class="btn ghost" id="btnLoad">Load from localStorage</button>
+        </div>
+        <div class="foot">
+          Tip: keep “real-world” values in here. Replace demo rows with literature numbers anytime.
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>2) Console</h2>
+      <div class="muted">Run log + PASS/FAIL rollup.</div>
+      <div class="log" id="log"></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>3) Plots • Kernel / Microphysics / UV</h2>
+      <div class="muted">K(t) and K(r) plus UV convergence sanity (finite integral).</div>
+      <div class="canvasWrap"><canvas id="cvKernelT" width="900" height="320"></canvas></div>
+      <div class="canvasWrap"><canvas id="cvKernelR" width="900" height="320"></canvas></div>
+      <div class="canvasWrap"><canvas id="cvUV" width="900" height="320"></canvas></div>
+    </div>
+
+    <div class="card">
+      <h2>4) Plots • H₀, Rotation, Pulsar Proxy, Bird Coherence</h2>
+      <div class="muted">Per-test quick charts (sanity-grade). Replace with full-fit models later.</div>
+      <div class="canvasWrap"><canvas id="cvH0" width="900" height="320"></canvas></div>
+      <div class="canvasWrap"><canvas id="cvRot" width="900" height="320"></canvas></div>
+      <div class="canvasWrap"><canvas id="cvPulsar" width="900" height="320"></canvas></div>
+      <div class="canvasWrap"><canvas id="cvBird" width="900" height="320"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>5) Summary Table</h2>
+    <div class="muted">Each test returns a result block with metrics + pass/fail.</div>
+    <table class="tbl" id="tbl"></table>
+    <div class="foot warn">
+      Note: this is a “sanity + integration” mega-runner (fast, honest, break-bad-friendly).
+      For publication-grade constraints, plug in full literature parameters and document mapping assumptions per lab.
+    </div>
+  </div>
+
+  <div class="foot">
+    Device: Ω-Phone QDS Lab • localhost • File: <b>qds_megasuite_onebutton_MAX.html</b>
+  </div>
+</div>
+
+<script>
+/* ===== tiny utils (ASCII-safe) ===== */
+const $ = (id)=>document.getElementById(id);
+const nowISO = ()=> new Date().toISOString().replace('T',' ').replace('Z','');
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const isNum=(x)=>typeof x==="number" && isFinite(x);
+function logln(s){ const el=$("log"); el.textContent += s + "\n"; el.scrollTop = el.scrollHeight; }
+function setStatus(ok, title, sub){
+  $("statusDot").className = "dot " + (ok===true?"ok": ok===false?"bad":"");
+  $("statusTitle").textContent = title;
+  $("statusSub").textContent = sub || "";
+}
+function dl(filename, text){
+  const blob = new Blob([text], {type:"text/plain"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function safeJSONParse(s){
+  try{ return {ok:true, v: JSON.parse(s)}; }catch(e){ return {ok:false, err:String(e)}; }
+}
+
+/* ===== simple canvas plotter (no libs) ===== */
+function plotLines(canvas, series, opts){
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+  // background grid
+  ctx.globalAlpha = 0.25;
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 1;
+  for(let i=0;i<=10;i++){
+    const x = Math.round(i*W/10);
+    const y = Math.round(i*H/10);
+    ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+
+  // compute bounds
+  let xmin=Infinity,xmax=-Infinity,ymin=Infinity,ymax=-Infinity;
+  series.forEach(s=>{
+    s.xy.forEach(p=>{
+      xmin=Math.min(xmin,p[0]); xmax=Math.max(xmax,p[0]);
+      ymin=Math.min(ymin,p[1]); ymax=Math.max(ymax,p[1]);
+    });
+  });
+  if(!isFinite(xmin)||!isFinite(ymin)){ return; }
+  if(xmin===xmax){ xmax=xmin+1; }
+  if(ymin===ymax){ ymax=ymin+1; }
+
+  const pad = 28;
+  const x2px = x => pad + (x-xmin)*(W-2*pad)/(xmax-xmin);
+  const y2py = y => H-pad - (y-ymin)*(H-2*pad)/(ymax-ymin);
+
+  // axes
+  ctx.strokeStyle = "rgba(255,255,255,.65)";
+  ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.moveTo(pad,pad); ctx.lineTo(pad,H-pad); ctx.lineTo(W-pad,H-pad); ctx.stroke();
+
+  // title
+  if(opts && opts.title){
+    ctx.fillStyle="rgba(255,255,255,.88)";
+    ctx.font="bold 18px system-ui";
+    ctx.fillText(opts.title, pad, 22);
+  }
+
+  // plot
+  series.forEach((s, idx)=>{
+    ctx.strokeStyle = s.color || `hsl(${(idx*70)%360} 80% 65%)`;
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    s.xy.forEach((p,i)=>{
+      const x=x2px(p[0]), y=y2py(p[1]);
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+  });
+
+  // legend (top-right)
+  ctx.font="12px ui-monospace, Menlo, Consolas";
+  let lx=W-pad-6, ly=pad+10;
+  series.slice(0,6).forEach((s, idx)=>{
+    const col = s.color || `hsl(${(idx*70)%360} 80% 65%)`;
+    ctx.fillStyle=col;
+    ctx.fillRect(lx-10, ly-8, 10, 10);
+    ctx.fillStyle="rgba(255,255,255,.85)";
+    const t = (s.name||`S${idx+1}`).slice(0,28);
+    const w = ctx.measureText(t).width;
+    ctx.fillText(t, lx-14-w, ly);
+    ly += 16;
+  });
+}
+
+/* ===== tests (plugins) ===== */
+function test_microphysics(data){
+  const k = data.kernel;
+  const sig2 = k.sigma2, tc = k.tau_c, lc = k.lambda_c;
+  const ok = isNum(sig2)&&sig2>0 && isNum(tc)&&tc>0 && isNum(lc)&&lc>0;
+  if(!ok) return {name:"Microphysics Kernel", pass:false, note:"bad params", curves:{}};
+
+  // K(t)/sig2 = exp(-|t|/tc)
+  const tmax = tc*5;
+  const txy = [];
+  for(let i=0;i<=200;i++){
+    const t = -tmax + 2*tmax*(i/200);
+    txy.push([t, Math.exp(-Math.abs(t)/tc)]);
+  }
+  // K(r)/sig2 = exp(-r^2/(2 lc^2))
+  const rmax = lc*4;
+  const rxy = [];
+  for(let i=0;i<=200;i++){
+    const r = 0 + rmax*(i/200);
+    rxy.push([r, Math.exp(-(r*r)/(2*lc*lc))]);
+  }
+  return {
+    name:"Microphysics Kernel",
+    pass:true,
+    metrics:{sigma2:sig2, tau_c:tc, lambda_c:lc},
+    curves:{Kt_over_sig2:txy, Kr_over_sig2:rxy}
+  };
+}
+
+// UV finiteness sanity: P(k) ~ k^-3 exp(-k/kUV). check integral I = ∫_{kmin}^{kmax} k^2 P(k) dk converges
+function test_uv(data){
+  const u = data.uv;
+  const kUV = u.k_uv;
+  const kmin = u.k_min, kmax = u.k_max;
+  if(!(isNum(kUV)&&kUV>0&&isNum(kmin)&&kmin>0&&isNum(kmax)&&kmax>kmin)) {
+    return {name:"UV Finiteness", pass:false, note:"bad params", curves:{}};
+  }
+  function P(k){ return Math.pow(k,-3) * Math.exp(-k/kUV); }
+  // numeric trapezoid
+  const N=600;
+  let I=0;
+  const xy=[];
+  let prevK=kmin, prevF = (prevK*prevK)*P(prevK);
+  for(let i=1;i<=N;i++){
+    const k = kmin + (kmax-kmin)*(i/N);
+    const f = (k*k)*P(k);
+    I += 0.5*(f+prevF)*(k-prevK);
+    if(i%10===0) xy.push([k, I]);
+    prevK=k; prevF=f;
+  }
+  // pass if tail contribution is small-ish
+  const tailStart = kmax*0.8;
+  let Itail=0;
+  prevK=tailStart; prevF=(prevK*prevK)*P(prevK);
+  for(let i=1;i<=N;i++){
+    const k = tailStart + (kmax-tailStart)*(i/N);
+    const f=(k*k)*P(k);
+    Itail += 0.5*(f+prevF)*(k-prevK);
+    prevK=k; prevF=f;
+  }
+  const fracTail = Itail / (I||1);
+  const pass = fracTail < u.tail_frac_max;
+  return {
+    name:"UV Finiteness",
+    pass,
+    metrics:{k_uv:kUV, I:I, tailFrac:fracTail},
+    curves:{I_of_k:xy},
+    note: pass ? "convergent" : "tail too large (increase k_max or reduce tail_frac_max)"
+  };
+}
+
+function test_h0(data){
+  const h = data.h0;
+  const A=h.A, p=h.p, tol=h.tol_frac;
+  if(!(isNum(A)&&A>0&&isNum(p)&&p>0&&isNum(tol)&&tol>0)) return {name:"H0 Variance", pass:false, note:"bad params", curves:{}};
+
+  const rows = h.samples || [];
+  let passCount=0;
+  const xyPred=[], xyObs=[];
+  rows.forEach(r=>{
+    const R=r.R_mpc, obs=r.sig_over_H;
+    const pred = A*Math.pow(R,-p);
+    xyPred.push([R, pred]);
+    xyObs.push([R, obs]);
+    const rel = Math.abs(obs-pred)/Math.max(pred,1e-12);
+    if(rel <= tol) passCount++;
+  });
+  const pass = passCount === rows.length && rows.length>0;
+  return {
+    name:"H0 Variance",
+    pass,
+    metrics:{A:A, p:p, tolFrac:tol, passN:passCount, N:rows.length},
+    curves:{pred:xyPred, obs:xyObs},
+    note: pass ? "within tolerance" : "one or more points out of band"
+  };
+}
+
+function test_rotation(data){
+  const g = data.rotation;
+  const a=g.alpha, lc=g.lambda_c_kpc, tol=g.tol_frac;
+  const pts = g.points || [];
+  if(!(isNum(a)&&isNum(lc)&&lc>0&&isNum(tol)&&tol>0) || pts.length===0) return {name:"Rotation Curves", pass:false, note:"bad params", curves:{}};
+
+  const xyN=[], xyQ=[];
+  let passN=0;
+  pts.forEach(p=>{
+    const r=p.r_kpc, vN=p.vN, vObs=p.vObs;
+    const vQ = vN*Math.sqrt(1 + a*Math.exp(-r/lc));
+    xyN.push([r, vN]);
+    xyQ.push([r, vQ]);
+    const rel = Math.abs(vQ - vObs)/Math.max(vObs,1e-12);
+    if(rel <= tol) passN++;
+  });
+  const pass = passN === pts.length;
+  return {
+    name:"Rotation Curves",
+    pass,
+    metrics:{alpha:a, lambda_c_kpc:lc, tolFrac:tol, passN:passN, N:pts.length},
+    curves:{newton:xyN, qds:xyQ},
+    note: pass ? "fits within tol (sanity)" : "outside tol (tweak alpha/lambda or use real galaxy data)"
+  };
+}
+
+// Pulsar constraint proxy: same idea as your one-button suite (amax vs lambda envelope)
+// simplified f(r,lambda)= (1+r/lambda)e^{-r/lambda}, amax = band/|f|
+function test_pulsar(data){
+  const ps = data.pulsar;
+  const lamGrid = ps.lambda_grid || {log10_min:-3, log10_max:3, points:140};
+  const systems = ps.systems || [];
+  const eps = ps.edge_eps || 2e-6;
+
+  function f(r, lam){
+    if(lam<=0 || r<0) return NaN;
+    if(r===0) return 1;
+    const x=r/lam;
+    return (1+x)*Math.exp(-x);
+  }
+  function amaxAllowed(r, band, lam){
+    const fv=f(r,lam);
+    const denom=Math.max(Math.abs(fv), eps);
+    return band/denom;
+  }
+
+  const curves={};
+  const env=[];
+  const lamList=[];
+  for(let i=0;i<lamGrid.points;i++){
+    const t = i/(lamGrid.points-1);
+    const log10 = lamGrid.log10_min + (lamGrid.log10_max-lamGrid.log10_min)*t;
+    const lam = Math.pow(10, log10);
+    lamList.push({log10, lam});
+    // envelope = min amax across systems
+    let amin=Infinity;
+    systems.forEach(s=>{
+      const amax = amaxAllowed(s.r, s.band, lam);
+      amin = Math.min(amin, amax);
+    });
+    env.push([log10, Math.log10(amin)]);
+  }
+  // per system curve
+  systems.forEach((s,idx)=>{
+    const xy=[];
+    lamList.forEach(L=>{
+      const amax=amaxAllowed(s.r, s.band, L.lam);
+      xy.push([L.log10, Math.log10(amax)]);
+    });
+    curves["sys_"+idx]=xy;
+  });
+
+  // pass criterion here is only “computed + sane monotonic-ish”
+  let monotonicOK=true;
+  for(let i=1;i<env.length;i++){
+    if(env[i][1] > env[i-1][1] + 1e-6){ monotonicOK=false; break; } // should generally decrease with lambda
+  }
+  return {
+    name:"Binary/Pulsar Constraint Proxy",
+    pass: monotonicOK && systems.length>0,
+    metrics:{systemsN:systems.length, gridN:lamGrid.points, edge_eps:eps},
+    curves:{envelope:env, perSystem:curves},
+    note: "sanity proxy (not full timing-model fit)"
+  };
+}
+
+function test_bird(data){
+  const b = data.bird;
+  const cohorts = b.cohorts || [];
+  if(cohorts.length===0) return {name:"Bird Migration Coherence", pass:false, note:"no cohorts", curves:{}};
+
+  // coherence metric: compare time series of daily distance (or heading proxy) via correlation
+  function corr(a,b){
+    const n=Math.min(a.length,b.length);
+    if(n<3) return NaN;
+    let ma=0,mb=0;
+    for(let i=0;i<n;i++){ ma+=a[i]; mb+=b[i]; }
+    ma/=n; mb/=n;
+    let num=0,da=0,db=0;
+    for(let i=0;i<n;i++){
+      const xa=a[i]-ma, xb=b[i]-mb;
+      num += xa*xb; da += xa*xa; db += xb*xb;
+    }
+    return num/Math.sqrt((da*db)||1e-12);
+  }
+
+  // use first as reference
+  const ref = cohorts[0];
+  const xy=[];
+  let passN=0;
+  for(let i=0;i<cohorts.length;i++){
+    const c = cohorts[i];
+    const r = corr(ref.series, c.series);
+    xy.push([i, r]);
+    if(r >= b.min_corr) passN++;
+  }
+  const pass = passN === cohorts.length;
+  return {
+    name:"Bird Migration Coherence",
+    pass,
+    metrics:{minCorr:b.min_corr, passN:passN, N:cohorts.length},
+    curves:{corrByCohort:xy},
+    note: pass ? "coherent vs ref" : "drift/anomaly flagged"
+  };
+}
+
+/* ===== self-tests ===== */
+function runSelfTests(){
+  const out=[];
+  function ok(name, cond){ out.push({name, pass:!!cond}); }
+
+  ok("exp(-0.1) approx", Math.abs(Math.exp(-0.1)-0.904837)<1e-6);
+  // correlation sanity
+  const a=[1,2,3,4], b=[1,2,3,4], c=[4,3,2,1];
+  function corr(a,b){
+    let n=Math.min(a.length,b.length), ma=0,mb=0;
+    for(let i=0;i<n;i++){ma+=a[i];mb+=b[i];}
+    ma/=n;mb/=n;
+    let num=0,da=0,db=0;
+    for(let i=0;i<n;i++){
+      const xa=a[i]-ma, xb=b[i]-mb;
+      num+=xa*xb; da+=xa*xa; db+=xb*xb;
+    }
+    return num/Math.sqrt((da*db)||1e-12);
+  }
+  ok("corr identical ~1", Math.abs(corr(a,b)-1)<1e-9);
+  ok("corr reversed ~-1", Math.abs(corr(a,c)+1)<1e-9);
+
+  // pulsar f(r,lam) boundary
+  function f(r,lam){ if(lam<=0||r<0) return NaN; if(r===0) return 1; const x=r/lam; return (1+x)*Math.exp(-x); }
+  ok("pulsar f(r=0)=1", f(0,1)===1);
+  ok("pulsar negative lam -> NaN", Number.isNaN(f(1,-1)));
+
+  return out;
+}
+
+/* ===== defaults ===== */
+function defaults(){
+  return {
+    kernel:{ sigma2:0.27, tau_c:0.35, lambda_c:2.4 },
+    uv:{ k_uv:40, k_min:1e-3, k_max:2e3, tail_frac_max:0.01 },
+    h0:{
+      A:0.017, p:0.35, tol_frac:0.35,
+      samples:[
+        {R_mpc:5,  sig_over_H:0.011},
+        {R_mpc:10, sig_over_H:0.009},
+        {R_mpc:20, sig_over_H:0.007},
+        {R_mpc:50, sig_over_H:0.005},
+        {R_mpc:100,sig_over_H:0.004}
+      ]
+    },
+    rotation:{
+      alpha:0.8, lambda_c_kpc:10, tol_frac:0.20,
+      points:[
+        {r_kpc:2,  vN:90,  vObs:130},
+        {r_kpc:5,  vN:120, vObs:160},
+        {r_kpc:10, vN:150, vObs:175},
+        {r_kpc:15, vN:160, vObs:180},
+        {r_kpc:25, vN:165, vObs:185}
+      ]
+    },
+    pulsar:{
+      edge_eps:2e-6,
+      lambda_grid:{log10_min:-3, log10_max:3, points:140},
+      systems:[
+        {name:"PSR B1913+16 (demo)", r:1.0,  band:0.0020},
+        {name:"Double Pulsar J0737-3039 (demo)", r:0.6, band:0.0015},
+        {name:"PSR J0348+0432 (demo)", r:0.25, band:0.0010},
+        {name:"PSR J1738+0333 (demo)", r:0.35, band:0.0012}
+      ]
+    },
+    bird:{
+      min_corr:0.88,
+      cohorts:[
+        {name:"Cohort A (ref)", series:[10,12,15,18,25,30,40,55,60,62]},
+        {name:"Cohort B",       series:[9,11,16,19,24,31,39,54,61,63]},
+        {name:"Cohort C",       series:[10,13,14,18,26,29,41,56,59,61]}
+      ]
+    }
+  };
+}
+
+/* ===== main run ===== */
+let LAST_REPORT = null;
+
+function makeTable(results){
+  const rows=[];
+  rows.push("<tr><th>Test</th><th>Pass</th><th>Key metrics</th><th>Note</th></tr>");
+  results.forEach(r=>{
+    const p = r.pass ? "✅" : "❌";
+    const m = r.metrics ? Object.keys(r.metrics).slice(0,6).map(k=>`${k}=${fmt(r.metrics[k])}`).join(" • ") : "";
+    rows.push(`<tr><td>${esc(r.name)}</td><td>${p}</td><td>${esc(m)}</td><td>${esc(r.note||"")}</td></tr>`);
+  });
+  $("tbl").innerHTML = rows.join("");
+}
+function esc(s){ return String(s).replace(/[&<>"]/g, c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c])); }
+function fmt(x){
+  if(typeof x==="number"){
+    if(!isFinite(x)) return "NaN";
+    if(Math.abs(x)>=1000 || Math.abs(x)<1e-3) return x.toExponential(3);
+    return x.toFixed(6).replace(/\.?0+$/,"");
+  }
+  return String(x);
+}
+
+function exportCSV(report){
+  // flatten curves to csv: test, curve, x, y
+  let out="test,curve,x,y\n";
+  report.results.forEach(r=>{
+    if(!r.curves) return;
+    Object.keys(r.curves).forEach(k=>{
+      const v=r.curves[k];
+      // nested map for pulsar perSystem
+      if(k==="perSystem" && v && typeof v==="object"){
+        Object.keys(v).forEach(sysKey=>{
+          (v[sysKey]||[]).forEach(p=>{ out += `${csv(r.name)},${csv(sysKey)},${p[0]},${p[1]}\n`; });
+        });
+      } else if(Array.isArray(v)){
+        v.forEach(p=>{ out += `${csv(r.name)},${csv(k)},${p[0]},${p[1]}\n`; });
+      }
+    });
+  });
+  return out;
+}
+function csv(s){ return `"${String(s).replace(/"/g,'""')}"`; }
+
+function runMegaSuite(){
+  $("log").textContent = "";
+  setStatus(null, "Running…", "One button. No excuses.");
+  logln("=== QDS MEGA SUITE • One-Button MAX ===");
+  logln("Time: " + nowISO());
+
+  const parsed = safeJSONParse($("dataBox").value);
+  if(!parsed.ok){
+    setStatus(false, "Bad JSON", parsed.err);
+    logln("❌ JSON parse error: " + parsed.err);
+    return;
+  }
+  const data = parsed.v;
+
+  const results=[];
+  const t0 = performance.now();
+
+  // run tests
+  const rMicro = test_microphysics(data); results.push(rMicro);
+  const rUV    = test_uv(data);          results.push(rUV);
+  const rH0    = test_h0(data);          results.push(rH0);
+  const rRot   = test_rotation(data);    results.push(rRot);
+  const rP     = test_pulsar(data);      results.push(rP);
+  const rBird  = test_bird(data);        results.push(rBird);
+
+  const passN = results.filter(x=>x.pass).length;
+  const failN = results.length - passN;
+
+  // plots
+  if(rMicro.curves && rMicro.curves.Kt_over_sig2){
+    plotLines($("cvKernelT"), [{name:"K(t)/sigma2", xy:rMicro.curves.Kt_over_sig2}], {title:"Kernel temporal factor"});
+  }
+  if(rMicro.curves && rMicro.curves.Kr_over_sig2){
+    plotLines($("cvKernelR"), [{name:"K(r)/sigma2", xy:rMicro.curves.Kr_over_sig2}], {title:"Kernel spatial factor"});
+  }
+  if(rUV.curves && rUV.curves.I_of_k){
+    plotLines($("cvUV"), [{name:"I(k) cumulative", xy:rUV.curves.I_of_k}], {title:"UV finiteness: cumulative integral"});
+  }
+  if(rH0.curves){
+    plotLines($("cvH0"), [
+      {name:"pred", xy:rH0.curves.pred},
+      {name:"obs",  xy:rH0.curves.obs}
+    ], {title:"H0 variance: pred vs obs"});
+  }
+  if(rRot.curves){
+    plotLines($("cvRot"), [
+      {name:"Newtonian vN", xy:rRot.curves.newton},
+      {name:"QDS vQDS",     xy:rRot.curves.qds}
+    ], {title:"Rotation: v(r) sanity"});
+  }
+  if(rP.curves){
+    const series=[];
+    // show 3 sys max to avoid clutter
+    if(rP.curves.perSystem){
+      const keys = Object.keys(rP.curves.perSystem).slice(0,3);
+      keys.forEach((k,idx)=>{
+        series.push({name:"sys "+(idx+1), xy:rP.curves.perSystem[k]});
+      });
+    }
+    series.push({name:"envelope", xy:rP.curves.envelope});
+    plotLines($("cvPulsar"), series, {title:"Pulsar proxy: log10(amax) vs log10(lambda)"});
+  }
+  if(rBird.curves && rBird.curves.corrByCohort){
+    plotLines($("cvBird"), [{name:"corr vs cohort index", xy:rBird.curves.corrByCohort}], {title:"Bird coherence: correlation to ref"});
+  }
+
+  makeTable(results);
+
+  const dt = performance.now()-t0;
+  logln("");
+  logln("Results: PASS " + passN + " / " + results.length + " • FAIL " + failN);
+  logln("Runtime: " + dt.toFixed(1) + " ms");
+
+  LAST_REPORT = {
+    title:"QDS MEGA SUITE • One-Button MAX",
+    time: nowISO(),
+    pass: passN, fail: failN,
+    results: results,
+    data: data
+  };
+
+  if(failN===0) setStatus(true, "MEGA SUITE PASS ✅", "All tests passed (sanity-grade).");
+  else setStatus(false, "MEGA SUITE FAIL ❌", failN + " test(s) failed. Fix params or data.");
+}
+
+/* ===== wire buttons ===== */
+$("btnDefaults").onclick = ()=>{ $("dataBox").value = JSON.stringify(defaults(), null, 2); logln("Loaded defaults."); };
+$("btnSave").onclick = ()=>{ localStorage.setItem("QDS_MEGA_DATA", $("dataBox").value); logln("Saved dataset to localStorage."); };
+$("btnLoad").onclick = ()=>{
+  const s=localStorage.getItem("QDS_MEGA_DATA");
+  if(s){ $("dataBox").value=s; logln("Loaded dataset from localStorage."); }
+  else logln("No saved dataset found.");
+};
+$("btnClear").onclick = ()=>{ $("log").textContent=""; $("tbl").innerHTML=""; setStatus(null,"Ready","Cleared."); };
+
+$("btnRun").onclick = runMegaSuite;
+
+$("btnSelf").onclick = ()=>{
+  const tests = runSelfTests();
+  $("log").textContent="";
+  logln("=== SELF-TEST SUITE ===");
+  let pass=0;
+  tests.forEach(t=>{
+    logln((t.pass?"✅ ":"❌ ") + t.name);
+    if(t.pass) pass++;
+  });
+  const fail = tests.length-pass;
+  logln("");
+  logln("Self-tests: " + pass + " pass, " + fail + " fail");
+  setStatus(fail===0, fail===0 ? "Self-tests PASS ✅" : "Self-tests FAIL ❌", "");
+};
+
+$("btnExportJSON").onclick = ()=>{
+  if(!LAST_REPORT){ logln("Nothing to export yet. Run the suite first."); return; }
+  dl("qds_megasuite_report_"+new Date().toISOString().slice(0,10)+".json", JSON.stringify(LAST_REPORT, null, 2));
+};
+
+$("btnExportCSV").onclick = ()=>{
+  if(!LAST_REPORT){ logln("Nothing to export yet. Run the suite first."); return; }
+  dl("qds_megasuite_curves_"+new Date().toISOString().slice(0,10)+".csv", exportCSV(LAST_REPORT));
+};
+
+// boot
+$("dataBox").value = JSON.stringify(defaults(), null, 2);
+setStatus(null,"Ready","Defaults loaded. Push RUN.");
+</script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+QDS OPS KEY
+Generated: Mon Dec 15 19:38:10 GMT 2025
+
+== Primary Doors ==
+Frontdoor: http://127.0.0.1:8011/frontdoor_show.html
+Dev Door:  http://127.0.0.1:8011/dev_door_space.html
+
+== Recent Frontdoor backups (latest 5) ==
+frontdoor_show_backup_20251215_193544.html
+frontdoor_show_backup_20251215_160531.html
+frontdoor_show_backup_20251215_151851.html
+frontdoor_show_backup_20251215_112220.html
+frontdoor_show_backup_20251215_091611.html
+
+== Your key scripts (if present) ==
+
+== Alias snapshot (grep qds/darkside/labside) ==
+alias api='cd ~/OMEGA_EMPIRE/UV_QDS && bash tools/tools_make_all_pages_index.sh'
+alias batt2d='cd ~/OMEGA_EMPIRE/UV_QDS/www && find . -type f -name "*battery*.html" -mtime -2 -print | sort'
+alias batt96='termux-open-url http://127.0.0.1:8000/qds_battery_hub_v9_6_science_neon.html'
+alias battindex='termux-open-url http://127.0.0.1:8000/qds_battery_index_v1_neon_os.html'
+alias battserve='cd ~/OMEGA_EMPIRE/UV_QDS/www && python -m http.server 8000'
+alias battserve1='cd ~/OMEGA_EMPIRE/UV_QDS/www && python -m http.server 8001'
+alias darkside='/data/data/com.termux/files/home/darkside.sh'
+alias ghgo='bash ~/OMEGA_EMPIRE/UV_QDS/www/ghgo.sh'
+alias ghlatest='bash ~/OMEGA_EMPIRE/UV_QDS/www/run_growthhub_latest_linked.sh'
+alias html2d='cd ~/OMEGA_EMPIRE/UV_QDS/www && find . -type f -name "*.html" -mtime -2 -print | sort'
+alias html2d_pretty='cd ~/OMEGA_EMPIRE/UV_QDS/www && find . -type f -name "*.html" -mtime -2 -exec ls -lh --time-style=long-iso {} \; | sort -k6,7'
+alias inbox='cd "$(find ~/OMEGA_EMPIRE -maxdepth 1 -type d -name "QDS_DATA_INBOX_*" -print 2>/dev/null | sort | tail -n 1)" && pwd'
+alias inboxls='ls -1d ~/OMEGA_EMPIRE/QDS_DATA_INBOX_* 2>/dev/null | sort'
+alias inboxtar='ls -1t ~/OMEGA_EMPIRE/QDS_DATA_INBOX_*.tar.gz 2>/dev/null | head -n 1'
+alias labside='/data/data/com.termux/files/home/labside.sh'
+alias lp='cd ~/OMEGA_EMPIRE/UV_QDS && bash tools/uv_qds_lazy_publish.sh'
+alias lpf='cd ~/OMEGA_EMPIRE/UV_QDS && REFRESH_FRONT_DOOR=1 bash tools/uv_qds_lazy_publish.sh'
+alias micro='cd ~/OMEGA_EMPIRE/UV_QDS/tools/micro && ls -1'
+alias openlan='termux-open-url "http://127.0.0.1:8022/physorg_qds_triage.html?x=$(date +%s)"'
+alias physvault='bash ~/news_refresh_phys.sh && termux-open-url "http://127.0.0.1:8011/physorg_qds_triage.html?x=$(date +%s)"'
+alias q='cd ~/OMEGA_EMPIRE/UV_QDS'
+alias qds48='bash ~/files_48h.sh'
+alias qds48c='qds48code'
+alias qds48cc='qds48code2'
+alias qds8000='pkill -f "http.server 8000" 2>/dev/null; python -m http.server 8000 --bind 127.0.0.1 &'
+alias qds8011='pkill -f "http\.server 8011" 2>/dev/null; cd ~/OMEGA_EMPIRE/UV_QDS/www && nohup python -m http.server 8011 --bind 127.0.0.1 >/dev/null 2>&1 & echo "[qds] serving www on :8011"'
+alias qds_labs='/data/data/com.termux/files/home/open_qds_labs.sh'
+alias qds_labs3='/data/data/com.termux/files/home/open_qds_labs_v3.sh'
+alias qds_org='/data/data/com.termux/files/home/qds_org.sh'
+alias qdsall='bash ~/OMEGA_EMPIRE/UV_QDS/www/qds_activate_all_micro.sh'
+alias qdskill='pkill -f "http\.server 8011" 2>/dev/null; echo "[qds] stopped :8011"'
+alias qdsnews='bash ~/qdsnews.sh'
+alias qdsoffer='bash ~/OMEGA_EMPIRE/UV_QDS/www/qds_make_offer_page_v1.sh'
+alias qdsofferlink='bash ~/OMEGA_EMPIRE/UV_QDS/www/qds_inject_offer_links_v1.sh'
+alias qdsopen='termux-open-url "http://127.0.0.1:8011/frontdoor_show.html?x=$(date +%s)"'
+alias qdspush='bash ~/qdspush.sh'
+alias qs='cd ~/OMEGA_EMPIRE/UV_QDS/www && ./qds_show_go.sh'
+alias qsmap='cat ~/qds_shortcuts.txt'
+alias s1='cd ~/OMEGA_EMPIRE/UV_QDS/www && kps; python -m http.server 8011'
+alias s8='cd ~/OMEGA_EMPIRE/UV_QDS/www && kps; python -m http.server 8000'
+alias tma='tmux a -t QDS || tmux new -s QDS'
+alias tmasafe='[ -n "$TMUX" ] && tmux switch-client -t QDS || (tmux a -t QDS || tmux new -s QDS)'
+alias uv='cd ~/OMEGA_EMPIRE/UV_QDS/www'
+alias w='cd ~/OMEGA_EMPIRE/UV_QDS/www'
+alias www='cd ~/OMEGA_EMPIRE/UV_QDS/www && pwd'
+
+== Latest HTML edits (last 24h, top 25) ==
+2025-12-14 22:19	./physorg_supervault.html
+2025-12-14 22:19	./physorg_supervault_v4.html
+2025-12-14 22:19	./qds_battery_news_lab_v1.html
+2025-12-14 22:27	./frontdoor_show_backup_20251214_222707.html
+2025-12-14 22:36	./physorg_qds_triage.html
+2025-12-14 22:57	./frontdoor_show_backup_20251214_225702.html
+2025-12-14 23:06	./frontdoor_show_backup_20251214_230638.html
+2025-12-14 23:33	./frontdoor_show_backup_20251214_233300.html
+2025-12-14 23:34	./frontdoor_show_backup_20251214_233406.html
+2025-12-14 23:56	./frontdoor_show_backup_20251214_235615.html
+2025-12-15 00:04	./frontdoor_show_backup_20251215_000402.html
+2025-12-15 09:16	./frontdoor_show_backup_20251215_091611.html
+2025-12-15 09:37	./physorg_news_compare_one_touch.html
+2025-12-15 11:22	./frontdoor_show_backup_20251215_112220.html
+2025-12-15 11:40	./growthhub_linked_20251215_114009.html
+2025-12-15 12:02	./qds_cheatsheet_space.html
+2025-12-15 15:18	./frontdoor_show_backup_20251215_151851.html
+2025-12-15 16:05	./frontdoor_show_backup_20251215_160531.html
+2025-12-15 17:50	./mo_coherence_lab.html
+2025-12-15 18:00	./nhs_triage_quick_sheet.html
+2025-12-15 18:12	./nhs_triage_quick_sheet_v2.html
+2025-12-15 18:21	./nhs_triage_quick_sheet_v3.html
+2025-12-15 19:24	./all_pages_index.html
+2025-12-15 19:35	./frontdoor_show.html
+2025-12-15 19:35	./frontdoor_show_backup_20251215_193544.html

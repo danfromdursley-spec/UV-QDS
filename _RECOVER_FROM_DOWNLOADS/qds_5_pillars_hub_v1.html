@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>QDS — 5 Pillars Hub v1</title>
+<style>
+  :root{
+    --bg1:#05060d; --bg2:#0b1030; --glow:#6be7ff;
+    --card:#0b0f24cc; --stroke:#1f2a55; --txt:#eef3ff; --mut:#b7c0e6;
+    --accent:#8b7bff; --accent2:#46ffb1;
+  }
+  body{
+    margin:0; color:var(--txt);
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background:
+      radial-gradient(1200px 600px at 10% 0%, #1a245a55, transparent 60%),
+      radial-gradient(900px 600px at 90% 10%, #3a0f7a55, transparent 60%),
+      linear-gradient(160deg,var(--bg1),var(--bg2));
+    min-height:100vh;
+  }
+  .wrap{max-width:820px; margin:0 auto; padding:22px 14px 60px;}
+  h1{
+    font-size:34px; letter-spacing:.5px; margin:14px 4px 6px;
+    text-shadow:0 0 18px #6be7ff33;
+  }
+  .sub{color:var(--mut); margin:0 4px 18px; font-size:14.5px;}
+  .row{display:flex; gap:10px; flex-wrap:wrap; margin:10px 4px 18px;}
+  .btn{
+    appearance:none; border:1px solid var(--stroke); color:var(--txt);
+    background: linear-gradient(135deg, #0c1438, #0a0f25);
+    padding:12px 14px; border-radius:14px; font-weight:600;
+    text-decoration:none; display:inline-flex; align-items:center; gap:8px;
+    box-shadow: inset 0 0 0 1px #ffffff08, 0 8px 22px #00000055;
+  }
+  .btn:hover{border-color:#3a4d9a;}
+  .btn.primary{
+    border-color:#2a8fb0;
+    background: linear-gradient(135deg, #0c1f3f, #0b1632);
+    box-shadow: 0 0 0 1px #6be7ff22, 0 10px 26px #00000066;
+  }
+  .grid{display:grid; gap:12px;}
+  .card{
+    border:1px solid var(--stroke);
+    background: linear-gradient(135deg, var(--card), #070b1d);
+    border-radius:18px; padding:16px 16px 14px;
+    box-shadow: 0 10px 28px #00000066, inset 0 0 0 1px #ffffff06;
+  }
+  .title{
+    display:flex; justify-content:space-between; align-items:center; gap:8px;
+    margin-bottom:6px;
+  }
+  .title h2{font-size:22px; margin:0;}
+  .tag{
+    font-size:11px; padding:4px 8px; border-radius:999px;
+    border:1px solid #ffffff1a; color:#e8ecff;
+    background: #0e1536;
+  }
+  .desc{color:var(--mut); font-size:13.5px; margin:0 0 12px;}
+  .mini{display:flex; gap:8px; flex-wrap:wrap;}
+  .mini a{
+    font-size:12.5px; padding:8px 10px; border-radius:10px;
+  }
+  footer{color:#9aa6d8; font-size:11.5px; margin-top:18px; opacity:.9}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>QDS — 5 Pillars Hub</h1>
+  <p class="sub">Phone-safe launcher for your newest local demos. Relative links → works on any localhost port. 🎩</p>
+
+  <div class="row">
+    <button class="btn primary" id="openAll">Open All Pillars</button>
+    <a class="btn" href="qds_battery_os_index_v1.html">Battery OS Index</a>
+    <a class="btn" href="omega_os_index_v1.html">Ω-OS Index</a>
+  </div>
+
+  <div class="grid">
+
+    <section class="card">
+      <div class="title">
+        <h2>Energy / Batteries</h2>
+        <span class="tag">near-term</span>
+      </div>
+      <p class="desc">Battery stress + QDS-informed correlated-noise labs and dashboards.</p>
+      <div class="mini">
+        <a class="btn" href="qds_battery_os_index_v1.html">Open pillar</a>
+        <a class="btn" href="qds_battery_hub_v9_7_science_neon_lab.html">v9.7 Lab</a>
+        <a class="btn" href="qds_battery_noise_toy_v1.html">Noise toy v1</a>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="title">
+        <h2>Semiconductor & Quantum Noise</h2>
+        <span class="tag">deep-tech</span>
+      </div>
+      <p class="desc">Kernel-mapped jitter/crosstalk/decoherence framing + first toy demo.</p>
+      <div class="mini">
+        <a class="btn" href="qds_chips_noise_v1.html">Open pillar</a>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="title">
+        <h2>Compression / Signals</h2>
+        <span class="tag">fast proof</span>
+      </div>
+      <p class="desc">Structure-preserving compression toys + mini benchmarks.</p>
+      <div class="mini">
+        <a class="btn" href="qds_compression_lab_v1.html">Open pillar</a>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="title">
+        <h2>Sensors / Metrology</h2>
+        <span class="tag">LifeFirst</span>
+      </div>
+      <p class="desc">Noise-floor calibration ideas, safe modelling demos, testable workflows.</p>
+      <div class="mini">
+        <a class="btn" href="qds_sensors_metrology_v1.html">Open pillar</a>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="title">
+        <h2>Reproducibility OS + Field Kit</h2>
+        <span class="tag">brand moat</span>
+      </div>
+      <p class="desc">Tiny portable test tasks + simple audit logs to make every other wedge easier to trust.</p>
+      <div class="mini">
+        <a class="btn" href="qds_test_task_pack_v1.html">Open pillar</a>
+      </div>
+    </section>
+
+  </div>
+
+  <footer>
+    QDS 5 Pillars Hub v1 • Offline-first • No external deps • Built for Termux localhost.
+  </footer>
+</div>
+
+<script>
+  const PILLARS = [
+    "qds_battery_os_index_v1.html",
+    "qds_chips_noise_v1.html",
+    "qds_compression_lab_v1.html",
+    "qds_sensors_metrology_v1.html",
+    "qds_test_task_pack_v1.html"
+  ];
+
+  document.getElementById("openAll").addEventListener("click", () => {
+    // Slight stagger reduces mobile popup-block rage.
+    PILLARS.forEach((p, i) => setTimeout(() => window.open(p, "_blank"), i * 120));
+  });
+</script>
+</body>
+</html>

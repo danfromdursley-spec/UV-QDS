@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>QDS Rotation Curve Tester</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      background: #05060a;
+      color: #e5f2ff;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+    h1 { font-size: 1.6rem; margin-bottom: 4px; }
+    h2 { font-size: 1.1rem; margin: 12px 0 4px; }
+    .sub {
+      font-size: 0.9rem;
+      color: #9fb3cc;
+      margin-bottom: 14px;
+    }
+    .panel {
+      border-radius: 12px;
+      background: radial-gradient(circle at top left, #15253a, #05060a);
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      border: 1px solid #28374d;
+    }
+    label {
+      font-size: 0.85rem;
+      color: #c4d7f2;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: flex-end;
+      margin-bottom: 8px;
+    }
+    .field {
+      flex: 1 1 110px;
+      min-width: 100px;
+    }
+    input[type="number"] {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid #394a63;
+      background: #040712;
+      color: #e5f2ff;
+      font-size: 0.9rem;
+    }
+    input[type="number"]:focus {
+      outline: none;
+      border-color: #4fd1c5;
+      box-shadow: 0 0 0 1px #4fd1c5;
+    }
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      background: linear-gradient(135deg, #38bdf8, #22c55e);
+      color: #020617;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    button.secondary {
+      background: #0f172a;
+      color: #cbd5f5;
+      border: 1px solid #334155;
+    }
+    button:active { transform: translateY(1px); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 6px;
+      font-size: 0.83rem;
+    }
+    th, td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #1f2937;
+      text-align: right;
+      white-space: nowrap;
+    }
+    th {
+      background: #020617;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    td:first-child, th:first-child { text-align: left; }
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .pill-pass {
+      background: #022c22;
+      color: #bbf7d0;
+      border: 1px solid #16a34a;
+    }
+    .pill-fail {
+      background: #450a0a;
+      color: #fecaca;
+      border: 1px solid #dc2626;
+    }
+    .summary {
+      font-size: 0.85rem;
+      color: #9fb3cc;
+      margin-top: 6px;
+    }
+    canvas {
+      width: 100%;
+      max-width: 100%;
+      background: #020617;
+      border-radius: 12px;
+      border: 1px solid #1e293b;
+      margin-top: 6px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      font-size: 0.75rem;
+      margin-left: 4px;
+      color: #cbd5f5;
+    }
+    @media (max-width: 640px) {
+      .row { flex-direction: column; align-items: stretch; }
+      button { width: 100%; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>QDS Rotation Curve Tester</h1>
+    <div class="sub">
+      Compare observed circular speeds against the QDS-modified law
+      <code>v<sub>QDS</sub> = v<sub>N</sub> · √(1 + α e<sup>−r/λ<sub>c</sub></sup>)</code>.
+      Radii in kpc, velocities in km/s.
+    </div>
+
+    <!-- Kernel controls -->
+    <div class="panel">
+      <h2>1. Kernel parameters</h2>
+      <div class="row">
+        <div class="field">
+          <label for="alpha">α (boost strength)</label>
+          <input type="number" id="alpha" step="0.01" value="0.30">
+        </div>
+        <div class="field">
+          <label for="lambda">λ<sub>c</sub> (kpc, scale length)</label>
+          <input type="number" id="lambda" step="0.1" value="5.0">
+        </div>
+        <div class="field">
+          <label for="tol">Tolerance (% difference allowed)</label>
+          <input type="number" id="tol" step="1" value="15">
+        </div>
+        <div class="field" style="flex:0 0 auto;">
+          <button id="recalcBtn" type="button">Recalculate all</button>
+        </div>
+      </div>
+      <div class="summary">
+        Tolerance is relative to <strong>v<sub>QDS</sub></strong> (e.g. 15%).
+      </div>
+    </div>
+
+    <!-- Data entry -->
+    <div class="panel">
+      <h2>2. Add rotation data <span class="badge">r in kpc, v in km/s</span></h2>
+      <div class="row">
+        <div class="field">
+          <label for="r_in">Radius r (kpc)</label>
+          <input type="number" id="r_in" step="0.1" min="0.1" placeholder="e.g. 2.0">
+        </div>
+        <div class="field">
+          <label for="vN_in">Newtonian v<sub>N</sub> (km/s)</label>
+          <input type="number" id="vN_in" step="1" min="0" placeholder="e.g. 120">
+        </div>
+        <div class="field">
+          <label for="vObs_in">Observed v<sub>obs</sub> (km/s)</label>
+          <input type="number" id="vObs_in" step="1" min="0" placeholder="e.g. 160">
+        </div>
+        <div class="field" style="flex:0 0 auto;">
+          <button id="addBtn" type="button">Add point</button>
+        </div>
+        <div class="field" style="flex:0 0 auto;">
+          <button id="clearBtn" type="button" class="secondary">Clear all</button>
+        </div>
+      </div>
+
+      <div style="max-height: 220px; overflow-y: auto; margin-top: 6px;">
+        <table id="dataTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>r (kpc)</th>
+              <th>v<sub>N</sub> (km/s)</th>
+              <th>v<sub>obs</sub> (km/s)</th>
+              <th>v<sub>QDS</sub> (km/s)</th>
+              <th>Δ (%)</th>
+              <th>|Δ| vs tol</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="summary" id="summaryText">
+        No points yet. Add some radii and speeds to see how QDS behaves.
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="panel">
+      <h2>3. Visual check</h2>
+      <div class="summary">
+        Blue line = Newtonian, green line = QDS prediction, dots = observed points.
+      </div>
+      <canvas id="chart" width="800" height="340"></canvas>
+    </div>
+  </div>
+
+  <script>
+    const alphaInput = document.getElementById('alpha');
+    const lambdaInput = document.getElementById('lambda');
+    const tolInput    = document.getElementById('tol');
+
+    const rInput    = document.getElementById('r_in');
+    const vNInput   = document.getElementById('vN_in');
+    const vObsInput = document.getElementById('vObs_in');
+
+    const addBtn    = document.getElementById('addBtn');
+    const clearBtn  = document.getElementById('clearBtn');
+    const recalcBtn = document.getElementById('recalcBtn');
+
+    const tableBody = document.querySelector('#dataTable tbody');
+    const summaryEl = document.getElementById('summaryText');
+
+    const canvas = document.getElementById('chart');
+    const ctx    = canvas.getContext('2d');
+
+    let points = []; // {r, vN, vObs, vQDS, diff, rel}
+
+    function computeVQDS(r, vN, alpha, lambdaC) {
+      if (r <= 0 || vN <= 0) return 0;
+      const boost = 1 + alpha * Math.exp(-r / lambdaC);
+      return vN * Math.sqrt(Math.max(boost, 0));
+    }
+
+    function recalcAll() {
+      const alpha  = parseFloat(alphaInput.value)  || 0;
+      const lambda = parseFloat(lambdaInput.value) || 1;
+      const tol    = parseFloat(tolInput.value)    || 0;
+
+      points = points.map(pt => {
+        const vQDS = computeVQDS(pt.r, pt.vN, alpha, lambda);
+        const diff = pt.vObs - vQDS;
+        const rel  = vQDS !== 0 ? (diff / vQDS) * 100 : 0;
+        return { ...pt, vQDS, diff, rel, tol };
+      });
+
+      renderTable();
+      renderSummary();
+      drawChart();
+    }
+
+    function addPoint() {
+      const rval   = parseFloat(rInput.value);
+      const vNval  = parseFloat(vNInput.value);
+      const vOval  = parseFloat(vObsInput.value);
+
+      if (!isFinite(rval) || rval <= 0 || !isFinite(vNval) || vNval <= 0 || !isFinite(vOval) || vOval < 0) {
+        alert('Please enter valid positive numbers for r, vN and v_obs.');
+        return;
+      }
+
+      const alpha  = parseFloat(alphaInput.value)  || 0;
+      const lambda = parseFloat(lambdaInput.value) || 1;
+      const tol    = parseFloat(tolInput.value)    || 0;
+
+      const vQDS = computeVQDS(rval, vNval, alpha, lambda);
+      const diff = vOval - vQDS;
+      const rel  = vQDS !== 0 ? (diff / vQDS) * 100 : 0;
+
+      points.push({ r: rval, vN: vNval, vObs: vOval, vQDS, diff, rel, tol });
+
+      rInput.value = '';
+      vNInput.value = '';
+      vObsInput.value = '';
+
+      renderTable();
+      renderSummary();
+      drawChart();
+    }
+
+    function clearAll() {
+      if (!confirm('Clear all data points?')) return;
+      points = [];
+      renderTable();
+      renderSummary();
+      drawChart();
+    }
+
+    function renderTable() {
+      tableBody.innerHTML = '';
+      const tol = parseFloat(tolInput.value) || 0;
+
+      points.forEach((pt, idx) => {
+        const tr = document.createElement('tr');
+        const pass = Math.abs(pt.rel) <= tol;
+
+        const pill = document.createElement('span');
+        pill.className = 'pill ' + (pass ? 'pill-pass' : 'pill-fail');
+        pill.textContent = pass ? 'PASS' : 'FAIL';
+
+        tr.innerHTML = `
+          <td>${idx + 1}</td>
+          <td>${pt.r.toFixed(2)}</td>
+          <td>${pt.vN.toFixed(1)}</td>
+          <td>${pt.vObs.toFixed(1)}</td>
+          <td>${pt.vQDS.toFixed(1)}</td>
+          <td>${pt.rel.toFixed(1)}</td>
+          <td></td>
+        `;
+        tr.lastElementChild.appendChild(pill);
+        tableBody.appendChild(tr);
+      });
+    }
+
+    function renderSummary() {
+      if (points.length === 0) {
+        summaryEl.textContent = 'No points yet. Add some radii and speeds to see how QDS behaves.';
+        return;
+      }
+      const tol  = parseFloat(tolInput.value) || 0;
+      const n    = points.length;
+      const pass = points.filter(pt => Math.abs(pt.rel) <= tol).length;
+      const frac = (pass / n) * 100;
+
+      const minR = Math.min(...points.map(p => p.r));
+      const maxR = Math.max(...points.map(p => p.r));
+      summaryEl.textContent =
+        `Points: ${n} | Within tolerance: ${pass} (${frac.toFixed(1)}%) | ` +
+        `r range: ${minR.toFixed(2)} – ${maxR.toFixed(2)} kpc | ` +
+        `Tolerance: ±${tol.toFixed(0)}% of v_QDS.`;
+    }
+
+    function drawChart() {
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      ctx.fillStyle = '#020617';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.save();
+      ctx.translate(48, 16);
+      const plotW = w - 64;
+      const plotH = h - 48;
+
+      let minR = 0, maxR = 10;
+      let minV = 0, maxV = 200;
+
+      if (points.length > 0) {
+        minR = Math.min(...points.map(p => p.r));
+        maxR = Math.max(...points.map(p => p.r));
+        const vs = points.map(p => p.vN)
+          .concat(points.map(p => p.vObs))
+          .concat(points.map(p => p.vQDS));
+        minV = Math.min(...vs);
+        maxV = Math.max(...vs);
+      }
+
+      if (minR === maxR) maxR = minR + 1;
+      if (minV === maxV) maxV = minV + 1;
+
+      const padR = 0.1 * (maxR - minR);
+      const padV = 0.2 * (maxV - minV);
+      minR -= padR; maxR += padR;
+      minV = Math.max(0, minV - padV);
+      maxV += padV;
+
+      function xScale(r) {
+        return ((r - minR) / (maxR - minR)) * plotW;
+      }
+      function yScale(v) {
+        return plotH - ((v - minV) / (maxV - minV)) * plotH;
+      }
+
+      // Axes + grid
+      ctx.strokeStyle = '#1f2937';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, yScale(0));
+      ctx.lineTo(plotW, yScale(0));
+      ctx.moveTo(0, 0);
+      ctx.lineTo(0, plotH);
+      ctx.stroke();
+
+      ctx.fillStyle = '#64748b';
+      ctx.font = '10px system-ui';
+      const tickCount = 4;
+      for (let i = 0; i <= tickCount; i++) {
+        const tV = minV + (i / tickCount) * (maxV - minV);
+        const y  = yScale(tV);
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(plotW, y);
+        ctx.strokeStyle = 'rgba(100,116,139,0.25)';
+        ctx.stroke();
+        ctx.fillText(tV.toFixed(0), -32, y + 3);
+      }
+      ctx.fillText('r (kpc)', plotW - 40, plotH + 14);
+      ctx.fillText('v (km/s)', -4, -6);
+
+      const alpha  = parseFloat(alphaInput.value)  || 0;
+      const lambda = parseFloat(lambdaInput.value) || 1;
+
+      // Draw Newtonian and QDS curves if we have points
+      if (points.length > 0) {
+        // sort by radius
+        const sorted = [...points].sort((a,b) => a.r - b.r);
+
+        // Newtonian
+        ctx.beginPath();
+        sorted.forEach((pt, i) => {
+          const x = xScale(pt.r);
+          const y = yScale(pt.vN);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // QDS
+        ctx.beginPath();
+        sorted.forEach((pt, i) => {
+          const vQ = computeVQDS(pt.r, pt.vN, alpha, lambda);
+          const x = xScale(pt.r);
+          const y = yScale(vQ);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.strokeStyle = '#22c55e';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      // Observed points
+      points.forEach(pt => {
+        const x = xScale(pt.r);
+        const y = yScale(pt.vObs);
+        const pass = Math.abs(pt.rel) <= (parseFloat(tolInput.value) || 0);
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = pass ? '#22c55e' : '#f97316';
+        ctx.fill();
+      });
+
+      ctx.restore();
+    }
+
+    addBtn.addEventListener('click', addPoint);
+    clearBtn.addEventListener('click', clearAll);
+    recalcBtn.addEventListener('click', recalcAll);
+
+    alphaInput.addEventListener('change', recalcAll);
+    lambdaInput.addEventListener('change', recalcAll);
+    tolInput.addEventListener('change', recalcAll);
+
+    drawChart();
+  </script>
+</body>
+</html>

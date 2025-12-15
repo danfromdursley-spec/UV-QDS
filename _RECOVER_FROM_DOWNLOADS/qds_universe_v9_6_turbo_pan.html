@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>QDS Universe V9.6 — Turbo Orbit + Free Pan</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #020617;
+      --panel: #020617ee;
+      --accent: #38bdf8;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    body {
+      background: radial-gradient(circle at top, #020617 0, #000 60%, #000 100%);
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 0.35rem 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(to right, rgba(2,6,23,0.96), rgba(15,23,42,0.75));
+      border-bottom: 1px solid #020617;
+      backdrop-filter: blur(12px);
+      position: relative;
+      z-index: 5;
+    }
+    header-left { display:flex;flex-direction:column; }
+    h1 {
+      font-size: 0.92rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      display: flex;
+      gap: 0.4rem;
+      align-items: center;
+      color: var(--accent);
+    }
+    .tag {
+      font-size: 0.65rem;
+      padding: 0.12rem 0.4rem;
+      border-radius: 999px;
+      border: 1px solid rgba(56,189,248,0.7);
+      background: radial-gradient(circle at top, rgba(8,47,73,0.9), rgba(15,23,42,0.5));
+      color: #e0f2fe;
+    }
+    .subtitle { margin-top:0.1rem;font-size:0.7rem;color:var(--muted); }
+    .subtitle span { color:#e5e7eb; }
+    header-right { display:flex;flex-direction:column;align-items:flex-end;gap:0.1rem;font-size:0.7rem;color:var(--muted); }
+    .status-pill {
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.8);
+      background: #020617cc;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .status-pill-dot {
+      width: 8px;height: 8px;border-radius:999px;
+      background: radial-gradient(circle at center,#22c55e,#16a34a);
+      box-shadow:0 0 10px rgba(34,197,94,0.8);
+    }
+    .status-pill span { color:#e5e7eb; }
+    .status-pill small { color:var(--muted);font-variant-numeric:tabular-nums; }
+
+    main { flex:1 1 auto;position:relative;display:flex;min-height:0; }
+    #universe-canvas {
+      flex:1 1 auto;width:100%;height:100%;display:block;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(56,189,248,0.15) 0, transparent 45%),
+        radial-gradient(circle at 80% 100%, rgba(147,51,234,0.13) 0, transparent 50%),
+        radial-gradient(circle at center, #020617 0, #000 60%, #000 100%);
+      touch-action:none;
+    }
+    .starfield-overlay {
+      pointer-events:none;position:absolute;inset:0;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(255,255,255,0.08) 0, transparent 55%),
+        radial-gradient(circle at 70% 80%, rgba(148,163,184,0.06) 0, transparent 60%);
+      mix-blend-mode:screen;opacity:0.55;
+    }
+    .sim-overlay {
+      pointer-events:none;position:absolute;inset:0;
+      padding:0.45rem 0.5rem;display:flex;flex-direction:column;justify-content:space-between;
+      font-size:0.7rem;
+    }
+    .overlay-row { display:flex;justify-content:space-between;gap:0.4rem;flex-wrap:wrap; }
+    .pill {
+      padding:0.2rem 0.55rem;border-radius:999px;
+      background:rgba(2,6,23,0.92);border:1px solid rgba(15,23,42,0.9);
+      display:inline-flex;align-items:center;gap:0.3rem;
+      box-shadow:0 0 18px rgba(15,23,42,0.8);
+    }
+    .pill strong { color:#e5e7eb;font-weight:500; }
+    .pill span { color:var(--muted);font-variant-numeric:tabular-nums; }
+    .hud-toggle-btn {
+      pointer-events:auto;cursor:pointer;
+      padding:0.2rem 0.6rem;border-radius:999px;
+      border:1px solid rgba(148,163,184,0.7);
+      background:radial-gradient(circle at top,#020617,#020617);
+      display:inline-flex;align-items:center;gap:0.25rem;
+      font-size:0.68rem;color:#e5e7eb;
+    }
+    .hud-toggle-btn .label-muted { color:var(--muted); }
+
+    .controls-panel {
+      pointer-events:auto;position:absolute;right:0.6rem;bottom:0.6rem;
+      width:min(360px,96vw);max-height:65vh;overflow:auto;
+      background:var(--panel);border-radius:0.9rem;border:1px solid #020617;
+      box-shadow:0 12px 40px rgba(15,23,42,0.9),0 0 32px rgba(56,189,248,0.25);
+      padding:0.55rem 0.7rem 0.6rem;
+      transition:transform 0.2s ease,opacity 0.2s ease;
+    }
+    body.hud-minimal .controls-panel{transform:translateY(110%);opacity:0;pointer-events:none;}
+    .controls-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.2rem;}
+    .controls-header h2{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);}
+    .chip{font-size:0.65rem;padding:0.16rem 0.45rem;border-radius:999px;border:1px solid rgba(56,189,248,0.7);background:#020617;color:#e0f2fe;}
+
+    .group{margin-top:0.25rem;padding:0.35rem 0.45rem 0.3rem;border-radius:0.7rem;
+      background:radial-gradient(circle at top left,rgba(15,23,42,0.85),rgba(2,6,23,0.98));
+      border:1px solid rgba(15,23,42,0.9);}
+    .group + .group{margin-top:0.3rem;}
+    .group-label{display:flex;justify-content:space-between;align-items:center;font-size:0.68rem;margin-bottom:0.08rem;}
+    .group-label strong{color:#e5e7eb;font-weight:500;}
+    .group-label span.value{color:#bae6fd;font-variant-numeric:tabular-nums;}
+    .range-row{display:flex;align-items:center;gap:0.45rem;}
+    .range-row input[type="range"]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:999px;background:#020617;outline:none;}
+    .range-row input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);border:1px solid #e0f2fe;box-shadow:0 0 0 4px rgba(56,189,248,0.28);cursor:pointer;}
+    .range-row input[type="range"]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--accent);border:1px solid #e0f2fe;box-shadow:0 0 0 4px rgba(56,189,248,0.28);cursor:pointer;}
+    .range-row input[type="range"]::-moz-range-track{height:4px;border-radius:999px;background:#020617;}
+    .toggle-row{display:flex;align-items:center;justify-content:space-between;gap:0.4rem;margin-top:0.14rem;font-size:0.68rem;color:var(--muted);}
+    .toggle-row label{display:inline-flex;align-items:center;gap:0.3rem;cursor:pointer;}
+    .toggle-row input[type="checkbox"]{width:30px;height:16px;border-radius:999px;border:1px solid #111827;appearance:none;background:#020617;position:relative;outline:none;cursor:pointer;}
+    .toggle-row input[type="checkbox"]::before{content:"";position:absolute;top:1px;left:1px;width:12px;height:12px;border-radius:999px;background:#9ca3af;transition:transform 0.16s ease,background 0.16s ease;}
+    .toggle-row input[type="checkbox"]:checked{background:#0369a1;border-color:#0ea5e9;}
+    .toggle-row input[type="checkbox"]:checked::before{transform:translateX(12px);background:#e0f2fe;}
+    .btn-row{display:flex;justify-content:space-between;gap:0.4rem;margin-top:0.3rem;}
+    button{all:unset;font-size:0.7rem;padding:0.26rem 0.52rem;border-radius:999px;border:1px solid #1f2937;background:radial-gradient(circle at top,#020617,#020617);cursor:pointer;color:#e5e7eb;display:inline-flex;align-items:center;gap:0.25rem;transition:border 0.16s ease,box-shadow 0.16s ease,transform 0.06s ease;}
+    button.primary{border-color:#0ea5e9;background:radial-gradient(circle at top,#082f49,#020617);color:#e0f2fe;box-shadow:0 0 18px rgba(56,189,248,0.35);}
+    button.ludicrous-active{border-color:rgba(248,113,113,0.95);background:radial-gradient(circle at top,#450a0a,#020617);box-shadow:0 0 20px rgba(248,113,113,0.75),0 0 28px rgba(251,113,133,0.45);color:#fee2e2;}
+    button:hover{border-color:#38bdf8;box-shadow:0 0 16px rgba(56,189,248,0.4);}
+    button:active{transform:scale(0.97);}
+    .footer-note{margin-top:0.28rem;font-size:0.62rem;color:var(--muted);display:flex;justify-content:space-between;gap:0.35rem;flex-wrap:wrap;}
+    @media (max-width:600px){header{padding:0.32rem 0.6rem;}h1{font-size:0.84rem;}.controls-panel{left:0.6rem;right:0.6rem;width:auto;}}
+  </style>
+</head>
+<body>
+  <header>
+    <header-left>
+      <h1>QDS Universe <span class="tag">V9.6 · Neon Warp</span></h1>
+      <div class="subtitle"><span>Full Physics:</span> N-body + QDS warp &nbsp; a(r,t) = GM/r² · [1 + α e<sup>-r/λc</sup> f(t/τc)]</div>
+    </header-left>
+    <header-right>
+      <div class="status-pill">
+        <div class="status-pill-dot"></div>
+        <span>Chaos Orbs stable</span>
+        <small id="fpsLabel">FPS: --</small>
+      </div>
+      <div class="subtitle">🎩 Turbo Orbit Speed + drag-to-pan view</div>
+    </header-right>
+  </header>
+
+  <main>
+    <canvas id="universe-canvas"></canvas>
+    <div class="starfield-overlay"></div>
+
+    <div class="sim-overlay">
+      <div class="overlay-row">
+        <div class="pill"><strong>Sim-time</strong><span id="simTimeLabel">0.0 s</span></div>
+        <div class="pill"><strong>Warp</strong><span id="warpLabel">λc=220 · τc=6 · α=0.35</span></div>
+        <button id="hudToggle" class="hud-toggle-btn" type="button">
+          <span>📱</span>
+          <span class="label-main">HUD</span>
+          <span class="label-muted">tap for Mobile</span>
+        </button>
+      </div>
+      <div class="overlay-row">
+        <div class="pill"><strong>Camera</strong><span id="cameraLabel">Drag in space to slide view</span></div>
+        <div class="pill"><strong>Ride-Along</strong><span id="rideLabel">Off</span></div>
+      </div>
+    </div>
+
+    <section class="controls-panel">
+      <div class="controls-header">
+        <h2>Orbit Engine · Control Deck</h2>
+        <div class="chip">Turbo Orbit Speed</div>
+      </div>
+
+      <div class="group">
+        <div class="group-label"><strong>Base time speed</strong><span class="value" id="speedLabel">1.5×</span></div>
+        <div class="range-row"><input id="speedSlider" type="range" min="0.1" max="4" step="0.1" value="1.5" /></div>
+      </div>
+
+      <div class="group">
+        <div class="group-label"><strong>Turbo orbit multiplier</strong><span class="value" id="turboLabel">1.0×</span></div>
+        <div class="range-row"><input id="turboSlider" type="range" min="1" max="8" step="0.5" value="1" /></div>
+        <div class="toggle-row">
+          <label><input type="checkbox" id="turboAutoToggle" checked /><span>Auto-ease Turbo when LUDICROUS ends</span></label>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-label"><strong>System spin (camera)</strong><span class="value" id="spinLabel">0.40×</span></div>
+        <div class="range-row"><input id="spinSlider" type="range" min="0" max="1" step="0.05" value="0.40" /></div>
+        <div class="toggle-row">
+          <label><input type="checkbox" id="spinToggle" checked /><span>Rotate camera around star</span></label>
+          <span>Smoothed orbit spin</span>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-label"><strong>λc — spatial warp scale</strong><span class="value" id="lambdaLabel">220</span></div>
+        <div class="range-row"><input id="lambdaSlider" type="range" min="40" max="400" step="10" value="220" /></div>
+      </div>
+
+      <div class="group">
+        <div class="group-label"><strong>τc — warp rhythm (s)</strong><span class="value" id="tauLabel">6.0</span></div>
+        <div class="range-row"><input id="tauSlider" type="range" min="2" max="16" step="0.5" value="6" /></div>
+      </div>
+
+      <div class="group">
+        <div class="group-label"><strong>α — QDS warp strength</strong><span class="value" id="alphaLabel">0.35</span></div>
+        <div class="range-row"><input id="alphaSlider" type="range" min="0" max="0.9" step="0.05" value="0.35" /></div>
+      </div>
+
+      <div class="group">
+        <div class="group-label"><strong>Ride-Along mode</strong><span class="value" id="rideSelectLabel">Auto: mid-orbit Chaos Orb</span></div>
+        <div class="toggle-row">
+          <label><input type="checkbox" id="rideToggle" /><span>Attach camera to Chaos Orb</span></label>
+          <span>🎮 Ride the orbit</span>
+        </div>
+        <div class="toggle-row">
+          <label><input type="checkbox" id="rideCmeToggle" checked /><span>Show CME flare when Ride-Along</span></label>
+          <span>Solar spice</span>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-label"><strong>Visuals</strong><span class="value">Neon warp clouds</span></div>
+        <div class="toggle-row">
+          <label><input type="checkbox" id="trailToggle" checked /><span>Persistent neon trails</span></label>
+          <span>Best for chaos</span>
+        </div>
+        <div class="toggle-row">
+          <label><input type="checkbox" id="noiseToggle" checked /><span>QDS micro jitter</span></label>
+          <span>Soft CME wobble</span>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-label"><strong>Turbo controls</strong><span class="value" id="ludicrousStatus">Idle</span></div>
+        <div class="btn-row">
+          <button id="resetBtn" class="primary" type="button">🔄 Reset System</button>
+          <button id="randomBtn" type="button">🎲 Randomise Orbits</button>
+        </div>
+        <div class="btn-row" style="margin-top:0.2rem;">
+          <button id="ludicrousBtn" type="button">🚀 LUDICROUS SPEED</button>
+          <button id="calmBtn" type="button">🧊 Calm Down</button>
+        </div>
+      </div>
+
+      <div class="footer-note">
+        <span>Drag in dark space: slide camera.</span>
+        <span>Ride-Along + trails = OPPO neon mode.</span>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function() {
+      const canvas = document.getElementById("universe-canvas");
+      const ctx = canvas.getContext("2d");
+
+      let width = 0, height = 0, baseScale = 1;
+      function resize() {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        width = rect.width;
+        height = rect.height;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        baseScale = Math.min(width, height) / 900;
+      }
+      window.addEventListener("resize", resize);
+      resize();
+
+      // Controls
+      const speedSlider = document.getElementById("speedSlider");
+      const turboSlider = document.getElementById("turboSlider");
+      const turboAutoToggle = document.getElementById("turboAutoToggle");
+      const spinSlider = document.getElementById("spinSlider");
+      const spinToggle = document.getElementById("spinToggle");
+      const lambdaSlider = document.getElementById("lambdaSlider");
+      const tauSlider = document.getElementById("tauSlider");
+      const alphaSlider = document.getElementById("alphaSlider");
+      const trailToggle = document.getElementById("trailToggle");
+      const noiseToggle = document.getElementById("noiseToggle");
+      const rideToggle = document.getElementById("rideToggle");
+      const rideCmeToggle = document.getElementById("rideCmeToggle");
+      const resetBtn = document.getElementById("resetBtn");
+      const randomBtn = document.getElementById("randomBtn");
+      const ludicrousBtn = document.getElementById("ludicrousBtn");
+      const calmBtn = document.getElementById("calmBtn");
+      const hudToggle = document.getElementById("hudToggle");
+
+      const speedLabel = document.getElementById("speedLabel");
+      const turboLabel = document.getElementById("turboLabel");
+      const spinLabel = document.getElementById("spinLabel");
+      const lambdaLabel = document.getElementById("lambdaLabel");
+      const tauLabel = document.getElementById("tauLabel");
+      const alphaLabel = document.getElementById("alphaLabel");
+      const simTimeLabel = document.getElementById("simTimeLabel");
+      const warpLabel = document.getElementById("warpLabel");
+      const cameraLabel = document.getElementById("cameraLabel");
+      const rideLabel = document.getElementById("rideLabel");
+      const rideSelectLabel = document.getElementById("rideSelectLabel");
+      const ludicrousStatus = document.getElementById("ludicrousStatus");
+      const fpsLabel = document.getElementById("fpsLabel");
+
+      const params = {
+        G: 1.0,
+        baseSpeed: parseFloat(speedSlider.value),
+        turbo: parseFloat(turboSlider.value),
+        lambdaC: parseFloat(lambdaSlider.value),
+        tauC: parseFloat(tauSlider.value),
+        alpha: parseFloat(alphaSlider.value),
+        spinBase: parseFloat(spinSlider.value),
+        spinEnabled: spinToggle.checked,
+        trails: trailToggle.checked,
+        noise: noiseToggle.checked,
+        rideAlong: rideToggle.checked,
+        rideCME: rideCmeToggle.checked,
+        softening: 25,
+        qdsOscAmp: 0.4,
+        ludicrous: false,
+        ludicrousBoost: 5.5,
+      };
+
+      function updateLabels() {
+        speedLabel.textContent = params.baseSpeed.toFixed(2) + "×";
+        turboLabel.textContent = params.turbo.toFixed(1) + "×";
+        spinLabel.textContent = params.spinBase.toFixed(2) + "×";
+        lambdaLabel.textContent = params.lambdaC.toFixed(0);
+        tauLabel.textContent = params.tauC.toFixed(1);
+        alphaLabel.textContent = params.alpha.toFixed(2);
+        warpLabel.textContent = "λc=" + params.lambdaC.toFixed(0) + " · τc=" + params.tauC.toFixed(1) + " · α=" + params.alpha.toFixed(2);
+        cameraLabel.textContent = params.rideAlong
+          ? "Ride-Along · drag still pans view"
+          : "Drag in space to slide camera";
+        rideLabel.textContent = params.rideAlong ? "On · Chaos Orb" : "Off";
+      }
+      updateLabels();
+
+      speedSlider.addEventListener("input", () => { params.baseSpeed = parseFloat(speedSlider.value); updateLabels(); });
+      turboSlider.addEventListener("input", () => { params.turbo = parseFloat(turboSlider.value); updateLabels(); });
+      spinSlider.addEventListener("input", () => { params.spinBase = parseFloat(spinSlider.value); updateLabels(); });
+      spinToggle.addEventListener("change", () => { params.spinEnabled = spinToggle.checked; updateLabels(); });
+      lambdaSlider.addEventListener("input", () => { params.lambdaC = parseFloat(lambdaSlider.value); updateLabels(); });
+      tauSlider.addEventListener("input", () => { params.tauC = parseFloat(tauSlider.value); updateLabels(); });
+      alphaSlider.addEventListener("input", () => { params.alpha = parseFloat(alphaSlider.value); updateLabels(); });
+      trailToggle.addEventListener("change", () => { params.trails = trailToggle.checked; });
+      noiseToggle.addEventListener("change", () => { params.noise = noiseToggle.checked; });
+      rideToggle.addEventListener("change", () => { params.rideAlong = rideToggle.checked; updateLabels(); });
+      rideCmeToggle.addEventListener("change", () => { params.rideCME = rideCmeToggle.checked; });
+      hudToggle.addEventListener("click", () => { document.body.classList.toggle("hud-minimal"); });
+
+      // Drag-to-pan state
+      let panX = 0, panY = 0;
+      let isDragging = false;
+      let lastX = 0, lastY = 0;
+
+      function startDrag(x, y) {
+        isDragging = true;
+        lastX = x;
+        lastY = y;
+      }
+      function dragTo(x, y) {
+        if (!isDragging) return;
+        const dx = x - lastX;
+        const dy = y - lastY;
+        lastX = x;
+        lastY = y;
+        const zoom = baseScale * camZoom;
+        if (zoom > 0) {
+          panX += dx / zoom;
+          panY += dy / zoom;
+        }
+      }
+      function endDrag() { isDragging = false; }
+
+      canvas.addEventListener("mousedown", (e) => {
+        if (e.button !== 0) return;
+        e.preventDefault();
+        startDrag(e.clientX, e.clientY);
+      });
+      window.addEventListener("mousemove", (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        dragTo(e.clientX, e.clientY);
+      });
+      window.addEventListener("mouseup", endDrag);
+
+      canvas.addEventListener("touchstart", (e) => {
+        if (e.touches.length > 0) {
+          const t = e.touches[0];
+          startDrag(t.clientX, t.clientY);
+        }
+      }, { passive: false });
+      canvas.addEventListener("touchmove", (e) => {
+        if (!isDragging) return;
+        if (e.touches.length > 0) {
+          const t = e.touches[0];
+          dragTo(t.clientX, t.clientY);
+          e.preventDefault();
+        }
+      }, { passive: false });
+      canvas.addEventListener("touchend", endDrag, { passive: true });
+      canvas.addEventListener("touchcancel", endDrag, { passive: true });
+
+      // Simulation state
+      let bodies = [];
+      let simTime = 0;
+      let lastTs = null;
+      let rotationAngle = 0;
+
+      // camera follow
+      let camTargetX = 0, camTargetY = 0, camTargetZoom = 1;
+      let camX = 0, camY = 0, camZoom = 1;
+
+      function makeSystem(randomise) {
+        bodies = [];
+        bodies.push({ name:"Star", mass:5000, x:0, y:0, vx:0, vy:0, radius:23, hue:48, isStar:true });
+        const planetCount = 7;
+        for (let i = 0; i < planetCount; i++) {
+          const baseR = 90 + i * 60;
+          const r = baseR * (randomise ? (0.7 + Math.random() * 0.7) : 1);
+          const angle = Math.random() * Math.PI * 2;
+          const mass = 4 + i * 1.4;
+          const orbitDir = Math.random() < 0.9 ? 1 : -1;
+          const x = r * Math.cos(angle);
+          const y = r * Math.sin(angle);
+          const vCirc = Math.sqrt((params.G * 5000) / r);
+          const jitter = randomise ? (0.9 + Math.random() * 0.3) : 1;
+          const vx = -orbitDir * vCirc * Math.sin(angle) * jitter;
+          const vy = orbitDir * vCirc * Math.cos(angle) * jitter;
+          bodies.push({ name:"P"+(i+1), mass, x, y, vx, vy, radius:7 + i*0.9, hue:200 + i*20, isStar:false });
+        }
+        if (bodies[4]) rideSelectLabel.textContent = "Auto: " + bodies[4].name + " Chaos Orb";
+        simTime = 0;
+        camTargetX = camX = 0;
+        camTargetY = camY = 0;
+        camTargetZoom = camZoom = 1;
+        panX = panY = 0;
+      }
+
+      resetBtn.addEventListener("click", () => makeSystem(false));
+      randomBtn.addEventListener("click", () => makeSystem(true));
+
+      // Ludicrous controls
+      ludicrousBtn.addEventListener("click", () => {
+        params.ludicrous = !params.ludicrous;
+        if (params.ludicrous) {
+          ludicrousStatus.textContent = "LUDICROUS engaged";
+          ludicrousBtn.classList.add("ludicrous-active");
+        } else {
+          ludicrousStatus.textContent = "Idle";
+          ludicrousBtn.classList.remove("ludicrous-active");
+          if (turboAutoToggle.checked && params.turbo > 1) {
+            params.turbo = 1;
+            turboSlider.value = "1";
+            updateLabels();
+          }
+        }
+      });
+      calmBtn.addEventListener("click", () => {
+        params.ludicrous = false;
+        ludicrousStatus.textContent = "Idle";
+        ludicrousBtn.classList.remove("ludicrous-active");
+        params.turbo = 1;
+        turboSlider.value = "1";
+        updateLabels();
+      });
+
+      makeSystem(false);
+
+      // FPS
+      let fpsLast = performance.now();
+      let fpsFrames = 0;
+      function updateFPS(now) {
+        fpsFrames++;
+        const diff = now - fpsLast;
+        if (diff >= 500) {
+          const fps = (fpsFrames * 1000) / diff;
+          fpsFrames = 0;
+          fpsLast = now;
+          fpsLabel.textContent = "FPS: " + fps.toFixed(0);
+        }
+      }
+
+      function step(timestamp) {
+        if (lastTs == null) lastTs = timestamp;
+        let realDt = (timestamp - lastTs) / 1000;
+        lastTs = timestamp;
+        if (realDt > 0.1) realDt = 0.1;
+
+        const dt = realDt * params.baseSpeed * params.turbo * (params.ludicrous ? params.ludicrousBoost : 1);
+        simTime += dt;
+        simTimeLabel.textContent = simTime.toFixed(1) + " s";
+
+        const omega = (2 * Math.PI) / params.tauC;
+        const f_t = 1 + params.qdsOscAmp * Math.sin(omega * simTime);
+
+        const ax = new Array(bodies.length).fill(0);
+        const ay = new Array(bodies.length).fill(0);
+
+        for (let i=0;i<bodies.length;i++) {
+          const bi = bodies[i];
+          for (let j=0;j<bodies.length;j++) {
+            if (i===j) continue;
+            const bj = bodies[j];
+            const dx = bj.x - bi.x;
+            const dy = bj.y - bi.y;
+            const r2 = dx*dx + dy*dy + params.softening;
+            const r = Math.sqrt(r2);
+            const inv_r3 = 1.0 / (r2 * r);
+            let factor = params.G * bj.mass * inv_r3;
+            const warp_r = Math.exp(-r / params.lambdaC);
+            factor *= (1 + params.alpha * warp_r * f_t);
+            ax[i] += factor * dx;
+            ay[i] += factor * dy;
+          }
+        }
+
+        if (params.noise) {
+          const noiseLevel = 0.03;
+          for (let i=1;i<bodies.length;i++) {
+            ax[i] += (Math.random()-0.5)*noiseLevel;
+            ay[i] += (Math.random()-0.5)*noiseLevel;
+          }
+        }
+
+        for (let i=0;i<bodies.length;i++) {
+          const b = bodies[i];
+          if (b.isStar) {
+            b.vx += ax[i]*dt*0.2;
+            b.vy += ay[i]*dt*0.2;
+          } else {
+            b.vx += ax[i]*dt;
+            b.vy += ay[i]*dt;
+          }
+          b.x += b.vx*dt;
+          b.y += b.vy*dt;
+        }
+
+        // camera follow Chaos Orb
+        const chaosIndex = 4;
+        let targetX = 0, targetY = 0, targetZoom = 1;
+        if (params.rideAlong && bodies[chaosIndex]) {
+          targetX = bodies[chaosIndex].x;
+          targetY = bodies[chaosIndex].y;
+          targetZoom = 1.3;
+        }
+        const ease = 1 - Math.exp(-6 * realDt);
+        camTargetX = targetX;
+        camTargetY = targetY;
+        camTargetZoom = targetZoom;
+        camX += (camTargetX - camX)*ease;
+        camY += (camTargetY - camY)*ease;
+        camZoom += (camTargetZoom - camZoom)*ease;
+
+        if (params.spinEnabled && !params.rideAlong) {
+          rotationAngle += params.spinBase * 0.25 * dt;
+        }
+
+        draw();
+        updateFPS(timestamp);
+        requestAnimationFrame(step);
+      }
+
+      function drawCMEGlow(ctx, radiusPx, t) {
+        const pulses = 3;
+        for (let i=0;i<pulses;i++) {
+          const phase = t*0.6 + i*0.8;
+          const angle = phase*0.9;
+          const spread = 0.9 + 0.3*Math.sin(phase);
+          const innerR = radiusPx*(1.0+0.4*spread);
+          const outerR = radiusPx*(1.5+0.6*spread);
+          const grad = ctx.createRadialGradient(0,0,innerR*0.95,0,0,outerR);
+          grad.addColorStop(0,"rgba(251,191,36,0.0)");
+          grad.addColorStop(0.2,"rgba(251,146,60,0.28)");
+          grad.addColorStop(0.8,"rgba(59,130,246,0.0)");
+          ctx.save();
+          ctx.rotate(angle);
+          ctx.beginPath();
+          ctx.fillStyle = grad;
+          ctx.ellipse(0,0,outerR,outerR*0.45,0,-0.6,0.6);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      function draw() {
+        if (!params.trails) ctx.clearRect(0,0,width,height);
+        else {
+          ctx.fillStyle = "rgba(3,6,16,0.16)";
+          ctx.fillRect(0,0,width,height);
+        }
+
+        ctx.save();
+        ctx.translate(width/2, height/2);
+        const zoom = baseScale * camZoom;
+        ctx.scale(zoom, zoom);
+        ctx.translate(panX, panY);        // <- user pan
+        if (!params.rideAlong) ctx.rotate(rotationAngle);
+        ctx.translate(-camX, -camY);
+
+        const star = bodies[0];
+        const starX = star.x, starY = star.y;
+
+        ctx.save();
+        ctx.translate(starX, starY);
+        const starRadiusPx = star.radius * baseScale * 1.2;
+        const starGrad = ctx.createRadialGradient(-starRadiusPx*0.25,-starRadiusPx*0.25,starRadiusPx*0.2,0,0,starRadiusPx*1.5);
+        starGrad.addColorStop(0,"rgba(255,255,255,1)");
+        starGrad.addColorStop(0.35,"rgba(252,211,77,0.98)");
+        starGrad.addColorStop(0.7,"rgba(251,146,60,0.25)");
+        starGrad.addColorStop(1,"rgba(15,23,42,0.02)");
+        ctx.beginPath();
+        ctx.fillStyle = starGrad;
+        ctx.arc(0,0,starRadiusPx,0,Math.PI*2);
+        ctx.fill();
+        drawCMEGlow(ctx, starRadiusPx, simTime);
+        ctx.beginPath();
+        ctx.lineWidth = 1.3 / camZoom;
+        ctx.strokeStyle = "rgba(15,23,42,0.9)";
+        ctx.arc(0,0,starRadiusPx,0,Math.PI*2);
+        ctx.stroke();
+        ctx.restore();
+
+        for (let i=1;i<bodies.length;i++) {
+          const b = bodies[i];
+          const rOrbit = Math.hypot(b.x - starX, b.y - starY);
+          const orbitRadiusPx = rOrbit * baseScale;
+          ctx.beginPath();
+          ctx.lineWidth = 0.8 / camZoom;
+          ctx.strokeStyle = "rgba(30,64,175,0.22)";
+          ctx.setLineDash([3/camZoom,3/camZoom]);
+          ctx.ellipse(starX, starY, orbitRadiusPx, orbitRadiusPx, 0, 0, Math.PI*2);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+
+        for (let i=1;i<bodies.length;i++) {
+          const b = bodies[i];
+          const px = b.x, py = b.y;
+          const rPx = b.radius * baseScale;
+          const grad = ctx.createRadialGradient(px-rPx*0.3,py-rPx*0.3,rPx*0.15,px,py,rPx*1.6);
+          const hue = b.hue;
+          grad.addColorStop(0,"hsla("+hue+",100%,85%,1)");
+          grad.addColorStop(0.35,"hsla("+hue+",95%,62%,0.98)");
+          grad.addColorStop(0.7,"hsla("+hue+",90%,60%,0.35)");
+          grad.addColorStop(1,"hsla("+hue+",90%,60%,0)");
+          ctx.beginPath();
+          ctx.fillStyle = grad;
+          ctx.arc(px,py,rPx,0,Math.PI*2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.lineWidth = 1 / camZoom;
+          ctx.strokeStyle = "rgba(15,23,42,0.9)";
+          ctx.arc(px,py,rPx,0,Math.PI*2);
+          ctx.stroke();
+
+          if (params.rideAlong && params.rideCME && i === 4) {
+            ctx.save();
+            ctx.translate(px,py);
+            const flareR = rPx*2.2;
+            const flareGrad = ctx.createRadialGradient(0,0,flareR*0.25,0,0,flareR*1.4);
+            flareGrad.addColorStop(0,"rgba(56,189,248,0.0)");
+            flareGrad.addColorStop(0.4,"rgba(129,140,248,0.5)");
+            flareGrad.addColorStop(1,"rgba(15,23,42,0.0)");
+            ctx.beginPath();
+            ctx.fillStyle = flareGrad;
+            ctx.arc(0,0,flareR,0,Math.PI*2);
+            ctx.fill();
+            ctx.restore();
+          }
+        }
+
+        ctx.restore();
+      }
+
+      requestAnimationFrame(step);
+    })();
+  </script>
+</body>
+</html>

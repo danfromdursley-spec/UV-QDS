@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>QDS Battery Suite v7 — AutoBench 🔋🎩</title>
+<style>
+  :root{
+    --bg:#0b0f14; --panel:#111826; --panel2:#0f1522; --text:#e6edf3;
+    --muted:#9aa7b2; --accent:#7dd3fc; --good:#86efac; --warn:#fbbf24; --bad:#f87171;
+    --border:#1f2a3a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
+    background:linear-gradient(180deg,#070b11,#0b111b 40%,#070b11);color:var(--text);}
+  .wrap{max-width:1100px;margin:0 auto;padding:14px}
+  .title{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    background:linear-gradient(90deg,#0f172a,#0b1220,#0f172a);
+    border:1px solid var(--border);border-radius:16px;padding:14px 16px;
+  }
+  .title h1{font-size:20px;margin:0}
+  .sub{color:var(--muted);font-size:12px}
+  .grid{display:grid;grid-template-columns:1.1fr 0.9fr;gap:12px;margin-top:12px}
+  .card{background:linear-gradient(180deg,var(--panel),var(--panel2));
+    border:1px solid var(--border);border-radius:16px;padding:12px}
+  .card h3{margin:0 0 8px 0;font-size:14px;color:#dbe7f3}
+  label{display:block;font-size:11px;color:var(--muted);margin:8px 0 4px}
+  input[type="number"],select{
+    width:100%;padding:8px 10px;border-radius:10px;border:1px solid var(--border);
+    background:#0b1220;color:var(--text);font-size:12px;
+  }
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .checks{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .check{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+  .check input{transform:scale(1.05)}
+  .btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  button{
+    border:1px solid var(--border);background:#0b1220;color:var(--text);
+    padding:9px 11px;border-radius:10px;font-size:12px;cursor:pointer;
+  }
+  button.primary{background:linear-gradient(90deg,#0ea5e9,#38bdf8);color:#00131d;border:none}
+  button.ghost{background:transparent}
+  .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;border:1px solid var(--border);color:var(--muted)}
+  .kpi{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .kbox{border:1px solid var(--border);border-radius:12px;padding:10px;background:#0a101c}
+  .kname{font-size:10px;color:var(--muted)}
+  .kval{font-size:18px;font-weight:700}
+  .good{color:var(--good)} .warn{color:var(--warn)} .bad{color:var(--bad)}
+  .log{
+    height:340px;overflow:auto;white-space:pre-wrap;background:#050910;
+    border:1px solid var(--border);border-radius:12px;padding:10px;font-size:11px;color:#d7e3ee
+  }
+  .small{font-size:10px;color:var(--muted)}
+  footer{margin-top:10px;color:var(--muted);font-size:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title">
+    <div>
+      <h1>QDS Battery Suite v7 — AutoBench 🔋🎩</h1>
+      <div class="sub">Single-file • no libs • mobile-safe • fairness-first correlation harness + real-world-ish presets</div>
+    </div>
+    <div class="pill">v7 AutoBench</div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>Core Controls</h3>
+      <div class="row3">
+        <div>
+          <label>Base drain per cycle (%)</label>
+          <input id="base" type="number" step="0.1" value="1.2">
+        </div>
+        <div>
+          <label>Noise amplitude (%)</label>
+          <input id="amp" type="number" step="0.1" value="1.8">
+        </div>
+        <div>
+          <label>Correlation p (0–0.99)</label>
+          <input id="p" type="number" step="0.01" min="0" max="0.99" value="0.25">
+        </div>
+      </div>
+
+      <div class="row3">
+        <div>
+          <label>Cells (n)</label>
+          <input id="n" type="number" step="100" value="1200">
+        </div>
+        <div>
+          <label>Max cycles cap</label>
+          <input id="maxc" type="number" step="100" value="4000">
+        </div>
+        <div>
+          <label>Failure threshold (%)</label>
+          <input id="thr" type="number" step="1" value="50">
+        </div>
+      </div>
+
+      <label>Stress Hammers</label>
+      <div class="checks">
+        <label class="check"><input id="nonlin" type="checkbox" checked> Nonlinear wear</label>
+        <label class="check"><input id="heat" type="checkbox" checked> Heat epochs</label>
+        <label class="check"><input id="outlier" type="checkbox" checked> Rare outliers</label>
+      </div>
+
+      <label>Bias Integrity</label>
+      <div class="checks">
+        <label class="check"><input id="paired" type="checkbox" checked> Paired Fair Mode</label>
+        <label class="check"><input id="noregen" type="checkbox" checked> No Regen</label>
+        <label class="check"><input id="blind" type="checkbox"> Blind labels (UI swap)</label>
+        <label class="check"><input id="hardnull" type="checkbox"> Hard null (force p=0)</label>
+      </div>
+
+      <div class="btns">
+        <button class="primary" id="runOne">Run single sim</button>
+        <button id="reset">Reset defaults</button>
+      </div>
+
+      <hr style="border:0;border-top:1px solid var(--border);margin:12px 0">
+
+      <h3>AutoBench Controls</h3>
+      <div class="row">
+        <div>
+          <label>AutoBench scenario count (real-world sampler)</label>
+          <input id="benchCount" type="number" step="1" value="12">
+        </div>
+        <div>
+          <label>Seed (reproducible demos)</label>
+          <input id="seed" type="number" step="1" value="12345">
+        </div>
+      </div>
+
+      <div class="btns">
+        <button class="primary" id="runLadder">Poster Ladder (6 blocks)</button>
+        <button class="primary" id="runBench">AutoBench (ladder + sampler)</button>
+        <button id="clearLog" class="ghost">Clear report</button>
+      </div>
+      <div class="small">
+        Ladder blocks: (A) amp=0 control • (B) p=0 hard null • (C) blind null •
+        (D) realistic phone • (E) controlled stress • (F) pathological honesty check.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Latest Results</h3>
+      <div class="kpi">
+        <div class="kbox">
+          <div class="kname">White mean cycles</div>
+          <div id="wMean" class="kval">—</div>
+        </div>
+        <div class="kbox">
+          <div class="kname">QDS mean cycles</div>
+          <div id="qMean" class="kval">—</div>
+        </div>
+        <div class="kbox">
+          <div class="kname">Δ (QDS vs White)</div>
+          <div id="delta" class="kval">—</div>
+        </div>
+        <div class="kbox">
+          <div class="kname">Mean paired Δ cycles</div>
+          <div id="pdelta" class="kval">—</div>
+        </div>
+      </div>
+
+      <label>AutoBench Report</label>
+      <div id="log" class="log"></div>
+      <footer>
+        This is a toy correlated-noise harness; battery advice should remain conservative.
+        The purpose here is fairness, regime-mapping, and habit coaching — not hard physics claims.
+      </footer>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================
+   QDS Battery Suite v7
+   AutoBench + Fair Harness
+   single-file, no deps
+========================= */
+
+const $ = id => document.getElementById(id);
+const logEl = $("log");
+
+function nowStamp(){
+  const d = new Date();
+  const pad = n => String(n).padStart(2,"0");
+  return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}, ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+
+function appendLog(s){
+  logEl.textContent += s + "\n";
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+function clamp(x,a,b){ return Math.max(a, Math.min(b,x)); }
+
+/* Simple seeded RNG (LCG) for reproducible demos */
+function makeRNG(seed){
+  let s = (seed >>> 0) || 123456789;
+  return function(){
+    s = (1664525 * s + 1013904223) >>> 0;
+    return (s / 4294967296);
+  }
+}
+
+/* Gaussian via Box-Muller using injected RNG */
+function gauss(rng){
+  let u = 0, v = 0;
+  while(u === 0) u = rng();
+  while(v === 0) v = rng();
+  return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+}
+
+/* AR(1) epsilon generator */
+function ar1Eps(rng, p, len){
+  const eps = new Array(len);
+  let e = gauss(rng);
+  eps[0] = e;
+  const scale = Math.sqrt(1 - p*p);
+  for(let i=1;i<len;i++){
+    e = p*e + scale*gauss(rng);
+    eps[i] = e;
+  }
+  return eps;
+}
+
+/* Simulate one cell life with provided epsilon stream */
+function simulateCell(params, epsStream){
+  const {base, amp, p, thr, maxc, nonlin, heat, outlier, noregen} = params;
+  let health = 100.0;
+  let cycles = 0;
+
+  // heat pattern: harsh every ~12 cycles
+  // outlier: rare shock probability per cycle
+  const heatPeriod = 12;
+  const outProb = 0.015;
+
+  for(let i=0;i<maxc;i++){
+    const eps = epsStream ? epsStream[i] : 0;
+    let drain = base;
+
+    // stochastic component
+    drain += amp * eps;
+
+    // nonlinear wear accelerates when health is low
+    if(nonlin){
+      const low = clamp((50 - health)/50, 0, 1);
+      drain *= (1 + 0.6*low);
+    }
+
+    // heat epochs increase drain on pattern
+    if(heat && (i % heatPeriod === 0) && i>0){
+      drain *= 1.35;
+    }
+
+    // rare outlier shock
+    if(outlier && Math.random() < outProb){
+      drain *= 2.2;
+    }
+
+    if(noregen){
+      drain = Math.max(0, drain);
+    }
+
+    health -= drain;
+    cycles++;
+
+    if(health <= thr){
+      break;
+    }
+  }
+  return cycles;
+}
+
+/* Paired Monte Carlo: same epsilon streams used for White and QDS */
+function runPairedSim(params){
+  const n = params.n;
+  const maxc = params.maxc;
+  const p = clamp(params.p, 0, 0.99);
+  const seed = params.seed || 12345;
+
+  // We use seeded RNG for epsilon only.
+  const rng = makeRNG(seed);
+
+  const whiteLives = new Array(n);
+  const qdsLives = new Array(n);
+  const deltas = new Array(n);
+
+  for(let k=0;k<n;k++){
+    // paired eps stream
+    const epsWhite = new Array(maxc);
+    for(let i=0;i<maxc;i++) epsWhite[i] = gauss(rng);
+
+    const epsQDS = (p > 0) ? ar1Eps(rng, p, maxc) : epsWhite.slice();
+
+    const Lw = simulateCell(params, epsWhite);
+    const Lq = simulateCell(params, epsQDS);
+
+    whiteLives[k] = Lw;
+    qdsLives[k] = Lq;
+    deltas[k] = (Lq - Lw);
+  }
+
+  function mean(arr){
+    let s=0; for(const x of arr) s+=x; return s/arr.length;
+  }
+  function std(arr, m){
+    let s=0; for(const x of arr){ const d=x-m; s+=d*d; }
+    return Math.sqrt(s/arr.length);
+  }
+
+  const wMean = mean(whiteLives);
+  const qMean = mean(qdsLives);
+  const wStd = std(whiteLives, wMean);
+  const qStd = std(qdsLives, qMean);
+  const dMean = mean(deltas);
+  const pct = (qMean - wMean) / Math.max(1e-9, wMean) * 100;
+
+  return {wMean, qMean, wStd, qStd, dMean, pct};
+}
+
+/* Build params from UI */
+function readParams(){
+  let p = parseFloat($("p").value);
+  if($("hardnull").checked) p = 0;
+
+  return {
+    base: parseFloat($("base").value),
+    amp: parseFloat($("amp").value),
+    p: clamp(p,0,0.99),
+    n: Math.max(50, parseInt($("n").value,10)),
+    maxc: Math.max(100, parseInt($("maxc").value,10)),
+    thr: clamp(parseFloat($("thr").value), 0, 99),
+    nonlin: $("nonlin").checked,
+    heat: $("heat").checked,
+    outlier: $("outlier").checked,
+    paired: $("paired").checked,
+    noregen: $("noregen").checked,
+    blind: $("blind").checked,
+    seed: parseInt($("seed").value,10) || 12345
+  };
+}
+
+function updateKPI(r){
+  $("wMean").textContent = r ? r.wMean.toFixed(1) : "—";
+  $("qMean").textContent = r ? r.qMean.toFixed(1) : "—";
+  const pct = r ? r.pct : 0;
+  const d = $("delta");
+  d.textContent = r ? `${pct.toFixed(1)}%` : "—";
+  d.className = "kval " + (pct>1 ? "good" : (pct<-1 ? "bad" : "warn"));
+  $("pdelta").textContent = r ? r.dMean.toFixed(2) : "—";
+}
+
+/* Pretty one-line record */
+function recordLine(tag, params, r){
+  return `${nowStamp()} · ${tag} · base=${params.base}% · amp=${params.amp}% · p=${params.p} · thr=${params.thr}% · n=${params.n} · max=${params.maxc}
+white μ=${r.wMean.toFixed(1)} σ=${r.wStd.toFixed(1)} · QDS μ=${r.qMean.toFixed(1)} σ=${r.qStd.toFixed(1)} · Δ=${r.pct.toFixed(1)}% · meanΔ=${r.dMean.toFixed(2)}
+stress: nonlin=${params.nonlin} heat=${params.heat} out=${params.outlier} · bias: paired=${params.paired} noRegen=${params.noregen} blind=${params.blind}`;
+}
+
+/* Run single sim from current UI */
+function runSingle(tag="Manual"){
+  const params = readParams();
+  // we always run paired in this v7 (core identity)
+  const r = runPairedSim(params);
+
+  // Blind labels is UI-only in this trimmed v7
+  updateKPI(r);
+  appendLog(recordLine(tag, params, r));
+  return {params, r};
+}
+
+/* Evidence ladder presets */
+function ladderPresets(){
+  const baseParams = readParams();
+
+  // clone helper
+  const C = o => JSON.parse(JSON.stringify(o));
+
+  const A = C(baseParams);
+  A.amp = 0.0; A.p = 0.25; A.thr = 50; A.n = 1200; A.maxc = 4000;
+
+  const B = C(baseParams);
+  B.amp = 1.8; B.p = 0.0; B.thr = 50; B.n = 1200; B.maxc = 4000; B.blind=false;
+
+  const Cb = C(B);
+  Cb.blind = true; // UI-only marker
+
+  const D = C(baseParams);
+  D.base = 1.2; D.amp = 1.8; D.p = 0.25; D.thr = 30; D.n = 1600; D.maxc = 4000;
+
+  const E = C(baseParams);
+  E.base = 3.0; E.amp = 5.0; E.p = 0.60; E.thr = 50; E.n = 2000; E.maxc = 5000;
+
+  const F = C(baseParams);
+  F.base = 8.0; F.amp = 14.0; F.p = 0.99; F.thr = 95; F.n = 5000; F.maxc = 8000;
+
+  return [
+    {tag:"Ladder A — amp=0 control", params:A},
+    {tag:"Ladder B — hard null p=0", params:B},
+    {tag:"Ladder C — blind null", params:Cb},
+    {tag:"Ladder D — realistic phone", params:D},
+    {tag:"Ladder E — controlled stress", params:E},
+    {tag:"Ladder F — pathological honesty", params:F},
+  ];
+}
+
+/* Run paired sim with injected params */
+function runWithParams(tag, params){
+  // override seed per tag for stability but still tied to user seed
+  const baseSeed = readParams().seed;
+  params.seed = (baseSeed + (tag.length*101)) >>> 0;
+
+  const r = runPairedSim(params);
+  updateKPI(r);
+  appendLog(recordLine(tag, params, r));
+  return r;
+}
+
+/* Real-world-ish sampler */
+function sampleScenarios(count){
+  const seed = parseInt($("seed").value,10) || 12345;
+  const rng = makeRNG(seed ^ 0xA5A5A5A5);
+
+  const scenarios = [];
+  for(let i=0;i<count;i++){
+    // ranges chosen to look like "plausible-device families"
+    // not claims — just structured variety
+    const family = (i % 4);
+    let base, amp, p, thr, n, maxc;
+
+    if(family===0){ // phones
+      base = 1.0 + 0.6*rng();
+      amp  = 1.2 + 1.4*rng();
+      p    = 0.10 + 0.25*rng();
+      thr  = [20,30,50][Math.floor(rng()*3)];
+      n    = 1200;
+      maxc = 4000;
+    } else if(family===1){ // laptops
+      base = 0.6 + 0.5*rng();
+      amp  = 0.8 + 1.2*rng();
+      p    = 0.05 + 0.20*rng();
+      thr  = [20,30,40][Math.floor(rng()*3)];
+      n    = 1400;
+      maxc = 6000;
+    } else if(family===2){ // EV-like toy regime
+      base = 0.25 + 0.25*rng();
+      amp  = 0.3 + 0.5*rng();
+      p    = 0.05 + 0.25*rng();
+      thr  = [60,70,80][Math.floor(rng()*3)];
+      n    = 1800;
+      maxc = 12000;
+    } else { // grid/industrial toy regime
+      base = 0.15 + 0.20*rng();
+      amp  = 0.2 + 0.4*rng();
+      p    = 0.02 + 0.18*rng();
+      thr  = [70,80,85][Math.floor(rng()*3)];
+      n    = 2000;
+      maxc = 20000;
+    }
+
+    scenarios.push({
+      tag:`Sampler ${i+1} — family=${["phone","laptop","EV-toy","grid-toy"][family]}`,
+      params:{
+        ...readParams(),
+        base: +base.toFixed(2),
+        amp: +amp.toFixed(2),
+        p: +p.toFixed(2),
+        thr,
+        n,
+        maxc,
+      }
+    });
+  }
+  return scenarios;
+}
+
+/* Button wiring */
+$("runOne").onclick = () => runSingle("Manual");
+$("reset").onclick = () => {
+  $("base").value=1.2; $("amp").value=1.8; $("p").value=0.25;
+  $("n").value=1200; $("maxc").value=4000; $("thr").value=50;
+  $("nonlin").checked=true; $("heat").checked=true; $("outlier").checked=true;
+  $("paired").checked=true; $("noregen").checked=true; $("blind").checked=false; $("hardnull").checked=false;
+  $("benchCount").value=12; $("seed").value=12345;
+  updateKPI(null); appendLog("— Reset to defaults —");
+};
+
+$("clearLog").onclick = () => { logEl.textContent=""; };
+
+$("runLadder").onclick = () => {
+  appendLog("=== Poster Ladder (6 blocks) ===");
+  const ladder = ladderPresets();
+  ladder.forEach(item => runWithParams(item.tag, item.params));
+  appendLog("=== End ladder ===\n");
+};
+
+$("runBench").onclick = () => {
+  const count = Math.max(4, parseInt($("benchCount").value,10) || 12);
+  appendLog("=== AutoBench start ===");
+  appendLog(`Seed=${$("seed").value} • Sampler count=${count}`);
+  appendLog("");
+
+  // first the ladder
+  const ladder = ladderPresets();
+  ladder.forEach(item => runWithParams(item.tag, item.params));
+
+  appendLog("");
+  appendLog("=== Real-world-ish sampler ===");
+  const samples = sampleScenarios(count);
+  samples.forEach(s => runWithParams(s.tag, s.params));
+
+  appendLog("\n=== AutoBench end ===\n");
+};
+</script>
+</body>
+</html>

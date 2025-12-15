@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MO / Agency–Coherence Lab</title>
+  <style>
+    :root{
+      --bg:#0b0f14; --panel:#111826; --ink:#e7eefc; --mut:#9bb0d1;
+      --line:#2a3a55; --good:#35d07f; --warn:#ffcc66; --bad:#ff5a7a;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.4 system-ui,Segoe UI,Roboto,Arial}
+    header{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    header h1{margin:0;font-size:16px}
+    header .tag{color:var(--mut);font-size:12px}
+    main{display:grid;grid-template-columns: 1.2fr 0.8fr;gap:12px;padding:12px;max-width:1100px;margin:0 auto}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    label{display:flex;gap:8px;align-items:center;color:var(--mut)}
+    input[type="range"]{width:220px}
+    .small{font-size:12px;color:var(--mut)}
+    .grid{display:grid;grid-template-columns: 1fr 1fr;gap:10px}
+    .stat{padding:10px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,0.02)}
+    .stat b{display:block;font-size:12px;color:var(--mut);margin-bottom:4px}
+    .val{font-size:18px}
+    .pill{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--mut);font-size:12px}
+    .good{color:var(--good)} .warn{color:var(--warn)} .bad{color:var(--bad)}
+    .hr{height:1px;background:var(--line);margin:10px 0}
+    svg{width:100%;height:auto;display:block}
+    .btnRow{display:flex;gap:8px;flex-wrap:wrap}
+    button{
+      background:#0f1725;border:1px solid var(--line);color:var(--ink);
+      padding:8px 10px;border-radius:10px;cursor:pointer
+    }
+    button:hover{border-color:#3b5378}
+  </style>
+</head>
+<body>
+<header>
+  <h1>MO / Agency–Coherence Lab</h1>
+  <span class="tag">“Support should be a ramp, not a wheelchair.” 🎩</span>
+</header>
+
+<main>
+  <section class="card">
+    <div class="row" style="justify-content:space-between">
+      <div class="row">
+        <span class="pill">Diagram</span>
+        <span class="small">Variables update live (A, D, K, N)</span>
+      </div>
+      <div class="btnRow">
+        <button id="resetBtn">Reset</button>
+        <button id="randomBtn">Random stress-test</button>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <!-- Simple causal map -->
+    <svg viewBox="0 0 900 520" role="img" aria-label="Causal diagram">
+      <defs>
+        <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+          <path d="M0,0 L12,6 L0,12 Z" fill="#2a3a55"></path>
+        </marker>
+      </defs>
+
+      <!-- Arrows -->
+      <line x1="220" y1="140" x2="430" y2="120" stroke="#2a3a55" stroke-width="3" marker-end="url(#arrow)"/>
+      <text x="300" y="105" fill="#9bb0d1" font-size="14">A → K (+)</text>
+
+      <line x1="660" y1="140" x2="470" y2="120" stroke="#2a3a55" stroke-width="3" marker-end="url(#arrow)"/>
+      <text x="520" y="105" fill="#9bb0d1" font-size="14">N → K (−)</text>
+
+      <line x1="450" y1="150" x2="240" y2="370" stroke="#2a3a55" stroke-width="3" marker-end="url(#arrow)"/>
+      <text x="305" y="275" fill="#9bb0d1" font-size="14">K → D (−)</text>
+
+      <line x1="240" y1="400" x2="450" y2="420" stroke="#2a3a55" stroke-width="3" marker-end="url(#arrow)"/>
+      <text x="310" y="445" fill="#9bb0d1" font-size="14">D → A (−)</text>
+
+      <line x1="660" y1="400" x2="240" y2="400" stroke="#2a3a55" stroke-width="3" marker-end="url(#arrow)"/>
+      <text x="420" y="388" fill="#9bb0d1" font-size="14">N → D (+)</text>
+
+      <!-- Nodes -->
+      <g>
+        <circle cx="180" cy="120" r="70" fill="#0f1725" stroke="#2a3a55" stroke-width="3"/>
+        <text x="180" y="108" text-anchor="middle" fill="#e7eefc" font-size="22">A</text>
+        <text x="180" y="132" text-anchor="middle" fill="#9bb0d1" font-size="14">Agency</text>
+        <text id="Atext" x="180" y="160" text-anchor="middle" fill="#35d07f" font-size="18">0.55</text>
+      </g>
+
+      <g>
+        <circle cx="450" cy="120" r="70" fill="#0f1725" stroke="#2a3a55" stroke-width="3"/>
+        <text x="450" y="108" text-anchor="middle" fill="#e7eefc" font-size="22">K</text>
+        <text x="450" y="132" text-anchor="middle" fill="#9bb0d1" font-size="14">Coherence</text>
+        <text id="Ktext" x="450" y="160" text-anchor="middle" fill="#35d07f" font-size="18">0.55</text>
+      </g>
+
+      <g>
+        <circle cx="720" cy="120" r="70" fill="#0f1725" stroke="#2a3a55" stroke-width="3"/>
+        <text x="720" y="108" text-anchor="middle" fill="#e7eefc" font-size="22">N</text>
+        <text x="720" y="132" text-anchor="middle" fill="#9bb0d1" font-size="14">Noise/Stress</text>
+        <text id="Ntext" x="720" y="160" text-anchor="middle" fill="#ffcc66" font-size="18">0.45</text>
+      </g>
+
+      <g>
+        <circle cx="180" cy="400" r="70" fill="#0f1725" stroke="#2a3a55" stroke-width="3"/>
+        <text x="180" y="388" text-anchor="middle" fill="#e7eefc" font-size="22">D</text>
+        <text x="180" y="412" text-anchor="middle" fill="#9bb0d1" font-size="14">Dependency</text>
+        <text id="Dtext" x="180" y="440" text-anchor="middle" fill="#ff5a7a" font-size="18">0.40</text>
+      </g>
+
+      <!-- Intervention box -->
+      <rect x="520" y="300" width="340" height="180" rx="16" fill="#0f1725" stroke="#2a3a55" stroke-width="3"/>
+      <text x="540" y="330" fill="#e7eefc" font-size="16">Intervention (choose a mode)</text>
+      <text x="540" y="354" fill="#9bb0d1" font-size="13">Rescue boosts K now but raises D.</text>
+      <text x="540" y="374" fill="#9bb0d1" font-size="13">Scaffold boosts A + K and lowers D over time.</text>
+      <text x="540" y="394" fill="#9bb0d1" font-size="13">Neglect drops D but spikes N and can crater K.</text>
+      <text id="modeText" x="540" y="440" fill="#ffcc66" font-size="16">Mode: Scaffold</text>
+      <text id="deltaText" x="540" y="468" fill="#35d07f" font-size="14">ΔA +0.08, ΔK +0.10, ΔD −0.06, ΔN −0.04</text>
+    </svg>
+  </section>
+
+  <aside class="card">
+    <div class="row" style="justify-content:space-between">
+      <span class="pill">Controls</span>
+      <span class="small">All values 0–1</span>
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="row">
+      <label><input type="radio" name="mode" value="scaffold" checked> Scaffold</label>
+      <label><input type="radio" name="mode" value="rescue"> Rescue</label>
+      <label><input type="radio" name="mode" value="neglect"> Neglect</label>
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="row">
+      <label>Warmth <span id="warmVal" class="pill">0.60</span></label>
+      <input id="warm" type="range" min="0" max="1" step="0.01" value="0.60">
+    </div>
+
+    <div class="row">
+      <label>Boundaries <span id="boundVal" class="pill">0.60</span></label>
+      <input id="bound" type="range" min="0" max="1" step="0.01" value="0.60">
+    </div>
+
+    <div class="row">
+      <label>Next step (doable) <span id="stepVal" class="pill">0.55</span></label>
+      <input id="step" type="range" min="0" max="1" step="0.01" value="0.55">
+    </div>
+
+    <div class="row">
+      <label>Fade support <span id="fadeVal" class="pill">0.50</span></label>
+      <input id="fade" type="range" min="0" max="1" step="0.01" value="0.50">
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="row">
+      <label>Base Agency A₀ <span id="A0Val" class="pill">0.55</span></label>
+      <input id="A0" type="range" min="0" max="1" step="0.01" value="0.55">
+    </div>
+
+    <div class="row">
+      <label>Base Noise N₀ <span id="N0Val" class="pill">0.45</span></label>
+      <input id="N0" type="range" min="0" max="1" step="0.01" value="0.45">
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="grid">
+      <div class="stat">
+        <b>Agency (A)</b>
+        <div id="Aout" class="val good">0.55</div>
+        <div class="small">skill + confidence + perceived control</div>
+      </div>
+      <div class="stat">
+        <b>Coherence (K)</b>
+        <div id="Kout" class="val good">0.55</div>
+        <div class="small">holds goals under pressure</div>
+      </div>
+      <div class="stat">
+        <b>Dependency (D)</b>
+        <div id="Dout" class="val bad">0.40</div>
+        <div class="small">stability borrowed from others</div>
+      </div>
+      <div class="stat">
+        <b>Noise (N)</b>
+        <div id="Nout" class="val warn">0.45</div>
+        <div class="small">stress / chaos / triggers</div>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+    <div class="small">
+      <b>Note:</b> This is a thought-experiment simulator, not a clinical tool. It’s for reasoning about patterns and trade-offs.
+    </div>
+  </aside>
+</main>
+
+<script>
+  const el = (id)=>document.getElementById(id);
+  const clamp=(x)=>Math.max(0,Math.min(1,x));
+  const fmt=(x)=> (Math.round(x*100)/100).toFixed(2);
+
+  const state = {
+    A0: 0.55, N0: 0.45,
+    warm:0.60, bound:0.60, step:0.55, fade:0.50,
+    mode:'scaffold'
+  };
+
+  function moodClass(x){
+    if (x >= 0.67) return 'good';
+    if (x >= 0.40) return 'warn';
+    return 'bad';
+  }
+
+  function compute(){
+    // Base: agency & noise
+    let A = state.A0;
+    let N = state.N0;
+
+    // Inputs
+    const w = state.warm, b = state.bound, s = state.step, f = state.fade;
+
+    // Mode weights (hand-tuned: simple + readable)
+    // Rescue: quick K gain, but D rises and A grows slowly.
+    // Scaffold: A and K rise, D drops, N drops a bit.
+    // Neglect: D drops short-term, but N rises, K drops, A may wobble.
+    let dA=0, dK=0, dD=0, dN=0;
+
+    if (state.mode === 'rescue'){
+      dK = +0.22*w + 0.10*b + 0.05*s - 0.10*N;
+      dD = +0.18*w + 0.08 - 0.10*f;
+      dA = +0.05*s + 0.03*b - 0.06*dD;
+      dN = -0.05*w + 0.04; // relief now, but some rebound
+    } else if (state.mode === 'scaffold'){
+      dA = +0.16*s + 0.10*b + 0.06*w - 0.12*N;
+      dD = -0.14*f - 0.06*b + 0.05*N; // fade + boundaries reduce D
+      dN = -0.08*w - 0.04*b + 0.06*(1-s); // warmth/boundaries reduce N
+      dK = +0.18*(A + dA) + 0.10*b + 0.06*w - 0.22*(N + dN) - 0.10*(0.5 + (dD>0?dD:0));
+    } else { // neglect
+      dD = -0.10 - 0.08*f;       // "no help" lowers dependency
+      dN = +0.20 + 0.10*(1-w);    // stress spikes
+      dA = -0.08 + 0.06*s - 0.10*(N + dN);
+      dK = -0.18 - 0.18*(N + dN) + 0.06*b; // boundaries without warmth can still help a little
+    }
+
+    // Apply deltas
+    A = clamp(A + dA);
+    N = clamp(N + dN);
+
+    // Coherence K depends on A, N, and dependency pressure
+    let D = clamp(0.40 + dD); // baseline dependency anchored at 0.40 for display simplicity
+    let K = clamp(0.20 + 0.55*A - 0.55*N - 0.25*D + 0.10*b + 0.06*w);
+
+    // UI
+    el('Aout').textContent = fmt(A);
+    el('Kout').textContent = fmt(K);
+    el('Dout').textContent = fmt(D);
+    el('Nout').textContent = fmt(N);
+
+    el('Aout').className = 'val ' + moodClass(A);
+    el('Kout').className = 'val ' + moodClass(K);
+    el('Dout').className = 'val ' + moodClass(1-D); // lower dependency is "better"
+    el('Nout').className = 'val ' + moodClass(1-N); // lower noise is "better"
+
+    el('Atext').textContent = fmt(A);
+    el('Ktext').textContent = fmt(K);
+    el('Dtext').textContent = fmt(D);
+    el('Ntext').textContent = fmt(N);
+
+    const modeName = state.mode[0].toUpperCase() + state.mode.slice(1);
+    el('modeText').textContent = 'Mode: ' + modeName;
+
+    // Show deltas (rounded)
+    el('deltaText').textContent =
+      `ΔA ${dA>=0?'+':''}${fmt(dA)}, `+
+      `ΔK ${dK>=0?'+':''}${fmt(dK)}, `+
+      `ΔD ${dD>=0?'+':''}${fmt(dD)}, `+
+      `ΔN ${dN>=0?'+':''}${fmt(dN)}`;
+    el('deltaText').setAttribute('fill', (state.mode==='neglect') ? '#ff5a7a' : '#35d07f');
+  }
+
+  function bindRange(id, key, labelId){
+    const r = el(id);
+    const lab = el(labelId);
+    r.addEventListener('input', ()=>{
+      state[key] = parseFloat(r.value);
+      lab.textContent = fmt(state[key]);
+      compute();
+    });
+  }
+
+  // Ranges
+  bindRange('warm','warm','warmVal');
+  bindRange('bound','bound','boundVal');
+  bindRange('step','step','stepVal');
+  bindRange('fade','fade','fadeVal');
+  bindRange('A0','A0','A0Val');
+  bindRange('N0','N0','N0Val');
+
+  // Mode radios
+  document.querySelectorAll('input[name="mode"]').forEach(r=>{
+    r.addEventListener('change', ()=>{
+      state.mode = r.value;
+      compute();
+    });
+  });
+
+  // Buttons
+  el('resetBtn').addEventListener('click', ()=>{
+    Object.assign(state, {A0:0.55,N0:0.45,warm:0.60,bound:0.60,step:0.55,fade:0.50,mode:'scaffold'});
+    // push into UI
+    [['A0','A0Val'],['N0','N0Val'],['warm','warmVal'],['bound','boundVal'],['step','stepVal'],['fade','fadeVal']]
+      .forEach(([k,lab])=>{ el(k).value = state[k]; el(lab).textContent = fmt(state[k]); });
+    document.querySelector('input[name="mode"][value="scaffold"]').checked = true;
+    compute();
+  });
+
+  el('randomBtn').addEventListener('click', ()=>{
+    // mild chaos, for “what if?”
+    state.A0 = clamp(state.A0 + (Math.random()-0.5)*0.25);
+    state.N0 = clamp(state.N0 + (Math.random()-0.5)*0.35);
+    state.warm = clamp(state.warm + (Math.random()-0.5)*0.25);
+    state.bound = clamp(state.bound + (Math.random()-0.5)*0.25);
+    state.step = clamp(state.step + (Math.random()-0.5)*0.25);
+    state.fade = clamp(state.fade + (Math.random()-0.5)*0.25);
+    [['A0','A0Val'],['N0','N0Val'],['warm','warmVal'],['bound','boundVal'],['step','stepVal'],['fade','fadeVal']]
+      .forEach(([k,lab])=>{ el(k).value = state[k]; el(lab).textContent = fmt(state[k]); });
+    compute();
+  });
+
+  // init
+  compute();
+</script>
+</body>
+</html>

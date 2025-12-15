@@ -1,0 +1,633 @@
+cat > ~/OMEGA_EMPIRE/UV_QDS/www/physorg_qds_triage.html <<'HTML'
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>QDS • News Triage Vault</title>
+<style>
+  :root{
+    --bg:#07090f;
+    --panel:#0b1020cc;
+    --card:#0b1326cc;
+    --text:#e9eefc;
+    --muted:#9aa7c4;
+    --line:#ffffff14;
+    --glow1:#ff3b00;
+    --glow2:#ffb300;
+    --glow3:#ff0055;
+    --good:#39ff88;
+    --warn:#ffcc33;
+    --bad:#ff3b5c;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Arial;
+    color:var(--text);
+    background:
+      radial-gradient(1200px 600px at 20% -10%, rgba(255,179,0,.18), transparent 55%),
+      radial-gradient(900px 500px at 80% 0%, rgba(255,0,85,.14), transparent 55%),
+      radial-gradient(900px 700px at 50% 110%, rgba(255,59,0,.14), transparent 60%),
+      linear-gradient(#04060d, #07090f 60%, #050712);
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:14px 12px 80px}
+  .header{
+    position:sticky; top:0; z-index:10;
+    padding:12px 10px;
+    backdrop-filter: blur(10px);
+    background: linear-gradient(to bottom, rgba(7,9,15,.92), rgba(7,9,15,.70));
+    border-bottom:1px solid var(--line);
+  }
+  .titleRow{display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap}
+  .hTitle{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  h1{font-size:18px;margin:0;letter-spacing:.3px}
+  .pill{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:6px 10px;border-radius:999px;
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(8,12,24,.55);
+    font-size:12px;color:var(--muted);
+  }
+  .statusDot{width:8px;height:8px;border-radius:50%;background:var(--good);box-shadow:0 0 10px rgba(57,255,136,.55)}
+  .panel{
+    margin-top:10px;
+    border-radius:18px;
+    padding:12px;
+    background:var(--panel);
+    position:relative;
+    border:1px solid rgba(255,255,255,.10);
+    overflow:hidden;
+  }
+  .panel::before{
+    content:"";
+    position:absolute; inset:-2px;
+    background: linear-gradient(90deg,var(--glow1),var(--glow2),var(--glow3),var(--glow2),var(--glow1));
+    filter: blur(10px);
+    opacity:.35;
+    z-index:0;
+  }
+  .panel::after{
+    content:"";
+    position:absolute; inset:1px;
+    background: rgba(8,12,24,.78);
+    border-radius:16px;
+    z-index:0;
+  }
+  .panel > *{position:relative; z-index:1}
+  .controls{display:grid;grid-template-columns:repeat(12,1fr);gap:10px}
+  .control{grid-column:span 6}
+  .control.wide{grid-column:span 12}
+  label{display:block;font-size:11px;color:var(--muted);margin:0 0 6px 2px;letter-spacing:.5px}
+  select,input{
+    width:100%;
+    border-radius:14px;
+    padding:10px 12px;
+    border:1px solid rgba(255,255,255,.14);
+    background: rgba(7,10,18,.65);
+    color:var(--text);
+    outline:none;
+  }
+  .btnRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  button{
+    border:none;
+    padding:10px 12px;
+    border-radius:14px;
+    color:var(--text);
+    background: rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.12);
+    cursor:pointer;
+  }
+  button:hover{background:rgba(255,255,255,.11)}
+  .btnHot{
+    border-color:rgba(255,179,0,.45);
+    box-shadow:0 0 18px rgba(255,179,0,.15);
+  }
+  .statsRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .chip{
+    padding:8px 10px;border-radius:999px;
+    font-size:12px;color:var(--muted);
+    border:1px solid rgba(255,255,255,.12);
+    background: rgba(7,10,18,.55);
+  }
+
+  .list{margin-top:12px;display:flex;flex-direction:column;gap:10px}
+  .card{
+    border-radius:18px;
+    padding:12px;
+    background:var(--card);
+    border:1px solid rgba(255,255,255,.10);
+    position:relative;
+    overflow:hidden;
+  }
+  .card::before{
+    content:"";
+    position:absolute;left:-40px;top:-40px;width:120px;height:120px;
+    background: radial-gradient(circle at 30% 30%, rgba(255,179,0,.20), transparent 65%);
+    opacity:.9;
+  }
+  .card > *{position:relative}
+  .topRow{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  .t{
+    font-size:16px; margin:0 0 6px 0; line-height:1.2;
+  }
+  .meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .tag{
+    font-size:11px;color:var(--muted);
+    padding:6px 10px;border-radius:999px;
+    border:1px solid rgba(255,255,255,.10);
+    background: rgba(0,0,0,.18);
+  }
+  .bucket{
+    font-size:12px;
+    padding:6px 10px;border-radius:999px;
+    border:1px solid rgba(255,255,255,.14);
+    background: rgba(0,0,0,.18);
+    white-space:nowrap;
+  }
+  .b-none{color:var(--muted)}
+  .b-vs{color:var(--warn); border-color: rgba(255,204,51,.35)}
+  .b-comp{color:var(--good); border-color: rgba(57,255,136,.35)}
+  .b-broken{color:var(--bad); border-color: rgba(255,59,92,.35)}
+
+  .desc{color:#cdd6ef;line-height:1.35;margin:8px 0 10px 0}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .aBtn{padding:8px 10px;border-radius:12px;font-size:12px}
+  .a-vs{border-color: rgba(255,204,51,.35)}
+  .a-comp{border-color: rgba(57,255,136,.35)}
+  .a-broken{border-color: rgba(255,59,92,.35)}
+  .a-clear{border-color: rgba(154,167,196,.25)}
+  .a-open{border-color: rgba(255,179,0,.30)}
+  textarea{
+    width:100%;
+    margin-top:10px;
+    min-height:54px;
+    resize:vertical;
+    border-radius:14px;
+    padding:10px 12px;
+    border:1px solid rgba(255,255,255,.14);
+    background: rgba(7,10,18,.55);
+    color:var(--text);
+    outline:none;
+  }
+  .foot{margin-top:10px;color:var(--muted);font-size:12px}
+  .small{font-size:11px;color:var(--muted)}
+  .hr{height:1px;background:var(--line);margin:10px 0}
+  @media (min-width:820px){
+    .control{grid-column:span 3}
+    .control.wide{grid-column:span 6}
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="wrap">
+      <div class="titleRow">
+        <div class="hTitle">
+          <h1>QDS • News Triage Vault</h1>
+          <span class="pill"><span class="statusDot"></span><span id="statusText">ready</span></span>
+          <span class="pill">Local rips: <span class="small">/news_rips/physorg/YYYY-MM-DD/MASTER.json</span></span>
+        </div>
+        <div class="pill">Last refresh: <span id="lastRefresh">—</span> • Dates: <span id="dateCount">0</span></div>
+      </div>
+
+      <div class="panel">
+        <div class="controls">
+          <div class="control">
+            <label>DATE</label>
+            <select id="dateSel"></select>
+          </div>
+          <div class="control">
+            <label>MODE</label>
+            <select id="modeSel">
+              <option value="all">All</option>
+              <option value="triage">Triage only (bucketed)</option>
+              <option value="untriaged">Untriaged only</option>
+            </select>
+          </div>
+          <div class="control">
+            <label>BUCKET</label>
+            <select id="bucketSel">
+              <option value="any">Any</option>
+              <option value="vs">QDS vs MAINSTREAM</option>
+              <option value="comp">QDS complements MAINSTREAM</option>
+              <option value="broken">QDS broken by data?</option>
+              <option value="none">None</option>
+            </select>
+          </div>
+          <div class="control wide">
+            <label>SEARCH (title / category / description / notes)</label>
+            <input id="q" placeholder="e.g. neutrino, ferromagnetism, battery, entropy…"/>
+          </div>
+          <div class="control">
+            <label>SORT</label>
+            <select id="sortSel">
+              <option value="time_desc">Newest</option>
+              <option value="time_asc">Oldest</option>
+              <option value="title_asc">Title A→Z</option>
+              <option value="bucket">Bucket</option>
+            </select>
+          </div>
+          <div class="control">
+            <label>LIMIT</label>
+            <select id="limitSel">
+              <option>50</option><option>100</option><option>200</option><option selected>500</option><option>2000</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="btnRow">
+          <button class="btnHot" id="reloadBtn">Reload JSON</button>
+          <button id="openFolderBtn">Open rip folder</button>
+          <button id="exportBtn">Export triage</button>
+          <label style="margin:0;display:inline-flex;align-items:center;gap:8px">
+            <input id="importFile" type="file" accept="application/json" style="display:none"/>
+            <button id="importBtn">Import triage</button>
+          </label>
+          <button id="clearAllBtn" title="Clears only triage + notes, not the RSS files">Clear triage</button>
+        </div>
+
+        <div class="statsRow">
+          <span class="chip">Items: <span id="nItems">0</span></span>
+          <span class="chip">vs: <span id="nVs">0</span></span>
+          <span class="chip">complements: <span id="nComp">0</span></span>
+          <span class="chip">broken?: <span id="nBroken">0</span></span>
+          <span class="chip">untriaged: <span id="nNone">0</span></span>
+          <span class="chip">Query: <span id="qChip">—</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div id="list" class="list"></div>
+    <div class="foot">
+      Tip: Triage + notes are stored locally (localStorage). Use Export/Import to carry it forward across devices/backups.
+    </div>
+  </div>
+
+<script>
+(() => {
+  const $ = (id)=>document.getElementById(id);
+
+  const STORAGE_KEY = "qds_news_triage_v1";
+  const NOTES_KEY   = "qds_news_notes_v1";
+  const state = {
+    dates: [],
+    items: [],
+    triage: loadJson(STORAGE_KEY, {}),
+    notes: loadJson(NOTES_KEY, {}),
+    lastRefresh: null,
+  };
+
+  function loadJson(k, fallback){
+    try { return JSON.parse(localStorage.getItem(k) || "") || fallback; }
+    catch { return fallback; }
+  }
+  function save(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.triage));
+    localStorage.setItem(NOTES_KEY, JSON.stringify(state.notes));
+  }
+
+  function nowISO(){
+    return new Date().toISOString().slice(0,19);
+  }
+
+  function bucketLabel(b){
+    if(b==="vs") return "QDS vs MAINSTREAM";
+    if(b==="comp") return "QDS complements MAINSTREAM";
+    if(b==="broken") return "QDS broken by data?";
+    return "untriaged";
+  }
+
+  function bucketClass(b){
+    if(b==="vs") return "b-vs";
+    if(b==="comp") return "b-comp";
+    if(b==="broken") return "b-broken";
+    return "b-none";
+  }
+
+  function itemKey(it){
+    // Prefer stable GUID/link; fall back to title+date
+    return (it.guid || it.link || (it.title+"|"+(it.pubDate||it.date||""))).slice(0,512);
+  }
+
+  async function listDates(){
+    // Your rip folder layout: /news_rips/physorg/YYYY-MM-DD/MASTER.json
+    // We'll probe the last ~21 days and only keep ones that exist.
+    const days = 21;
+    const out = [];
+    const today = new Date();
+    for(let i=0;i<days;i++){
+      const d = new Date(today.getTime() - i*86400e3);
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth()+1).padStart(2,"0");
+      const dd = String(d.getDate()).padStart(2,"0");
+      const s = `${yyyy}-${mm}-${dd}`;
+      const url = `news_rips/physorg/${s}/MASTER.json`;
+      try{
+        const r = await fetch(url, {cache:"no-store"});
+        if(r.ok){
+          out.push(s);
+        }
+      }catch(e){}
+    }
+    return out;
+  }
+
+  async function loadDate(dateStr){
+    const url = `news_rips/physorg/${dateStr}/MASTER.json`;
+    const r = await fetch(url, {cache:"no-store"});
+    if(!r.ok) throw new Error(`Fetch failed: ${r.status}`);
+    const j = await r.json();
+    // Expecting either {items:[...]} or [...]
+    const items = Array.isArray(j) ? j : (j.items || j.ITEMS || j.master || []);
+    return items.map(x => normalizeItem(x));
+  }
+
+  function normalizeItem(x){
+    // your rip script likely uses common RSS fields; normalize gently
+    const it = {...x};
+    it.title = it.title || it.TITLE || "Untitled";
+    it.link  = it.link  || it.LINK  || it.url || "";
+    it.pubDate = it.pubDate || it.date || it.published || it.pub || "";
+    it.category = it.category || it.cat || it.section || it.feed || "";
+    it.summary  = it.summary  || it.description || it.desc || it.contentSnippet || "";
+    it.source   = it.source   || it.site || "phys.org";
+    return it;
+  }
+
+  function toTimeValue(pubDate){
+    // Works if pubDate is ISO-ish; otherwise fallback 0
+    const t = Date.parse(pubDate);
+    return isNaN(t) ? 0 : t;
+  }
+
+  function render(){
+    const dateStr = $("dateSel").value;
+    const mode = $("modeSel").value;
+    const bucket = $("bucketSel").value;
+    const q = $("q").value.trim().toLowerCase();
+    const sort = $("sortSel").value;
+    const limit = parseInt($("limitSel").value,10) || 500;
+
+    $("lastRefresh").textContent = state.lastRefresh || "—";
+    $("dateCount").textContent = state.dates.length;
+
+    let items = state.items.slice();
+
+    // MODE filter
+    items = items.filter(it => {
+      const b = state.triage[itemKey(it)] || "none";
+      if(mode==="triage") return b!=="none";
+      if(mode==="untriaged") return b==="none";
+      return true;
+    });
+
+    // BUCKET filter
+    items = items.filter(it => {
+      const b = state.triage[itemKey(it)] || "none";
+      if(bucket==="any") return true;
+      if(bucket==="none") return b==="none";
+      return b===bucket;
+    });
+
+    // SEARCH filter
+    if(q){
+      items = items.filter(it => {
+        const k = itemKey(it);
+        const note = (state.notes[k] || "");
+        const hay = `${it.title} ${it.category} ${it.summary} ${note}`.toLowerCase();
+        return hay.includes(q);
+      });
+    }
+
+    // SORT
+    items.sort((a,b)=>{
+      const ba = state.triage[itemKey(a)] || "none";
+      const bb = state.triage[itemKey(b)] || "none";
+      if(sort==="time_desc") return toTimeValue(b.pubDate)-toTimeValue(a.pubDate);
+      if(sort==="time_asc") return toTimeValue(a.pubDate)-toTimeValue(b.pubDate);
+      if(sort==="title_asc") return (a.title||"").localeCompare(b.title||"");
+      if(sort==="bucket") return (ba+ (a.title||"")).localeCompare(bb+(b.title||""));
+      return 0;
+    });
+
+    // STATS (from full state.items for this date, not filtered)
+    const counts = {vs:0,comp:0,broken:0,none:0};
+    for(const it of state.items){
+      const b = state.triage[itemKey(it)] || "none";
+      counts[b] = (counts[b]||0)+1;
+    }
+    $("nItems").textContent = state.items.length;
+    $("nVs").textContent = counts.vs||0;
+    $("nComp").textContent = counts.comp||0;
+    $("nBroken").textContent = counts.broken||0;
+    $("nNone").textContent = counts.none||0;
+    $("qChip").textContent = q ? q : "—";
+
+    // limit
+    items = items.slice(0, limit);
+
+    // render list
+    const list = $("list");
+    list.innerHTML = "";
+    for(const it of items){
+      list.appendChild(renderCard(it));
+    }
+  }
+
+  function renderCard(it){
+    const k = itemKey(it);
+    const b = state.triage[k] || "none";
+    const note = state.notes[k] || "";
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const top = document.createElement("div");
+    top.className = "topRow";
+
+    const left = document.createElement("div");
+    left.style.flex = "1";
+
+    const h = document.createElement("div");
+    h.className = "t";
+    h.textContent = it.title || "Untitled";
+
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    const t1 = document.createElement("span"); t1.className="tag"; t1.textContent = it.pubDate ? it.pubDate : "—";
+    const t2 = document.createElement("span"); t2.className="tag"; t2.textContent = it.category ? it.category : "—";
+    const t3 = document.createElement("span"); t3.className="tag"; t3.textContent = it.source || "phys.org";
+    meta.append(t1,t2,t3);
+
+    left.append(h, meta);
+
+    const right = document.createElement("div");
+    const buck = document.createElement("span");
+    buck.className = `bucket ${bucketClass(b)}`;
+    buck.textContent = bucketLabel(b);
+    right.appendChild(buck);
+
+    top.append(left,right);
+
+    const desc = document.createElement("div");
+    desc.className = "desc";
+    desc.textContent = (it.summary || "").trim() || "—";
+
+    const actions = document.createElement("div");
+    actions.className = "actions";
+
+    const mkBtn = (label, cls, val) => {
+      const btn = document.createElement("button");
+      btn.className = `aBtn ${cls}`;
+      btn.textContent = label;
+      btn.onclick = () => {
+        if(val==="none") delete state.triage[k];
+        else state.triage[k] = val;
+        save();
+        render();
+      };
+      return btn;
+    };
+
+    actions.append(
+      mkBtn("QDS vs", "a-vs", "vs"),
+      mkBtn("Complements", "a-comp", "comp"),
+      mkBtn("Broken?", "a-broken", "broken"),
+      mkBtn("Clear", "a-clear", "none")
+    );
+
+    const open = document.createElement("button");
+    open.className = "aBtn a-open";
+    open.textContent = "Open";
+    open.onclick = ()=>{ if(it.link) window.open(it.link, "_blank"); };
+    actions.appendChild(open);
+
+    const ta = document.createElement("textarea");
+    ta.placeholder = "Notes / why you filed it here (saved locally)…";
+    ta.value = note;
+    ta.onchange = () => {
+      const v = ta.value.trim();
+      if(v) state.notes[k] = v;
+      else delete state.notes[k];
+      save();
+    };
+
+    card.append(top, desc, actions, ta);
+    return card;
+  }
+
+  async function reloadAll(){
+    $("statusText").textContent = "loading…";
+    try{
+      state.dates = await listDates();
+      if(state.dates.length===0){
+        $("statusText").textContent = "no dates found";
+        $("dateSel").innerHTML = `<option value="">—</option>`;
+        state.items = [];
+        state.lastRefresh = nowISO();
+        render();
+        return;
+      }
+      // fill date selector (newest first)
+      $("dateSel").innerHTML = state.dates.map(d=>`<option value="${d}">${d}</option>`).join("");
+      const chosen = $("dateSel").value || state.dates[0];
+      $("dateSel").value = chosen;
+
+      state.items = await loadDate(chosen);
+      state.lastRefresh = nowISO();
+      $("statusText").textContent = "ready";
+      render();
+    }catch(e){
+      console.error(e);
+      $("statusText").textContent = "error";
+      state.items = [];
+      state.lastRefresh = nowISO();
+      render();
+      alert("Failed to load MASTER.json. Check: symlink exists and you're serving /www on 8011.");
+    }
+  }
+
+  // Hook up controls
+  $("reloadBtn").onclick = reloadAll;
+  $("openFolderBtn").onclick = ()=>{
+    const d = $("dateSel").value;
+    if(!d) return;
+    // opens directory listing if python http.server allows it
+    window.open(`news_rips/physorg/${d}/`, "_blank");
+  };
+
+  $("dateSel").onchange = async ()=>{
+    const d = $("dateSel").value;
+    if(!d) return;
+    $("statusText").textContent = "loading…";
+    try{
+      state.items = await loadDate(d);
+      state.lastRefresh = nowISO();
+      $("statusText").textContent = "ready";
+      render();
+    }catch(e){
+      console.error(e);
+      $("statusText").textContent = "error";
+      alert("Failed loading that date. Is the folder there?");
+    }
+  };
+
+  for(const id of ["modeSel","bucketSel","sortSel","limitSel"]){
+    $(id).onchange = render;
+  }
+  $("q").addEventListener("input", ()=>{ window.clearTimeout(window.__qt); window.__qt=setTimeout(render,120); });
+
+  // Export/Import triage map + notes
+  $("exportBtn").onclick = ()=>{
+    const payload = {
+      version: 1,
+      exported_at: new Date().toISOString(),
+      triage: state.triage,
+      notes: state.notes
+    };
+    const blob = new Blob([JSON.stringify(payload,null,2)], {type:"application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `qds_news_triage_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 1500);
+  };
+
+  $("importBtn").onclick = ()=> $("importFile").click();
+  $("importFile").onchange = async (ev)=>{
+    const f = ev.target.files && ev.target.files[0];
+    if(!f) return;
+    try{
+      const text = await f.text();
+      const j = JSON.parse(text);
+      if(j && j.triage) state.triage = j.triage;
+      if(j && j.notes) state.notes = j.notes;
+      save();
+      render();
+      alert("Imported triage OK.");
+    }catch(e){
+      alert("Import failed: not valid JSON?");
+    } finally {
+      ev.target.value = "";
+    }
+  };
+
+  $("clearAllBtn").onclick = ()=>{
+    if(!confirm("Clear ALL triage + notes (local only)?")) return;
+    state.triage = {};
+    state.notes = {};
+    save();
+    render();
+  };
+
+  // boot
+  reloadAll();
+})();
+</script>
+</body>
+</html>
+HTML

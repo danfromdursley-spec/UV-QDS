@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/">
+<channel>
+                    <title>Physics News - Physics News, Material Sciences, Science News, Physics</title>
+            <link>https://phys.org/physics-news/</link>
+            <language>en-us</language> 
+            <description>The latest news in physics, materials science, quantum physics, optics and photonics, superconductivity science and technology.  Updated Daily.</description>
+                        <item>
+                <title>Ultrashort laser pulses catch a snapshot of a &#039;molecular handshake&#039;</title>
+                <description>Liquids and solutions are complex environments—think, for example, of sugar dissolving in water, where each sugar molecule becomes surrounded by a restless crowd of water molecules. Inside living cells, the picture is even more complex: tiny liquid droplets carry proteins or RNA and help organize the cell&#039;s chemistry.</description>
+                <link>https://phys.org/news/2025-12-ultrashort-laser-pulses-snapshot-molecular.html</link>
+                <category>Optics &amp; Photonics Soft Matter </category>
+                <pubDate>Sun, 14 Dec 2025 11:10:01 EST</pubDate>
+                <guid isPermaLink="false">news684769629</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/ultrashort-laser-pulse.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>Long-hypothesized dynamic transition seen in deeply supercooled water for the first time</title>
+                <description>In a new study published in Nature Physics, researchers have achieved the first experimental observation of a fragile-to-strong transition in deeply supercooled water, resolving a scientific puzzle that has persisted for nearly three decades.</description>
+                <link>https://phys.org/news/2025-12-dynamic-transition-deeply-supercooled.html</link>
+                <category>Condensed Matter Soft Matter </category>
+                <pubDate>Sun, 14 Dec 2025 10:00:01 EST</pubDate>
+                <guid isPermaLink="false">news684763149</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/researchers-observe-lo.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>Atomic Josephson contacts: How Bose-Einstein condensates replicate Shapiro steps</title>
+                <description>The microscopic processes taking place in superconductors are difficult to observe directly. Researchers at the RPTU University of Kaiserslautern-Landau have therefore implemented a quantum simulation of the Josephson effect: They separated two Bose-Einstein condensates (BECs) by means of an extremely thin optical barrier.</description>
+                <link>https://phys.org/news/2025-12-atomic-josephson-contacts-bose-einstein.html</link>
+                <category>Superconductivity Quantum Physics </category>
+                <pubDate>Fri, 12 Dec 2025 11:39:27 EST</pubDate>
+                <guid isPermaLink="false">news684761941</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/how-bose-einstein-cond.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>Water&#039;s enigmatic surface: X-ray snapshots reveal atoms and molecules at work</title>
+                <description>Water is all around us, yet its surface layer—home to chemical reactions that shape life on Earth—is surprisingly hard to study. Experiments at SLAC&#039;s X-ray laser are bringing it into focus.</description>
+                <link>https://phys.org/news/2025-12-enigmatic-surface-ray-snapshots-reveal.html</link>
+                <category>Optics &amp; Photonics Soft Matter </category>
+                <pubDate>Fri, 12 Dec 2025 10:58:14 EST</pubDate>
+                <guid isPermaLink="false">news684759481</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/slac-researchers-wield-1.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>Pinpointing the glow of a single atom to advance quantum emitter engineering</title>
+                <description>Researchers have discovered how to design and place single-photon sources at the atomic scale inside ultrathin 2D materials, lighting the path for future quantum innovations.</description>
+                <link>https://phys.org/news/2025-12-atom-advance-quantum-emitter.html</link>
+                <category>General Physics Quantum Physics </category>
+                <pubDate>Fri, 12 Dec 2025 09:30:35 EST</pubDate>
+                <guid isPermaLink="false">news684754202</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/pinpointing-the-glow-o.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>Dual substitution induces room-temperature ferromagnetism and negative thermal expansion in BiFeO₃</title>
+                <description>Using a dual-cation substitution approach, researchers at Science Tokyo introduced ferromagnetism into bismuth ferrite, a well-known and promising multiferroic material for next-generation memory technologies. By replacing ions at both the bismuth and iron sites with calcium ions and heavier elements, they modified the spin structure and achieved ferromagnetism at room temperature. Additionally, negative thermal expansion was observed. This ability to engineer magnetism and thermal expansion in a multiferroic material aids in realizing future memory devices.</description>
+                <link>https://phys.org/news/2025-12-dual-substitution-room-temperature-ferromagnetism.html</link>
+                <category>Condensed Matter </category>
+                <pubDate>Thu, 11 Dec 2025 19:50:01 EST</pubDate>
+                <guid isPermaLink="false">news684690170</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/engineering-magnetism.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>Tiny optical modulator could enable giant future quantum computers</title>
+                <description>Researchers have made a major advance in quantum computing with a new device that is nearly 100 times smaller than the diameter of a human hair.</description>
+                <link>https://phys.org/news/2025-12-tiny-optical-modulator-enable-giant.html</link>
+                <category>Optics &amp; Photonics Quantum Physics </category>
+                <pubDate>Thu, 11 Dec 2025 16:46:37 EST</pubDate>
+                <guid isPermaLink="false">news684693961</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/tiny-new-device-could.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>Chip-scale magnetometer uses light for high-precision magnetic sensing</title>
+                <description>Researchers have developed a precision magnetometer based on a special material that changes optical properties in response to a magnetic field. The device, which is integrated onto a chip, could benefit space missions, navigation and biomedical applications.</description>
+                <link>https://phys.org/news/2025-12-chip-scale-magnetometer-high-precision.html</link>
+                <category>Condensed Matter Optics &amp; Photonics </category>
+                <pubDate>Thu, 11 Dec 2025 14:54:30 EST</pubDate>
+                <guid isPermaLink="false">news684687241</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/chip-scale-magnetomete-1.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>All-optical modulation in silicon achieved via an electron avalanche process</title>
+                <description>Over the past decades, engineers have introduced numerous technologies that rely on light and its underlying characteristics. These include photonic and quantum systems that could advance imaging, communication and information processing.</description>
+                <link>https://phys.org/news/2025-12-optical-modulation-silicon-electron-avalanche.html</link>
+                <category>Optics &amp; Photonics Quantum Physics </category>
+                <pubDate>Thu, 11 Dec 2025 08:40:01 EST</pubDate>
+                <guid isPermaLink="false">news684579966</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/researchers-realize-al.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>Using soccer balls to refine computational fluid dynamics research methods</title>
+                <description>If you&#039;re a soccer fan, you&#039;re familiar with this common sight: A penalty kick is in place, with a &quot;wall&quot; of defenders lined up in front of the goal, ready to leap to try to block the ball if it sails overhead.</description>
+                <link>https://phys.org/news/2025-12-soccer-balls-refine-fluid-dynamics.html</link>
+                <category>General Physics Soft Matter </category>
+                <pubDate>Wed, 10 Dec 2025 14:33:14 EST</pubDate>
+                <guid isPermaLink="false">news684599581</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/the-perfect-kick.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>Magnetic ordering induces Jahn-Teller effect in spinel-type compounds</title>
+                <description>The Jahn-Teller effect, proposed by Jahn and Teller in 1937, describes how molecules or crystals with degenerate electronic orbitals can lower their total energy by distorting their structure. This distortion lifts the degeneracy, stabilizing certain orbitals that become occupied by electrons. While many materials exhibiting this effect have been found, the involvement of spin—the source of magnetism—has rarely been observed because magnetic ordering usually occurs at much lower temperatures than structural distortions caused by the Jahn-Teller effect.</description>
+                <link>https://phys.org/news/2025-12-magnetic-jahn-teller-effect-spinel.html</link>
+                <category>Condensed Matter </category>
+                <pubDate>Wed, 10 Dec 2025 14:20:02 EST</pubDate>
+                <guid isPermaLink="false">news684598501</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/magnetic-ordering-indu-1.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>Study links vanishing of specific heats at absolute zero with principle of entropy increase</title>
+                <description>In a new publication, Professor José-María Martín-Olalla, from the Department of Condensed Matter Physics at the University of Seville, has described the direct link between the vanishing of specific heats at absolute zero—a general experimental observation established in the early 20th century—and the second law of thermodynamics.</description>
+                <link>https://phys.org/news/2025-12-links-specific-absolute-principle-entropy.html</link>
+                <category>General Physics </category>
+                <pubDate>Wed, 10 Dec 2025 13:25:28 EST</pubDate>
+                <guid isPermaLink="false">news684595502</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2021/matter-1.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>ALICE solves mystery of light-nuclei survival</title>
+                <description>Observations of the formation of light-nuclei from high-energy collisions may help in the hunt for dark matter.</description>
+                <link>https://phys.org/news/2025-12-alice-mystery-nuclei-survival.html</link>
+                <category>General Physics </category>
+                <pubDate>Wed, 10 Dec 2025 12:36:34 EST</pubDate>
+                <guid isPermaLink="false">news684592561</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/alice-solves-mystery-o.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>The rhythm of swarms: Tunable particles synchronize movement like living organisms</title>
+                <description>A collaboration between the University of Konstanz and Forschungszentrum Jülich has achieved the first fully tunable experimental realization of a long predicted &quot;swarmalator&quot; system. The study, published in Nature Communications, shows how tiny, self-propelled particles can simultaneously coordinate their motion and synchronize their internal rhythms—a behavior reminiscent of flashing fireflies, Japanese tree frogs or schooling fish.</description>
+                <link>https://phys.org/news/2025-12-rhythm-swarms-tunable-particles-synchronize.html</link>
+                <category>General Physics Soft Matter </category>
+                <pubDate>Wed, 10 Dec 2025 12:19:25 EST</pubDate>
+                <guid isPermaLink="false">news684591541</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/the-rhythm-of-swarms.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>Direct observation reveals &#039;two-in-one&#039; roles of plasma turbulence</title>
+                <description>Producing fusion energy requires heating plasma to more than one hundred million degrees and confining it stably with strong magnetic fields. However, plasma naturally develops fluctuations known as turbulence, and they carry heat outward and weaken confinement. Understanding how heat and turbulence spread is therefore essential.</description>
+                <link>https://phys.org/news/2025-12-reveals-roles-plasma-turbulence.html</link>
+                <category>Plasma Physics </category>
+                <pubDate>Wed, 10 Dec 2025 12:15:45 EST</pubDate>
+                <guid isPermaLink="false">news684591301</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/direct-observation-rev.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>New iron telluride thin film achieves superconductivity for quantum computer chips</title>
+                <description>If quantum computing is going to become an every-day reality, we need better superconducting thin films, the hardware that enables storage and processing of quantum information. Too often, these thin films have impurities or other defects that make them useless for real quantum computer chips.</description>
+                <link>https://phys.org/news/2025-12-iron-telluride-thin-superconductivity-quantum.html</link>
+                <category>Superconductivity Quantum Physics </category>
+                <pubDate>Wed, 10 Dec 2025 12:12:16 EST</pubDate>
+                <guid isPermaLink="false">news684591121</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/new-superconducting-th.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>An old jeweler&#039;s trick could unlock next-generation nuclear clocks</title>
+                <description>In 2008, a team of UCLA-led scientists proposed a scheme to use a laser to excite the nucleus of thorium atoms to realize extremely accurate, portable clocks. Last year, they realized this longstanding goal by bombarding thorium atoms embedded in specialized fluoride crystals with a laser. Now, they have found a way to dramatically simplify and strengthen the process by replacing the specialized crystals with thorium electroplated onto steel.</description>
+                <link>https://phys.org/news/2025-12-jeweler-generation-nuclear-clocks.html</link>
+                <category>General Physics </category>
+                <pubDate>Wed, 10 Dec 2025 11:00:04 EST</pubDate>
+                <guid isPermaLink="false">news684583882</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/an-old-jewelers-trick.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>Quantum machine learning nears practicality as partial error correction reduces hardware demands</title>
+                <description>Imagine a future where quantum computers supercharge machine learning—training models in seconds, extracting insights from massive datasets and powering next-gen AI. That future might be closer than you think, thanks to a breakthrough from researchers at Australia&#039;s national research agency, CSIRO, and The University of Melbourne.</description>
+                <link>https://phys.org/news/2025-12-quantum-machine-nears-partial-error.html</link>
+                <category>Quantum Physics </category>
+                <pubDate>Wed, 10 Dec 2025 09:20:06 EST</pubDate>
+                <guid isPermaLink="false">news684580675</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/quantum-computer-2.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>Neutrino observatories show promise for detecting light dark matter</title>
+                <description>Dark matter is an elusive type of matter that does not emit, reflect or absorb light, yet is estimated to account for most of the universe&#039;s mass. Over the past decades, many physicists worldwide have been trying to detect this type of matter or signals associated with its presence, employing various approaches and technologies.</description>
+                <link>https://phys.org/news/2025-12-neutrino-observatories-dark.html</link>
+                <category>General Physics </category>
+                <pubDate>Wed, 10 Dec 2025 09:10:02 EST</pubDate>
+                <guid isPermaLink="false">news684579982</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/study-highlights-the-p.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>Ghostly solar neutrinos caught transforming carbon atoms deep underground</title>
+                <description>Neutrinos are one of the most mysterious particles in the universe, often called &quot;ghost particles&quot; because they rarely interact with anything else. Trillions stream through our bodies every second, yet leave no trace. They are produced during nuclear reactions, including those that take place in the core of our sun.</description>
+                <link>https://phys.org/news/2025-12-ghostly-solar-neutrinos-caught-carbon.html</link>
+                <category>General Physics </category>
+                <pubDate>Wed, 10 Dec 2025 09:00:10 EST</pubDate>
+                <guid isPermaLink="false">news684508634</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/new-breakthrough-in-de-1.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>&#039;Light-bending&#039; material that controls blue and ultraviolet light could transform advanced chipmaking</title>
+                <description>Researchers from TU Delft and Radboud University (The Netherlands) have discovered that the two-dimensional ferroelectric material CuInP₂S₆ (CIPS) can be used to control the pathway and properties of blue and ultraviolet light like no other material can.</description>
+                <link>https://phys.org/news/2025-12-material-blue-ultraviolet-advanced-chipmaking.html</link>
+                <category>Condensed Matter Optics &amp; Photonics </category>
+                <pubDate>Tue, 09 Dec 2025 17:50:02 EST</pubDate>
+                <guid isPermaLink="false">news684517303</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/scientists-discover-re-1.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>Surprising nanoscopic heat traps found in diamonds</title>
+                <description>Diamond is famous in material science for being the best natural heat conductor on Earth—but new research reveals that, at the atomic scale, it can briefly trap heat in unexpected ways. The findings could influence how scientists design diamond-based quantum technologies, including ultra-precise sensors and future quantum computers.</description>
+                <link>https://phys.org/news/2025-12-nanoscopic-diamonds.html</link>
+                <category>Optics &amp; Photonics Quantum Physics </category>
+                <pubDate>Tue, 09 Dec 2025 12:37:15 EST</pubDate>
+                <guid isPermaLink="false">news684506221</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/surprising-nanoscopic.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>Laser draws made-to-order magnetic landscapes</title>
+                <description>Researchers at the Paul Scherrer Institute PSI, in collaboration with the National Institute of Standards and Technology (NIST) in Boulder, Colorado, have for the first time succeeded in using existing laser technology to continuously vary the magnetic properties of two-dimensional materials.</description>
+                <link>https://phys.org/news/2025-12-laser-magnetic-landscapes.html</link>
+                <category>Condensed Matter Optics &amp; Photonics </category>
+                <pubDate>Tue, 09 Dec 2025 12:03:33 EST</pubDate>
+                <guid isPermaLink="false">news684504181</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/laser-draws-made-to-or.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>Electron-phonon interactions in crystals found to be quantized by a fundamental constant</title>
+                <description>A researcher at the Department of Physics at Tohoku University has uncovered a surprising quantum phenomenon hidden inside ordinary crystals: the strength of interactions between electrons and lattice vibrations—known as phonons—is not continuous, but quantized. Even more remarkably, this strength is universally linked to one of the most iconic numbers in physics: the fine-structure constant.</description>
+                <link>https://phys.org/news/2025-12-electron-phonon-interactions-crystals-quantized.html</link>
+                <category>Condensed Matter Quantum Physics </category>
+                <pubDate>Tue, 09 Dec 2025 11:10:02 EST</pubDate>
+                <guid isPermaLink="false">news684500724</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/listening-to-the-whisp-1.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>A new traveling-wave Josephson amplifier with built-in reverse isolation</title>
+                <description>Traveling-wave parametric amplifiers (TWPAs) are electronic devices that boost weak microwave signals (i.e., electromagnetic waves with frequencies typically ranging between 1 and 100 GHz). Recently, many engineers have been developing TWPAs based on superconductors, materials that conduct electricity with a resistance of zero at low temperatures.</description>
+                <link>https://phys.org/news/2025-12-josephson-amplifier-built-reverse-isolation.html</link>
+                <category>Superconductivity Quantum Physics </category>
+                <pubDate>Tue, 09 Dec 2025 09:30:01 EST</pubDate>
+                <guid isPermaLink="false">news684420067</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/a-new-traveling-wave-j.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>From light to logic: Ultrafast quantum switching in 2D materials</title>
+                <description>Scientists from the Indian Institute of Technology Bombay have found a way to use light to control and read tiny quantum states inside atom-thin materials. The simple technique could pave the way for computers that are dramatically faster and consume far less power than today&#039;s electronics.</description>
+                <link>https://phys.org/news/2025-12-logic-ultrafast-quantum-2d-materials.html</link>
+                <category>Optics &amp; Photonics Quantum Physics </category>
+                <pubDate>Tue, 09 Dec 2025 08:51:39 EST</pubDate>
+                <guid isPermaLink="false">news684492661</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/from-light-to-logic-ul.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>CERN upbeat as China halts particle accelerator mega-project</title>
+                <description>The chief of the CERN physics laboratory says China&#039;s decision to pause its major particle accelerator project presents an &quot;opportunity&quot; to ensure Europe&#039;s rival plan goes ahead.</description>
+                <link>https://phys.org/news/2025-12-cern-upbeat-china-halts-particle.html</link>
+                <category>General Physics </category>
+                <pubDate>Tue, 09 Dec 2025 04:23:21 EST</pubDate>
+                <guid isPermaLink="false">news684476571</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/a-handout-from-cern-sh.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>Expanding the search for quantum-ready 2D materials</title>
+                <description>Quantum technologies from ultrasensitive sensors to next-generation information processors depend on the ability of quantum bits, or qubits, to maintain their delicate quantum states for a sufficiently long time to be useful.</description>
+                <link>https://phys.org/news/2025-12-quantum-ready-2d-materials.html</link>
+                <category>Condensed Matter Quantum Physics </category>
+                <pubDate>Mon, 08 Dec 2025 17:12:21 EST</pubDate>
+                <guid isPermaLink="false">news684436321</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/expanding-the-search-f.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>New model describes how reaction-diffusion networks develop &#039;foams&#039;</title>
+                <description>For numerous fundamental processes of life, the formation of certain protein patterns is essential. Protein pattern formation controlled by molecular switches is—like many processes in nature—far removed from a state of equilibrium.</description>
+                <link>https://phys.org/news/2025-12-reaction-diffusion-networks-foams.html</link>
+                <category>Soft Matter </category>
+                <pubDate>Mon, 08 Dec 2025 15:37:14 EST</pubDate>
+                <guid isPermaLink="false">news684430621</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/biophysics-pattern-for.jpg" width="90" height="90" />            </item>
+                        <item>
+                <title>Quantifying unknown quantum states: Study explores effectiveness of existing methods</title>
+                <description>Reliably quantifying and characterizing the quantum states of various systems is highly advantageous for both quantum physics research and the development of quantum technologies. Quantifying these states typically entails performing several measurements and reconstructing them via a process known as quantum-state tomography.</description>
+                <link>https://phys.org/news/2025-12-quantifying-unknown-quantum-states-explores.html</link>
+                <category>Optics &amp; Photonics Quantum Physics </category>
+                <pubDate>Mon, 08 Dec 2025 12:50:09 EST</pubDate>
+                <guid isPermaLink="false">news684420057</guid>
+                <media:thumbnail url="https://scx1.b-cdn.net/csz/news/tmb/2025/exploring-effectivenes.jpg" width="90" height="90" />            </item>
+                    </channel>
+</rss>

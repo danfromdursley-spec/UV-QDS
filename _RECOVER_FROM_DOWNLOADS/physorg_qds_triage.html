@@ -1,0 +1,899 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>QDS • News Triage Vault</title>
+<style>
+  :root{
+    --bg:#07090f;
+    --panel:#0b1020cc;
+    --card:#0b1326cc;
+    --text:#e9eefc;
+    --muted:#9aa7c4;
+    --line:#ffffff14;
+    --glow1:#ff3b00;
+    --glow2:#ffb300;
+    --glow3:#ff0055;
+    --good:#39ff88;
+    --warn:#ffcc33;
+    --bad:#ff3b5c;
+
+    --chip:#0b1020ee;
+    --chipLine:#ffffff18;
+    --btn:#0b1020ee;
+    --btnLine:#ffffff20;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(1200px 600px at 20% -10%, rgba(255,179,0,.18), transparent 60%),
+      radial-gradient(900px 500px at 80% 0%, rgba(255,0,85,.14), transparent 55%),
+      radial-gradient(900px 700px at 50% 110%, rgba(255,59,0,.14), transparent 60%),
+      linear-gradient(#04060d, #07090f 60%, #050712);
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:14px 12px 90px}
+  .header{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+    padding:12px 12px;border-radius:18px;
+    background:linear-gradient(180deg, rgba(11,16,32,.70), rgba(11,16,32,.35));
+    border:1px solid var(--line);
+    box-shadow: 0 0 0 1px rgba(255,179,0,.06), 0 18px 60px rgba(0,0,0,.55);
+  }
+  h1{font-size:20px;margin:0;letter-spacing:.2px}
+  .ready{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:8px 10px;border-radius:999px;
+    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);
+    font-weight:700;
+  }
+  .dot{width:10px;height:10px;border-radius:99px;background:var(--good);box-shadow:0 0 18px rgba(57,255,136,.45)}
+  .sub{
+    margin-top:10px;
+    padding:12px;border-radius:18px;
+    background:rgba(11,16,32,.55);border:1px solid var(--line);
+  }
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .label{font-size:12px;color:var(--muted);letter-spacing:.2px}
+  .chip{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:8px 10px;border-radius:999px;
+    background:var(--chip);border:1px solid var(--chipLine);
+    font-weight:700;
+  }
+  .chip small{font-weight:600;color:var(--muted)}
+  .grid{
+    display:grid;grid-template-columns:repeat(12,1fr);gap:12px;margin-top:12px;
+  }
+  .panel{
+    grid-column:span 12;
+    padding:12px;border-radius:18px;
+    background:var(--panel);border:1px solid var(--line);
+    box-shadow: 0 0 0 1px rgba(255,59,0,.06), 0 18px 60px rgba(0,0,0,.55);
+    backdrop-filter: blur(10px);
+  }
+  @media(min-width:860px){
+    .panel.half{grid-column:span 6}
+  }
+  .field{
+    display:flex;flex-direction:column;gap:6px;min-width:160px;flex:1;
+  }
+  select,input[type="text"]{
+    width:100%;
+    padding:12px 12px;border-radius:14px;
+    background:rgba(0,0,0,.20);
+    border:1px solid rgba(255,255,255,.12);
+    color:var(--text);
+    outline:none;
+  }
+  input::placeholder{color:#7581a8}
+  .btn{
+    appearance:none;border:1px solid var(--btnLine);
+    background:var(--btn);
+    color:var(--text);
+    padding:12px 14px;border-radius:14px;
+    font-weight:800;letter-spacing:.2px;
+  }
+  .btn:hover{border-color:rgba(255,179,0,.35)}
+  .btn.primary{border-color:rgba(255,179,0,.45); box-shadow:0 0 0 1px rgba(255,179,0,.08)}
+  .btn.danger{border-color:rgba(255,59,92,.45)}
+  .btn.good{border-color:rgba(57,255,136,.35)}
+  .btn.ghost{background:rgba(255,255,255,.03)}
+  .mut{color:var(--muted)}
+  .tiny{font-size:12px}
+  .counts{
+    display:flex;gap:10px;flex-wrap:wrap;margin-top:10px
+  }
+  .count{
+    padding:8px 10px;border-radius:999px;
+    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);
+    font-weight:800;
+  }
+  .count b{color:var(--glow2)}
+  .list{margin-top:12px;display:flex;flex-direction:column;gap:12px}
+  .card{
+    padding:12px;border-radius:18px;
+    background:linear-gradient(180deg, rgba(11,19,38,.70), rgba(11,19,38,.38));
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow: 0 0 0 1px rgba(255,179,0,.05), 0 18px 60px rgba(0,0,0,.55);
+  }
+  .cardTop{
+    display:flex;gap:10px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap
+  }
+  .title{font-weight:900;font-size:18px;line-height:1.2;margin:0}
+  .tag{
+    padding:6px 10px;border-radius:999px;font-weight:900;letter-spacing:.2px;
+    border:1px solid rgba(255,179,0,.35);
+    color:var(--glow2);
+    background:rgba(255,179,0,.08);
+    white-space:nowrap;
+  }
+  .meta{
+    display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px
+  }
+  .pill{
+    padding:8px 10px;border-radius:999px;
+    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);
+    font-weight:800
+  }
+  .desc{margin:10px 0 0 0;line-height:1.35;color:#d8e0ff}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  textarea{
+    width:100%;min-height:64px;resize:vertical;
+    padding:12px;border-radius:14px;
+    background:rgba(0,0,0,.20);
+    border:1px solid rgba(255,255,255,.12);
+    color:var(--text);
+    outline:none;
+    margin-top:10px;
+  }
+
+  /* Backtest extras */
+  .btGrid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px;margin-top:8px}
+  .btBox{grid-column:span 12;padding:12px;border-radius:18px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.10)}
+  @media(min-width:860px){.btBox.half{grid-column:span 6}}
+  input[type="range"]{width:100%}
+  .legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .lg{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);font-weight:800}
+  .sw{width:10px;height:10px;border-radius:99px;display:inline-block}
+  canvas{
+    width:100%;height:240px;border-radius:14px;
+    background:rgba(0,0,0,.20);
+    border:1px solid rgba(255,255,255,.10);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div>
+      <h1>QDS • News Triage Vault</h1>
+      <div class="mut tiny" style="margin-top:4px">
+        Local rips: <b>/news_rips/physorg/YYYY-MM-DD/MASTER.json</b>
+      </div>
+    </div>
+    <div class="ready"><span class="dot"></span>ready <span class="mut tiny" id="status">idle</span></div>
+  </div>
+
+  <div class="sub">
+    <div class="row" style="justify-content:space-between">
+      <div class="chip"><small>Last refresh:</small> <span id="lastRefresh">—</span> <small>• Dates:</small> <span id="dateCount">0</span></div>
+      <div class="chip"><small>Vault:</small> <span id="vaultVersion">orange/black • v2 backtest</span></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="panel half">
+      <div class="row">
+        <div class="field">
+          <div class="label">DATE</div>
+          <select id="dateSel"></select>
+        </div>
+        <div class="field">
+          <div class="label">MODE</div>
+          <select id="modeSel">
+            <option value="All">All</option>
+            <option value="Physics">Physics</option>
+            <option value="Space">Space</option>
+            <option value="Tech">Tech</option>
+            <option value="Energy">Energy</option>
+            <option value="Materials">Materials</option>
+            <option value="Biology">Biology</option>
+            <option value="AI">AI</option>
+            <option value="Education">Education</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <div class="field">
+          <div class="label">BUCKET</div>
+          <select id="bucketSel">
+            <option value="All">All</option>
+            <option value="vs">QDS vs MAINSTREAM</option>
+            <option value="complement">Complements</option>
+            <option value="broken">Broken?</option>
+            <option value="untriaged">Untriaged</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <div class="field">
+          <div class="label">SEARCH (title / category / description / notes)</div>
+          <input id="q" type="text" placeholder="e.g. neutrino, ferromagnetism, battery, entropy" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <div class="field">
+          <div class="label">SORT</div>
+          <select id="sortSel">
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+          </select>
+        </div>
+        <div class="field">
+          <div class="label">LIMIT</div>
+          <select id="limitSel">
+            <option>100</option><option>250</option><option selected>500</option><option>1000</option><option>2000</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px">
+        <button class="btn primary" id="btnReload">Reload JSON</button>
+        <button class="btn" id="btnOpenFolder">Open rip folder</button>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="btnExport">Export triage</button>
+        <button class="btn" id="btnImport">Import triage</button>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn danger" id="btnClear">Clear triage</button>
+      </div>
+
+      <div class="counts" id="counts"></div>
+    </div>
+
+    <div class="panel half">
+      <div class="row" style="justify-content:space-between">
+        <div class="chip"><small>Backtest:</small> <span id="btState">idle</span></div>
+        <div class="chip"><small>History pts:</small> <span id="btPts">0</span></div>
+      </div>
+
+      <div class="btGrid">
+        <div class="btBox half">
+          <div class="label">HARSHNESS (loose → strict)</div>
+          <div class="row" style="align-items:center">
+            <input id="harsh" type="range" min="0" max="100" value="35"/>
+            <span class="chip"><small>H:</small> <span id="harshLbl">35</span></span>
+          </div>
+          <div class="mut tiny" style="margin-top:8px">
+            Higher harshness demands stronger “QDS-adjacent” signal to count as VS/Complement.
+          </div>
+        </div>
+
+        <div class="btBox half">
+          <div class="label">MAX DAYS TO SWEEP (newest → older)</div>
+          <div class="row" style="align-items:center">
+            <input id="maxDays" type="range" min="1" max="365" value="120"/>
+            <span class="chip"><small>D:</small> <span id="maxDaysLbl">120</span></span>
+          </div>
+          <div class="mut tiny" style="margin-top:8px">
+            Uses folder listing if available; falls back to probing. Keeps within sane limits.
+          </div>
+        </div>
+
+        <div class="btBox">
+          <div class="row">
+            <button class="btn good" id="btnTestDay">Test this day</button>
+            <button class="btn primary" id="btnBacktest">Backtest many days</button>
+            <button class="btn danger" id="btnClearBT">Clear backtest history</button>
+          </div>
+
+          <div class="legend">
+            <span class="lg"><span class="sw" style="background:var(--glow2)"></span>Items</span>
+            <span class="lg"><span class="sw" style="background:var(--good)"></span>VS_pred</span>
+            <span class="lg"><span class="sw" style="background:var(--warn)"></span>Comp_pred</span>
+            <span class="lg"><span class="sw" style="background:var(--bad)"></span>Broken</span>
+          </div>
+
+          <div style="margin-top:10px">
+            <canvas id="btCanvas" width="1200" height="260"></canvas>
+          </div>
+
+          <div class="mut tiny" style="margin-top:8px" id="btMeta">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="grid-column:span 12">
+      <div class="row" style="justify-content:space-between">
+        <div class="chip"><small>Query:</small> <span id="queryEcho">—</span></div>
+        <div class="chip"><small>Loaded:</small> <span id="loadedEcho">—</span></div>
+      </div>
+      <div class="list" id="list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===========================
+   QDS • News Triage Vault
+   v2 Backtest + Graph
+   =========================== */
+
+const ROOT = "/news_rips/physorg";
+const MASTER = "MASTER.json";
+
+const LS_TRIAGE = "QDS_TRIAGE_MAP_v2";
+const LS_BT     = "QDS_TRIAGE_BACKTEST_v2";
+
+const $ = (id)=>document.getElementById(id);
+const nowIso = ()=> new Date().toISOString();
+
+function setStatus(t){ $("status").textContent = t; }
+
+function safeJSON(x, fallback){
+  try{ return JSON.parse(x); }catch{ return fallback; }
+}
+
+function loadTriage(){
+  return safeJSON(localStorage.getItem(LS_TRIAGE)||"{}", {});
+}
+function saveTriage(map){
+  localStorage.setItem(LS_TRIAGE, JSON.stringify(map));
+}
+function loadBT(){
+  return safeJSON(localStorage.getItem(LS_BT)||"[]", []);
+}
+function saveBT(arr){
+  localStorage.setItem(LS_BT, JSON.stringify(arr));
+}
+
+function itemId(it){
+  return it.id || it.guid || it.link || (it.title||"")+"|"+(it.pubDate||it.date||"");
+}
+
+async function fetchJSON(url){
+  const r = await fetch(url, {cache:"no-store"});
+  if(!r.ok) throw new Error("HTTP "+r.status);
+  return await r.json();
+}
+
+async function headOK(url){
+  try{
+    const r = await fetch(url, {method:"HEAD", cache:"no-store"});
+    return r.ok;
+  }catch(e){ return false; }
+}
+
+function parseDateFoldersFromDirListing(html){
+  // python http.server directory listing contains href="2025-12-14/"
+  const re = /href="(\d{4}-\d{2}-\d{2})\/"/g;
+  const out = [];
+  let m;
+  while((m = re.exec(html))){ out.push(m[1]); }
+  // unique, sorted desc
+  return Array.from(new Set(out)).sort((a,b)=> b.localeCompare(a));
+}
+
+async function discoverDates(maxDays){
+  // Try directory listing first (fast)
+  try{
+    const r = await fetch(ROOT + "/", {cache:"no-store"});
+    if(r.ok){
+      const html = await r.text();
+      const got = parseDateFoldersFromDirListing(html);
+      if(got.length) return got.slice(0, maxDays);
+    }
+  }catch(e){}
+  // Fallback: probe backwards day-by-day
+  const out = [];
+  const today = new Date();
+  for(let i=0;i<maxDays;i++){
+    const dt = new Date(today.getTime() - i*86400000);
+    const y = dt.getFullYear();
+    const m = String(dt.getMonth()+1).padStart(2,"0");
+    const d = String(dt.getDate()).padStart(2,"0");
+    const key = `${y}-${m}-${d}`;
+    const ok = await headOK(`${ROOT}/${key}/${MASTER}`);
+    if(ok) out.push(key);
+  }
+  return out;
+}
+
+function normalizeItems(master){
+  // Be forgiving: different rippers name arrays differently
+  return master.items || master.articles || master.news || master.feed || [];
+}
+
+/* ---------- triage logic (manual) ---------- */
+function setBucket(triageMap, id, bucket){
+  if(!triageMap[id]) triageMap[id] = {bucket:"", notes:"", ts:Date.now()};
+  triageMap[id].bucket = bucket;
+  triageMap[id].ts = Date.now();
+}
+function setNotes(triageMap, id, notes){
+  if(!triageMap[id]) triageMap[id] = {bucket:"", notes:"", ts:Date.now()};
+  triageMap[id].notes = notes;
+  triageMap[id].ts = Date.now();
+}
+
+/* ---------- backtest scoring ---------- */
+function scoreStory(it, mode, harsh){
+  // You can tune this battery anytime. This aims to be useful + stable.
+  const t = (it.title||"").toLowerCase();
+  const d = (it.description||"").toLowerCase();
+  const c = (it.category||"").toLowerCase();
+  const s = (t+" "+d+" "+c);
+
+  // base signals (QDS-adjacent themes)
+  const sig = [
+    {re:/correlat|coheren|kernel|memory|lindblad|decoher|stochastic|noise|variance|entropy|information|mutual information/, w:2.0},
+    {re:/gravity|cosmolog|hubble|galaxy|rotation|lens|dark (matter|energy)|vacuum|spacetime|metric/, w:1.8},
+    {re:/quantum|superconduct|spin|magnet|phonon|topolog|metamaterial|nanopore|ion|electrolyte|battery/, w:1.6},
+    {re:/turbulence|plasma|mhd|fusion|instabil|feedback|control|spectrum|psd|noise floor/, w:1.4},
+    {re:/compress|codec|signal processing|error[- ]correction|bandwidth|fisher|likelihood/, w:1.3},
+  ];
+
+  // mode bias: keep it gentle, not brittle
+  let modeBoost = 0.0;
+  const mm = (mode||"All").toLowerCase();
+  if(mm !== "all"){
+    if(c.includes(mm) || t.includes(mm)) modeBoost += 0.4;
+  }
+
+  let score = modeBoost;
+  for(const k of sig){
+    if(k.re.test(s)) score += k.w;
+  }
+
+  // Harshness → thresholds (loose=low threshold; strict=high)
+  // map harsh 0..100 to thresholds roughly 1.8..4.4
+  const vsTh   = 1.8 + (harsh/100)*2.6;
+  const compTh = vsTh - 0.9; // complement if medium signal
+
+  if(score >= vsTh) return {label:"vs", score};
+  if(score >= compTh) return {label:"complement", score};
+  return {label:"", score};
+}
+
+/* ---------- rendering ---------- */
+let triageMap = loadTriage();
+let btHistory = loadBT();
+
+let dates = [];
+let currentMaster = null;
+let currentDate = null;
+
+function renderCounts(items){
+  const total = items.length;
+  let vs=0, comp=0, broken=0, untri=0;
+  for(const it of items){
+    const id = itemId(it);
+    const tr = triageMap[id];
+    const b = tr?.bucket || (it.triage||it.bucket||"");
+    if(b==="vs") vs++;
+    else if(b==="complement") comp++;
+    else if(b==="broken") broken++;
+    else untri++;
+  }
+  $("counts").innerHTML = `
+    <span class="count">Items: <b>${total}</b></span>
+    <span class="count">vs: <b>${vs}</b></span>
+    <span class="count">complements: <b>${comp}</b></span>
+    <span class="count">broken?: <b>${broken}</b></span>
+    <span class="count">untriaged: <b>${untri}</b></span>
+  `;
+}
+
+function pickBucketTag(it){
+  const id = itemId(it);
+  const tr = triageMap[id];
+  const b = tr?.bucket || it.triage || it.bucket || "";
+  if(b==="vs") return {text:"QDS vs MAINSTREAM", color:"var(--glow2)"};
+  if(b==="complement") return {text:"Complements", color:"var(--good)"};
+  if(b==="broken") return {text:"Broken?", color:"var(--bad)"};
+  return {text:"", color:"rgba(255,255,255,.25)"};
+}
+
+function renderList(){
+  if(!currentMaster){ $("list").innerHTML = ""; return; }
+  const mode = $("modeSel").value;
+  const bucket = $("bucketSel").value;
+  const q = ($("q").value||"").trim().toLowerCase();
+  const sort = $("sortSel").value;
+  const limit = Number($("limitSel").value || 500);
+
+  let items = normalizeItems(currentMaster).slice();
+
+  // mode filter (light)
+  if(mode !== "All"){
+    items = items.filter(it=>{
+      const cat = (it.category||"").toLowerCase();
+      const title = (it.title||"").toLowerCase();
+      return cat.includes(mode.toLowerCase()) || title.includes(mode.toLowerCase());
+    });
+  }
+
+  // bucket filter
+  if(bucket !== "All"){
+    items = items.filter(it=>{
+      const id = itemId(it);
+      const b = (triageMap[id]?.bucket || it.triage || it.bucket || "");
+      if(bucket === "untriaged") return !b;
+      return b === bucket;
+    });
+  }
+
+  // search filter (title/category/description/notes)
+  if(q){
+    items = items.filter(it=>{
+      const id = itemId(it);
+      const note = (triageMap[id]?.notes||"").toLowerCase();
+      const s = ((it.title||"")+" "+(it.category||"")+" "+(it.description||"")+" "+note).toLowerCase();
+      return s.includes(q);
+    });
+  }
+
+  // sort by date where possible
+  function toTime(it){
+    const raw = it.pubDate || it.date || it.published || it.updated || "";
+    const t = Date.parse(raw);
+    return isNaN(t) ? 0 : t;
+  }
+  items.sort((a,b)=>{
+    const ta=toTime(a), tb=toTime(b);
+    return sort==="newest" ? (tb-ta) : (ta-tb);
+  });
+
+  // limit
+  items = items.slice(0, limit);
+
+  renderCounts(items);
+  $("queryEcho").textContent = q ? q : "—";
+  $("loadedEcho").textContent = `${currentDate} • mode=${mode} • bucket=${bucket} • showing=${items.length}`;
+
+  const html = items.map(it=>{
+    const id = itemId(it);
+    const title = it.title || "(untitled)";
+    const desc = it.description || "";
+    const link = it.link || it.url || "";
+    const cat = it.category || "";
+    const date = it.pubDate || it.date || it.published || "";
+    const tag = pickBucketTag(it);
+    const note = triageMap[id]?.notes || "";
+
+    const tagHTML = tag.text ? `<span class="tag" style="border-color:${tag.color};color:${tag.color};background:rgba(255,179,0,.08)">${tag.text}</span>` : "";
+
+    return `
+      <div class="card" data-id="${escapeAttr(id)}">
+        <div class="cardTop">
+          <div style="flex:1;min-width:240px">
+            <p class="title">${escapeHTML(title)}</p>
+          </div>
+          ${tagHTML}
+        </div>
+
+        <div class="meta">
+          ${date ? `<span class="pill">${escapeHTML(date)}</span>` : ``}
+          ${cat ? `<span class="pill">${escapeHTML(cat)}</span>` : ``}
+          ${link ? `<span class="pill">phys.org</span>` : ``}
+        </div>
+
+        ${desc ? `<p class="desc">${escapeHTML(desc)}</p>` : ``}
+
+        <div class="actions">
+          <button class="btn primary" data-act="vs">QDS vs</button>
+          <button class="btn good" data-act="complement">Complements</button>
+          <button class="btn danger" data-act="broken">Broken?</button>
+          <button class="btn ghost" data-act="clear">Clear</button>
+          ${link ? `<button class="btn" data-act="open">Open</button>` : ``}
+        </div>
+
+        <textarea data-act="notes" placeholder="Notes / why you filed it here (saved locally)...">${escapeHTML(note)}</textarea>
+      </div>
+    `;
+  }).join("");
+
+  $("list").innerHTML = html || `<div class="mut">No items match your filters.</div>`;
+}
+
+function escapeHTML(s){
+  return String(s||"").replace(/[&<>"']/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]));
+}
+function escapeAttr(s){
+  return escapeHTML(s).replace(/"/g,"&quot;");
+}
+
+/* ---------- interactions ---------- */
+$("list").addEventListener("click", (e)=>{
+  const btn = e.target.closest("button");
+  if(!btn) return;
+  const card = e.target.closest(".card");
+  if(!card) return;
+  const id = card.getAttribute("data-id");
+  const act = btn.getAttribute("data-act");
+
+  if(act==="vs"){ setBucket(triageMap, id, "vs"); saveTriage(triageMap); renderList(); }
+  if(act==="complement"){ setBucket(triageMap, id, "complement"); saveTriage(triageMap); renderList(); }
+  if(act==="broken"){ setBucket(triageMap, id, "broken"); saveTriage(triageMap); renderList(); }
+  if(act==="clear"){ setBucket(triageMap, id, ""); saveTriage(triageMap); renderList(); }
+  if(act==="open"){
+    // get link from current item
+    const it = (normalizeItems(currentMaster)||[]).find(x=> itemId(x)===id);
+    const link = it?.link || it?.url || "";
+    if(link) window.open(link, "_blank");
+  }
+});
+
+$("list").addEventListener("input", (e)=>{
+  const ta = e.target.closest("textarea");
+  if(!ta) return;
+  const card = e.target.closest(".card");
+  if(!card) return;
+  const id = card.getAttribute("data-id");
+  setNotes(triageMap, id, ta.value);
+  saveTriage(triageMap);
+});
+
+/* ---------- load / reload ---------- */
+async function loadDay(date){
+  currentDate = date;
+  setStatus("loading "+date);
+  try{
+    const url = `${ROOT}/${date}/${MASTER}`;
+    currentMaster = await fetchJSON(url);
+    $("lastRefresh").textContent = nowIso();
+    setStatus("ok");
+  }catch(e){
+    currentMaster = {items:[]};
+    setStatus("missing");
+  }
+  renderList();
+}
+
+async function boot(){
+  setStatus("discovering dates…");
+  const maxDays = Number($("maxDays").value||120);
+  dates = await discoverDates(maxDays);
+  $("dateSel").innerHTML = dates.map(d=>`<option value="${d}">${d}</option>`).join("");
+  $("dateCount").textContent = String(dates.length);
+  $("lastRefresh").textContent = nowIso();
+
+  const first = dates[0] || new Date().toISOString().slice(0,10);
+  $("dateSel").value = first;
+  await loadDay(first);
+
+  // render backtest history graph
+  updateBTUI();
+  drawBTGraph();
+  setStatus("ready");
+}
+
+/* ---------- filter refresh hooks ---------- */
+["dateSel","modeSel","bucketSel","sortSel","limitSel","q"].forEach(id=>{
+  $(id).addEventListener(id==="q" ? "input" : "change", ()=>{
+    if(id==="dateSel") loadDay($("dateSel").value);
+    else renderList();
+  });
+});
+
+$("btnReload").addEventListener("click", ()=> loadDay($("dateSel").value));
+$("btnOpenFolder").addEventListener("click", ()=>{
+  const d = $("dateSel").value;
+  window.open(`${ROOT}/${d}/`, "_blank");
+});
+
+/* ---------- export / import ---------- */
+$("btnExport").addEventListener("click", ()=>{
+  const payload = {
+    exported_at: nowIso(),
+    root: ROOT,
+    triage_map: triageMap,
+    note: "QDS News Triage Vault export"
+  };
+  const blob = new Blob([JSON.stringify(payload,null,2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `qds_triage_export_${new Date().toISOString().replace(/[:.]/g,"_")}.json`;
+  a.click();
+});
+
+$("btnImport").addEventListener("click", ()=>{
+  const inp = document.createElement("input");
+  inp.type = "file";
+  inp.accept = "application/json";
+  inp.onchange = async ()=>{
+    const f = inp.files?.[0];
+    if(!f) return;
+    const txt = await f.text();
+    const j = safeJSON(txt, null);
+    if(!j || !j.triage_map){ alert("No triage_map found in JSON"); return; }
+    triageMap = j.triage_map;
+    saveTriage(triageMap);
+    renderList();
+  };
+  inp.click();
+});
+
+$("btnClear").addEventListener("click", ()=>{
+  if(!confirm("Clear ALL triage + notes saved locally?")) return;
+  triageMap = {};
+  saveTriage(triageMap);
+  renderList();
+});
+
+/* ---------- backtest / graph ---------- */
+function updateBTUI(){
+  $("harshLbl").textContent = $("harsh").value;
+  $("maxDaysLbl").textContent = $("maxDays").value;
+  $("btPts").textContent = String(btHistory.length);
+}
+$("harsh").addEventListener("input", ()=>{ updateBTUI(); });
+$("maxDays").addEventListener("input", ()=>{ updateBTUI(); });
+
+function btKey(date, mode, harsh){
+  return `${date}|${mode}|${harsh}`;
+}
+
+async function testDay(date, mode, harsh){
+  const url = `${ROOT}/${date}/${MASTER}`;
+  try{
+    const master = await fetchJSON(url);
+    const items = normalizeItems(master);
+    let itemsN=0, vs=0, comp=0, broken=0;
+    for(const it of items){
+      // apply mode filter lightly
+      if(mode !== "All"){
+        const cat = (it.category||"").toLowerCase();
+        const title = (it.title||"").toLowerCase();
+        if(!cat.includes(mode.toLowerCase()) && !title.includes(mode.toLowerCase())) continue;
+      }
+      itemsN++;
+      const res = scoreStory(it, mode, harsh);
+      if(res.label==="vs") vs++;
+      else if(res.label==="complement") comp++;
+    }
+    return {date, mode, harsh, items:itemsN, vs_pred:vs, comp_pred:comp, broken:0, ts:Date.now()};
+  }catch(e){
+    return {date, mode, harsh, items:0, vs_pred:0, comp_pred:0, broken:1, ts:Date.now()};
+  }
+}
+
+function drawBTGraph(){
+  const cv = $("btCanvas");
+  const g = cv.getContext("2d");
+  g.clearRect(0,0,cv.width,cv.height);
+
+  const pad = 34, w = cv.width - pad*2, h = cv.height - pad*2;
+
+  // axes
+  g.strokeStyle = "rgba(255,255,255,.14)";
+  g.lineWidth = 2;
+  g.beginPath();
+  g.moveTo(pad, pad);
+  g.lineTo(pad, pad+h);
+  g.lineTo(pad+w, pad+h);
+  g.stroke();
+
+  if(!btHistory.length){
+    $("btMeta").textContent = "No backtest history yet — run a test.";
+    return;
+  }
+
+  // show latest run series (same mode+harsh) for readability
+  const last = btHistory[btHistory.length-1];
+  const series = btHistory
+    .filter(p=> p.mode===last.mode && p.harsh===last.harsh)
+    .sort((a,b)=> a.date.localeCompare(b.date))
+    .slice(-180);
+
+  $("btMeta").textContent = `Series: mode=${last.mode} • harsh=${last.harsh} • points=${series.length} • range=${series[0].date} → ${series[series.length-1].date}`;
+
+  const maxY = Math.max(1, ...series.map(p=>Math.max(p.items,p.vs_pred,p.comp_pred,p.broken)));
+
+  const sx = (i)=> pad + (series.length===1?0:(i/(series.length-1))*w);
+  const sy = (v)=> pad + h - (v/maxY)*h;
+
+  function plot(key, color, alpha, lw){
+    g.strokeStyle = color;
+    g.globalAlpha = alpha;
+    g.lineWidth = lw;
+    g.beginPath();
+    series.forEach((p,i)=>{
+      const x = sx(i), y = sy(p[key]);
+      if(i===0) g.moveTo(x,y); else g.lineTo(x,y);
+    });
+    g.stroke();
+  }
+
+  // Use your scheme colors
+  plot("items",   "rgba(255,179,0,1)", 0.70, 3);
+  plot("vs_pred", "rgba(57,255,136,1)", 0.95, 3.2);
+  plot("comp_pred","rgba(255,204,51,1)", 0.70, 2.6);
+  plot("broken",  "rgba(255,59,92,1)", 0.60, 2.4);
+
+  // labels
+  g.globalAlpha = 0.9;
+  g.fillStyle = "rgba(255,255,255,.65)";
+  g.font = "16px system-ui";
+  g.fillText("0", 8, pad+h+6);
+  g.fillText(String(maxY), 8, pad+14);
+}
+
+$("btnTestDay").addEventListener("click", async ()=>{
+  const date = $("dateSel").value;
+  const mode = $("modeSel").value;
+  const harsh = Number($("harsh").value||35);
+
+  $("btState").textContent = "testing day…";
+  const p = await testDay(date, mode, harsh);
+  const key = btKey(p.date, p.mode, p.harsh);
+
+  // replace if exists, else append
+  const idx = btHistory.findIndex(x=> btKey(x.date,x.mode,x.harsh)===key);
+  if(idx>=0) btHistory[idx] = p; else btHistory.push(p);
+
+  saveBT(btHistory);
+  $("btState").textContent = "ok";
+  updateBTUI();
+  drawBTGraph();
+});
+
+$("btnBacktest").addEventListener("click", async ()=>{
+  const mode = $("modeSel").value;
+  const harsh = Number($("harsh").value||35);
+  const maxDays = Number($("maxDays").value||120);
+
+  $("btState").textContent = "discovering…";
+  const sweepDates = await discoverDates(maxDays);
+
+  // newest->older already
+  const seen = new Set(btHistory.map(x=> btKey(x.date,x.mode,x.harsh)));
+  let added = 0;
+
+  $("btState").textContent = `backtesting ${sweepDates.length}…`;
+
+  for(let i=0;i<sweepDates.length;i++){
+    const date = sweepDates[i];
+    const key = btKey(date, mode, harsh);
+    if(seen.has(key)) continue;
+
+    const p = await testDay(date, mode, harsh);
+    btHistory.push(p);
+    added++;
+
+    if(added % 8 === 0){
+      saveBT(btHistory);
+      drawBTGraph();
+    }
+  }
+
+  saveBT(btHistory);
+  $("btState").textContent = `done (+${added})`;
+  updateBTUI();
+  drawBTGraph();
+});
+
+$("btnClearBT").addEventListener("click", ()=>{
+  if(!confirm("Clear backtest history stored locally?")) return;
+  btHistory = [];
+  saveBT(btHistory);
+  $("btState").textContent = "cleared";
+  updateBTUI();
+  drawBTGraph();
+});
+
+/* ---------- start ---------- */
+updateBTUI();
+boot();
+</script>
+</body>
+</html>

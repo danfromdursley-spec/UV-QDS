@@ -1,0 +1,31 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QDS Chips & Quantum Noise v1</title>
+<style>
+body{margin:0;font-family:system-ui;background:#070b1a;color:#e9f1ff}
+.wrap{max-width:860px;margin:0 auto;padding:18px}
+.card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:16px;margin:12px 0}
+button{background:#0e1b40;color:#fff;border:1px solid rgba(255,255,255,.12);padding:12px 14px;border-radius:12px;font-weight:600}
+small{opacity:.7}
+</style></head>
+<body><div class="wrap">
+<h1>Semiconductor & Quantum Noise</h1>
+<div class="card">
+<p>Phone-safe credibility toy. Maps a simple correlated-jitter slider to a fake "stability" score.</p>
+<label>Correlation ρ: <span id="rhoV">0.60</span></label>
+<input id="rho" type="range" min="0" max="0.99" step="0.01" value="0.60" style="width:100%">
+</div>
+<div class="card">
+<button id="run">Run toy test</button>
+<p id="out"><small>Waiting for test.</small></p>
+</div>
+<script>
+const rho=document.getElementById("rho"),rhoV=document.getElementById("rhoV"),out=document.getElementById("out");
+rho.oninput=()=>rhoV.textContent=Number(rho.value).toFixed(2);
+document.getElementById("run").onclick=()=>{
+  const r=Number(rho.value);
+  const stability=(100*(1-0.55*r)).toFixed(1);
+  out.innerHTML="Toy result: correlated jitter model suggests ~<b>"+stability+
+    "%</b> relative stability margin (illustrative only).";
+};
+</script>
+</div></body></html>

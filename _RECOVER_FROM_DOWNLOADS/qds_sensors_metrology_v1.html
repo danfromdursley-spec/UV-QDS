@@ -1,0 +1,31 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QDS Sensors & Metrology v1</title>
+<style>
+body{margin:0;font-family:system-ui;background:#070b1a;color:#e9f1ff}
+.wrap{max-width:860px;margin:0 auto;padding:18px}
+.card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:16px;margin:12px 0}
+button{background:#0e1b40;color:#fff;border:1px solid rgba(255,255,255,.12);padding:12px 14px;border-radius:12px;font-weight:600}
+small{opacity:.7}
+</style></head>
+<body><div class="wrap">
+<h1>Sensors / Metrology (LifeFirst)</h1>
+<div class="card">
+<p>Noise-floor calibration toy. Demonstrates how correlated noise changes averaging benefit.</p>
+<label>Correlation ρ: <span id="rhoV">0.30</span></label>
+<input id="rho" type="range" min="0" max="0.99" step="0.01" value="0.30" style="width:100%">
+</div>
+<div class="card">
+<button id="run">Run toy scan</button>
+<p id="out"><small>Safe demo. No medical claims.</small></p>
+</div>
+<script>
+const rho=document.getElementById("rho"),rhoV=document.getElementById("rhoV"),out=document.getElementById("out");
+rho.oninput=()=>rhoV.textContent=Number(rho.value).toFixed(2);
+document.getElementById("run").onclick=()=>{
+  const r=Number(rho.value);
+  const gain=(1/(1+3*r)).toFixed(2);
+  out.innerHTML="Toy averaging gain factor ~ <b>"+gain+
+    "x</b> under correlated noise (illustrative).<br><small>LifeFirst: modelling only.</small>";
+};
+</script>
+</div></body></html>

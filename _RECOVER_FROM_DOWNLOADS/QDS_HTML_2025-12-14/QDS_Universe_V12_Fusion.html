@@ -1,0 +1,735 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>QDS Universe V12 Fusion 🎩💥</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <style>
+    :root {
+      --hud-bg1: #ff7a3c;
+      --hud-bg2: #ff2f92;
+      --hud-radius: 22px;
+      --hud-shadow: 0 14px 40px rgba(0,0,0,0.45);
+      --hud-text: #fff;
+      --accent: #ffd86b;
+      --btn-radius: 999px;
+      --font-main: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: radial-gradient(circle at top, #050818 0, #02040a 55%, #000 100%);
+      font-family: var(--font-main);
+      color: var(--hud-text);
+    }
+    #container {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+    }
+
+    /* HUD PANEL – 60% size of earlier big panel */
+    #hud {
+      position: fixed;
+      top: env(safe-area-inset-top, 10px);
+      left: env(safe-area-inset-left, 10px);
+      width: min(260px, 70vw);
+      max-height: 88vh;
+      padding: 14px 16px 16px;
+      border-radius: var(--hud-radius);
+      background: linear-gradient(140deg, var(--hud-bg1), var(--hud-bg2));
+      box-shadow: var(--hud-shadow);
+      color: var(--hud-text);
+      font-size: 13px;
+      line-height: 1.35;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 10;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+
+    #hud.hidden {
+      transform: translateY(-10px) translateX(-10px) scale(0.92);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    #subtitle {
+      font-size: 11px;
+      opacity: 0.9;
+      margin-bottom: 4px;
+    }
+
+    .slider-group {
+      margin-top: 4px;
+    }
+    .slider-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 11px;
+      margin-bottom: 4px;
+    }
+    .slider-label-row span.value {
+      font-variant-numeric: tabular-nums;
+      opacity: 0.9;
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.18);
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px rgba(0,0,0,0.25);
+      cursor: pointer;
+      border: 0;
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      border: 0;
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 6px;
+    }
+    button.hud-btn {
+      border: 0;
+      border-radius: var(--btn-radius);
+      padding: 7px 8px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      color: #fff;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.35);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    button.hud-btn span.emoji {
+      font-size: 13px;
+    }
+    #fireCme { background: linear-gradient(135deg, #ffb347, #ff7a3c); }
+    #maxChaos { background: linear-gradient(135deg, #ff4b6b, #ff006c); }
+    #normal { background: linear-gradient(135deg, #36d1ff, #009dff); }
+    #rideAlong { background: linear-gradient(135deg, #5beb78, #12b45a); }
+    #meltdown {
+      margin-top: 4px;
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, #ff7b47, #ff2f92);
+    }
+    #maxChaos.active {
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.9), 0 10px 26px rgba(0,0,0,0.5);
+      transform: translateY(-1px);
+    }
+
+    .select-wrapper {
+      margin-top: 6px;
+    }
+    select {
+      width: 100%;
+      border-radius: 999px;
+      padding: 6px 26px 6px 10px;
+      border: 0;
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+      background: rgba(10,7,20,0.55);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18);
+      appearance: none;
+      -moz-appearance: none;
+      -webkit-appearance: none;
+      background-image: linear-gradient(45deg, transparent 50%, #fff 50%), linear-gradient(135deg, #fff 50%, transparent 50%);
+      background-position: calc(100% - 14px) 12px, calc(100% - 9px) 12px;
+      background-size: 5px 5px, 5px 5px;
+      background-repeat: no-repeat;
+    }
+
+    #planetInfo, #status {
+      margin-top: 6px;
+      font-size: 11px;
+      padding: 6px 8px;
+      border-radius: 16px;
+      background: rgba(15,5,10,0.35);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+    }
+    #status {
+      background: rgba(0,0,0,0.35);
+      opacity: 0.95;
+    }
+
+    #hudToggle {
+      position: fixed;
+      right: env(safe-area-inset-right, 12px);
+      bottom: env(safe-area-inset-bottom, 12px);
+      border-radius: 999px;
+      padding: 10px 18px;
+      border: 0;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: radial-gradient(circle at 30% 0, #8df, #29f);
+      color: #00111d;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.55);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 9;
+    }
+
+    #hudToggle span.dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(255,255,255,0.9);
+    }
+
+    #credits {
+      position: fixed;
+      left: 50%;
+      bottom: env(safe-area-inset-bottom, 4px);
+      transform: translateX(-50%);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(180,230,255,0.6);
+      text-shadow: 0 0 8px rgba(0,255,255,0.45);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    @media (max-width: 480px) {
+      #title { font-size: 16px; }
+      #hud {
+        width: min(240px, 78vw);
+        padding: 12px 13px 14px;
+      }
+      button.hud-btn {
+        font-size: 11px;
+        padding-block: 6px;
+      }
+      #hudToggle {
+        padding: 9px 15px;
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="container"></div>
+
+  <div id="hud">
+    <div id="title">QDS UNIVERSE V12 🎩💥</div>
+    <div id="subtitle">Neon warp-grid. Tune λ<sub>c</sub>, τ<sub>c</sub>, fire CMEs, ride planets, then trigger MELTDOWN.</div>
+
+    <div class="slider-group">
+      <div class="slider-label-row">
+        <span>λ<sub>c</sub> (spatial coherence)</span>
+        <span class="value" id="lambdaValue">2.0</span>
+      </div>
+      <input id="lambdaSlider" type="range" min="0.5" max="4" step="0.1" value="2" />
+    </div>
+
+    <div class="slider-group">
+      <div class="slider-label-row">
+        <span>τ<sub>c</sub> (temporal coherence)</span>
+        <span class="value" id="tauValue">2.0</span>
+      </div>
+      <input id="tauSlider" type="range" min="0.5" max="4" step="0.1" value="2" />
+    </div>
+
+    <div class="button-row">
+      <button id="fireCme" class="hud-btn"><span class="emoji">💥</span><span>Fire CME</span></button>
+      <button id="maxChaos" class="hud-btn"><span class="emoji">🔥</span><span>MAX Chaos</span></button>
+      <button id="normal" class="hud-btn"><span class="emoji">💎</span><span>Normal</span></button>
+      <button id="rideAlong" class="hud-btn"><span class="emoji">🛸</span><span>Ride Along</span></button>
+      <button id="meltdown" class="hud-btn"><span class="emoji">☢️</span><span>QDS MELTDOWN</span></button>
+    </div>
+
+    <div class="select-wrapper">
+      <select id="planetSelect">
+        <option value="sun">Sun (center)</option>
+        <option value="mercury">Mercury</option>
+        <option value="venus">Venus</option>
+        <option value="earth" selected>Earth</option>
+        <option value="mars">Mars</option>
+        <option value="jupiter">Jupiter</option>
+        <option value="saturn">Saturn</option>
+        <option value="uranus">Uranus</option>
+        <option value="neptune">Neptune</option>
+        <option value="pluto">Pluto (respect!)</option>
+      </select>
+    </div>
+
+    <div id="planetInfo">Planet info will appear here.</div>
+    <div id="status">Status: Neon grid humming softly in Normal mode.</div>
+  </div>
+
+  <button id="hudToggle"><span class="dot"></span>HUD</button>
+  <div id="credits">Tap grid to spawn chaos orbs • λ<sub>c</sub>, τ<sub>c</sub> drive QDS warp</div>
+
+  <!-- Three.js from CDN -->
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+  <script>
+  (() => {
+    const container = document.getElementById('container');
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x02040a, 0.012);
+
+    const camera = new THREE.PerspectiveCamera(
+      55,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      500
+    );
+    camera.position.set(0, 18, 42);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    container.appendChild(renderer.domElement);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.06;
+    controls.minDistance = 10;
+    controls.maxDistance = 120;
+    controls.maxPolarAngle = Math.PI * 0.62;
+
+    // Background gradient "nebula" using large hemisphere light + subtle stars
+    const hemiLight = new THREE.HemisphereLight(0x4acbff, 0x020308, 0.7);
+    scene.add(hemiLight);
+
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    dirLight.position.set(10, 20, 10);
+    scene.add(dirLight);
+
+    // Neon grid plane
+    const gridSize = 120;
+    const gridDivisions = 80;
+    const grid = new THREE.GridHelper(gridSize, gridDivisions, 0x00ffff, 0x00a0ff);
+    grid.material.opacity = 0.9;
+    grid.material.transparent = true;
+    grid.position.y = 0;
+    scene.add(grid);
+
+    // Add faint warp rings (concentric circles)
+    const warpGroup = new THREE.Group();
+    scene.add(warpGroup);
+    const warpMaterial = new THREE.LineBasicMaterial({
+      color: 0x00b7ff,
+      transparent: true,
+      opacity: 0.25
+    });
+    for (let i = 0; i < 9; i++) {
+      const radius = 6 + i * 4;
+      const circle = new THREE.CircleGeometry(radius, 128);
+      circle.vertices.shift?.(); // in case of old geometry
+      const ring = new THREE.LineLoop(circle, warpMaterial.clone());
+      ring.rotation.x = -Math.PI / 2;
+      warpGroup.add(ring);
+    }
+
+    // Simple star field
+    const starGeo = new THREE.BufferGeometry();
+    const starCount = 500;
+    const starPositions = new Float32Array(starCount * 3);
+    for (let i = 0; i < starCount; i++) {
+      const r = 160 * Math.random() + 40;
+      const theta = Math.random() * 2 * Math.PI;
+      const phi = Math.acos((Math.random() * 2) - 1);
+      starPositions[i*3] = r * Math.sin(phi) * Math.cos(theta);
+      starPositions[i*3+1] = r * Math.sin(phi) * Math.sin(theta) + 40;
+      starPositions[i*3+2] = r * Math.cos(phi);
+    }
+    starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+    const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.6, transparent: true, opacity: 0.9 });
+    const stars = new THREE.Points(starGeo, starMat);
+    scene.add(stars);
+
+    // Planets
+    const planetData = [
+      { id: 'sun', name: 'Sun', color: 0xfff4c0, radius: 2.5, orbitR: 0, speed: 0 },
+      { id: 'mercury', name: 'Mercury', color: 0xdedede, radius: 0.35, orbitR: 5, speed: 0.028 },
+      { id: 'venus', name: 'Venus', color: 0xffd58a, radius: 0.55, orbitR: 7, speed: 0.022 },
+      { id: 'earth', name: 'Earth', color: 0x4cc3ff, radius: 0.6, orbitR: 9.5, speed: 0.018 },
+      { id: 'mars', name: 'Mars', color: 0xff7940, radius: 0.45, orbitR: 12, speed: 0.015 },
+      { id: 'jupiter', name: 'Jupiter', color: 0xfff2cf, radius: 1.4, orbitR: 16, speed: 0.011 },
+      { id: 'saturn', name: 'Saturn', color: 0xffe7ba, radius: 1.1, orbitR: 20, speed: 0.009 },
+      { id: 'uranus', name: 'Uranus', color: 0x96ecff, radius: 0.9, orbitR: 24, speed: 0.007 },
+      { id: 'neptune', name: 'Neptune', color: 0x567bff, radius: 0.85, orbitR: 28, speed: 0.006 },
+      { id: 'pluto', name: 'Pluto', color: 0xbbc1d8, radius: 0.3, orbitR: 32, speed: 0.004 }
+    ];
+
+    const planets = {};
+    const chaosOrbs = [];
+    const planetGroup = new THREE.Group();
+    scene.add(planetGroup);
+
+    const glowMat = new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.14 });
+
+    planetData.forEach(p => {
+      const geo = new THREE.SphereGeometry(p.radius, 32, 32);
+      const mat = new THREE.MeshStandardMaterial({
+        color: p.color,
+        emissive: p.id === 'sun' ? 0xffe49f : p.color,
+        emissiveIntensity: p.id === 'sun' ? 1.8 : 0.3,
+        roughness: 0.25,
+        metalness: 0.1
+      });
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(p.orbitR, p.radius, 0);
+      planetGroup.add(mesh);
+
+      // Soft glow shell for big bodies
+      if (p.id === 'sun' || p.id === 'jupiter' || p.id === 'saturn') {
+        const glowGeo = new THREE.SphereGeometry(p.radius * 2.8, 32, 32);
+        const glow = new THREE.Mesh(glowGeo, glowMat.clone());
+        mesh.add(glow);
+      }
+
+      planets[p.id] = {
+        ...p,
+        mesh,
+        angle: Math.random() * Math.PI * 2
+      };
+
+      // Orbit ring (skip Sun)
+      if (p.orbitR > 0) {
+        const orbitGeo = new THREE.RingGeometry(p.orbitR - 0.02, p.orbitR + 0.02, 128);
+        const orbitMat = new THREE.MeshBasicMaterial({
+          color: 0xffe4a0,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.22
+        });
+        const orbit = new THREE.Mesh(orbitGeo, orbitMat);
+        orbit.rotation.x = -Math.PI / 2;
+        scene.add(orbit);
+      }
+    });
+
+    // Saturn rings
+    (() => {
+      const saturn = planets['saturn'];
+      if (!saturn) return;
+      const ringGeo = new THREE.RingGeometry(saturn.radius * 1.6, saturn.radius * 2.5, 64);
+      const ringMat = new THREE.MeshBasicMaterial({
+        color: 0xfff2cf,
+        transparent: true,
+        opacity: 0.6,
+        side: THREE.DoubleSide
+      });
+      const rings = new THREE.Mesh(ringGeo, ringMat);
+      rings.rotation.x = -Math.PI / 3;
+      saturn.mesh.add(rings);
+    })();
+
+    // CME shock rings
+    const cmeRings = [];
+    function spawnCME(strength = 1) {
+      const geo = new THREE.RingGeometry(1, 1.3, 128);
+      const mat = new THREE.MeshBasicMaterial({
+        color: 0xffe28a,
+        transparent: true,
+        opacity: 0.85,
+        side: THREE.DoubleSide
+      });
+      const ring = new THREE.Mesh(geo, mat);
+      ring.rotation.x = -Math.PI / 2;
+      ring.position.set(0, 0.06, 0);
+      scene.add(ring);
+      cmeRings.push({ mesh: ring, life: 0, strength });
+    }
+
+    // Chaos orbs from taps
+    function spawnChaosOrb(x, z) {
+      const radius = 0.25 + Math.random() * 0.45;
+      const geo = new THREE.SphereGeometry(radius, 24, 24);
+      const mat = new THREE.MeshStandardMaterial({
+        color: 0xff7a3c,
+        emissive: 0xff5b3c,
+        emissiveIntensity: 1.4,
+        roughness: 0.1,
+        metalness: 0.3
+      });
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(x, 0.5, z);
+      planetGroup.add(mesh);
+      chaosOrbs.push({
+        mesh,
+        baseY: 0.5,
+        t: Math.random() * Math.PI * 2
+      });
+    }
+
+    renderer.domElement.addEventListener('pointerdown', (e) => {
+      const rect = renderer.domElement.getBoundingClientRect();
+      const ndcX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      const ndcY = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      const mouse = new THREE.Vector2(ndcX, ndcY);
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera(mouse, camera);
+      const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+      const pos = new THREE.Vector3();
+      raycaster.ray.intersectPlane(plane, pos);
+      if (Math.abs(pos.x) < gridSize * 0.5 && Math.abs(pos.z) < gridSize * 0.5) {
+        spawnChaosOrb(pos.x, pos.z);
+        flashStatus('Spawned a chaos orb on the QDS grid.');
+      }
+    });
+
+    // UI wiring
+    const lambdaSlider = document.getElementById('lambdaSlider');
+    const tauSlider = document.getElementById('tauSlider');
+    const lambdaValue = document.getElementById('lambdaValue');
+    const tauValue = document.getElementById('tauValue');
+    const fireCmeBtn = document.getElementById('fireCme');
+    const maxChaosBtn = document.getElementById('maxChaos');
+    const normalBtn = document.getElementById('normal');
+    const rideAlongBtn = document.getElementById('rideAlong');
+    const meltdownBtn = document.getElementById('meltdown');
+    const planetSelect = document.getElementById('planetSelect');
+    const planetInfo = document.getElementById('planetInfo');
+    const statusBox = document.getElementById('status');
+    const hud = document.getElementById('hud');
+    const hudToggle = document.getElementById('hudToggle');
+
+    let lambdaC = parseFloat(lambdaSlider.value);
+    let tauC = parseFloat(tauSlider.value);
+    let chaosLevel = 0;
+    let rideAlong = false;
+    let rideTargetId = 'earth';
+    let meltdownTimer = 0;
+
+    const infoMap = {
+      sun: "Sun – fusion furnace driving everything. QDS waves start here.",
+      mercury: "Mercury – scorched rock, racing close to the grid well.",
+      venus: "Venus – runaway greenhouse, thick clouds, slow spin.",
+      earth: "Earth – home. Liquid water, plate tectonics, questionable Wi‑Fi.",
+      mars: "Mars – dusty, cold, dreaming of warmer epochs.",
+      jupiter: "Jupiter – gas giant, storm champion, gravity bully.",
+      saturn: "Saturn – ringed elegance with icy debris ballet.",
+      uranus: "Uranus – tilted oddball rolling around the Sun.",
+      neptune: "Neptune – deep blue winds howling at supersonic speeds.",
+      pluto: "Pluto – tiny, icy, emotionally still a planet."
+    };
+
+    function updatePlanetInfo() {
+      const id = planetSelect.value;
+      planetInfo.textContent = infoMap[id] || "QDS region of unknown vibes.";
+    }
+    updatePlanetInfo();
+
+    function flashStatus(text) {
+      statusBox.textContent = "Status: " + text;
+    }
+
+    lambdaSlider.addEventListener('input', () => {
+      lambdaC = parseFloat(lambdaSlider.value);
+      lambdaValue.textContent = lambdaC.toFixed(1);
+      flashStatus("λc set to " + lambdaC.toFixed(1) + " – warp rings stretch/relax.");
+    });
+
+    tauSlider.addEventListener('input', () => {
+      tauC = parseFloat(tauSlider.value);
+      tauValue.textContent = tauC.toFixed(1);
+      flashStatus("τc set to " + tauC.toFixed(1) + " – temporal wobble retuned.");
+    });
+
+    fireCmeBtn.addEventListener('click', () => {
+      spawnCME(1);
+      flashStatus("CME fired – shock ring rolling through the grid.");
+    });
+
+    maxChaosBtn.addEventListener('click', () => {
+      const active = !maxChaosBtn.classList.contains('active');
+      maxChaosBtn.classList.toggle('active', active);
+      chaosLevel = active ? 1 : 0.25;
+      flashStatus(active
+        ? "MAX Chaos engaged – jittery orbits, noisy QDS background."
+        : "Chaos dialed back – still lively, but survivable.");
+    });
+
+    normalBtn.addEventListener('click', () => {
+      maxChaosBtn.classList.remove('active');
+      chaosLevel = 0.15;
+      lambdaC = 2; tauC = 2;
+      lambdaSlider.value = 2; tauSlider.value = 2;
+      lambdaValue.textContent = "2.0"; tauValue.textContent = "2.0";
+      rideAlong = false;
+      flashStatus("Normal mode – QDS grid humming softly.");
+    });
+
+    rideAlongBtn.addEventListener('click', () => {
+      rideAlong = !rideAlong;
+      rideTargetId = planetSelect.value || 'earth';
+      flashStatus(rideAlong
+        ? "Ride Along engaged – camera surfing with " + rideTargetId + "."
+        : "Ride Along disengaged – back to free camera.");
+    });
+
+    meltdownBtn.addEventListener('click', () => {
+      meltdownTimer = 6; // seconds
+      chaosLevel = 1.4;
+      for (let i = 0; i < 4; i++) spawnCME(1.4);
+      flashStatus("QDS MELTDOWN – stacked CMEs, max coherence, neon storm.");
+    });
+
+    planetSelect.addEventListener('change', () => {
+      updatePlanetInfo();
+      rideTargetId = planetSelect.value;
+      flashStatus("Locked HUD targeting to " + rideTargetId + ".");
+    });
+
+    hudToggle.addEventListener('click', () => {
+      hud.classList.toggle('hidden');
+    });
+
+    // Animation loop
+    let lastTime = performance.now();
+    function animate(now) {
+      requestAnimationFrame(animate);
+      const dt = (now - lastTime) / 1000;
+      lastTime = now;
+
+      const timeScale = 0.8 + tauC * 0.25;
+
+      // Warp rings breathing with λc
+      const warpStrength = 0.06 * lambdaC;
+      warpGroup.children.forEach((ring, idx) => {
+        const phase = now * 0.0006 + idx * 0.6;
+        const scale = 1 + Math.sin(phase) * warpStrength;
+        ring.scale.set(scale, scale, scale);
+        ring.material.opacity = 0.16 + 0.08 * Math.cos(phase * 1.5);
+      });
+
+      // Planets & chaos orbs
+      const chaosAmp = chaosLevel * 0.35;
+      const chaosFreq = 1.5 + tauC * 0.8;
+      planetData.forEach(p => {
+        const planet = planets[p.id];
+        if (!planet) return;
+        if (p.orbitR > 0) {
+          planet.angle += p.speed * timeScale * dt;
+          const baseX = Math.cos(planet.angle) * p.orbitR;
+          const baseZ = Math.sin(planet.angle) * p.orbitR;
+          const jitterX = chaosAmp * Math.sin(now * 0.0015 * chaosFreq + p.orbitR);
+          const jitterZ = chaosAmp * Math.cos(now * 0.0012 * chaosFreq + p.orbitR * 0.7);
+          const warpY = 0.45 + 0.4 * Math.sin((baseX * baseX + baseZ * baseZ) * 0.003 + now * 0.001 * lambdaC);
+          planet.mesh.position.set(baseX + jitterX, warpY, baseZ + jitterZ);
+        } else {
+          // Sun bob
+          planet.mesh.position.y = 1.8 + 0.4 * Math.sin(now * 0.0009 * tauC);
+        }
+      });
+
+      chaosOrbs.forEach((orb, i) => {
+        orb.t += dt * (1.5 + chaosLevel);
+        orb.mesh.position.y = orb.baseY + Math.sin(orb.t * 2) * (0.4 + chaosLevel * 0.2);
+        const s = 1 + 0.2 * Math.sin(orb.t * 3);
+        orb.mesh.scale.set(s, s, s);
+      });
+
+      // CME rings
+      for (let i = cmeRings.length - 1; i >= 0; i--) {
+        const c = cmeRings[i];
+        c.life += dt;
+        const r = 2 + c.life * (22 * (0.6 + lambdaC * 0.3));
+        c.mesh.scale.set(r, r, r);
+        c.mesh.material.opacity = Math.max(0, 0.9 - c.life * (0.6 + chaosLevel * 0.4));
+        if (c.life > 2.2) {
+          scene.remove(c.mesh);
+          cmeRings.splice(i, 1);
+        }
+      }
+
+      // MELTDOWN visual
+      if (meltdownTimer > 0) {
+        meltdownTimer -= dt;
+        const pulse = 1 + 0.2 * Math.sin(now * 0.02);
+        grid.scale.set(pulse, 1, pulse);
+        grid.material.opacity = 0.7 + 0.3 * Math.abs(Math.sin(now * 0.03));
+        hemiLight.intensity = 0.7 + 0.4 * Math.abs(Math.sin(now * 0.025));
+      } else {
+        grid.scale.set(1, 1, 1);
+        grid.material.opacity = 0.9;
+        hemiLight.intensity = 0.7;
+      }
+
+      // Ride along camera
+      if (rideAlong) {
+        const target = planets[rideTargetId] || planets['earth'];
+        if (target) {
+          const offset = new THREE.Vector3(0, 3.5 + lambdaC, 9 + 2 * tauC);
+          const worldPos = target.mesh.getWorldPosition(new THREE.Vector3());
+          const desired = worldPos.clone().add(offset);
+          camera.position.lerp(desired, 0.08);
+          camera.lookAt(worldPos);
+        }
+      }
+
+      stars.rotation.y += dt * 0.01;
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    requestAnimationFrame(animate);
+
+    function onResize() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    }
+    window.addEventListener('resize', onResize);
+  })();
+  </script>
+</body>
+</html>

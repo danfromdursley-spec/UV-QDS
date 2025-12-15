@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>QDS • SuperVault V4</title>
+<style>
+  :root{
+    --bg:#05070c;
+    --panel: rgba(10,14,22,.72);
+    --panel2: rgba(10,14,22,.58);
+    --text:#eaf1ff;
+    --muted:#9fb0d0;
+    --line: rgba(255,255,255,.10);
+
+    --hot1:#ff6a00;  /* orange */
+    --hot2:#ffcc00;  /* yellow */
+    --hot3:#ff2d55;  /* red/pink */
+    --good:#19ff9b;
+    --warn:#ffd166;
+    --bad:#ff3b3b;
+    --cyan:#33d6ff;
+
+    --r: 18px;
+    --shadow: 0 20px 70px rgba(0,0,0,.60);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0; color:var(--text);
+    font: 14px/1.45 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    background:
+      radial-gradient(900px 500px at 20% 0%, rgba(255,106,0,.18), transparent 55%),
+      radial-gradient(800px 500px at 80% 10%, rgba(255,204,0,.12), transparent 60%),
+      radial-gradient(900px 700px at 50% 100%, rgba(255,45,85,.12), transparent 60%),
+      linear-gradient(180deg, #04060b, #03050a 35%, #02040a 100%);
+    padding: 16px 12px 80px;
+  }
+
+  .wrap{max-width: 980px; margin:0 auto;}
+  .top{
+    position: relative;
+    padding: 14px 14px 16px;
+    border-radius: calc(var(--r) + 8px);
+    background: rgba(0,0,0,.35);
+    box-shadow: var(--shadow);
+    overflow:hidden;
+    border: 1px solid rgba(255,255,255,.10);
+  }
+  .top:before{
+    content:"";
+    position:absolute; inset:-2px;
+    background: linear-gradient(90deg, var(--hot1), var(--hot2), var(--hot3), var(--hot1));
+    filter: blur(10px);
+    opacity:.25;
+    z-index:0;
+  }
+  .top:after{
+    content:"";
+    position:absolute; inset:1px;
+    background: linear-gradient(180deg, rgba(15,20,30,.92), rgba(8,10,16,.86));
+    border-radius: calc(var(--r) + 6px);
+    z-index:0;
+  }
+  .top > *{position:relative; z-index:1;}
+
+  .hrow{display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;}
+  .title{
+    display:flex; align-items:center; gap:10px;
+    font-weight: 800;
+    letter-spacing:.3px;
+    font-size: 22px;
+  }
+  .pill{
+    padding:6px 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.12);
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .pill.ok{color:#a9ffd9; border-color: rgba(25,255,155,.35); background: rgba(25,255,155,.08);}
+  .pill.bad{color:#ffd0d0; border-color: rgba(255,59,59,.35); background: rgba(255,59,59,.08);}
+  .sub{color:var(--muted); margin-top:4px}
+
+  .grid{
+    margin-top: 12px;
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 860px){ .grid{grid-template-columns:1fr;} }
+
+  .card{
+    background: linear-gradient(180deg, rgba(10,14,22,.74), rgba(7,10,16,.60));
+    border:1px solid rgba(255,255,255,.10);
+    border-radius: var(--r);
+    box-shadow: 0 16px 45px rgba(0,0,0,.45);
+    padding: 12px;
+  }
+  .label{font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:rgba(234,241,255,.62); margin-bottom:8px;}
+  .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+  select,input,textarea,button{
+    font: inherit;
+    color: var(--text);
+    background: rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.10);
+    border-radius: 14px;
+    padding: 10px 12px;
+    outline: none;
+  }
+  input::placeholder, textarea::placeholder{color: rgba(180,195,225,.55);}
+  select{padding-right: 30px;}
+  textarea{width:100%; min-height: 170px; resize: vertical; border-radius: 16px; background: rgba(0,0,0,.25);}
+  .btn{
+    cursor:pointer;
+    user-select:none;
+    border-radius: 16px;
+    padding: 11px 14px;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.07);
+  }
+  .btn.big{
+    padding: 14px 16px;
+    font-weight: 800;
+    letter-spacing: .02em;
+  }
+  .btn.primary{
+    border-color: rgba(255,204,0,.35);
+    box-shadow: 0 0 0 2px rgba(255,204,0,.12), 0 18px 45px rgba(0,0,0,.35);
+    background: linear-gradient(180deg, rgba(255,204,0,.14), rgba(255,106,0,.10));
+  }
+  .btn.ghost{
+    background: rgba(255,255,255,.05);
+  }
+  .btn.danger{
+    border-color: rgba(255,45,85,.35);
+    background: rgba(255,45,85,.10);
+  }
+
+  .stats{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px}
+  .stat{
+    padding: 8px 10px; border-radius: 999px;
+    background: rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.10);
+    color: rgba(234,241,255,.72);
+  }
+
+  .list{margin-top: 14px;}
+  .item{
+    border-radius: 18px;
+    border:1px solid rgba(255,255,255,.10);
+    background: rgba(10,14,22,.60);
+    padding: 12px;
+    margin-bottom: 10px;
+    box-shadow: 0 14px 40px rgba(0,0,0,.35);
+  }
+  .item .t{font-size: 18px; font-weight: 800; margin: 0 0 6px;}
+  .meta{display:flex; gap:8px; flex-wrap:wrap; color:rgba(234,241,255,.70); align-items:center;}
+  .tag{padding:6px 10px; border-radius: 999px; border:1px solid rgba(255,255,255,.10); background: rgba(255,255,255,.05); color: rgba(234,241,255,.72); font-size: 12px;}
+  .tag.src{color: rgba(51,214,255,.85); border-color: rgba(51,214,255,.22); background: rgba(51,214,255,.07);}
+  .tag.un{color: rgba(180,195,225,.85);}
+  .tag.vs{color: rgba(255,204,0,.95); border-color: rgba(255,204,0,.25); background: rgba(255,204,0,.10);}
+  .tag.comp{color: rgba(25,255,155,.95); border-color: rgba(25,255,155,.25); background: rgba(25,255,155,.09);}
+  .tag.broken{color: rgba(255,45,85,.95); border-color: rgba(255,45,85,.30); background: rgba(255,45,85,.10);}
+  .desc{color: rgba(234,241,255,.78); margin: 10px 0 10px;}
+  .triageBtns{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:8px}
+  .triageBtns button{padding: 9px 12px; border-radius: 999px}
+  .small{font-size: 12px; color: rgba(234,241,255,.60)}
+  .footnote{margin-top:8px; color: rgba(234,241,255,.55); font-size: 12px}
+  .hr{height:1px; background: rgba(255,255,255,.08); margin: 10px 0}
+
+  .mono{
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    white-space: pre;
+    overflow:auto;
+    max-height: 360px;
+    padding: 12px;
+    border-radius: 16px;
+    background: rgba(0,0,0,.28);
+    border:1px solid rgba(255,255,255,.10);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div class="hrow">
+      <div>
+        <div class="title">QDS • SuperVault V4 <span id="ready" class="pill">booting</span></div>
+        <div class="sub">One-touch refresh + unbiased triage + ≤40-line brief (copy/paste to chat).</div>
+      </div>
+      <div class="pill" id="paths">/news_rips/physorg/YYYY-MM-DD/MASTER.json</div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="label">One-touch</div>
+        <div class="row">
+          <button class="btn big primary" id="btnRefresh">REFRESH + BUILD BRIEF</button>
+          <button class="btn big ghost" id="btnReload">Reload only</button>
+          <button class="btn big ghost" id="btnOpenRip">Open rip folder</button>
+        </div>
+        <div class="stats" id="stats"></div>
+        <div class="footnote">
+          **Zero-bias guardrail:** this tool never auto-marks “broken”. Only *you* can label items.
+          Highlighting is just search/match, not a verdict.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="label">Filters</div>
+        <div class="row">
+          <select id="dateSel" title="date"></select>
+          <select id="viewSel" title="view">
+            <option value="all">All</option>
+            <option value="triaged">Triaged only</option>
+            <option value="untriaged">Untriaged only</option>
+          </select>
+          <select id="bucketSel" title="bucket">
+            <option value="any">Any bucket</option>
+            <option value="vs">QDS vs MAINSTREAM</option>
+            <option value="comp">QDS complements MAINSTREAM</option>
+            <option value="broken">QDS Broken by Data ?</option>
+            <option value="untriaged">Untriaged</option>
+          </select>
+          <select id="sortSel" title="sort">
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="priority">Priority (broken → vs → comp → untriaged)</option>
+          </select>
+          <select id="lineSel" title="brief lines max">
+            <option>20</option>
+            <option selected>40</option>
+            <option>60</option>
+            <option>80</option>
+          </select>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <input id="q" style="flex:1; min-width: 220px" placeholder="search title/category/summary/notes (e.g. neutrino, entropy, battery)"/>
+          <button class="btn ghost" id="btnClear">Clear search</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid" style="margin-top:12px">
+    <div class="card">
+      <div class="label">Super Smart Brief (≤ N lines)</div>
+      <div class="row">
+        <button class="btn danger" id="btnCopyBrief">Copy brief</button>
+        <button class="btn ghost" id="btnExportPack">Export evidence pack</button>
+        <button class="btn ghost" id="btnImportPack">Import evidence pack</button>
+        <input id="fileIn" type="file" accept="application/json" style="display:none"/>
+      </div>
+      <div class="mono" id="brief">(press REFRESH + BUILD BRIEF)</div>
+      <div class="footnote">Tip: export the evidence pack, upload it into chat, and I’ll audit each triaged item “for/against” with citations.</div>
+    </div>
+
+    <div class="card">
+      <div class="label">Server log (last lines)</div>
+      <div class="mono" id="log">(none)</div>
+      <div class="footnote">If this stays empty, you’re probably running plain http.server instead of qds_vault_server.py.</div>
+    </div>
+  </div>
+
+  <div class="list" id="list"></div>
+
+</div>
+
+<script>
+const LS_TRIAGE = "SV4_TRIAGE";
+const LS_NOTES  = "SV4_NOTES";
+
+let STATE = {
+  dates: [],
+  latest: null,
+  date: null,
+  items: [],
+  triage: loadJSON(LS_TRIAGE, {}),
+  notes:  loadJSON(LS_NOTES, {}),
+  snapshotMeta: null
+};
+
+function loadJSON(key, fallback){
+  try{ return JSON.parse(localStorage.getItem(key) || ""); }catch(e){ return fallback; }
+}
+function saveJSON(key, obj){ localStorage.setItem(key, JSON.stringify(obj)); }
+
+function esc(s){ return (s||"").replace(/[&<>"]/g, c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c])); }
+function nowISO(){ return new Date().toISOString().slice(0,19); }
+
+async function api(path){
+  const r = await fetch(path, {cache:"no-store"});
+  if(!r.ok) throw new Error(`${path} -> HTTP ${r.status}`);
+  return r.json();
+}
+
+function setReady(ok, msg){
+  const el = document.getElementById("ready");
+  el.textContent = msg;
+  el.className = "pill " + (ok ? "ok" : "bad");
+}
+
+function fmtBucket(b){
+  if(b==="vs") return "QDS vs MAINSTREAM";
+  if(b==="comp") return "QDS complements MAINSTREAM";
+  if(b==="broken") return "QDS broken by data?";
+  return "untriaged";
+}
+
+function bucketTagClass(b){
+  if(b==="vs") return "vs";
+  if(b==="comp") return "comp";
+  if(b==="broken") return "broken";
+  return "un";
+}
+
+function computeCounts(){
+  const t = STATE.triage || {};
+  let vs=0, comp=0, broken=0, triaged=0;
+  for(const k in t){
+    triaged++;
+    if(t[k]==="vs") vs++;
+    else if(t[k]==="comp") comp++;
+    else if(t[k]==="broken") broken++;
+  }
+  const items = STATE.items.length;
+  return {items, triaged, vs, comp, broken, untriaged: Math.max(0, items - triaged)};
+}
+
+function renderStats(){
+  const c = computeCounts();
+  const el = document.getElementById("stats");
+  el.innerHTML = `
+    <div class="stat">Items: <b>${c.items}</b></div>
+    <div class="stat">Triaged: <b>${c.triaged}</b></div>
+    <div class="stat">vs: <b>${c.vs}</b></div>
+    <div class="stat">complements: <b>${c.comp}</b></div>
+    <div class="stat">broken?: <b>${c.broken}</b></div>
+    <div class="stat">untriaged: <b>${c.untriaged}</b></div>
+  `;
+}
+
+function populateDates(){
+  const sel = document.getElementById("dateSel");
+  sel.innerHTML = "";
+  for(const d of STATE.dates){
+    const o = document.createElement("option");
+    o.value = d; o.textContent = d;
+    sel.appendChild(o);
+  }
+  sel.value = STATE.date || STATE.latest || (STATE.dates[0]||"");
+}
+
+function sortItems(arr, mode){
+  const tri = STATE.triage || {};
+  const pr = b => (b==="broken"?0 : b==="vs"?1 : b==="comp"?2 : 3);
+  const ts = it => new Date(it.published || it.pubDate || 0).getTime() || 0;
+
+  if(mode==="oldest") return arr.sort((a,b)=>ts(a)-ts(b));
+  if(mode==="priority"){
+    return arr.sort((a,b)=>{
+      const pa = pr(tri[a.id]||"untriaged");
+      const pb = pr(tri[b.id]||"untriaged");
+      if(pa!==pb) return pa-pb;
+      return ts(b)-ts(a);
+    });
+  }
+  // newest default
+  return arr.sort((a,b)=>ts(b)-ts(a));
+}
+
+function filterItems(){
+  const view = document.getElementById("viewSel").value;
+  const bucket = document.getElementById("bucketSel").value;
+  const q = (document.getElementById("q").value||"").toLowerCase().trim();
+
+  const tri = STATE.triage || {};
+  let out = STATE.items.slice();
+
+  out = out.filter(it=>{
+    const b = tri[it.id] || "untriaged";
+    if(view==="triaged" && b==="untriaged") return false;
+    if(view==="untriaged" && b!=="untriaged") return false;
+
+    if(bucket==="vs" && b!=="vs") return false;
+    if(bucket==="comp" && b!=="comp") return false;
+    if(bucket==="broken" && b!=="broken") return false;
+    if(bucket==="untriaged" && b!=="untriaged") return false;
+
+    if(q){
+      const hay = `${it.title||""} ${it.category||""} ${it.summary||it.description||""} ${STATE.notes[it.id]||""}`.toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  out = sortItems(out, document.getElementById("sortSel").value);
+  return out;
+}
+
+function renderList(){
+  renderStats();
+  const list = document.getElementById("list");
+  const arr = filterItems();
+
+  list.innerHTML = arr.map(it=>{
+    const b = (STATE.triage[it.id] || "untriaged");
+    const note = (STATE.notes[it.id] || "");
+    const published = it.published || it.pubDate || "";
+    const src = it.source || "phys.org";
+    const cat = it.category || "—";
+    const sum = it.summary || it.description || "";
+    const link = it.link || it.url || "";
+
+    return `
+      <div class="item">
+        <div class="meta">
+          <span class="tag ${bucketTagClass(b)}">${esc(fmtBucket(b))}</span>
+          <span class="tag">${esc(published || "—")}</span>
+          <span class="tag src">${esc(src)}</span>
+          <span class="tag">${esc(cat)}</span>
+        </div>
+        <div class="t">${esc(it.title||"(no title)")}</div>
+        <div class="desc">${esc(sum)}</div>
+
+        <div class="triageBtns">
+          <button class="btn ghost" onclick="setTriage('${it.id}','vs')">QDS vs</button>
+          <button class="btn ghost" onclick="setTriage('${it.id}','comp')">Complements</button>
+          <button class="btn ghost" onclick="setTriage('${it.id}','broken')">Broken?</button>
+          <button class="btn ghost" onclick="setTriage('${it.id}','untriaged')">Clear</button>
+          <button class="btn ghost" onclick="openLink('${esc(link)}')">Open</button>
+          <button class="btn ghost" onclick="copyOne('${it.id}')">Copy 1-line</button>
+        </div>
+
+        <div class="hr"></div>
+        <textarea placeholder="Notes / why you filed it here (saved locally)…" oninput="setNote('${it.id}', this.value)">${esc(note)}</textarea>
+        <div class="small">ID: ${esc(it.id||"—")}</div>
+      </div>
+    `;
+  }).join("");
+
+  if(!arr.length){
+    list.innerHTML = `<div class="item"><div class="t">No results</div><div class="small">Try clearing filters/search.</div></div>`;
+  }
+}
+
+window.setTriage = (id, v)=>{
+  if(v==="untriaged") delete STATE.triage[id];
+  else STATE.triage[id]=v;
+  saveJSON(LS_TRIAGE, STATE.triage);
+  renderList();
+  buildBrief(); // keep brief fresh
+};
+
+window.setNote = (id, txt)=>{
+  STATE.notes[id]=txt;
+  saveJSON(LS_NOTES, STATE.notes);
+};
+
+window.openLink = (url)=>{
+  if(!url) return;
+  // on android termux-open-url will catch normal open in browser too
+  window.open(url, "_blank");
+};
+
+window.copyOne = async (id)=>{
+  const it = STATE.items.find(x=>x.id===id);
+  if(!it) return;
+  const b = STATE.triage[id] || "untriaged";
+  const line = `[${b.toUpperCase()}] ${it.title||""} — ${it.link||""}`.trim();
+  await navigator.clipboard.writeText(line);
+};
+
+function buildBrief(){
+  const maxLines = parseInt(document.getElementById("lineSel").value||"40",10);
+  const tri = STATE.triage || {};
+  const counts = computeCounts();
+
+  // priority-sorted, triaged first
+  const pr = b => (b==="broken"?0 : b==="vs"?1 : b==="comp"?2 : 3);
+  const items = STATE.items.slice().sort((a,b)=>{
+    const pa = pr(tri[a.id]||"untriaged");
+    const pb = pr(tri[b.id]||"untriaged");
+    if(pa!==pb) return pa-pb;
+    const ta = new Date(a.published||0).getTime()||0;
+    const tb = new Date(b.published||0).getTime()||0;
+    return tb-ta;
+  });
+
+  const header = [
+    "QDS SuperVault Brief",
+    `Snapshot: ${STATE.snapshotMeta?.master_path ? (STATE.snapshotMeta.master_path.split("/").pop() || "MASTER.json") : "MASTER.json"}`,
+    `Updated: ${STATE.snapshotMeta?.created_at || nowISO()}`,
+    `Counts: items=${counts.items}, triaged=${counts.triaged}, broken=${counts.broken}, vs=${counts.vs}, comp=${counts.comp}, neutral=${counts.untriaged}`,
+    "---",
+    "Top items (priority-sorted). Please assess: does any item directly contradict a QDS prediction, or is it neutral/adjacent?"
+  ];
+
+  let lines = header.slice();
+  let n = 0;
+  for(const it of items){
+    const b = tri[it.id] || "untriaged";
+    if(b==="untriaged") continue; // brief focuses triaged only
+    n++;
+    const label = b==="broken" ? "[BROKEN?]" : b==="vs" ? "[VS]" : "[COMP]";
+    const t = (it.title||"").replace(/const link = normPhysUrl(it.link) || "#";s+/g," ").trim();
+    const s = ((it.summary||it.description||"")+"").replace(/const link = normPhysUrl(it.link) || "#";s+/g," ").trim();
+    const link = it.link||"";
+    const note = (STATE.notes[it.id]||"").replace(/const link = normPhysUrl(it.link) || "#";s+/g," ").trim();
+    const line = `${String(n).padStart(2,"0")}. ${label} ${t} — ${s.slice(0,160)}… ${link}${note?(" | note: "+note.slice(0,120)):""}`;
+    lines.push(line);
+
+    if(lines.length >= maxLines) break;
+  }
+
+  if(n===0){
+    lines.push("(No triaged items yet. Tag a few as VS/COMP/BROKEN? and hit refresh.)");
+  }
+
+  document.getElementById("brief").textContent = lines.join("const link = normPhysUrl(it.link) || "#";n");
+}
+
+async function loadDates(){
+  try{
+    const d = await api("/api/dates");
+    STATE.dates = d.dates || [];
+    STATE.latest = d.latest || (STATE.dates[STATE.dates.length-1]||null);
+    STATE.date = STATE.latest;
+    populateDates();
+    setReady(true, "ready");
+  }catch(e){
+    setReady(false, "server?");
+    document.getElementById("log").textContent = "Could not reach /api/dates.const link = normPhysUrl(it.link) || "#";nRun: python ~/qds_vault_server.py --port 8011 --root ~/OMEGA_EMPIRE/UV_QDS/www";
+  }
+}
+
+async function loadSnapshot(date){
+  const snap = await api("/api/snapshot?date="+encodeURIComponent(date));
+  STATE.items = snap.items || [];
+  STATE.snapshotMeta = snap;
+  renderList();
+  buildBrief();
+}
+
+async function doRefresh(){
+  setReady(true, "refreshing…");
+  try{
+    const r = await api("/api/refresh");
+    document.getElementById("log").textContent = r.ok ? (r.log||"(ok)") : ("ERROR: "+(r.error||r.log||"unknown"));
+    await loadDates();
+    const date = r.latest || STATE.latest || document.getElementById("dateSel").value;
+    STATE.date = date;
+    document.getElementById("dateSel").value = date;
+    await loadSnapshot(date);
+    setReady(true, "ready");
+  }catch(e){
+    document.getElementById("log").textContent = String(e);
+    setReady(false, "error");
+  }
+}
+
+function downloadJSON(name, obj){
+  const blob = new Blob([JSON.stringify(obj, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+}
+
+function exportPack(){
+  const pack = {
+    version: "SV4_evidence_pack_v1",
+    exported_at: new Date().toISOString(),
+    snapshot: {
+      source: "phys.org rss (local rip)",
+      created_at: STATE.snapshotMeta?.created_at || nowISO(),
+      item_count: STATE.items.length,
+      master_path: STATE.snapshotMeta?.master_path || ""
+    },
+    items: STATE.items,
+    triage: STATE.triage,
+    notes: STATE.notes
+  };
+  const date = document.getElementById("dateSel").value || "unknown";
+  downloadJSON(`qds_evidence_pack_${date}.json`, pack);
+}
+
+function importPack(file){
+  const fr = new FileReader();
+  fr.onload = ()=>{
+    try{
+      const obj = JSON.parse(fr.result);
+      if(obj.triage) STATE.triage = obj.triage;
+      if(obj.notes)  STATE.notes  = obj.notes;
+      saveJSON(LS_TRIAGE, STATE.triage);
+      saveJSON(LS_NOTES, STATE.notes);
+      renderList();
+      buildBrief();
+      document.getElementById("log").textContent = "Imported pack OK.";
+    }catch(e){
+      document.getElementById("log").textContent = "Import failed: "+e;
+    }
+  };
+  fr.readAsText(file);
+}
+
+document.getElementById("btnRefresh").onclick = doRefresh;
+document.getElementById("btnReload").onclick = async ()=>{
+  const date = document.getElementById("dateSel").value;
+  await loadSnapshot(date);
+  document.getElementById("log").textContent = "(reloaded)";
+};
+document.getElementById("btnOpenRip").onclick = ()=>{
+  // opens a static path; your Android file handler may download instead — still useful.
+  const date = document.getElementById("dateSel").value;
+  window.open(`/news_rips/physorg/${date}/MASTER.json`, "_blank");
+};
+document.getElementById("btnCopyBrief").onclick = async ()=>{
+  await navigator.clipboard.writeText(document.getElementById("brief").textContent || "");
+};
+document.getElementById("btnExportPack").onclick = exportPack;
+document.getElementById("btnImportPack").onclick = ()=> document.getElementById("fileIn").click();
+document.getElementById("fileIn").addEventListener("change", e=>{
+  const f = e.target.files && e.target.files[0];
+  if(f) importPack(f);
+});
+document.getElementById("btnClear").onclick = ()=>{
+  document.getElementById("q").value = "";
+  renderList();
+};
+document.getElementById("dateSel").onchange = async (e)=>{
+  await loadSnapshot(e.target.value);
+};
+["viewSel","bucketSel","sortSel"].forEach(id=>{
+  document.getElementById(id).onchange = ()=> renderList();
+});
+document.getElementById("q").oninput = ()=> renderList();
+document.getElementById("lineSel").onchange = ()=> buildBrief();
+
+(async function boot(){
+  await loadDates();
+  const date = document.getElementById("dateSel").value || STATE.latest;
+  if(date) await loadSnapshot(date);
+  buildBrief();
+})();
+</script>
+</body>
+</html>

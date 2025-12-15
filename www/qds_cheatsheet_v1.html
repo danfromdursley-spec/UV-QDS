@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>QDS – Terminal Cheat Sheet</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root {
+      --bg: #050810;
+      --card: #111827;
+      --accent: #22c55e;
+      --accent-soft: rgba(34,197,94,0.15);
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --border: #1f2933;
+      --danger: #f97373;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #111827 0, var(--bg) 55%);
+      color: var(--text);
+    }
+    h1 {
+      font-size: 1.7rem;
+      margin-bottom: 0.25rem;
+    }
+    h2 {
+      font-size: 1.15rem;
+      margin: 1.5rem 0 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+    .pill {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0,1fr);
+      gap: 8px;
+    }
+    @media (min-width: 720px) {
+      .grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    }
+    .card {
+      background: rgba(15,23,42,0.96);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+    .card h3 {
+      margin: 0 0 4px;
+      font-size: 0.95rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+    }
+    .card small {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    code {
+      display: block;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      font-size: 0.8rem;
+      background: #020617;
+      border-radius: 6px;
+      padding: 4px 6px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .danger code {
+      border: 1px solid rgba(248,113,113,0.65);
+    }
+    .tagline {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+    .section-note {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 0.3rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>QDS Terminal Cheat Sheet</h1>
+  <div class="tagline">
+    Phone lab quick-reference. Aliases live in <code>~/.bashrc</code> – copy/paste as needed.
+  </div>
+
+  <!-- NAVIGATION -->
+  <h2>Navigation</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>q <small>project root</small></h3>
+      <div class="desc">Jump to main QDS repo.</div>
+      <code>cd ~/OMEGA_EMPIRE/UV_QDS</code>
+    </div>
+    <div class="card">
+      <h3>uv / w <small>HTML lab</small></h3>
+      <div class="desc">Jump to web / dashboards folder.</div>
+      <code>cd ~/OMEGA_EMPIRE/UV_QDS/www</code>
+    </div>
+    <div class="card">
+      <h3>qds_org <small>org map</small></h3>
+      <div class="desc">Open QDS org / map launcher script.</div>
+      <code>/data/data/com.termux/files/home/qds_org.sh</code>
+    </div>
+    <div class="card">
+      <h3>qds_labs / qds_labs3 <small>lab decks</small></h3>
+      <div class="desc">Open QDS labs dashboards (v1 / v3).</div>
+      <code>/data/data/com.termux/files/home/open_qds_labs.sh<br/>/data/data/com.termux/files/home/open_qds_labs_v3.sh</code>
+    </div>
+  </div>
+
+  <!-- SERVERS -->
+  <h2>Servers & Ports</h2>
+  <div class="section-note">8000 / 8011 are your main local ports.</div>
+  <div class="grid">
+    <div class="card">
+      <h3>s8 <small>server 8000</small></h3>
+      <div class="desc">Kill old servers and start 8000 in <code>www</code>.</div>
+      <code>cd ~/OMEGA_EMPIRE/UV_QDS/www &amp;&amp; kps; python -m http.server 8000</code>
+    </div>
+    <div class="card">
+      <h3>s1 <small>server 8011</small></h3>
+      <div class="desc">Kill old servers and start 8011 in <code>www</code>.</div>
+      <code>cd ~/OMEGA_EMPIRE/UV_QDS/www &amp;&amp; kps; python -m http.server 8011</code>
+    </div>
+    <div class="card">
+      <h3>qds8000 <small>quick 8000</small></h3>
+      <div class="desc">Restart Python HTTP server on 8000 (bound to localhost).</div>
+      <code>pkill -f "http.server 8000" 2&gt;/dev/null; python -m http.server 8000 --bind 127.0.0.1 &amp;</code>
+    </div>
+    <div class="card">
+      <h3>qds8011 <small>quick 8011</small></h3>
+      <div class="desc">Restart Python HTTP server on 8011 (localhost).</div>
+      <code>pkill -f "http.server 8011" 2&gt;/dev/null; python -m http.server 8011 --bind 127.0.0.1 &amp;</code>
+    </div>
+    <div class="card">
+      <h3>battserve / battserve1 <small>battery lab</small></h3>
+      <div class="desc">Start servers in <code>www</code> for battery dashboards.</div>
+      <code>cd ~/OMEGA_EMPIRE/UV_QDS/www &amp;&amp; python -m http.server 8000<br/>cd ~/OMEGA_EMPIRE/UV_QDS/www &amp;&amp; python -m http.server 8001</code>
+    </div>
+    <div class="card">
+      <h3>labside / darkside <small>meta launchers</small></h3>
+      <div class="desc">High-level launch scripts for lab/front-door.</div>
+      <code>/data/data/com.termux/files/home/labside.sh<br/>/data/data/com.termux/files/home/darkside.sh</code>
+    </div>
+  </div>
+
+  <!-- KILL / RESET -->
+  <h2>Kill / Reset</h2>
+  <div class="grid">
+    <div class="card danger">
+      <h3>kps <small>kill python servers</small></h3>
+      <div class="desc">Kill all <code>http.server</code> processes.</div>
+      <code>pkill -f http.server 2&gt;/dev/null || true</code>
+    </div>
+    <div class="card danger">
+      <h3>battkill <small>kill 8000 / 8001</small></h3>
+      <div class="desc">Kill battery servers on 8000 &amp; 8001.</div>
+      <code>pkill -f "http.server 8000" 2&gt;/dev/null;<br/>pkill -f "http.server 8001" 2&gt;/dev/null;<br/>echo "[batt] server stopped"</code>
+    </div>
+    <div class="card danger">
+      <h3>Kill 8000 (manual) <small>from doc</small></h3>
+      <div class="desc">Bare kill for port 8000 (no echo). Pulled from your <em>KILL SERVER</em> doc.</div>
+      <code>pkill -f "http.server 8000" 2&gt;/dev/null</code>
+    </div>
+  </div>
+
+  <!-- GROWTH HUB / OFFERS -->
+  <h2>GrowthHub & Offers</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>ghgo / ghlatest <small>GrowthHub</small></h3>
+      <div class="desc">Open GrowthHub demo / latest linked page.</div>
+      <code>bash ~/OMEGA_EMPIRE/UV_QDS/www/ghgo.sh<br/>bash ~/OMEGA_EMPIRE/UV_QDS/www/run_growthhub_latest_linked.sh</code>
+    </div>
+    <div class="card">
+      <h3>qdsoffer / qdsofferlink <small>offer pages</small></h3>
+      <div class="desc">Build offer page and inject offer links into pages.</div>
+      <code>bash ~/OMEGA_EMPIRE/UV_QDS/www/qds_make_offer_page_v1.sh<br/>bash ~/OMEGA_EMPIRE/UV_QDS/www/qds_inject_offer_links_v1.sh</code>
+    </div>
+    <div class="card">
+      <h3>qdsall <small>activate micro pages</small></h3>
+      <div class="desc">Run QDS micro activator script.</div>
+      <code>bash ~/OMEGA_EMPIRE/UV_QDS/www/qds_activate_all_micro.sh</code>
+    </div>
+  </div>
+
+  <!-- INDEX / PUBLISH -->
+  <h2>Index & Publish</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>api <small>rebuild all_pages index</small></h3>
+      <div class="desc">Rebuild master index for all HTML pages.</div>
+      <code>cd ~/OMEGA_EMPIRE/UV_QDS &amp;&amp; bash tools/tools_make_all_pages_index.sh</code>
+    </div>
+    <div class="card">
+      <h3>lp / lpf <small>lazy publish</small></h3>
+      <div class="desc">Publish UV_QDS changes; <code>lpf</code> forces front door refresh.</div>
+      <code>cd ~/OMEGA_EMPIRE/UV_QDS &amp;&amp; bash tools/uv_qds_lazy_publish.sh<br/>cd ~/OMEGA_EMPIRE/UV_QDS &amp;&amp; REFRESH_FRONT_DOOR=1 bash tools/uv_qds_lazy_publish.sh</code>
+    </div>
+  </div>
+
+  <!-- BATTERY & RECENT FILES -->
+  <h2>Battery Dash & Recent HTML</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>batt96 / battindex <small>open dashboards</small></h3>
+      <div class="desc">Open main battery hub and index in Chrome.</div>
+      <code>termux-open-url http://127.0.0.1:8000/qds_battery_hub_v9_6_science_neon.html<br/>termux-open-url http://127.0.0.1:8000/qds_battery_index_v1_neon_os.html</code>
+    </div>
+    <div class="card">
+      <h3>batt2d <small>battery HTML last 2 days</small></h3>
+      <div class="desc">List all <code>*battery*.html</code> files modified in last 2 days.</div>
+      <code>cd ~/OMEGA_EMPIRE/UV_QDS/www &amp;&amp; find . -type f -name "*battery*.html" -mtime -2 -print | sort</code>
+    </div>
+    <div class="card">
+      <h3>html2d / html2d_pretty <small>HTML last 2 days</small></h3>
+      <div class="desc">List recent HTML pages, plain or pretty (with sizes &amp; dates).</div>
+      <code>cd ~/OMEGA_EMPIRE/UV_QDS/www &amp;&amp; find . -type f -name "*.html" -mtime -2 -print | sort<br/>cd ~/OMEGA_EMPIRE/UV_QDS/www &amp;&amp; find . -type f -name "*.html" -mtime -2 -exec ls -lh --time-style=long-iso {} \; | sort -k6,7</code>
+    </div>
+  </div>
+
+  <!-- STATS / SCANS -->
+  <h2>Stats & Scans</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>files_48h.sh <small>last 48h stats</small></h3>
+      <div class="desc">Files by type &amp; size over last 48 hours.</div>
+      <code>bash ~/files_48h.sh</code>
+    </div>
+    <div class="card">
+      <h3>fullscan.sh <small>since 2025-10-20</small></h3>
+      <div class="desc">Big Android scan: file counts by type since QDS kick-off.</div>
+      <code>cd ~/OMEGA_EMPIRE/UV_QDS/www<br/>./fullscan.sh</code>
+    </div>
+    <div class="card">
+      <h3>sysdash <small>system dashboard</small></h3>
+      <div class="desc">Run system dashboard helper script.</div>
+      <code>/data/data/com.termux/files/home/system_dashboard.sh</code>
+    </div>
+  </div>
+
+  <!-- LAB TEST PLATFORM (from doc) -->
+  <h2>Lab Test Platform</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Manual lab start <small>from LAB BASH doc</small></h3>
+      <div class="desc">Start server in <code>www</code> and open the test platform V3.</div>
+      <code>cd ~/OMEGA_EMPIRE/UV_QDS/www<br/>python -m http.server 8000 --bind 127.0.0.1<br/># then in browser:<br/>http://127.0.0.1:8000/qds_test_platformV3.html</code>
+    </div>
+  </div>
+
+</body>
+</html>

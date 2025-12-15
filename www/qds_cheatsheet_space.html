@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>QDS Space Cheat Sheet — 30s Pitch</title>
+<style>
+:root{--bg:#050814;--fg:#e8f0ff;--mut:#9bb0d3;--a:#42d3ff;--b:#7cffb2;--c:#b48cff;--card:rgba(255,255,255,.06);--br:18px}
+*{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:
+radial-gradient(1200px 800px at 20% 10%, rgba(66,211,255,.18), transparent 60%),
+radial-gradient(900px 700px at 80% 20%, rgba(124,255,178,.14), transparent 55%),
+radial-gradient(1100px 900px at 50% 120%, rgba(180,140,255,.12), transparent 60%),
+radial-gradient(circle at 10% 30%, rgba(255,255,255,.10) 1px, transparent 2px),
+radial-gradient(circle at 70% 60%, rgba(255,255,255,.08) 1px, transparent 2px),
+radial-gradient(circle at 40% 80%, rgba(255,255,255,.06) 1px, transparent 2px),
+var(--bg); color:var(--fg); line-height:1.25}
+.wrap{max-width:860px;margin:0 auto;padding:18px}
+.h{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+.badge{padding:6px 10px;border:1px solid rgba(255,255,255,.18);border-radius:999px;background:rgba(0,0,0,.25);color:var(--mut);font-size:12px}
+h1{margin:4px 0 0;font-size:22px;letter-spacing:.4px}
+p{margin:8px 0;color:var(--mut)}
+.grid{display:grid;gap:12px;grid-template-columns:1fr}
+@media(min-width:860px){.grid{grid-template-columns:1.2fr .8fr}}
+.card{background:var(--card);border:1px solid rgba(255,255,255,.10);border-radius:var(--br);padding:14px;backdrop-filter:blur(8px)}
+.k{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.12em}
+.ta{width:100%;min-height:120px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.14);
+color:var(--fg);border-radius:14px;padding:10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{appearance:none;border:0;border-radius:14px;padding:10px 12px;font-weight:650;cursor:pointer;
+background:linear-gradient(135deg, rgba(66,211,255,.95), rgba(180,140,255,.85));color:#06101f}
+.btn2{background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.18);color:var(--fg)}
+small{color:var(--mut)}
+ul{margin:10px 0 0;padding-left:18px;color:var(--mut)}
+li{margin:6px 0}
+hr{border:0;border-top:1px solid rgba(255,255,255,.12);margin:12px 0}
+.tag{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.14);color:var(--mut);font-size:12px;margin:4px 6px 0 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="h">
+    <div class="badge">SPACE MODE • PHONE-FIRST • OFFLINE</div>
+    <div class="badge">UKRI / Innovate UK: Case <b id="caseTxt">00953048</b></div>
+    <h1>QDS Cheat Sheet — 30-sec “what I’m building + what I need”</h1>
+  </div>
+  <p>Edit the pitch if you like, then hit <b>Copy</b> before you answer the call. 🎩📈</p>
+
+  <div class="grid">
+    <div class="card">
+      <div class="k">30-second pitch (read verbatim)</div>
+      <textarea id="pitch" class="ta"></textarea>
+      <div class="row">
+        <button class="btn" onclick="copyTxt('pitch')">Copy pitch</button>
+        <button class="btn btn2" onclick="saveAll()">Save</button>
+        <button class="btn btn2" onclick="loadAll()">Load</button>
+        <small id="status">Ready.</small>
+      </div>
+      <hr/>
+      <div class="k">If they ask “what’s the ask?” — 10 seconds</div>
+      <textarea id="ask10" class="ta" style="min-height:72px"></textarea>
+      <div class="row"><button class="btn btn2" onclick="copyTxt('ask10')">Copy 10s ask</button></div>
+    </div>
+
+    <div class="card">
+      <div class="k">Call prompts (so you don’t blank)</div>
+      <ul>
+        <li><b>Eligibility:</b> “Which collaboration types qualify here (business + academic? business + business? subcontractors?)”</li>
+        <li><b>Partner timing:</b> “Do partners need full commitment letters now, or can they be ‘in principle’ with named contacts?”</li>
+        <li><b>Route:</b> “If this comp is collaborations-only, which solo-friendly call should I apply to instead?”</li>
+        <li><b>Assessment:</b> “Do you recommend an assessment call and what evidence should I bring?”</li>
+      </ul>
+      <hr/>
+      <div class="k">Proof / demos I can show in 60 seconds</div>
+      <span class="tag">GrowthHub Revenue Floor</span>
+      <span class="tag">Battery Habitat / Reliability Lab</span>
+      <span class="tag">QDS-SAVE (compression)</span>
+      <span class="tag">Pulsar / Signals suites</span>
+      <span class="tag">NASA Lab Suite deck</span>
+      <hr/>
+      <div class="k">Partner wish-list (plain English)</div>
+      <textarea id="partners" class="ta" style="min-height:120px"></textarea>
+      <div class="row"><button class="btn btn2" onclick="copyTxt('partners')">Copy partner list</button></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <div class="k">One-liner summary (if they need it)</div>
+    <textarea id="oneL" class="ta" style="min-height:62px"></textarea>
+    <div class="row"><button class="btn btn2" onclick="copyTxt('oneL')">Copy one-liner</button></div>
+    <hr/>
+    <small>Tip: if they ask “is this physics or product?” answer: “Both — but the funding ask is for the productised battery/reliability work with real-world validation.”</small>
+  </div>
+</div>
+
+<script>
+const KEY="QDS_SPACE_CHEATSHEET_V1";
+const defaults={
+caseNo:"00953048",
+pitch:
+`Hi — I’m Dan Williams. I’m building Quantum Design Systems: a practical R&D micro-lab focused on measurable battery life and reliability uplift.
+I’ve already built working demo tools and a clear delivery plan: (1) a battery habitat & reliability test rig, (2) data/telemetry compression so tests run cheaper and faster, and (3) a simple revenue-floor model to keep it commercially grounded.
+What I need is the correct Innovate UK route and the right kind of collaboration partner(s) so I can submit properly — not force the wrong form.
+If you can guide me on eligible partner structures and the fastest path to submission, I can move immediately into pilots and evidence.`,
+ask10:
+`My ask: help me match to the right call + confirm what partner structure qualifies, then help me connect to a suitable project partner so I can submit on time.`,
+partners:
+`Ideal collaborators (pick any):
+• Battery / power electronics lab or SME (test protocols, cycling, safety, thermal).
+• University group (materials, electrochemistry, reliability statistics).
+• Real-world pilot host (EV fleet, medical devices, off-grid/solar, IoT).
+I can bring: working prototypes, fast iteration, data tooling, and a clear pilot plan.`,
+oneL:
+`Building a battery reliability + data efficiency lab with working demos; need the correct Innovate UK pathway and an eligible collaboration partner setup to submit.`
+};
+
+function $(id){return document.getElementById(id);}
+function setStatus(t){$("status").textContent=t;}
+function copyTxt(id){
+  const el=$(id); el.select(); el.setSelectionRange(0, 1e9);
+  navigator.clipboard.writeText(el.value).then(()=>setStatus("Copied ✅")).catch(()=>setStatus("Copy failed — long-press to copy."));
+  setTimeout(()=>setStatus("Ready."),1200);
+}
+function saveAll(){
+  const obj={caseNo:defaults.caseNo,pitch:$("pitch").value,ask10:$("ask10").value,partners:$("partners").value,oneL:$("oneL").value};
+  localStorage.setItem(KEY, JSON.stringify(obj));
+  setStatus("Saved to localStorage ✅"); setTimeout(()=>setStatus("Ready."),1200);
+}
+function loadAll(){
+  const raw=localStorage.getItem(KEY);
+  const obj=raw?JSON.parse(raw):defaults;
+  $("caseTxt").textContent=obj.caseNo||defaults.caseNo;
+  $("pitch").value=obj.pitch||defaults.pitch;
+  $("ask10").value=obj.ask10||defaults.ask10;
+  $("partners").value=obj.partners||defaults.partners;
+  $("oneL").value=obj.oneL||defaults.oneL;
+  setStatus(raw?"Loaded ✅":"Loaded defaults ✅"); setTimeout(()=>setStatus("Ready."),1200);
+}
+loadAll();
+</script>
+</body>
+</html>

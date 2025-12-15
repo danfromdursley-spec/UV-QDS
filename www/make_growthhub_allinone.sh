@@ -1,0 +1,570 @@
+#!/data/data/com.termux/files/usr/bin/bash
+set -e
+
+OUT="growthhub_allinone_v1.html"
+MAN="manifest-growthhub.json"
+SW="sw-growthhub.js"
+ICON="growthhub_icon.svg"
+
+cat > "$ICON" <<'SVG'
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#00e5ff"/>
+      <stop offset="100%" stop-color="#00ff88"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="#05070b"/>
+  <path d="M256 86 L426 382 H86 Z" fill="none" stroke="url(#g)" stroke-width="18"/>
+  <rect x="242" y="170" width="28" height="200" rx="10" fill="url(#g)"/>
+  <rect x="208" y="210" width="96" height="18" rx="9" fill="url(#g)"/>
+  <rect x="208" y="260" width="96" height="18" rx="9" fill="url(#g)"/>
+  <rect x="208" y="310" width="96" height="18" rx="9" fill="url(#g)"/>
+  <circle cx="150" cy="410" r="10" fill="#00e5ff"/>
+  <circle cx="256" cy="410" r="10" fill="#00ff88"/>
+  <circle cx="362" cy="410" r="10" fill="#00e5ff"/>
+</svg>
+SVG
+
+cat > "$MAN" <<'JSON'
+{
+  "name": "GrowthHub QDS — All-in-One",
+  "short_name": "GrowthHub",
+  "start_url": "./growthhub_allinone_v1.html",
+  "display": "standalone",
+  "background_color": "#05070b",
+  "theme_color": "#05070b",
+  "icons": [
+    {
+      "src": "./growthhub_icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
+JSON
+
+cat > "$SW" <<'JS'
+const CACHE = "growthhub-aio-v1";
+const ASSETS = [
+  "./growthhub_allinone_v1.html",
+  "./manifest-growthhub.json",
+  "./sw-growthhub.js",
+  "./growthhub_icon.svg"
+];
+
+self.addEventListener("install", (e) => {
+  e.waitUntil(
+    caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting())
+  );
+});
+
+self.addEventListener("activate", (e) => {
+  e.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(keys.map((k) => (k !== CACHE ? caches.delete(k) : null)))
+    ).then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener("fetch", (e) => {
+  e.respondWith(
+    caches.match(e.request).then((cached) => cached || fetch(e.request))
+  );
+});
+JS
+
+cat > "$OUT" <<'HTML'
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GrowthHub QDS — All-in-One Board Pack</title>
+
+  <link rel="manifest" href="manifest-growthhub.json" />
+  <meta name="theme-color" content="#05070b" />
+
+  <style>
+    :root{
+      --bg:#05070b;
+      --bg2:#0b0f16;
+      --panel:#0c111a;
+      --text:#e8f1ff;
+      --muted:#a7b3c7;
+      --accent1:#00e5ff;
+      --accent2:#00ff88;
+      --warn:#ffd36a;
+      --ok:#7dffb3;
+      --shadow: 0 10px 30px rgba(0,0,0,.45);
+      --r: 18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 10% -10%, rgba(0,229,255,.10), transparent 50%),
+        radial-gradient(1200px 700px at 90% 10%, rgba(0,255,136,.10), transparent 50%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+    }
+    header{
+      position: sticky; top:0; z-index:50;
+      backdrop-filter: blur(10px);
+      background: rgba(5,7,11,.7);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .wrap{max-width: 980px; margin:0 auto; padding: 18px 16px 40px}
+    .row{display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:space-between}
+    .brand{
+      display:flex; gap:12px; align-items:center;
+      padding: 8px 0;
+    }
+    .logo{
+      width:34px; height:34px; border-radius:10px;
+      background: linear-gradient(135deg, rgba(0,229,255,.25), rgba(0,255,136,.25));
+      border: 1px solid rgba(255,255,255,.07);
+      display:grid; place-items:center;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.03);
+    }
+    .logo-dot{
+      width:16px; height:16px; border-radius:5px;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      filter: drop-shadow(0 0 8px rgba(0,229,255,.35));
+    }
+    h1{font-size: 1.15rem; margin:0}
+    .sub{font-size:.85rem; color:var(--muted)}
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 6px 10px; border-radius: 999px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.06);
+      font-size:.78rem; color:var(--muted)
+    }
+    .btn{
+      appearance:none; border:0; cursor:pointer;
+      padding: 10px 14px; border-radius: 12px;
+      font-weight: 650; letter-spacing:.2px;
+      background: linear-gradient(135deg, rgba(0,229,255,.18), rgba(0,255,136,.18));
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: var(--shadow);
+      transition: transform .08s ease, border .2s ease, background .2s ease;
+    }
+    .btn:hover{transform: translateY(-1px)}
+    .btn:active{transform: translateY(1px)}
+    .btn-strong{
+      background: linear-gradient(135deg, rgba(0,229,255,.35), rgba(0,255,136,.35));
+      border: 1px solid rgba(0,255,136,.35);
+    }
+    nav{
+      display:flex; gap:8px; flex-wrap: wrap;
+      padding: 10px 0 4px;
+    }
+    nav a{
+      text-decoration:none; color: var(--muted);
+      padding: 8px 10px; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.06);
+      background: rgba(255,255,255,.03);
+      font-size:.82rem;
+    }
+    nav a:hover{color:var(--text); border-color: rgba(0,229,255,.25)}
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: var(--r);
+      padding: 18px 18px 16px;
+      box-shadow: var(--shadow);
+    }
+    .grid{
+      display:grid; gap:14px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 860px){
+      .grid-2{grid-template-columns: 1.1fr .9fr}
+      .grid-3{grid-template-columns: 1fr 1fr 1fr}
+    }
+    h2{
+      font-size: 1.05rem; margin: 0 0 10px 0;
+      letter-spacing:.2px;
+    }
+    h3{
+      font-size:.95rem; margin: 16px 0 8px;
+      color: #dbe8ff;
+    }
+    p{margin: 8px 0; color: var(--text)}
+    ul{margin: 8px 0 0 18px; color: var(--text)}
+    li{margin: 4px 0}
+    .muted{color: var(--muted)}
+    .tag{
+      display:inline-block; padding: 3px 8px; border-radius: 999px;
+      font-size:.72rem; margin-right:6px;
+      background: rgba(0,229,255,.08);
+      border: 1px solid rgba(0,229,255,.18);
+      color: #cfefff;
+    }
+    .tag.green{
+      background: rgba(0,255,136,.08);
+      border-color: rgba(0,255,136,.2);
+      color: #d7ffec;
+    }
+    .tag.warn{
+      background: rgba(255,211,106,.08);
+      border-color: rgba(255,211,106,.2);
+      color: #fff0c9;
+    }
+    .quote{
+      padding: 12px 14px;
+      border-left: 3px solid rgba(0,229,255,.45);
+      background: rgba(255,255,255,.03);
+      border-radius: 10px;
+      color: #eaf5ff;
+    }
+    .kpi{
+      display:flex; gap:10px; flex-wrap:wrap;
+    }
+    .kpi .box{
+      flex:1 1 180px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 14px;
+      padding: 12px 12px 10px;
+    }
+    .box .big{
+      font-size: 1.15rem; font-weight: 760;
+      background: linear-gradient(90deg, var(--accent1), var(--accent2));
+      -webkit-background-clip:text; background-clip:text; color: transparent;
+    }
+    .small{font-size:.82rem}
+    .divider{
+      height:1px; background: rgba(255,255,255,.06); margin: 14px 0;
+    }
+    details{
+      border: 1px solid rgba(255,255,255,.05);
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+    }
+    summary{
+      cursor:pointer; font-weight: 650; color: #e9f4ff;
+    }
+    footer{
+      margin-top: 30px; padding-top: 16px;
+      border-top: 1px solid rgba(255,255,255,.06);
+      color: var(--muted); font-size:.8rem;
+    }
+    .install-note{
+      font-size:.78rem; color: var(--muted);
+      margin-left: 8px;
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="wrap">
+    <div class="row">
+      <div class="brand">
+        <div class="logo"><div class="logo-dot"></div></div>
+        <div>
+          <h1>GrowthHub QDS — All-in-One Board Pack</h1>
+          <div class="sub">Revenue • Battery • Compression • Board-safe flow</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <span class="pill">Phone-first • Local-ready • Stroud/Dursley rooted</span>
+        <button id="installBtn" class="btn btn-strong" style="display:none;">Add to Home Screen</button>
+      </div>
+    </div>
+
+    <nav>
+      <a href="#mindset">Board Mindset</a>
+      <a href="#opening">60-sec Opener</a>
+      <a href="#demo">Tap Demo Flow</a>
+      <a href="#ask">The Ask</a>
+      <a href="#pillars">Three Pillars</a>
+      <a href="#cred">Credibility</a>
+      <a href="#pricing">Value & Retainers</a>
+      <a href="#qds">QDS Exec Summary</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="grid grid-2">
+    <div class="card">
+      <span class="tag">Meeting-Ready</span>
+      <span class="tag green">Three-Pillar Focus</span>
+      <span class="tag warn">No Overclaiming</span>
+
+      <h2 id="mindset">Board mindset (north star)</h2>
+      <p class="muted">This is the anchor framing to keep everything calm and credible.</p>
+      <ul>
+        <li>They are not judging the deep physics today.</li>
+        <li>They are judging credibility, practicality, and whether they want to support you for 12 months.</li>
+        <li>They are also judging local benefit for Stroud District.</li>
+      </ul>
+
+      <div class="divider"></div>
+
+      <h3>One-line positioning</h3>
+      <div class="quote">
+        “I’m not asking you to fund a dream — I’m asking you to fund proof.  
+        The three-pillar demo already exists. Your support turns it into stable tools, pilots, and honest results.”
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Fast summary for the room</h2>
+      <div class="kpi">
+        <div class="box">
+          <div class="big">3 Pillars</div>
+          <div class="small muted">Revenue Truth • Battery Habitat • QDS-SAVE Compression</div>
+        </div>
+        <div class="box">
+          <div class="big">Demo built</div>
+          <div class="small muted">Phone-first working suite</div>
+        </div>
+        <div class="box">
+          <div class="big">Pilot-first</div>
+          <div class="small muted">Measurable uplift bands, not magic claims</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <details>
+        <summary>Install note (if the button doesn’t show)</summary>
+        <p class="muted">
+          If your browser doesn’t surface the install prompt, use the Chrome menu:
+          <strong>⋮ → Add to Home screen</strong>.
+          This page is configured as a lightweight PWA.
+        </p>
+      </details>
+    </div>
+  </section>
+
+  <section class="card" style="margin-top:14px;">
+    <h2 id="opening">Your 60–second opening script</h2>
+    <div class="quote">
+      “Thanks everyone. I’m Dan Williams from Dursley.  
+      I’m a self-taught developer who builds physics, data, and battery tools that run on very cheap hardware —  
+      literally my Android phone and a Raspberry Pi.  
+      Over the last few months I’ve packaged the most practical parts of that work into a three-pillar toolkit I call GrowthHub QDS:  
+      Revenue modelling, Battery reliability, and Data/Compression.  
+      Today I’ll show you what each pillar does, why it’s useful for founders and councils,  
+      and what support I’d need to build this into a proper local tech lab here in Stroud.”
+    </div>
+    <p class="muted">Deliver slow, calm, and confident. Then tap straight into the home screen.</p>
+  </section>
+
+  <section class="grid grid-2" style="margin-top:14px;">
+    <div class="card">
+      <h2 id="demo">Exact demo order (safe tap sequence)</h2>
+      <ol>
+        <li>Start on GrowthHub home screen. Hold still 2–3 seconds.</li>
+        <li>Open <strong>Revenue Pillar</strong> — show honest-mode funnel + capacity.</li>
+        <li>Back → open <strong>Battery Habitat</strong> — show toggles/presets and uplift bands.</li>
+        <li>Back → open <strong>Compression</strong> — run a quick bench.</li>
+        <li>Open <strong>Stroud/Impact</strong> page if needed for council framing.</li>
+      </ol>
+      <p class="muted">Rule of thumb: do not open experimental tabs. Three pillars only.</p>
+    </div>
+
+    <div class="card">
+      <h2 id="ask">Your ask (board-safe)</h2>
+      <div class="quote">
+        “I’d like help turning this from a one-man shed lab into a small, local tech and education lab.  
+        What I’m asking for is:  
+        guidance on structure, introductions to partners,  
+        and support for a 12-month pilot — around £150–£250k total —  
+        to develop the tools, run pilots, and make this sustainable locally.”
+      </div>
+
+      <div class="divider"></div>
+
+      <h3>12-month outcome picture</h3>
+      <ul>
+        <li>1 school/education pilot</li>
+        <li>1 battery/energy partner pilot</li>
+        <li>1 data/compression client or embedded test</li>
+        <li>Stable v1 of the three-pillar toolkit</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="card" style="margin-top:14px;">
+    <h2 id="pillars">The three pillars (tight commercial framing)</h2>
+
+    <div class="grid grid-3">
+      <div class="card">
+        <span class="tag green">Battery Habitat</span>
+        <h3>Life uplift without chemistry hype</h3>
+        <ul>
+          <li>Housing & vibration</li>
+          <li>Airflow / thermal symmetry</li>
+          <li>Duty-cycle stress patterns</li>
+          <li>Decision-support uplift bands (e.g., 5–15%)</li>
+        </ul>
+        <p class="muted">Positioned as “cheap wins before expensive mistakes.”</p>
+      </div>
+
+      <div class="card">
+        <span class="tag">Revenue Floor</span>
+        <h3>Honest-mode forecasting</h3>
+        <ul>
+          <li>Leads → sprints → pilots → retainers</li>
+          <li>Capacity caps baked in</li>
+          <li>Clear revenue floor outputs</li>
+          <li>Advisor + founder friendly</li>
+        </ul>
+        <p class="muted">Cuts through optimistic decks with realistic runway math.</p>
+      </div>
+
+      <div class="card">
+        <span class="tag">QDS-SAVE</span>
+        <h3>Keep the structure, drop the waste</h3>
+        <ul>
+          <li>Telemetry thinning logic</li>
+          <li>Signal vs noise framing</li>
+          <li>Obvious tie-in to battery data</li>
+          <li>Longer-term licensing path</li>
+        </ul>
+        <p class="muted">Starts simple, scales into embedded value.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid grid-2" style="margin-top:14px;">
+    <div class="card">
+      <h2 id="cred">Credibility snapshot</h2>
+      <ul>
+        <li>Working phone-first demo already built.</li>
+        <li>Cross-domain seriousness: physics, heritage, industry interest.</li>
+        <li>Clear ethics + local commitment.</li>
+      </ul>
+      <details>
+        <summary>Use this sentence if asked “why you?”</summary>
+        <p>
+          “Because I’ve already built what you’re seeing with almost no budget.
+          You’re not funding a blank page — you’re funding productisation, pilots, and proof.”
+        </p>
+      </details>
+    </div>
+
+    <div class="card">
+      <h2 id="pricing">Value + retainer bands (if it comes up)</h2>
+      <div class="kpi">
+        <div class="box">
+          <div class="big">Demo replacement</div>
+          <div class="small muted">~£47k–£105k equivalent build value</div>
+        </div>
+        <div class="box">
+          <div class="big">Prod v1</div>
+          <div class="small muted">~£100k–£180k typical SaaS hardening band</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <h3>Retainers (post-pilot)</h3>
+      <ul>
+        <li><strong>Starter:</strong> £350 + VAT / month (one pillar)</li>
+        <li><strong>Growth:</strong> £750 + VAT / month (two pillars)</li>
+        <li><strong>Partner:</strong> £1,500 + VAT / month (all three)</li>
+      </ul>
+      <p class="muted">Simple, calm, sustainable support framing.</p>
+    </div>
+  </section>
+
+  <section class="card" style="margin-top:14px;">
+    <h2 id="qds">QDS executive summary (ultra-short, safe)</h2>
+    <p>
+      QDS is a GR-compatible stochastic extension that preserves standard cosmology in the mean-field limit
+      while predicting small, measurable deviations and improved galaxy-scale fits.
+    </p>
+    <ul>
+      <li>Matches large-scale ΛCDM global fits closely.</li>
+      <li>Improves rotation-curve residuals substantially.</li>
+      <li>Predicts small-scale lensing/power deviations testable with next-gen surveys.</li>
+    </ul>
+    <p class="muted">
+      If they don’t ask about physics, don’t dive — keep it as credibility texture only.
+    </p>
+  </section>
+
+  <section class="card" style="margin-top:14px;">
+    <h2>Likely board questions (short answers)</h2>
+    <details>
+      <summary>“Where do you see this in 12 months?”</summary>
+      <p>“A small local lab with 2–3 pilots running: one school, one battery/energy partner, and one data/compression client, plus a stable version of the toolkit for founders.”</p>
+    </details>
+    <details>
+      <summary>“Is this too many ideas?”</summary>
+      <p>“The wider ecosystem is long-term. What I’m showing today is a tight three-pillar product focus for Year 1.”</p>
+    </details>
+    <details>
+      <summary>“Who pays for this?”</summary>
+      <p>“Founders/advisors for Revenue tools, battery/energy operators for life modelling, and data-heavy teams for telemetry efficiency. Councils benefit from rollout and job/skills impacts.”</p>
+    </details>
+    <details>
+      <summary>“What’s the risk?”</summary>
+      <p>“Low. The tools already work. Support accelerates hardening and measured pilots.”</p>
+    </details>
+  </section>
+
+  <footer>
+    <div class="muted">
+      GrowthHub QDS — All-in-One board pack • v1  
+      Built for calm delivery, tight scope, and local pilot readiness.
+    </div>
+  </footer>
+</main>
+
+<script>
+  // PWA install flow
+  let deferredPrompt = null;
+  const btn = document.getElementById("installBtn");
+
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    btn.style.display = "inline-block";
+  });
+
+  btn.addEventListener("click", async () => {
+    if (!deferredPrompt) {
+      alert("If the install prompt doesn't appear, use Chrome menu: ⋮ → Add to Home screen.");
+      return;
+    }
+    deferredPrompt.prompt();
+    const choice = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    btn.style.display = "none";
+  });
+
+  // Register service worker
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw-growthhub.js").catch(()=>{});
+    });
+  }
+</script>
+</body>
+</html>
+HTML
+
+chmod +x "$0" 2>/dev/null || true
+
+echo "✅ Generated:"
+echo " - $OUT"
+echo " - $MAN"
+echo " - $SW"
+echo " - $ICON"
+echo ""
+echo "Next:"
+echo "  python -m http.server 8011 --bind 127.0.0.1"
+echo "  termux-open-url 'http://127.0.0.1:8011/$OUT'"
